@@ -219,7 +219,7 @@ function paint(){
     $("#d-dish").innerHTML = twoLines(top.dish.name);
     $("#d-time").textContent = top.dish.time + " min";
     $("#d-uses").innerHTML = "uses " + top.used
-      .map(u => `${u.name.toLowerCase()} <b>${u.daysLeft}d</b>`).join(", ");
+      .map(u => `${u.name.toLowerCase()} <b>${window.FD.daysLeftOf(u)}d</b>`).join(", ");
   } else {
     $("#d-dish").innerHTML = "Add something<br><span class=\"plus\">to the app</span>";
     $("#d-time").textContent = "—";
@@ -230,21 +230,24 @@ function paint(){
   const u0 = urgent[0];
   if (u0) {
     $("#d-urgent-name").textContent = u0.name;
-    $("#d-urgent-days").textContent = u0.daysLeft <= 0 ? "0" : String(u0.daysLeft);
-    $("#d-urgent-unit").textContent = u0.daysLeft <= 0 ? "use today"
-                                    : (u0.daysLeft === 1 ? "day left" : "days left");
-    const soonCount = items.filter(i => i.daysLeft <= 2).length;
+    const u0d = window.FD.daysLeftOf(u0);
+    $("#d-urgent-days").textContent = u0d <= 0 ? "0" : String(u0d);
+    $("#d-urgent-unit").textContent = u0d <= 0 ? "use today"
+                                    : (u0d === 1 ? "day left" : "days left");
+    const soonCount = items.filter(i => window.FD.daysLeftOf(i) <= 2).length;
     $("#d-more").innerHTML = soonCount > 1 ? `<b>+${soonCount - 1} more</b>` : "";
   }
 
   /* 3 — glance */
-  const soon = items.filter(i => i.daysLeft <= 2).length;
+  const soon = items.filter(i => window.FD.daysLeftOf(i) <= 2).length;
   $("#d-count").textContent = items.length + " items";
   $("#d-glance").textContent = soon ? `${soon} need using soon` : "all good this week";
-  $("#d-bars").innerHTML = items.slice().sort((a,b)=>a.daysLeft-b.daysLeft).slice(0,12)
-    .map(i => `<span class="${i.daysLeft<=0?"r":(i.daysLeft<=2?"k":"")}"></span>`).join("");
-  $("#d-urgent-list").innerHTML = items.slice().sort((a,b)=>a.daysLeft-b.daysLeft).slice(0,3)
-    .map(i => `${i.name.toLowerCase()} <b>${i.daysLeft}d</b>`).join(" · ");
+  const ordered = items.slice().sort((a,b)=>window.FD.daysLeftOf(a)-window.FD.daysLeftOf(b));
+  $("#d-bars").innerHTML = ordered.slice(0,12)
+    .map(i => { const d = window.FD.daysLeftOf(i);
+                return `<span class="${d<=0?"r":(d<=2?"k":"")}"></span>`; }).join("");
+  $("#d-urgent-list").innerHTML = ordered.slice(0,3)
+    .map(i => `${i.name.toLowerCase()} <b>${window.FD.daysLeftOf(i)}d</b>`).join(" · ");
 
   paintDots();
 }

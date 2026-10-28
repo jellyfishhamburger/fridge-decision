@@ -49,6 +49,27 @@
 
   const DEFAULT_GOAL = {greensPerDay:1, maxMinutes:20};
 
+  /* Local calendar date. toISOString() is UTC: after midnight in HK it still returns
+     yesterday's date, which silently steals a day from every countdown. */
+  function localDate(d) {
+    const x = d || new Date();
+    const p = n => String(n).padStart(2, "0");
+    return `${x.getFullYear()}-${p(x.getMonth() + 1)}-${p(x.getDate())}`;
+  }
+
+  /* A display sits on a fridge for weeks, so "3 days" must actually tick.
+     Items store addedAt + life as well; fall back to the stored number for old data. */
+  function daysLeftOf(it) {
+    if (it && it.addedAt && typeof it.life === "number") {
+      const added = new Date(it.addedAt + "T00:00:00");
+      if (!isNaN(added)) {
+        const elapsed = Math.floor((Date.now() - added.getTime()) / 86400000);
+        return Math.max(0, it.life - elapsed);
+      }
+    }
+    return typeof it.daysLeft === "number" ? it.daysLeft : 0;
+  }
+
   function itemsByCat(items) {
     const m = {};
     items.forEach(i => { (m[i.cat] = m[i.cat] || []).push(i); });
@@ -62,9 +83,9 @@
     for (const c of d.needs) {
       const list = byCat[c];
       if (!list || !list.length) return null;
-      used.push(list.slice().sort((a, b) => a.daysLeft - b.daysLeft)[0]);
+      used.push(list.slice().sort((a, b) => daysLeftOf(a) - daysLeftOf(b))[0]);
     }
-    const urgency     = used.reduce((s, i) => s + Math.max(0, 8 - i.daysLeft) * 0.9, 0);
+    const urgency     = used.reduce((s, i) => s + Math.max(0, 8 - daysLeftOf(i)) * 0.9, 0);
     const timePenalty = Math.max(0, d.time - goal.maxMinutes) * 1.4;
     const greensBonus = (d.greens && goal.greensPerDay > 0) ? 4 : 0;
     return {dish: d, score: urgency + greensBonus - timePenalty, used, urgency, greensBonus, timePenalty};
@@ -76,8 +97,8 @@
 
   /* what the fridge screen cares about: the most urgent items, one line each */
   function urgent(items, limit) {
-    return items.slice().sort((a, b) => a.daysLeft - b.daysLeft).slice(0, limit || 3);
+    return items.slice().sort((a, b) => daysLeftOf(a) - daysLeftOf(b)).slice(0, limit || 3);
   }
 
-  global.FD = {CATALOG, DISHES, DEFAULT_GOAL, scoreDish, decide, urgent};
+  global.FD = {CATALOG, DISHES, DEFAULT_GOAL, scoreDish, decide, urgent, daysLeftOf, localDate};
 })(window);

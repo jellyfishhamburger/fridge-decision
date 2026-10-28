@@ -149,7 +149,7 @@ function save(){
   try{ localStorage.setItem(LS_ITEMS, JSON.stringify(items)); localStorage.setItem(LS_GOAL, JSON.stringify(goal)); }catch(e){}
 }
 const uid = () => Math.random().toString(36).slice(2,9);
-const today = () => new Date().toISOString().slice(0,10);
+const today = () => window.FD.localDate();
 
 /* ---------- rendering ---------- */
 const $ = s => document.querySelector(s);
@@ -160,12 +160,13 @@ function expiryText(d){ return d <= 0 ? "today" : d + "d"; }
 function renderItems(){
   const box = $("#items");
   box.innerHTML = "";
-  const sorted = items.slice().sort((a,b)=>a.daysLeft-b.daysLeft);
+  const sorted = items.slice().sort((a,b)=>window.FD.daysLeftOf(a)-window.FD.daysLeftOf(b));
   sorted.forEach(it=>{
     const el = document.createElement("span");
-    el.className = "chip " + expiryClass(it.daysLeft);
+    const dleft = window.FD.daysLeftOf(it);
+    el.className = "chip " + expiryClass(dleft);
     el.innerHTML = `<span class="dot"></span><span>${it.name}</span>
-      <span class="d">${expiryText(it.daysLeft)}</span>
+      <span class="d">${expiryText(dleft)}</span>
       <button aria-label="remove ${it.name}" data-del="${it.id}">×</button>`;
     box.appendChild(el);
   });
@@ -179,7 +180,7 @@ function decide(){ return window.FD.decide(items, goal); }
 
 function reasons(r){
   const out = [];
-  const names = r.used.map(i=>`<b>${i.name.toLowerCase()}</b> — ${i.daysLeft <= 0 ? "today" : i.daysLeft + " day" + (i.daysLeft===1?"":"s")}`).join(", ");
+  const names = r.used.map(i=>{const d=window.FD.daysLeftOf(i);return `<b>${i.name.toLowerCase()}</b> — ${d <= 0 ? "today" : d + " day" + (d===1?"":"s")}`;}).join(", ");
   out.push(`Uses ${names}, so nothing is wasted by choosing this.`);
   if(r.greensBonus) out.push(`Counts as today's greens — the thing you skip when you're tired.`);
   if(r.dish.time <= 15) out.push(`<b>${r.dish.time} minutes</b>, one pan — short enough to beat ordering in.`);
@@ -279,7 +280,7 @@ $("#days").addEventListener("input", e=>{ pendingDays = +e.target.value; $("#day
 
 $("#saveBtn").addEventListener("click", ()=>{
   if(!picked){ toast("Pick a category first"); return; }
-  items.push({id:uid(), cat:picked.id, name:picked.name, tag:picked.tag, daysLeft:pendingDays, addedAt:today()});
+  items.push({id:uid(), cat:picked.id, name:picked.name, tag:picked.tag, daysLeft:pendingDays, life:pendingDays, addedAt:today()});
   save(); renderItems(); closeSheet();
   toast(picked.name + " added · use within " + pendingDays + "d");
 });
