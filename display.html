@@ -224,14 +224,14 @@ function twoLines(name){
 let ranked = [];
 
 function paint(){
-  ranked = FD.decide(items, S);
+  ranked = FD.decide(items, S).filter(r => r.status !== "blocked");
   const urg = FD.urgent(items, 3);
 
   /* 1 — decision */
   if (ranked.length) {
     const pick = ranked[Math.min(altIndex, ranked.length - 1)];
-    $("#d-dish").innerHTML = twoLines(pick.dish.name);
-    $("#d-time").textContent = pick.dish.time + " min";
+    $("#d-dish").innerHTML = twoLines(pick.recipe.name);
+    $("#d-time").textContent = pick.recipe.minutes + " min" + (pick.status === "shop1" ? " · 差1样" : "");
     $("#d-uses").innerHTML = "uses " + pick.used
       .map(u => `${u.name.toLowerCase()} <b>${FD.daysLeftOf(u)}d</b>`).join(", ");
     $("#d-pix").innerHTML = window.FD_ICON(pick.used[0].cat, 38);
@@ -305,13 +305,13 @@ $("#k-next").addEventListener("click", nextScreen);
 $("#k-take").addEventListener("click", ()=>{
   const pick = ranked[Math.min(altIndex, ranked.length-1)];
   if(!pick){ flash("Nothing to cook", "add food first"); return; }
-  FD.log("take", pick.dish.id);
-  flash("Logged", pick.dish.name.toLowerCase());
+  FD.log("take", pick.recipe.id);
+  flash("记下了", pick.recipe.name);
   paintTally();
 });
 $("#k-skip").addEventListener("click", ()=>{
   const pick = ranked[Math.min(altIndex, ranked.length-1)];
-  if(pick) FD.log("skip", pick.dish.id);
+  if(pick) FD.log("skip", pick.recipe.id);
   if(altIndex < ranked.length - 1){ altIndex++; }
   paint();
   pos = order.indexOf(0) >= 0 ? order.indexOf(0) : 0;

@@ -10,7 +10,8 @@
   :root{
     --bg:#f6f7f5; --card:#fff; --ink:#16211c; --muted:#6b7a72; --line:#e2e7e3;
     --green:#0f7a5a; --green-soft:#e6f2ed; --amber:#b26a00; --amber-soft:#fdf1e0;
-    --red:#b3261e; --red-soft:#fbe9e7; --shadow:0 1px 2px rgba(16,33,28,.06),0 8px 24px rgba(16,33,28,.06);
+    --red:#b3261e; --red-soft:#fbe9e7;
+    --shadow:0 1px 2px rgba(16,33,28,.06),0 8px 24px rgba(16,33,28,.06);
     --radius:16px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -28,14 +29,10 @@
   .items{display:flex;flex-wrap:wrap;gap:8px}
   .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fbfcfb;
     border-radius:999px;padding:8px 12px;font-size:14px;line-height:1}
-  .chip .dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:0 0 auto}
   .chip svg{flex:0 0 auto;color:var(--green)}
   .chip.warn svg{color:var(--amber)} .chip.urgent svg{color:var(--red)}
-  .pick svg{color:var(--green);display:block;margin:0 auto}
-  .pick{display:flex;flex-direction:column;align-items:center;gap:3px}
   .chip .d{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-  .chip.warn .dot{background:var(--amber)} .chip.warn .d{color:var(--amber)}
-  .chip.urgent .dot{background:var(--red)} .chip.urgent .d{color:var(--red);font-weight:600}
+  .chip.warn .d{color:var(--amber)} .chip.urgent .d{color:var(--red);font-weight:600}
   .chip button{border:0;background:none;padding:0 0 0 2px;margin:0;color:#9aa8a1;font-size:16px;line-height:1;cursor:pointer}
   .empty{font-size:13px;color:var(--muted);padding:6px 0}
   .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:14px;
@@ -46,53 +43,63 @@
   .btn.quiet{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
   .row{display:flex;gap:10px}
   .row > *{flex:1}
-  /* decision */
+  /* verdict */
   .verdict{background:var(--green);color:#fff;border-radius:20px;padding:20px;margin:12px 0;box-shadow:0 12px 32px rgba(15,122,90,.24)}
-  .verdict .kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.8}
-  .verdict h3{font-size:26px;margin:6px 0 8px;line-height:1.15;letter-spacing:-.02em}
-  .verdict .meta{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;opacity:.95}
+  .verdict.amber{background:#a96206;box-shadow:0 12px 32px rgba(169,98,6,.22)}
+  .verdict .kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+  .verdict h3{font-size:25px;margin:6px 0 8px;line-height:1.15;letter-spacing:-.01em}
+  .verdict .meta{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;opacity:.95}
   .verdict .meta b{font-weight:600}
+  .badge{background:rgba(255,255,255,.18);border-radius:8px;padding:3px 8px;font-size:12px;font-weight:600}
+  .shop{background:var(--amber-soft);border:1px solid #f0d9b5;border-radius:14px;padding:12px 14px;margin:10px 0;
+    font-size:14px;line-height:1.55;color:#7a4a05}
+  .shop b{color:#5d3800}
   .why{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;font-size:14px;line-height:1.6;color:#2b3a33}
   .why ul{margin:8px 0 0;padding-left:18px} .why li{margin:4px 0}
+  .pantryline{margin-top:10px;font-size:13px;color:var(--muted);line-height:1.6}
+  .pantryline b{color:var(--ink)}
+  .ptog{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;
+    padding:5px 10px;margin:4px 6px 0 0;font-size:12.5px;cursor:pointer;background:#fff}
+  .ptog.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44}
   .alt{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid var(--line);font-size:14px}
   .alt:first-of-type{border-top:0}
   .alt .t{color:var(--muted);font-size:12px;margin-top:2px}
   .alt .go{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;color:var(--green);cursor:pointer;font-family:inherit}
   .steps{font-size:14px;line-height:1.7;color:#2b3a33;margin:10px 0 0;padding-left:20px}
   .steps li{margin:6px 0}
+  .srcline{font-size:11.5px;color:#93a29a;margin-top:10px}
+  .srcline a{color:#7b9187}
   /* sheet */
   .scrim{position:fixed;inset:0;background:rgba(12,22,18,.42);display:none;z-index:40}
   .scrim.on{display:block}
   .sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;border-radius:20px 20px 0 0;
     padding:18px 16px calc(18px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .22s ease;
-    max-width:520px;margin:0 auto}
+    max-width:520px;margin:0 auto;max-height:88vh;overflow:auto}
   .sheet.on{transform:translateY(0)}
   .sheet h3{font-size:17px;margin:0 0 4px}
-  .sheet .hint{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 14px}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 16px;max-height:38vh;overflow:auto}
-  .pick{border:1px solid var(--line);border-radius:12px;background:#fbfcfb;padding:12px 8px;font-size:13.5px;
-    text-align:center;cursor:pointer;font-family:inherit;line-height:1.25}
+  .sheet .hint{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 14px}
+  .pick{border:1px solid var(--line);border-radius:12px;background:#fbfcfb;padding:10px 8px;font-size:13px;
+    text-align:center;cursor:pointer;font-family:inherit;line-height:1.3;
+    display:flex;flex-direction:column;align-items:center;gap:3px}
+  .pick small{color:#9aa8a1;font-size:10.5px}
   .pick.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44;font-weight:600}
+  .pick svg{color:var(--green);display:block}
   .field{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;font-size:14px}
   input[type=range]{width:58%;accent-color:var(--green)}
   .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(-16px);top:14px;background:#16211c;color:#fff;
     font-size:13.5px;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:86%;
     box-shadow:0 8px 24px rgba(12,22,18,.24)}
   .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-  .foot{font-size:11.5px;color:#93a29a;text-align:center;line-height:1.6;padding:18px 8px 0}
-  .tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:999px;background:var(--green-soft);color:#0b5c44;vertical-align:middle}
-  .tag.a{background:var(--amber-soft);color:var(--amber)}
-  .tag.r{background:var(--red-soft);color:var(--red)}
-  .cam{width:100%;border-radius:14px;background:#0d1512;display:none;margin-bottom:10px}
-  .cam.on{display:block}
-  .note{font-size:12px;color:var(--muted);line-height:1.55;margin:8px 0 0}
+  .foot{font-size:11.5px;color:#93a29a;text-align:center;line-height:1.8;padding:18px 8px 0}
+  .foot a{color:#0f7a5a}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>What can I cook tonight?</h1>
-    <div class="sub">One decision, not another list. Built from 18 fridge interviews.</div>
+    <div class="sub">One decision, not another list. 20 real recipes, calories included.</div>
   </header>
 
   <section class="card">
@@ -110,26 +117,25 @@
   <div id="result"></div>
 
   <div class="foot">
-    Prototype v0 · decision layer only · no hardware, no recognition<br>
-    Data stays on this phone (localStorage)<br>
-    <a href="display.html" style="color:#0f7a5a;font-size:12.5px">Fridge display version →</a>
-    &nbsp;·&nbsp;<a href="settings.html" style="color:#0f7a5a;font-size:12.5px">Settings →</a>
+    Prototype v0.3 · no hardware, no recognition<br>
+    Recipes: HowToCook (CC-BY-4.0) · <a href="display.html">Fridge display →</a> ·
+    <a href="settings.html">Settings →</a>
   </div>
 </div>
 
 <div class="scrim" id="scrim"></div>
 
 <div class="sheet" id="sheet">
-  <h3 id="sheetTitle">Add what you just put in</h3>
-  <p class="hint" id="sheetHint">Pick a category — the prototype does not guess for you yet. Auto-storage time is preset per category, adjust if you want.</p>
+  <h3>Add what you just put in</h3>
+  <p class="hint" id="sheetHint">Pick the food — the prototype does not guess for you yet. Storage time is preset per food, adjust it if you want.</p>
   <video class="cam" id="cam" playsinline muted></video>
-  <div class="row" id="camRow" style="margin-bottom:10px">
+  <div class="row" style="margin-bottom:10px">
     <button class="btn quiet" id="snapBtn">Open camera</button>
   </div>
   <div class="grid" id="picks"></div>
   <div class="field">
     <span>Use within <b id="daysLbl">3 days</b></span>
-    <input type="range" id="days" min="1" max="21" value="3">
+    <input type="range" id="days" min="1" max="60" value="3">
   </div>
   <button class="btn primary" id="saveBtn">Add to fridge</button>
   <button class="btn quiet" id="cancelBtn" style="margin-top:8px">Cancel</button>
@@ -142,110 +148,133 @@
 <script src="logic.js"></script>
 <script>
 "use strict";
-const {CATALOG, DISHES} = window.FD;
-const LS_ITEMS = "fd.items.v1";
-const LS_GOAL  = "fd.goal.v1";
-
-/* ---------- state ---------- */
-let items = load(LS_ITEMS, []);
-let goal  = window.FD.settings();   // goals + panel settings live in one place
+const $ = s => document.querySelector(s);
+let items  = FD.items();
+let goal   = FD.settings();
+let pantry = FD.pantry();
 let picked = null, pendingDays = 3, stream = null;
 
-function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
-function save(){
-  try{ localStorage.setItem(LS_ITEMS, JSON.stringify(items)); localStorage.setItem(LS_GOAL, JSON.stringify(goal)); }catch(e){}
+const uid = () => Math.random().toString(36).slice(2, 9);
+const today = () => FD.localDate();
+
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove("on"), 1900);
 }
-const uid = () => Math.random().toString(36).slice(2,9);
-const today = () => window.FD.localDate();
+function saveItems(){ FD.saveItems(items); }
 
-/* ---------- rendering ---------- */
-const $ = s => document.querySelector(s);
-
-function expiryClass(d){ return d <= 0 ? "urgent" : d <= 2 ? "urgent" : d <= 4 ? "warn" : ""; }
+/* ---------- fridge list ---------- */
+function expiryClass(d){ return d <= 2 ? "urgent" : d <= 5 ? "warn" : ""; }
 function expiryText(d){ return d <= 0 ? "today" : d + "d"; }
 
 function renderItems(){
-  const box = $("#items");
-  box.innerHTML = "";
-  const sorted = items.slice().sort((a,b)=>window.FD.daysLeftOf(a)-window.FD.daysLeftOf(b));
-  sorted.forEach(it=>{
+  const box = $("#items"); box.innerHTML = "";
+  items.slice().sort((a,b)=>FD.daysLeftOf(a)-FD.daysLeftOf(b)).forEach(it=>{
+    const d = FD.daysLeftOf(it);
+    const f = FD.byId[it.cat];
     const el = document.createElement("span");
-    const dleft = window.FD.daysLeftOf(it);
-    el.className = "chip " + expiryClass(dleft);
-    el.innerHTML = `${window.FD_ICON(it.cat, 16)}<span>${it.name}</span>
-      <span class="d">${expiryText(dleft)}</span>
-      <button aria-label="remove ${it.name}" data-del="${it.id}">×</button>`;
+    el.className = "chip " + expiryClass(d);
+    el.innerHTML = `${window.FD_ICON(it.cat, 16)}<span>${(f && f.cn) || it.name}</span>
+      <span class="d">${expiryText(d)}</span>
+      <button aria-label="remove" data-del="${it.id}">×</button>`;
     box.appendChild(el);
   });
   $("#cnt").textContent = items.length + (items.length === 1 ? " item" : " items");
   $("#emptyNote").style.display = items.length ? "none" : "block";
 }
 
-/* ---------- decision engine (shared with the fridge screen) ---------- */
-function scoreDish(d){ return window.FD.scoreDish(d, items, goal); }
-function decide(){ return window.FD.decide(items, goal); }
-
-function reasons(r){
-  const out = [];
-  const names = r.used.map(i=>{const d=window.FD.daysLeftOf(i);return `<b>${i.name.toLowerCase()}</b> — ${d <= 0 ? "today" : d + " day" + (d===1?"":"s")}`;}).join(", ");
-  out.push(`Uses ${names}, so nothing is wasted by choosing this.`);
-  if(r.greensBonus) out.push(`Counts as today's greens — the thing you skip when you're tired.`);
-  if(r.dish.time <= 15) out.push(`<b>${r.dish.time} minutes</b>, one pan — short enough to beat ordering in.`);
-  else out.push(`<b>${r.dish.time} minutes</b> — at or under your ${goal.maxMinutes}-minute limit.`);
-  if(r.timePenalty > 0) out.push(`Over your ${goal.maxMinutes}-minute limit, so it is ranked down.`);
-  return out;
-}
+/* ---------- result ---------- */
+function kcalText(r){ return r.recipe.kcal ? `${r.recipe.kcal} kcal` : ""; }
 
 function renderResult(list){
   const box = $("#result");
-  if(!list.length){
-    box.innerHTML = `<div class="card"><h2>No combination yet</h2>
-      <p class="empty">Your fridge needs at least one protein or carb plus a vegetable to make a call.
-      Add something, or load the demo fridge.</p></div>`;
+  const usable = list.filter(r => r.status !== "blocked");
+  if(!usable.length){
+    box.innerHTML = `<div class="card"><h2>Nothing cookable yet</h2>
+      <p class="empty">Your fridge has nothing that pairs into a dish. Add one more thing — or load the demo fridge.</p></div>`;
     return;
   }
-  const top = list[0], alts = list.slice(1,3);
+  const top = usable[0];
+  const alts = usable.slice(1, 3);
+  const shop = FD.shoppingHint(top);
+  const pantryMissing = top.pantryMissing;
+
   box.innerHTML = `
-    <div class="verdict">
-      <div class="kicker">Tonight</div>
-      <h3>${top.dish.name}</h3>
+    <div class="verdict ${top.status==="shop1"?"amber":""}">
+      <div class="kicker">${top.status==="shop1" ? "One thing away" : "Tonight"}</div>
+      <h3>${top.recipe.name}</h3>
       <div class="meta">
-        <span>⏱ <b>${top.dish.time} min</b></span>
-        <span>🍳 <b>1 pan</b></span>
-        <span>🥬 <b>${top.dish.greens ? "greens ✓" : "no greens"}</b></span>
+        <span class="badge">${top.recipe.minutes} min</span>
+        ${top.recipe.kcal ? `<span class="badge">${top.recipe.kcal} kcal</span>` : ""}
+        <span class="badge">${top.recipe.greens ? "greens ✓" : "no greens"}</span>
       </div>
     </div>
+    ${top.status==="shop1" ? `<div class="shop">还差一样：<b>${shop}</b><br>
+        这样就不用改计划 —— 顺路买回来就能做。</div>` : ""}
     <div class="why">
-      <b>Why this one</b>
+      <b>为什么推这道</b>
       <ul>${reasons(top).map(r=>`<li>${r}</li>`).join("")}</ul>
-      <ol class="steps">${top.dish.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+      <ol class="steps">${top.recipe.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+      ${pantryMissing.length ? pantryLine(pantryMissing) : ""}
+      <div class="srcline">菜谱与热量来源：<a href="${top.recipe.src}" target="_blank" rel="noopener">HowToCook</a>
+        · 热量为该菜谱页的「个人份」估算，不是实验室测量值</div>
     </div>
-    ${alts.length ? `<div class="card"><h2>Or these <span class="count">also possible right now</span></h2>
-      ${alts.map(a=>`<div class="alt"><div><div>${a.dish.name}</div>
-        <div class="t">${a.dish.time} min · ${a.dish.greens?"greens ✓":"no greens"}</div></div>
-        <button class="go" data-pick="${a.dish.id}">use this</button></div>`).join("")}
+    ${alts.length ? `<div class="card"><h2>其他选择 <span class="count">不一定马上能做</span></h2>
+      ${alts.map(a=>`<div class="alt"><div>
+        <div>${a.recipe.name} ${a.status==="shop1"?`<span style="color:#b26a00;font-size:12px">· 差 1 样</span>`:""}</div>
+        <div class="t">${a.recipe.minutes} min${a.recipe.kcal?` · ${a.recipe.kcal} kcal`:""}${a.recipe.greens?" · greens ✓":""}</div></div>
+        <button class="go" data-pick="${a.recipe.id}">用这个</button></div>`).join("")}
     </div>` : ""}
   `;
   box.querySelectorAll("[data-pick]").forEach(b=>{
     b.addEventListener("click", ()=>{
-      const d = DISHES.find(x=>x.id===b.dataset.pick);
-      const r = scoreDish(d);
-      if(r) { renderResult([r, ...list.filter(x=>x.dish.id!==d.id)]); window.scrollTo({top:0,behavior:"smooth"}); }
+      const r = list.find(x=>x.recipe.id===b.dataset.pick);
+      if(r) { renderResult([r, ...list.filter(x=>x!==r)]); window.scrollTo({top:0,behavior:"smooth"}); }
     });
   });
+  box.querySelectorAll("[data-pantry]").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const id = b.dataset.pantry;
+      if(pantry.includes(id)) pantry = pantry.filter(x=>x!==id); else pantry.push(id);
+      FD.savePantry(pantry);
+      renderResult(FD.decide(items, goal));
+    });
+  });
+}
+
+function reasons(r){
+  const out = [];
+  if(r.used.length){
+    out.push("用掉 " + r.used.map(i=>{
+      const f = FD.byId[i.cat]; const d = FD.daysLeftOf(i);
+      return `<b>${(f&&f.cn)||i.name}</b>（${d<=0?"今天到期":d+" 天"}）`;
+    }).join("、"));
+  }
+  if(r.greensBonus) out.push("正好补上今天那份绿叶菜 —— 累了最容易跳过的那样。");
+  if(r.recipe.minutes <= goal.maxMinutes) out.push(`<b>${r.recipe.minutes} 分钟</b>，一口锅，比点外卖快。`);
+  else out.push(`${r.recipe.minutes} 分钟，超过你设的 ${goal.maxMinutes} 分钟上限，所以排在后面。`);
+  if(r.status==="shop1") out.push("只差一样，买了就能做，不用换计划。");
+  return out;
+}
+
+function pantryLine(missingIds){
+  const names = missingIds.map(id => {
+    const p = FD.pantryById[id];
+    return `<span class="ptog" data-pantry="${id}">${p ? p.cn : id}</span>`;
+  }).join("");
+  return `<div class="pantryline">这道菜还要调味：${names}<br><span style="font-size:12px">点一下标记“家里有”。</span></div>`;
 }
 
 /* ---------- sheet ---------- */
 function openSheet(){
   $("#scrim").classList.add("on");
   $("#sheet").classList.add("on");
-  picked = null; pendingDays = 3;
-  const g = $("#picks");
-  g.innerHTML = "";
-  CATALOG.forEach(c=>{
+  picked = null;
+  const g = $("#picks"); g.innerHTML = "";
+  FD.CATALOG.forEach(c=>{
     const b = document.createElement("button");
-    b.className = "pick"; b.type="button";
-    b.innerHTML = window.FD_ICON(c.id, 22) + "<span>" + c.name + "</span>";
+    b.className = "pick"; b.type = "button";
+    b.innerHTML = window.FD_ICON(c.id, 22) + `<span>${c.cn}</span><small>${c.name}</small>`;
     b.addEventListener("click", ()=>{
       picked = c; pendingDays = c.days;
       g.querySelectorAll(".pick").forEach(x=>x.classList.remove("on"));
@@ -254,25 +283,19 @@ function openSheet(){
     });
     g.appendChild(b);
   });
-  $("#days").value = 3; $("#daysLbl").textContent = "3 days";
+  $("#days").value = 3; $("#daysLbl").textContent = "3 days"; pendingDays = 3;
 }
 function closeSheet(){
   $("#scrim").classList.remove("on");
   $("#sheet").classList.remove("on");
   stopCam();
 }
-function toast(msg){
-  const t = $("#toast"); t.textContent = msg; t.classList.add("on");
-  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove("on"), 1900);
-}
 async function startCam(){
   try{
     stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
     const v = $("#cam"); v.srcObject = stream; v.classList.add("on"); await v.play();
-    $("#snapBtn").textContent = "Photo taken — now pick a category";
-  }catch(e){
-    toast("Camera needs HTTPS + permission — pick a category below instead");
-  }
+    $("#snapBtn").textContent = "Photo taken — now pick the food";
+  }catch(e){ toast("Camera needs HTTPS + permission — pick the food instead"); }
 }
 function stopCam(){
   if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
@@ -287,35 +310,36 @@ $("#snapBtn").addEventListener("click", startCam);
 $("#days").addEventListener("input", e=>{ pendingDays = +e.target.value; $("#daysLbl").textContent = pendingDays + " days"; });
 
 $("#saveBtn").addEventListener("click", ()=>{
-  if(!picked){ toast("Pick a category first"); return; }
-  items.push({id:uid(), cat:picked.id, name:picked.name, tag:picked.tag, daysLeft:pendingDays, life:pendingDays, addedAt:today()});
-  save(); renderItems(); closeSheet();
-  toast(picked.name + " added · use within " + pendingDays + "d");
+  if(!picked){ toast("Pick a food first"); return; }
+  const hh = FD.household();
+  items.push({id:uid(), cat:picked.id, name:picked.name, tag:picked.tag,
+              daysLeft:pendingDays, life:pendingDays, addedAt:today(),
+              by: hh.members.length ? hh.members[0] : null});
+  saveItems(); renderItems(); closeSheet();
+  toast(picked.cn + " added · " + pendingDays + "d");
 });
 
 $("#decideBtn").addEventListener("click", ()=>{
-  renderResult(decide());
+  renderResult(FD.decide(items, goal));
   const r = $("#result");
   if(r) window.scrollTo({top:r.offsetTop - 80, behavior:"smooth"});
 });
 
 $("#demoBtn").addEventListener("click", ()=>{
-  items = [
-    {id:uid(), cat:"tofu",     name:"Tofu",             tag:"protein", daysLeft:2,  addedAt:today()},
-    {id:uid(), cat:"shrimp",   name:"Shrimp",           tag:"protein", daysLeft:1,  addedAt:today()},
-    {id:uid(), cat:"greens",   name:"Leafy greens",     tag:"greens",  daysLeft:2,  addedAt:today()},
-    {id:uid(), cat:"onion",    name:"Onion",            tag:"veg",     daysLeft:14, addedAt:today()},
-    {id:uid(), cat:"dumpling", name:"Frozen dumplings", tag:"carb",    daysLeft:30, addedAt:today()},
-    {id:uid(), cat:"egg",      name:"Eggs",             tag:"protein", daysLeft:9,  addedAt:today()}
-  ];
-  save(); renderItems(); toast("Demo fridge loaded — the interview personas' actual leftovers");
+  const mk = (cat, days) => {
+    const f = FD.byId[cat];
+    return {id:uid(), cat, name:f.name, tag:f.tag, daysLeft:days, life:days, addedAt:today()};
+  };
+  items = [mk("pork",3), mk("chili",5), mk("egg",9), mk("greens",2), mk("rice",2), mk("tofu",3)];
+  saveItems(); renderItems();
+  toast("Demo fridge: 猪肉、青椒、鸡蛋、青菜、米饭、豆腐");
 });
 
 $("#items").addEventListener("click", e=>{
   const b = e.target.closest("[data-del]");
   if(!b) return;
   items = items.filter(i=>i.id!==b.dataset.del);
-  save(); renderItems();
+  saveItems(); renderItems();
 });
 
 /* ---------- boot ---------- */

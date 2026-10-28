@@ -121,6 +121,43 @@
     <button class="btn quiet" id="clearLog">Clear the log</button>
   </section>
 
+  <!-- pantry -->
+  <section class="card">
+    <h2>Cupboard basics</h2>
+    <p class="hint">Condiments are not fridge contents. The app only asks about the ones a recipe needs —
+      and a dish that is otherwise one ingredient short still counts as cookable.</p>
+    <div id="pantryChips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+  </section>
+
+  <!-- household -->
+  <section class="card">
+    <h2>Household</h2>
+    <p class="hint">One panel on the fridge, several phones. Every phone joins with the same code, so
+      anyone can log a shopping trip and everyone sees the same fridge.</p>
+    <div class="stat" style="grid-template-columns:1fr 1fr">
+      <div><b id="hhCode" style="font-size:20px;letter-spacing:.16em">—</b><span>household code</span></div>
+      <div><b id="hhPanel" style="font-size:20px">—</b><span>panel bound</span></div>
+    </div>
+    <button class="btn ghost" id="hhNew">Create a household code</button>
+    <button class="btn quiet" id="hhPanelBtn">Bind this device as the panel</button>
+    <div id="hhMembers" class="hint" style="margin-top:10px"></div>
+    <p class="hint" style="margin-top:8px;color:#b26a00">
+      Honest limitation: the code and the member list live on this device only. Sharing a fridge
+      between two real phones needs a backend — that is the next build, not something this page fakes.
+    </p>
+  </section>
+
+  <!-- recipes -->
+  <section class="card">
+    <h2>Recipe library</h2>
+    <p class="hint" id="rcHint"></p>
+    <table>
+      <thead><tr><th>Dish</th><th class="r">Time</th><th class="r">kcal</th><th class="r">Needs</th></tr></thead>
+      <tbody id="rcRows"></tbody>
+    </table>
+    <button class="btn ghost" id="showAllRecipes">Show all recipes</button>
+  </section>
+
   <!-- the database -->
   <section class="card">
     <h2>The database</h2>
@@ -180,8 +217,8 @@ function paint(){
     row.innerHTML = `<span class="n">${pos+1}</span>
       <div class="t">${m.name}<small>${m.sub}</small></div>
       <div class="mv">
-        <button data-up="${pos}" ${pos===0?"disabled":""}>↑</button>
-        <button data-down="${pos}" ${pos===S.screens.length-1?"disabled":""}>↓</button>
+        <button data-up="${pos}" ${pos===0?"disabled":""} title="move up">▲</button>
+        <button data-down="${pos}" ${pos===S.screens.length-1?"disabled":""} title="move down">▼</button>
         <button data-rm="${pos}" title="hide">✕</button>
       </div>`;
     list.appendChild(row);
@@ -211,13 +248,13 @@ let showAllFoods = false;
 function paintDB(){
   const foods = FD.CATALOG;
   const usda = foods.filter(f=>f.src==="usda").length;
-  $("#dbHint").innerHTML = `${foods.length} foods · ${FD.DISHES.length} dishes · ` +
+  $("#dbHint").innerHTML = `${foods.length} foods · ${FD.RECIPES.length} recipes · ` +
     `${usda} shelf lives from the FDA/USDA cold storage chart, ${foods.length-usda} still estimates.`;
 
   const rows = (showAllFoods ? foods : foods.slice().sort((a,b)=>a.days-b.days).slice(0,8));
   $("#dbRows").innerHTML = rows.map(f=>`
     <tr>
-      <td>${f.name}</td>
+      <td>${f.cn} <span style="color:#93a29a">${f.name}</span></td>
       <td style="color:#6b7a72">${f.tag}</td>
       <td class="r">${f.days} d</td>
       <td class="r"><span class="pill ${f.src==="usda"?"":"est"}">${f.src==="usda"?"USDA":"est."}</span></td>
@@ -263,7 +300,62 @@ $("#clearLog").addEventListener("click", ()=>{
 });
 $("#showAll").addEventListener("click", ()=>{ showAllFoods = !showAllFoods; paintDB(); });
 
-paint(); paintDB();
+/* ---------- pantry ---------- */
+function paintPantry(){
+  const have = new Set(FD.pantry());
+  $("#pantryChips").innerHTML = FD.PANTRY.map(p =>
+    `<span class="pill ${have.has(p.id)?"":"est"}" data-p="${p.id}"
+       style="cursor:pointer;font-size:12px;padding:5px 9px">${p.cn}</span>`).join("");
+}
+$("#pantryChips").addEventListener("click", e=>{
+  const el = e.target.closest("[data-p]"); if(!el) return;
+  const have = new Set(FD.pantry());
+  const id = el.dataset.p;
+  have.has(id) ? have.delete(id) : have.add(id);
+  FD.savePantry([...have]); paintPantry();
+});
+
+/* ---------- household ---------- */
+function paintHousehold(){
+  const h = FD.household();
+  $("#hhCode").textContent = h.code || "—";
+  $("#hhPanel").textContent = h.panel ? "yes" : "no";
+  $("#hhMembers").textContent = h.members.length
+    ? "Joined phones: " + h.members.join(", ")
+    : "No phone has joined yet.";
+}
+$("#hhNew").addEventListener("click", ()=>{
+  const h = FD.household();
+  const code = h.code || FD.newCode();
+  FD.saveHousehold({code, members: h.members.length ? h.members : ["this phone"]});
+  paintHousehold(); toast("Household code: " + code);
+});
+$("#hhPanelBtn").addEventListener("click", ()=>{
+  const h = FD.household();
+  if(!h.code){ toast("Create a code first"); return; }
+  FD.saveHousehold({panel: !h.panel});
+  paintHousehold(); toast(FD.household().panel ? "This device is the panel" : "Panel unbound");
+});
+
+/* ---------- recipes ---------- */
+let allRecipes = false;
+function paintRecipes(){
+  const rs = allRecipes ? FD.RECIPES : FD.RECIPES.slice(0, 8);
+  $("#rcHint").innerHTML = `${FD.RECIPES.length} real recipes from
+    <a href="${FD.DB.recipeSource.url}" target="_blank" rel="noopener" style="color:#0f7a5a">HowToCook</a>
+    (${FD.DB.recipeSource.license}), each carrying its own calorie estimate.`;
+  $("#rcRows").innerHTML = rs.map(r=>`
+    <tr>
+      <td>${r.name}</td>
+      <td class="r">${r.minutes}′</td>
+      <td class="r">${r.kcal ?? "—"}</td>
+      <td class="r" style="color:#6b7a72">${r.needs.map(n=>FD.byId[n]?FD.byId[n].cn:n).join(" ")}</td>
+    </tr>`).join("");
+  $("#showAllRecipes").textContent = allRecipes ? "Show the first 8" : `Show all ${FD.RECIPES.length} recipes`;
+}
+$("#showAllRecipes").addEventListener("click", ()=>{ allRecipes = !allRecipes; paintRecipes(); });
+
+paint(); paintDB(); paintPantry(); paintHousehold(); paintRecipes();
 </script>
 </body>
 </html>
