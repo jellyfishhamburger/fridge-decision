@@ -1,47 +1,51 @@
-# Fridge Decision — prototype v0 (decision layer)
+# Fridge Decision — prototype v0.2
 
-**Live:** https://jellyfishhamburger.github.io/fridge-decision/
+**App:** https://jellyfishhamburger.github.io/fridge-decision/
+**Fridge panel:** https://jellyfishhamburger.github.io/fridge-decision/display.html
+**Settings:** https://jellyfishhamburger.github.io/fridge-decision/settings.html
 
-IDAT7211 group project. This prototype deliberately contains **no hardware and no image
-recognition**: it exists to test the one thing the user research says people are actually
-missing — *a decision*, not another inventory list.
+IDAT7211 group project. No hardware and no image recognition: this exists to test the one
+thing the research says people are missing — *a decision*, not another inventory list.
 
-## What it does
+## Files
 
-1. **In your fridge** — a list of items with days-left, colour-coded (green → amber → red).
-2. **Add item** — pick a category (camera button is wired to the real camera but does *not*
-   guess the item yet; recognition is intentionally out of scope for v0).
-3. **Decide for me** — one primary suggestion plus two alternatives, each showing:
-   - the exact items it consumes (always the most urgent instance of each),
-   - whether it delivers today's greens,
-   - cooking time against a user limit,
-   - step-by-step method.
-4. **Load demo fridge** — seeds the leftovers from our interviews (tofu, shrimp, greens,
-   onion, dumplings, eggs) so the decision can be demonstrated live in 10 seconds.
+| File | What it is |
+|---|---|
+| `data.js` | **The content database.** 21 foods (shelf life + source tag) and 18 dishes (which foods, how long, greens or not, steps). Everything the product knows starts here. |
+| `logic.js` | The decision rule, the date maths, user settings, and the take/skip log. |
+| `icons.js` | 16 line drawings covering all 21 foods, drawn for a 296×128 three-colour panel. |
+| `index.html` | Phone app: fridge list → one decision + two alternatives. |
+| `display.html` | 2.9″ e-paper simulation with three physical buttons. |
+| `settings.html` | What the panel shows, how fast it rotates, and the goals that drive ranking. |
 
-## Where the logic lives
-
-`index.html` is the whole app. The scoring function is `scoreDish()`:
+## The decision rule
 
 ```
-score = urgency  (0..~7 per used item, = max(0, 8 - daysLeft) * 0.9)
-      + greensBonus (4, if the dish lands a green and the user has a greens goal)
-      - timePenalty (1.4 per minute over the user's limit)
+score = urgency  Σ max(0, 8 − daysLeft) × 0.9   per used ingredient
+      + greensBonus  4  if the dish lands a green and a greens goal is set
+      − timePenalty  1.4 per minute over the user's weeknight limit
 ```
 
-`DISHES` declares exact catalogue ids, so the "why this one" line can never name an
-ingredient the dish does not use. Adding a dish = one object. Adding an ingredient = one
-line in `CATALOG`.
+A dish is only eligible if every ingredient is in the fridge. Ranking pushes whatever is
+about to die to the top — that is the whole product claim, and it is one function.
 
-## Deliberately not built (next)
+## Where the numbers come from
 
-- Real ingredient recognition (vision) — needs a model, not a rule table.
-- "Ate greens today" logging, so the greens bonus is once-per-day instead of always on.
-- Hardware: magnetic module / fridge display. Out of scope for the midterm.
-- Multi-user (a shared fridge is used by more than one person; this prototype is
-  single-device, single-user — a known limitation we state rather than hide).
+Shelf lives are tagged `src:"usda"` (taken from the FDA/USDA Cold Food Storage Chart,
+refrigerated at 40 °F / 4 °C, conservative end of the range — 9 of 21 foods) or `src:"est"`
+(practitioner estimate, **not yet sourced** — 12 of 21). The settings page shows which is
+which, because a demo that quotes a shelf life nobody can defend is worse than no number.
+
+## Deliberately not built
+
+- Real ingredient recognition (vision).
+- Portions, nutrition numbers, full recipes (the 3–4 step method is enough for the screen).
+- Multi-user. A shared fridge is used by more than one person; this is single-device and
+  single-user — a known limitation we state rather than hide.
+- A sync channel between phone and panel (both read the same `localStorage` on one device;
+  real hardware needs a gateway or a backend).
 
 ## Deploy
 
 Static site, GitHub Pages from `main`. Any edit: commit + push, Pages rebuilds in ~1 min.
-Service worker is network-first for the HTML, so edits appear immediately on reload.
+The service worker is network-first for HTML, so edits appear on reload.
