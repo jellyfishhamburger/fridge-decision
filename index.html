@@ -29,6 +29,10 @@
   .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fbfcfb;
     border-radius:999px;padding:8px 12px;font-size:14px;line-height:1}
   .chip .dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:0 0 auto}
+  .chip svg{flex:0 0 auto;color:var(--green)}
+  .chip.warn svg{color:var(--amber)} .chip.urgent svg{color:var(--red)}
+  .pick svg{color:var(--green);display:block;margin:0 auto}
+  .pick{display:flex;flex-direction:column;align-items:center;gap:3px}
   .chip .d{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
   .chip.warn .dot{background:var(--amber)} .chip.warn .d{color:var(--amber)}
   .chip.urgent .dot{background:var(--red)} .chip.urgent .d{color:var(--red);font-weight:600}
@@ -109,6 +113,7 @@
     Prototype v0 · decision layer only · no hardware, no recognition<br>
     Data stays on this phone (localStorage)<br>
     <a href="display.html" style="color:#0f7a5a;font-size:12.5px">Fridge display version →</a>
+    &nbsp;·&nbsp;<a href="settings.html" style="color:#0f7a5a;font-size:12.5px">Settings →</a>
   </div>
 </div>
 
@@ -132,16 +137,18 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="data.js"></script>
+<script src="icons.js"></script>
 <script src="logic.js"></script>
 <script>
 "use strict";
-const {CATALOG, DISHES, DEFAULT_GOAL} = window.FD;
+const {CATALOG, DISHES} = window.FD;
 const LS_ITEMS = "fd.items.v1";
 const LS_GOAL  = "fd.goal.v1";
 
 /* ---------- state ---------- */
 let items = load(LS_ITEMS, []);
-let goal  = load(LS_GOAL, {greensPerDay:1, maxMinutes:20});
+let goal  = window.FD.settings();   // goals + panel settings live in one place
 let picked = null, pendingDays = 3, stream = null;
 
 function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
@@ -165,7 +172,7 @@ function renderItems(){
     const el = document.createElement("span");
     const dleft = window.FD.daysLeftOf(it);
     el.className = "chip " + expiryClass(dleft);
-    el.innerHTML = `<span class="dot"></span><span>${it.name}</span>
+    el.innerHTML = `${window.FD_ICON(it.cat, 16)}<span>${it.name}</span>
       <span class="d">${expiryText(dleft)}</span>
       <button aria-label="remove ${it.name}" data-del="${it.id}">×</button>`;
     box.appendChild(el);
@@ -237,12 +244,13 @@ function openSheet(){
   g.innerHTML = "";
   CATALOG.forEach(c=>{
     const b = document.createElement("button");
-    b.className = "pick"; b.type="button"; b.textContent = c.name;
+    b.className = "pick"; b.type="button";
+    b.innerHTML = window.FD_ICON(c.id, 22) + "<span>" + c.name + "</span>";
     b.addEventListener("click", ()=>{
-      picked = c; pendingDays = c.life;
+      picked = c; pendingDays = c.days;
       g.querySelectorAll(".pick").forEach(x=>x.classList.remove("on"));
       b.classList.add("on");
-      $("#days").value = c.life; $("#daysLbl").textContent = c.life + " days";
+      $("#days").value = c.days; $("#daysLbl").textContent = c.days + " days";
     });
     g.appendChild(b);
   });

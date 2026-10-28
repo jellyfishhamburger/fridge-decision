@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f7a5a">
+<title>Settings — Fridge Decision</title>
+<style>
+  :root{
+    --bg:#f6f7f5; --card:#fff; --ink:#16211c; --muted:#6b7a72; --line:#e2e7e3;
+    --green:#0f7a5a; --green-soft:#e6f2ed; --amber:#b26a00; --red:#b3261e;
+    --shadow:0 1px 2px rgba(16,33,28,.06),0 8px 24px rgba(16,33,28,.06);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;-webkit-text-size-adjust:100%}
+  .wrap{max-width:560px;margin:0 auto;padding:20px 16px 60px}
+  h1{font-size:21px;margin:0 0 4px;letter-spacing:-.02em}
+  .sub{font-size:13px;color:var(--muted);line-height:1.55;margin:0 0 14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}
+  .card h2{font-size:14px;margin:0 0 4px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .card .hint{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 12px}
+  .seg{display:flex;flex-wrap:wrap;gap:8px}
+  .seg button{border:1px solid var(--line);background:#fbfcfb;border-radius:10px;padding:9px 12px;
+    font-size:13.5px;font-family:inherit;color:var(--ink);cursor:pointer}
+  .seg button.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44;font-weight:600}
+  .list{display:flex;flex-direction:column;gap:8px}
+  .row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fbfcfb}
+  .row .n{width:20px;height:20px;border-radius:6px;background:var(--green-soft);color:#0b5c44;
+    font-size:11px;font-weight:700;display:grid;place-items:center;flex:0 0 auto}
+  .row .t{flex:1;font-size:14px}
+  .row .t small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+  .row .mv{display:flex;gap:4px}
+  .row .mv button{width:30px;height:30px;border:1px solid var(--line);background:#fff;border-radius:8px;
+    font-size:13px;cursor:pointer;color:var(--ink);font-family:inherit}
+  .row .mv button[disabled]{opacity:.35;cursor:default}
+  .sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;font-size:14px}
+  .sw + .sw{border-top:1px solid var(--line)}
+  .sw input{width:20px;height:20px;accent-color:var(--green)}
+  .num{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;font-size:14px}
+  .num + .num{border-top:1px solid var(--line)}
+  .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0 4px}
+  .stat div{background:#fbfcfb;border:1px solid var(--line);border-radius:12px;padding:12px 10px;text-align:center}
+  .stat b{display:block;font-size:22px;letter-spacing:-.02em}
+  .stat span{font-size:11.5px;color:var(--muted)}
+  .btn{display:flex;align-items:center;justify-content:center;width:100%;border:0;border-radius:12px;
+    padding:13px;font-size:14.5px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:10px}
+  .btn.ghost{background:#fff;border:1px solid var(--green);color:var(--green)}
+  .btn.quiet{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:500}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:7px 4px;border-bottom:1px solid var(--line)}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+  td.r{text-align:right;font-variant-numeric:tabular-nums}
+  .pill{font-size:10.5px;padding:2px 7px;border-radius:999px;background:var(--green-soft);color:#0b5c44}
+  .pill.est{background:#fdf1e0;color:var(--amber)}
+  .toast{position:fixed;left:50%;top:14px;transform:translateX(-50%) translateY(-16px);background:#16211c;color:#fff;
+    font-size:13.5px;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;z-index:60;pointer-events:none}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+  a{color:var(--green)}
+  .foot{font-size:12px;color:#93a29a;line-height:1.7;text-align:center;padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Settings</h1>
+  <p class="sub">What the fridge panel shows, how often, and what it is aiming for. Everything here is stored on this device.</p>
+
+  <!-- panel behaviour -->
+  <section class="card">
+    <h2>Fridge panel</h2>
+    <p class="hint">Three-colour e-paper. Nothing scrolls; the panel moves between screens on its own or when the button is pressed.</p>
+    <div class="seg" id="rot">
+      <button data-ms="4000">Every 4 s</button>
+      <button data-ms="6000">Every 6 s</button>
+      <button data-ms="10000">Every 10 s</button>
+      <button data-ms="20000">Every 20 s</button>
+      <button data-ms="0">Button only</button>
+    </div>
+  </section>
+
+  <!-- which screens, in which order -->
+  <section class="card">
+    <h2>Screens &amp; order</h2>
+    <p class="hint">Untick one and it stops appearing. Use the arrows to change the order — the panel starts with the top one.</p>
+    <div class="list" id="screens"></div>
+  </section>
+
+  <!-- goals that drive the decision -->
+  <section class="card">
+    <h2>What it aims for</h2>
+    <p class="hint">These two numbers are what make one dish rank above another.</p>
+    <div class="num">
+      <span>Greens servings per day</span>
+      <span class="seg" id="greens">
+        <button data-v="0">Off</button><button data-v="1">1</button><button data-v="2">2</button>
+      </span>
+    </div>
+    <div class="num">
+      <span>Longest I'll cook on a weeknight</span>
+      <span class="seg" id="mins">
+        <button data-v="10">10 min</button><button data-v="15">15</button>
+        <button data-v="20">20</button><button data-v="30">30</button>
+      </span>
+    </div>
+  </section>
+
+  <!-- the three buttons -->
+  <section class="card">
+    <h2>Panel buttons</h2>
+    <p class="hint">Three physical buttons, fixed in firmware:</p>
+    <div class="list">
+      <div class="row"><span class="n">›</span><div class="t">Next<small>next screen</small></div></div>
+      <div class="row"><span class="n">✓</span><div class="t">I'll cook this<small>logs a take — this is the number that matters</small></div></div>
+      <div class="row"><span class="n">✕</span><div class="t">Not this one<small>shows the next suggestion and logs a skip</small></div></div>
+    </div>
+    <div class="stat">
+      <div><b id="s-take">0</b><span>taken</span></div>
+      <div><b id="s-skip">0</b><span>skipped</span></div>
+      <div><b id="s-rate">—</b><span>accept rate</span></div>
+    </div>
+    <button class="btn quiet" id="clearLog">Clear the log</button>
+  </section>
+
+  <!-- the database -->
+  <section class="card">
+    <h2>The database</h2>
+    <p class="hint" id="dbHint"></p>
+    <table>
+      <thead><tr><th>Food</th><th>Category</th><th class="r">Good for</th><th class="r">Source</th></tr></thead>
+      <tbody id="dbRows"></tbody>
+    </table>
+    <button class="btn ghost" id="showAll">Show all foods</button>
+  </section>
+
+  <a class="btn ghost" href="index.html" style="text-decoration:none">← Back to the app</a>
+  <a class="btn ghost" href="display.html" style="text-decoration:none">See the fridge panel →</a>
+
+  <div class="foot">Prototype v0.2 · data in <code>data.js</code> · same file drives the app and the panel</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="icons.js"></script>
+<script src="logic.js"></script>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+let S = FD.settings();
+
+function toast(m){
+  const t=$("#toast"); t.textContent=m; t.classList.add("on");
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("on"),1500);
+}
+function save(patch, msg){
+  S = FD.saveSettings(patch);
+  paint(); if(msg) toast(msg);
+}
+
+const SCREEN_META = [
+  {i:0, name:"Tonight's decision", sub:"one dish, the reason, the time"},
+  {i:1, name:"Use first",          sub:"the single most urgent item + days left"},
+  {i:2, name:"Fridge at a glance",  sub:"how many need using soon"}
+];
+
+function paint(){
+  /* rotation */
+  document.querySelectorAll("#rot button").forEach(b=>{
+    const ms = +b.dataset.ms;
+    const on = ms === 0 ? (!S.auto || S.rotMs === 0) : (S.auto && S.rotMs === ms);
+    b.classList.toggle("on", on);
+  });
+
+  /* screens, in stored order */
+  const list = $("#screens"); list.innerHTML="";
+  (S.screens.length ? S.screens : []).forEach((idx, pos)=>{
+    const m = SCREEN_META.find(x=>x.i===idx);
+    const row = document.createElement("div");
+    row.className="row";
+    row.innerHTML = `<span class="n">${pos+1}</span>
+      <div class="t">${m.name}<small>${m.sub}</small></div>
+      <div class="mv">
+        <button data-up="${pos}" ${pos===0?"disabled":""}>↑</button>
+        <button data-down="${pos}" ${pos===S.screens.length-1?"disabled":""}>↓</button>
+        <button data-rm="${pos}" title="hide">✕</button>
+      </div>`;
+    list.appendChild(row);
+  });
+  const hidden = SCREEN_META.filter(m=>!S.screens.includes(m.i));
+  if(hidden.length){
+    const row = document.createElement("div");
+    row.className="row"; row.style.borderStyle="dashed";
+    row.innerHTML = `<div class="t" style="color:#6b7a72">Hidden: ${hidden.map(h=>h.name).join(", ")}</div>
+      <div class="mv"><button id="restore">+</button></div>`;
+    list.appendChild(row);
+  }
+
+  /* goals */
+  document.querySelectorAll("#greens button").forEach(b=>b.classList.toggle("on", +b.dataset.v === S.greensPerDay));
+  document.querySelectorAll("#mins button").forEach(b=>b.classList.toggle("on", +b.dataset.v === S.maxMinutes));
+
+  /* log */
+  const st = FD.stats();
+  $("#s-take").textContent = st.taken;
+  $("#s-skip").textContent = st.skipped;
+  $("#s-rate").textContent = st.rate === null ? "—" : st.rate + "%";
+}
+
+/* ---------- database table ---------- */
+let showAllFoods = false;
+function paintDB(){
+  const foods = FD.CATALOG;
+  const usda = foods.filter(f=>f.src==="usda").length;
+  $("#dbHint").innerHTML = `${foods.length} foods · ${FD.DISHES.length} dishes · ` +
+    `${usda} shelf lives from the FDA/USDA cold storage chart, ${foods.length-usda} still estimates.`;
+
+  const rows = (showAllFoods ? foods : foods.slice().sort((a,b)=>a.days-b.days).slice(0,8));
+  $("#dbRows").innerHTML = rows.map(f=>`
+    <tr>
+      <td>${f.name}</td>
+      <td style="color:#6b7a72">${f.tag}</td>
+      <td class="r">${f.days} d</td>
+      <td class="r"><span class="pill ${f.src==="usda"?"":"est"}">${f.src==="usda"?"USDA":"est."}</span></td>
+    </tr>`).join("");
+  $("#showAll").textContent = showAllFoods ? "Show the shortest-lived only" : `Show all ${foods.length} foods`;
+}
+
+/* ---------- events ---------- */
+document.querySelectorAll("#rot button").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    const ms = +b.dataset.ms;
+    save(ms === 0 ? {auto:false, rotMs:0} : {auto:true, rotMs:ms}, ms===0?"Panel will only move on the button":"Saved");
+  });
+});
+$("#screens").addEventListener("click", e=>{
+  const t = e.target;
+  if(t.id === "restore"){
+    const next = SCREEN_META.map(m=>m.i).filter(i=>!S.screens.includes(i) || S.screens.includes(i));
+    save({screens:[0,1,2]}, "All screens back");
+    return;
+  }
+  if(t.dataset.up !== undefined || t.dataset.down !== undefined || t.dataset.rm !== undefined){
+    const arr = S.screens.slice();
+    if(t.dataset.rm !== undefined){
+      if(arr.length <= 1){ toast("Keep at least one screen"); return; }
+      arr.splice(+t.dataset.rm,1); save({screens:arr}, "Screen hidden");
+    } else {
+      const pos = +(t.dataset.up ?? t.dataset.down);
+      const swap = t.dataset.up !== undefined ? pos-1 : pos+1;
+      [arr[pos], arr[swap]] = [arr[swap], arr[pos]];
+      save({screens:arr}, "Order saved");
+    }
+  }
+});
+document.querySelectorAll("#greens button").forEach(b=>b.addEventListener("click", ()=>{
+  save({greensPerDay:+b.dataset.v}, "Goal saved");
+}));
+document.querySelectorAll("#mins button").forEach(b=>b.addEventListener("click", ()=>{
+  save({maxMinutes:+b.dataset.v}, "Goal saved");
+}));
+$("#clearLog").addEventListener("click", ()=>{
+  FD.write(FD.LS_LOG, []); paint(); toast("Log cleared");
+});
+$("#showAll").addEventListener("click", ()=>{ showAllFoods = !showAllFoods; paintDB(); });
+
+paint(); paintDB();
+</script>
+</body>
+</html>
