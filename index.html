@@ -12,65 +12,115 @@
     --green:#0f7a5a; --green-soft:#e6f2ed; --amber:#b26a00; --amber-soft:#fdf1e0;
     --red:#b3261e; --red-soft:#fbe9e7;
     --shadow:0 1px 2px rgba(16,33,28,.06),0 8px 24px rgba(16,33,28,.06);
-    --radius:16px;
+    --r:16px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
     -webkit-text-size-adjust:100%}
-  body{padding:0 0 96px}
+  body{padding:0 0 calc(88px + env(safe-area-inset-bottom))}
   .wrap{max-width:520px;margin:0 auto;padding:0 16px}
-  header{padding:20px 0 8px}
-  h1{font-size:22px;line-height:1.2;margin:0 0 4px;letter-spacing:-.02em}
-  .sub{font-size:13px;color:var(--muted);line-height:1.5}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:12px 0;box-shadow:var(--shadow)}
-  .card h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+  /* ---------- top bar ---------- */
+  .top{position:sticky;top:0;z-index:20;background:rgba(246,247,245,.94);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line)}
+  .topin{max-width:520px;margin:0 auto;padding:14px 16px 10px;display:flex;align-items:center;gap:10px}
+  .topin h1{font-size:19px;margin:0;letter-spacing:-.02em;flex:1;line-height:1.2}
+  .gear{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:#fff;
+    display:grid;place-items:center;cursor:pointer;flex:0 0 auto;text-decoration:none;color:var(--ink)}
+  .gear svg{width:21px;height:21px}
+
+  /* ---------- views ---------- */
+  .view{display:none;padding-top:14px}
+  .view.on{display:block}
+  .lede{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:0 0 12px;box-shadow:var(--shadow)}
+  .card h2{font-size:15px;margin:0 0 10px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
   .count{font-size:12px;color:var(--muted);font-weight:400}
+
+  /* ---------- fridge rows ---------- */
   .items{display:flex;flex-direction:column;gap:8px}
   .chip{display:flex;align-items:center;gap:10px;width:100%;border:1px solid var(--line);background:#fbfcfb;
     border-radius:14px;padding:13px 14px;font-size:17.5px;line-height:1;font-weight:600}
   .chip svg{flex:0 0 auto;color:var(--green);width:22px;height:22px}
   .chip.warn svg{color:var(--amber)} .chip.urgent svg{color:var(--red)}
-  .chip .d{font-size:13.5px;color:var(--muted);font-variant-numeric:tabular-nums;font-weight:500;
-    margin-left:auto}
+  .chip .d{font-size:13.5px;color:var(--muted);font-variant-numeric:tabular-nums;font-weight:500;margin-left:auto}
   .chip.warn .d{color:var(--amber)} .chip.urgent .d{color:var(--red);font-weight:600}
   .chip button{border:0;background:none;padding:0 0 0 2px;margin:0;color:#b7c1bb;font-size:18px;line-height:1;cursor:pointer}
   .empty{font-size:13px;color:var(--muted);padding:6px 0}
   .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:14px;
-    padding:16px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}
+    padding:15px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}
   .btn.primary{background:var(--green);color:#fff;box-shadow:0 6px 18px rgba(15,122,90,.28)}
   .btn.primary:active{transform:translateY(1px)}
   .btn.ghost{background:#fff;color:var(--green);border:1px solid var(--green)}
   .btn.quiet{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
-  .row{display:flex;gap:10px}
-  .row > *{flex:1}
-  /* verdict */
-  .verdict{background:var(--green);color:#fff;border-radius:20px;padding:20px;margin:12px 0;box-shadow:0 12px 32px rgba(15,122,90,.24)}
+  .row{display:flex;gap:10px} .row > *{flex:1}
+
+  /* ---------- verdict ---------- */
+  .verdict{background:var(--green);color:#fff;border-radius:20px;padding:18px;margin:0 0 12px;box-shadow:0 12px 32px rgba(15,122,90,.24)}
   .verdict.amber{background:#a96206;box-shadow:0 12px 32px rgba(169,98,6,.22)}
   .verdict .kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
-  .verdict h3{font-size:25px;margin:6px 0 8px;line-height:1.15;letter-spacing:-.01em}
-  .verdict .meta{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;opacity:.95}
-  .verdict .meta b{font-weight:600}
+  .verdict h3{font-size:24px;margin:6px 0 8px;line-height:1.15}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;font-size:13px}
   .badge{background:rgba(255,255,255,.18);border-radius:8px;padding:3px 8px;font-size:12px;font-weight:600}
-  .shop{background:var(--amber-soft);border:1px solid #f0d9b5;border-radius:14px;padding:12px 14px;margin:10px 0;
+  .shop{background:var(--amber-soft);border:1px solid #f0d9b5;border-radius:14px;padding:12px 14px;margin:0 0 12px;
     font-size:14px;line-height:1.55;color:#7a4a05}
-  .shop b{color:#5d3800}
-  .why{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;font-size:14px;line-height:1.6;color:#2b3a33}
+  .why{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;font-size:14px;line-height:1.6;color:#2b3a33}
   .why ul{margin:8px 0 0;padding-left:18px} .why li{margin:4px 0}
-  .pantryline{margin-top:10px;font-size:13px;color:var(--muted);line-height:1.6}
-  .pantryline b{color:var(--ink)}
-  .ptog{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;
-    padding:5px 10px;margin:4px 6px 0 0;font-size:12.5px;cursor:pointer;background:#fff}
-  .ptog.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44}
-  .alt{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid var(--line);font-size:14px}
-  .alt:first-of-type{border-top:0}
-  .alt .t{color:var(--muted);font-size:12px;margin-top:2px}
-  .alt .go{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;color:var(--green);cursor:pointer;font-family:inherit}
-  .steps{font-size:14px;line-height:1.7;color:#2b3a33;margin:10px 0 0;padding-left:20px}
+  .steps{font-size:14px;line-height:1.7;margin:10px 0 0;padding-left:20px}
   .steps li{margin:6px 0}
   .srcline{font-size:11.5px;color:#93a29a;margin-top:10px}
   .srcline a{color:#7b9187}
-  /* sheet */
+  .pantryline{margin-top:10px;font-size:13px;color:var(--muted);line-height:1.6}
+  .ptog{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;
+    padding:5px 10px;margin:4px 6px 0 0;font-size:12.5px;cursor:pointer;background:#fff}
+  .ptog.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44}
+
+  /* ---------- recipe list ---------- */
+  .filters{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+  .f{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 13px;font-size:13px;
+    white-space:nowrap;cursor:pointer;font-family:inherit;color:var(--ink)}
+  .f.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44;font-weight:600}
+  .rc{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:0 0 10px;box-shadow:var(--shadow)}
+  .rc h4{margin:0 0 6px;font-size:17px;letter-spacing:-.01em;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  .rc .tags{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .tg{background:#f2f5f3;border-radius:7px;padding:3px 7px}
+  .tg.g{background:var(--green-soft);color:#0b5c44}
+  .tg.a{background:var(--amber-soft);color:#7a4a05}
+  .rc .uses{font-size:13px;color:#3a473f;margin:8px 0 0;line-height:1.55}
+  .rc details{margin-top:10px}
+  .rc summary{font-size:13.5px;color:var(--green);cursor:pointer;font-weight:600}
+  .rc ol{font-size:13.5px;line-height:1.65;padding-left:20px;margin:8px 0 0}
+  .rc .src{font-size:11px;color:#93a29a;margin-top:8px}
+  .rc .src a{color:#7b9187}
+  .rc .go{width:100%;margin-top:10px;border:1px solid var(--green);background:#fff;color:var(--green);
+    border-radius:11px;padding:11px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer}
+
+  /* ---------- build view ---------- */
+  .picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .pf{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#fbfcfb;
+    border-radius:12px;padding:10px 12px;font-size:15px;cursor:pointer;font-family:inherit;color:var(--ink)}
+  .pf svg{width:20px;height:20px;color:var(--green)}
+  .pf.on{border-color:var(--green);background:var(--green-soft);font-weight:600}
+  .slider{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;margin:6px 0 2px}
+  .slider input{width:60%;accent-color:var(--green)}
+  .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;padding:10px 0;
+    border-top:1px solid var(--line);margin-top:8px}
+  .switch input{width:20px;height:20px;accent-color:var(--green)}
+  .note{font-size:12px;color:var(--muted);line-height:1.55;margin:8px 0 0}
+
+  /* ---------- bottom nav ---------- */
+  .nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.97);
+    border-top:1px solid var(--line);padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+    backdrop-filter:blur(10px)}
+  .navin{max-width:520px;margin:0 auto;display:flex}
+  .nav button{flex:1;border:0;background:none;font-family:inherit;cursor:pointer;color:var(--muted);
+    display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;padding:4px 0}
+  .nav button svg{width:23px;height:23px}
+  .nav button.on{color:var(--green);font-weight:600}
+
+  /* ---------- sheet ---------- */
   .scrim{position:fixed;inset:0;background:rgba(12,22,18,.42);display:none;z-index:40}
   .scrim.on{display:block}
   .sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;border-radius:20px 20px 0 0;
@@ -87,7 +137,7 @@
   .pick.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44;font-weight:600}
   .pick svg{color:var(--green);display:block}
   .field{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;font-size:14px}
-  input[type=range]{width:58%;accent-color:var(--green)}
+  input[type=range]{accent-color:var(--green)}
   .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(-16px);top:14px;background:#16211c;color:#fff;
     font-size:13.5px;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:86%;
     box-shadow:0 8px 24px rgba(12,22,18,.24)}
@@ -97,52 +147,124 @@
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>What can I cook tonight?</h1>
-    <div class="sub">One decision, not another list. 20 real recipes, calories included.</div>
-  </header>
 
-  <section class="card">
-    <h2>冰箱里现在有 <span class="count" id="cnt">0 items</span></h2>
-    <div style="font-size:12.5px;color:var(--muted);margin:-4px 0 10px">右边数字＝还能放几天。越红越要先吃。</div>
-    <div class="items" id="items"></div>
-    <p class="empty" id="emptyNote">Nothing logged yet — add something below.</p>
-    <div class="row" style="margin-top:14px">
-      <button class="btn ghost" id="addBtn">+ Add item</button>
-      <button class="btn quiet" id="demoBtn">Load demo fridge</button>
-    </div>
-  </section>
-
-  <button class="btn primary" id="decideBtn" style="margin-top:4px">Decide for me →</button>
-
-  <div id="result"></div>
-
-  <div class="foot">
-    Prototype v0.3 · no hardware, no recognition<br>
-    Recipes: HowToCook (CC-BY-4.0) · <a href="display.html">Fridge display →</a> ·
-    <a href="settings.html">Settings →</a>
+<div class="top">
+  <div class="topin">
+    <h1 id="pageTitle">冰箱里有什么</h1>
+    <a class="gear" href="settings.html" aria-label="设置">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <circle cx="12" cy="12" r="3.2"/>
+        <path d="M12 3.6v2.2M12 18.2v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M3.6 12h2.2M18.2 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/>
+      </svg>
+    </a>
   </div>
 </div>
 
-<div class="scrim" id="scrim"></div>
+<div class="wrap">
 
+  <!-- ============ view 1: fridge ============ -->
+  <section class="view on" id="view-fridge">
+    <p class="lede">右边数字＝还能放几天，越红越要先吃。数据存在这台设备里。</p>
+    <div class="card">
+      <h2>存货 <span class="count" id="cnt">0 items</span></h2>
+      <div class="items" id="items"></div>
+      <p class="empty" id="emptyNote">还没记录任何东西 —— 用下面的按钮加一样。</p>
+      <div class="row" style="margin-top:14px">
+        <button class="btn ghost" id="addBtn">＋ 加一样</button>
+        <button class="btn quiet" id="demoBtn">载入示例</button>
+      </div>
+    </div>
+    <button class="btn primary" id="decideBtn">给我一个决定 →</button>
+    <div id="result" style="margin-top:14px"></div>
+  </section>
+
+  <!-- ============ view 2: discover ============ -->
+  <section class="view" id="view-discover">
+    <p class="lede">按"先用掉快坏的"排序。差一样的菜也算能做饭，会告诉你去买什么。</p>
+    <div class="filters" id="discFilters">
+      <button class="f on" data-f="all">全部</button>
+      <button class="f" data-f="ready">现在就能做</button>
+      <button class="f" data-f="shop1">差一样</button>
+      <button class="f" data-f="greens">有绿叶菜</button>
+      <button class="f" data-f="light">≤ 500 kcal</button>
+    </div>
+    <div id="discList"></div>
+  </section>
+
+  <!-- ============ view 3: build ============ -->
+  <section class="view" id="view-build">
+    <p class="lede">先选你今天想吃的（从冰箱里挑），再用条件收窄 —— 不是在搜菜谱，是在做决定。</p>
+    <div class="card">
+      <h2>我想吃 <span class="count" id="pickCount">未选</span></h2>
+      <div class="picker" id="picker"></div>
+      <div class="slider">
+        <span>热量上限 <b id="kcalLbl">600 kcal</b></span>
+        <input type="range" id="kcal" min="200" max="1000" step="50" value="600">
+      </div>
+      <div class="slider">
+        <span>最多用时 <b id="minLbl">30 分钟</b></span>
+        <input type="range" id="mins" min="10" max="40" step="5" value="30">
+      </div>
+      <div class="switch">
+        <span>必须有绿叶菜</span>
+        <input type="checkbox" id="mustGreens">
+      </div>
+      <div class="switch">
+        <span>只看纤维较高的</span>
+        <input type="checkbox" id="highFiber">
+      </div>
+      <p class="note">"纤维较高"是按食材推断的粗分档（含绿叶菜 / 西兰花 / 茄子 / 香菇 / 胡萝卜等），<b>不是克数</b> —— 我们的菜谱数据里没有纤维含量。</p>
+      <button class="btn quiet" id="clearPick" style="margin-top:12px">清空选择</button>
+    </div>
+    <div id="buildList"></div>
+  </section>
+
+  <div class="foot">
+    原型 v0.4 · 无硬件、无图像识别<br>
+    <a href="display.html">冰箱墨水屏 →</a> · <a href="settings.html">设置 →</a>
+  </div>
+</div>
+
+<!-- bottom nav -->
+<nav class="nav">
+  <div class="navin">
+    <button class="on" data-view="fridge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <rect x="6" y="3.2" width="12" height="17.6" rx="2.6"/><path d="M6 9.6h12M9 5.6v2M9 11.8v2.4"/>
+      </svg>
+      冰箱
+    </button>
+    <button data-view="discover">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <path d="M12 3.4l2.2 5.4 5.8.5-4.4 3.8 1.3 5.7L12 15.7 7.1 18.8l1.3-5.7L4 9.3l5.8-.5z"/>
+      </svg>
+      推荐
+    </button>
+    <button data-view="build">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <path d="M4 7.5h16M4 12h16M4 16.5h10"/><circle cx="18.4" cy="16.5" r="1.6"/>
+      </svg>
+      自己选
+    </button>
+  </div>
+</nav>
+
+<div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet">
-  <h3>Add what you just put in</h3>
-  <p class="hint" id="sheetHint">Pick the food — the prototype does not guess for you yet. Storage time is preset per food, adjust it if you want.</p>
+  <h3>加入一样东西</h3>
+  <p class="hint">选食物 —— 原型还不会替你认。保质期按食物预设，可以自己改。</p>
   <video class="cam" id="cam" playsinline muted></video>
   <div class="row" style="margin-bottom:10px">
-    <button class="btn quiet" id="snapBtn">Open camera</button>
+    <button class="btn quiet" id="snapBtn">打开相机</button>
   </div>
   <div class="grid" id="picks"></div>
   <div class="field">
-    <span>Use within <b id="daysLbl">3 days</b></span>
+    <span>可以放到 <b id="daysLbl">3 天后</b></span>
     <input type="range" id="days" min="1" max="60" value="3">
   </div>
-  <button class="btn primary" id="saveBtn">Add to fridge</button>
-  <button class="btn quiet" id="cancelBtn" style="margin-top:8px">Cancel</button>
+  <button class="btn primary" id="saveBtn">加进冰箱</button>
+  <button class="btn quiet" id="cancelBtn" style="margin-top:8px">取消</button>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script src="data.js"></script>
@@ -151,157 +273,242 @@
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
 let items  = FD.items();
 let goal   = FD.settings();
 let pantry = FD.pantry();
 let picked = null, pendingDays = 3, stream = null;
+let discFilter = "all", buildPicks = new Set();
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 const today = () => FD.localDate();
+const food = id => FD.byId[id] || {cn: id, name: id};
+const cnOf = id => food(id).cn;
 
 function toast(msg){
   const t = $("#toast"); t.textContent = msg; t.classList.add("on");
-  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove("on"), 1900);
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove("on"), 1800);
 }
-function saveItems(){ FD.saveItems(items); }
 
-/* ---------- fridge list ---------- */
-function expiryClass(d){ return d <= 2 ? "urgent" : d <= 5 ? "warn" : ""; }
-function expiryText(d){
-  if (d <= 0) return "今天到期";
-  if (d === 1) return "还剩 1 天";
-  return `还剩 ${d} 天`;
+/* ---------- fibre bucket (inferred, not measured) ---------- */
+const FIBRE = new Set(["greens","broccoli","eggplant","mushroom","carrot","tomato","onion","chili","potato"]);
+const highFibre = r => r.needs.some(n => FIBRE.has(n));
+
+/* ============ view switching ============ */
+const TITLES = {fridge:"冰箱里有什么", discover:"今晚吃什么", build:"自己做主"};
+function show(view){
+  $$(".view").forEach(v => v.classList.toggle("on", v.id === "view-" + view));
+  $$(".nav button").forEach(b => b.classList.toggle("on", b.dataset.view === view));
+  $("#pageTitle").textContent = TITLES[view];
+  window.scrollTo({top:0});
+  if(view === "discover") renderDiscover();
+  if(view === "build") renderBuild();
 }
+$$(".nav button").forEach(b => b.addEventListener("click", () => show(b.dataset.view)));
+
+/* ============ view 1: fridge ============ */
+function expiryClass(d){ return d <= 2 ? "urgent" : d <= 5 ? "warn" : ""; }
+function expiryText(d){ return d <= 0 ? "今天到期" : (d === 1 ? "还剩 1 天" : `还剩 ${d} 天`); }
 
 function renderItems(){
   const box = $("#items"); box.innerHTML = "";
   items.slice().sort((a,b)=>FD.daysLeftOf(a)-FD.daysLeftOf(b)).forEach(it=>{
     const d = FD.daysLeftOf(it);
-    const f = FD.byId[it.cat];
-    const el = document.createElement("span");
+    const el = document.createElement("div");
     el.className = "chip " + expiryClass(d);
-    el.innerHTML = `${window.FD_ICON(it.cat, 16)}<span>${(f && f.cn) || it.name}</span>
+    el.innerHTML = `${window.FD_ICON(it.cat,22)}<span>${cnOf(it.cat)}</span>
       <span class="d">${expiryText(d)}</span>
       <button aria-label="remove" data-del="${it.id}">×</button>`;
     box.appendChild(el);
   });
-  $("#cnt").textContent = items.length + (items.length === 1 ? " item" : " items");
+  $("#cnt").textContent = items.length + " 样";
   $("#emptyNote").style.display = items.length ? "none" : "block";
-}
-
-/* ---------- result ---------- */
-function kcalText(r){ return r.recipe.kcal ? `${r.recipe.kcal} kcal` : ""; }
-
-function renderResult(list){
-  const box = $("#result");
-  const usable = list.filter(r => r.status !== "blocked");
-  if(!usable.length){
-    box.innerHTML = `<div class="card"><h2>Nothing cookable yet</h2>
-      <p class="empty">Your fridge has nothing that pairs into a dish. Add one more thing — or load the demo fridge.</p></div>`;
-    return;
-  }
-  const top = usable[0];
-  const alts = usable.slice(1, 3);
-  const shop = FD.shoppingHint(top);
-  const pantryMissing = top.pantryMissing;
-
-  box.innerHTML = `
-    <div class="verdict ${top.status==="shop1"?"amber":""}">
-      <div class="kicker">${top.status==="shop1" ? "One thing away" : "Tonight"}</div>
-      <h3>${top.recipe.name}</h3>
-      <div class="meta">
-        <span class="badge">${top.recipe.minutes} min</span>
-        ${top.recipe.kcal ? `<span class="badge">${top.recipe.kcal} kcal</span>` : ""}
-        <span class="badge">${top.recipe.greens ? "greens ✓" : "no greens"}</span>
-      </div>
-    </div>
-    ${top.status==="shop1" ? `<div class="shop">还差一样：<b>${shop}</b><br>
-        这样就不用改计划 —— 顺路买回来就能做。</div>` : ""}
-    <div class="why">
-      <b>为什么推这道</b>
-      <ul>${reasons(top).map(r=>`<li>${r}</li>`).join("")}</ul>
-      <ol class="steps">${top.recipe.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
-      ${pantryMissing.length ? pantryLine(pantryMissing) : ""}
-      <div class="srcline">菜谱与热量来源：<a href="${top.recipe.src}" target="_blank" rel="noopener">HowToCook</a>
-        · 热量为该菜谱页的「个人份」估算，不是实验室测量值</div>
-    </div>
-    ${alts.length ? `<div class="card"><h2>其他选择 <span class="count">不一定马上能做</span></h2>
-      ${alts.map(a=>`<div class="alt"><div>
-        <div>${a.recipe.name} ${a.status==="shop1"?`<span style="color:#b26a00;font-size:12px">· 差 1 样</span>`:""}</div>
-        <div class="t">${a.recipe.minutes} min${a.recipe.kcal?` · ${a.recipe.kcal} kcal`:""}${a.recipe.greens?" · greens ✓":""}</div></div>
-        <button class="go" data-pick="${a.recipe.id}">用这个</button></div>`).join("")}
-    </div>` : ""}
-  `;
-  box.querySelectorAll("[data-pick]").forEach(b=>{
-    b.addEventListener("click", ()=>{
-      const r = list.find(x=>x.recipe.id===b.dataset.pick);
-      if(r) { renderResult([r, ...list.filter(x=>x!==r)]); window.scrollTo({top:0,behavior:"smooth"}); }
-    });
-  });
-  box.querySelectorAll("[data-pantry]").forEach(b=>{
-    b.addEventListener("click", ()=>{
-      const id = b.dataset.pantry;
-      if(pantry.includes(id)) pantry = pantry.filter(x=>x!==id); else pantry.push(id);
-      FD.savePantry(pantry);
-      renderResult(FD.decide(items, goal));
-    });
-  });
 }
 
 function reasons(r){
   const out = [];
   if(r.used.length){
     out.push("用掉 " + r.used.map(i=>{
-      const f = FD.byId[i.cat]; const d = FD.daysLeftOf(i);
-      return `<b>${(f&&f.cn)||i.name}</b>（${d<=0?"今天到期":d+" 天"}）`;
+      const d = FD.daysLeftOf(i);
+      return `<b>${cnOf(i.cat)}</b>（${d<=0?"今天到期":d+" 天"}）`;
     }).join("、"));
   }
   if(r.greensBonus) out.push("正好补上今天那份绿叶菜 —— 累了最容易跳过的那样。");
   if(r.recipe.minutes <= goal.maxMinutes) out.push(`<b>${r.recipe.minutes} 分钟</b>，一口锅，比点外卖快。`);
   else out.push(`${r.recipe.minutes} 分钟，超过你设的 ${goal.maxMinutes} 分钟上限，所以排在后面。`);
-  if(r.status==="shop1") out.push("只差一样，买了就能做，不用换计划。");
+  if(r.status === "shop1") out.push("只差一样，买了就能做，不用换计划。");
   return out;
 }
 
 function pantryLine(missingIds){
-  const names = missingIds.map(id => {
-    const p = FD.pantryById[id];
-    return `<span class="ptog" data-pantry="${id}">${p ? p.cn : id}</span>`;
-  }).join("");
-  return `<div class="pantryline">这道菜还要调味：${names}<br><span style="font-size:12px">点一下标记“家里有”。</span></div>`;
+  const names = missingIds.map(id => `<span class="ptog" data-pantry="${id}">${food(id).cn}</span>`).join("");
+  return `<div class="pantryline">这道菜还要调味：${names}<br><span style="font-size:12px">点一下标记"家里有"。</span></div>`;
 }
 
-/* ---------- sheet ---------- */
+function renderResult(list){
+  const box = $("#result");
+  const usable = list.filter(r => r.status !== "blocked");
+  if(!usable.length){
+    box.innerHTML = `<div class="card"><h2>还做不了菜</h2>
+      <p class="empty">冰箱里的东西凑不出任何一道菜。再加一样，或者载入示例。</p></div>`;
+    return;
+  }
+  const top = usable[0], alts = usable.slice(1,3);
+  box.innerHTML = `
+    <div class="verdict ${top.status==="shop1"?"amber":""}">
+      <div class="kicker">${top.status==="shop1" ? "差一样就能做" : "今晚"}</div>
+      <h3>${top.recipe.name}</h3>
+      <div class="meta">
+        <span class="badge">${top.recipe.minutes} 分钟</span>
+        ${top.recipe.kcal?`<span class="badge">${top.recipe.kcal} kcal</span>`:""}
+        <span class="badge">${top.recipe.greens?"有绿叶菜":"无绿叶菜"}</span>
+      </div>
+    </div>
+    ${top.status==="shop1"?`<div class="shop">还差一样：<b>${FD.shoppingHint(top)}</b><br>买回来就能做，不用改计划。</div>`:""}
+    <div class="why">
+      <b>为什么推这道</b>
+      <ul>${reasons(top).map(r=>`<li>${r}</li>`).join("")}</ul>
+      <ol class="steps">${top.recipe.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+      ${top.pantryMissing.length?pantryLine(top.pantryMissing):""}
+      <div class="srcline">菜谱与热量：<a href="${top.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · 个人份估算，非实测</div>
+    </div>
+    ${alts.length?`<div class="card"><h2>其他选择 <span class="count">不一定马上能做</span></h2>
+      ${alts.map(a=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)">
+        <div><div>${a.recipe.name} ${a.status==="shop1"?`<span style="color:#b26a00;font-size:12px">· 差 1 样</span>`:""}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${a.recipe.minutes} 分钟${a.recipe.kcal?` · ${a.recipe.kcal} kcal`:""}${a.recipe.greens?" · 绿叶菜":""}</div></div>
+        <button class="go" data-pick="${a.recipe.id}" style="border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;color:var(--green);font-family:inherit">看这个</button>
+      </div>`).join("")}
+    </div>`:""}`;
+
+  box.querySelectorAll("[data-pick]").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const r = list.find(x=>x.recipe.id===b.dataset.pick);
+      if(r){ renderResult([r,...list.filter(x=>x!==r)]); window.scrollTo({top:0,behavior:"smooth"}); }
+    });
+  });
+  box.querySelectorAll("[data-pantry]").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const id = b.dataset.pantry;
+      pantry = pantry.includes(id) ? pantry.filter(x=>x!==id) : [...pantry, id];
+      FD.savePantry(pantry); renderResult(FD.decide(items, goal));
+    });
+  });
+}
+
+/* ============ view 2: discover ============ */
+function recipeCard(r, opts){
+  opts = opts || {};
+  const used = r.used.map(i=>`${cnOf(i.cat)}（${FD.daysLeftOf(i)} 天）`).join("、");
+  const missing = r.missing.length ? `<span class="tg a">差 ${r.missing.map(cnOf).join("、")}</span>` : "";
+  return `<div class="rc">
+    <h4>${r.recipe.name}</h4>
+    <div class="tags">
+      <span class="tg">${r.recipe.minutes} 分钟</span>
+      ${r.recipe.kcal?`<span class="tg">${r.recipe.kcal} kcal</span>`:""}
+      ${r.recipe.greens?`<span class="tg g">绿叶菜</span>`:""}
+      ${highFibre(r.recipe)?`<span class="tg">纤维较高</span>`:""}
+      ${missing}
+      ${r.status==="ready"?`<span class="tg g">现在能做</span>`:""}
+    </div>
+    ${used?`<p class="uses">用掉：${used}</p>`:""}
+    <details><summary>看做法</summary><ol>${r.recipe.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+      <div class="src">来源：<a href="${r.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · 热量为个人份估算</div>
+    </details>
+    <button class="go" data-take="${r.recipe.id}">就吃这个</button>
+  </div>`;
+}
+
+function renderDiscover(){
+  let list = FD.decide(items, goal).filter(r => r.status !== "blocked");
+  if(discFilter === "ready")  list = list.filter(r => r.status === "ready");
+  if(discFilter === "shop1")  list = list.filter(r => r.status === "shop1");
+  if(discFilter === "greens") list = list.filter(r => r.recipe.greens);
+  if(discFilter === "light")  list = list.filter(r => (r.recipe.kcal||0) <= 500);
+  const box = $("#discList");
+  box.innerHTML = list.length
+    ? list.map(r=>recipeCard(r)).join("")
+    : `<div class="card"><p class="empty">这个条件下没有菜。换个筛选，或者往冰箱里再加一样。</p></div>`;
+  box.querySelectorAll("[data-take]").forEach(b=>b.addEventListener("click", ()=>{
+    FD.log("take", b.dataset.take);
+    toast("记下了 —— 采纳率 +1");
+  }));
+}
+
+/* ============ view 3: build ============ */
+function renderPicker(){
+  const box = $("#picker");
+  const have = [...new Set(items.map(i => i.cat))];
+  box.innerHTML = have.length
+    ? have.map(cat => `<button class="pf ${buildPicks.has(cat)?"on":""}" data-cat="${cat}">
+        ${window.FD_ICON(cat,20)}${cnOf(cat)}</button>`).join("")
+    : `<p class="empty">冰箱是空的，先去第一页加东西。</p>`;
+  box.querySelectorAll("[data-cat]").forEach(b=>b.addEventListener("click", ()=>{
+    const c = b.dataset.cat;
+    buildPicks.has(c) ? buildPicks.delete(c) : buildPicks.add(c);
+    renderBuild();
+  }));
+  $("#pickCount").textContent = buildPicks.size ? `已选 ${buildPicks.size} 样` : "未选";
+}
+
+function renderBuild(){
+  renderPicker();
+  const kcalMax = +$("#kcal").value, minsMax = +$("#mins").value;
+  const mustGreens = $("#mustGreens").checked, wantFibre = $("#highFiber").checked;
+  $("#kcalLbl").textContent = kcalMax + " kcal";
+  $("#minLbl").textContent = minsMax + " 分钟";
+
+  let list = FD.decide(items, goal).filter(r => r.status !== "blocked");
+  // 只在"想吃的"里筛：菜必须用到所选食材（没有选就不限）
+  if(buildPicks.size){
+    list = list.filter(r => r.recipe.needs.some(n => buildPicks.has(n)));
+  }
+  list = list.filter(r => (r.recipe.kcal || 0) <= kcalMax && r.recipe.minutes <= minsMax);
+  if(mustGreens) list = list.filter(r => r.recipe.greens);
+  if(wantFibre)  list = list.filter(r => highFibre(r.recipe));
+
+  const box = $("#buildList");
+  box.innerHTML = (list.length
+    ? list.map(r=>recipeCard(r)).join("")
+    : `<div class="card"><p class="empty">条件太紧了 —— 把热量上限调高，或者取消"必须绿叶菜"。</p></div>`)
+    + `<p class="note" style="text-align:center">共 ${list.length} 道符合。</p>`;
+  box.querySelectorAll("[data-take]").forEach(b=>b.addEventListener("click", ()=>{
+    FD.log("take", b.dataset.take); toast("记下了 —— 采纳率 +1");
+  }));
+}
+$("#kcal").addEventListener("input", renderBuild);
+$("#mins").addEventListener("input", renderBuild);
+$("#mustGreens").addEventListener("change", renderBuild);
+$("#highFiber").addEventListener("change", renderBuild);
+$("#clearPick").addEventListener("click", ()=>{ buildPicks.clear(); renderBuild(); });
+
+/* ---------- add sheet ---------- */
 function openSheet(){
-  $("#scrim").classList.add("on");
-  $("#sheet").classList.add("on");
+  $("#scrim").classList.add("on"); $("#sheet").classList.add("on");
   picked = null;
   const g = $("#picks"); g.innerHTML = "";
   FD.CATALOG.forEach(c=>{
     const b = document.createElement("button");
     b.className = "pick"; b.type = "button";
-    b.innerHTML = window.FD_ICON(c.id, 22) + `<span>${c.cn}</span><small>${c.name}</small>`;
+    b.innerHTML = window.FD_ICON(c.id,22) + `<span>${c.cn}</span><small>${c.name}</small>`;
     b.addEventListener("click", ()=>{
       picked = c; pendingDays = c.days;
       g.querySelectorAll(".pick").forEach(x=>x.classList.remove("on"));
       b.classList.add("on");
-      $("#days").value = c.days; $("#daysLbl").textContent = c.days + " days";
+      $("#days").value = c.days; $("#daysLbl").textContent = c.days + " 天后";
     });
     g.appendChild(b);
   });
-  $("#days").value = 3; $("#daysLbl").textContent = "3 days"; pendingDays = 3;
+  $("#days").value = 3; $("#daysLbl").textContent = "3 天后"; pendingDays = 3;
 }
 function closeSheet(){
-  $("#scrim").classList.remove("on");
-  $("#sheet").classList.remove("on");
-  stopCam();
+  $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); stopCam();
 }
 async function startCam(){
   try{
     stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
     const v = $("#cam"); v.srcObject = stream; v.classList.add("on"); await v.play();
-    $("#snapBtn").textContent = "Photo taken — now pick the food";
-  }catch(e){ toast("Camera needs HTTPS + permission — pick the food instead"); }
+    $("#snapBtn").textContent = "拍好了 —— 现在选是哪种食物";
+  }catch(e){ toast("相机需要 HTTPS + 权限，先手选吧"); }
 }
 function stopCam(){
   if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
@@ -313,44 +520,47 @@ $("#addBtn").addEventListener("click", openSheet);
 $("#cancelBtn").addEventListener("click", closeSheet);
 $("#scrim").addEventListener("click", closeSheet);
 $("#snapBtn").addEventListener("click", startCam);
-$("#days").addEventListener("input", e=>{ pendingDays = +e.target.value; $("#daysLbl").textContent = pendingDays + " days"; });
+$("#days").addEventListener("input", e=>{ pendingDays = +e.target.value; $("#daysLbl").textContent = pendingDays + " 天后"; });
 
 $("#saveBtn").addEventListener("click", ()=>{
-  if(!picked){ toast("Pick a food first"); return; }
+  if(!picked){ toast("先选一样食物"); return; }
   const hh = FD.household();
   items.push({id:uid(), cat:picked.id, name:picked.name, tag:picked.tag,
               daysLeft:pendingDays, life:pendingDays, addedAt:today(),
               by: hh.members.length ? hh.members[0] : null});
-  saveItems(); renderItems(); closeSheet();
-  toast(picked.cn + " added · " + pendingDays + "d");
+  FD.saveItems(items); renderItems(); closeSheet();
+  toast(picked.cn + " 已加入 · 放 " + pendingDays + " 天");
 });
 
 $("#decideBtn").addEventListener("click", ()=>{
   renderResult(FD.decide(items, goal));
-  const r = $("#result");
-  if(r) window.scrollTo({top:r.offsetTop - 80, behavior:"smooth"});
+  const r = $("#result"); if(r) window.scrollTo({top:r.offsetTop - 70, behavior:"smooth"});
 });
 
 $("#demoBtn").addEventListener("click", ()=>{
-  const mk = (cat, days) => {
-    const f = FD.byId[cat];
-    return {id:uid(), cat, name:f.name, tag:f.tag, daysLeft:days, life:days, addedAt:today()};
-  };
+  const mk = (cat, days) => { const f = FD.byId[cat];
+    return {id:uid(), cat, name:f.name, tag:f.tag, daysLeft:days, life:days, addedAt:today()}; };
   items = [mk("pork",3), mk("chili",5), mk("egg",9), mk("greens",2), mk("rice",2), mk("tofu",3)];
-  saveItems(); renderItems();
-  toast("Demo fridge: 猪肉、青椒、鸡蛋、青菜、米饭、豆腐");
+  FD.saveItems(items); renderItems();
+  toast("示例：猪肉、青椒、鸡蛋、青菜、米饭、豆腐");
 });
 
 $("#items").addEventListener("click", e=>{
-  const b = e.target.closest("[data-del]");
-  if(!b) return;
+  const b = e.target.closest("[data-del]"); if(!b) return;
   items = items.filter(i=>i.id!==b.dataset.del);
-  saveItems(); renderItems();
+  FD.saveItems(items); renderItems();
+});
+
+$("#discFilters").addEventListener("click", e=>{
+  const b = e.target.closest("[data-f]"); if(!b) return;
+  discFilter = b.dataset.f;
+  $$("#discFilters .f").forEach(x=>x.classList.toggle("on", x===b));
+  renderDiscover();
 });
 
 /* ---------- boot ---------- */
 renderItems();
-if(!items.length) window.addEventListener("load", ()=>setTimeout(()=>toast("Tip: tap “Load demo fridge” to see a decision"), 900));
+if(!items.length) setTimeout(()=>toast("提示：第一页有「载入示例」"), 900);
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 </script>
 </body>
