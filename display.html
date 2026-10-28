@@ -95,7 +95,7 @@
 
           <!-- 1 · decision -->
           <div class="scr on" data-scr="0">
-            <div class="hd"><span>Tonight · <b id="d-time">12 min</b></span><span id="d-alt"></span></div>
+            <div class="hd"><span>今晚吃这个 · <b id="d-time">12 分钟</b></span><span id="d-alt"></span></div>
             <div class="body">
               <div class="big two" id="d-dish">Shrimp<br><span class="plus">+ greens</span></div>
               <div class="pix" id="d-pix"></div>
@@ -108,7 +108,7 @@
 
           <!-- 2 · countdown -->
           <div class="scr" data-scr="1">
-            <div class="hd"><span>Use first</span><span id="d-more"></span></div>
+            <div class="hd"><span>先吃这个</span><span id="d-more"></span></div>
             <div class="body">
               <div id="d-urgent-icon" style="color:var(--ink)"></div>
               <div>
@@ -127,7 +127,7 @@
 
           <!-- 3 · glance -->
           <div class="scr" data-scr="2">
-            <div class="hd"><span>In the fridge</span><span id="d-count">0 items</span></div>
+            <div class="hd"><span>冰箱里</span><span id="d-count">0 items</span></div>
             <div class="body" style="align-items:flex-start;flex-direction:column;gap:0;justify-content:center">
               <div class="big" id="d-glance">all good this week</div>
               <div class="bars" id="d-bars"></div>
@@ -231,9 +231,10 @@ function paint(){
   if (ranked.length) {
     const pick = ranked[Math.min(altIndex, ranked.length - 1)];
     $("#d-dish").innerHTML = twoLines(pick.recipe.name);
-    $("#d-time").textContent = pick.recipe.minutes + " min" + (pick.status === "shop1" ? " · 差1样" : "");
+    $("#d-time").textContent = pick.recipe.minutes + " 分钟" + (pick.status === "shop1" ? " · 差1样" : "");
     $("#d-uses").innerHTML = "uses " + pick.used
-      .map(u => `${u.name.toLowerCase()} <b>${FD.daysLeftOf(u)}d</b>`).join(", ");
+      .map(u => { const f = FD.byId[u.cat];
+                  return `${(f && f.cn) || u.name} <b>${FD.daysLeftOf(u)} 天</b>`; }).join("、");
     $("#d-pix").innerHTML = window.FD_ICON(pick.used[0].cat, 38);
     $("#d-alt").innerHTML = altIndex ? `<b>alt ${altIndex+1}</b>` : "";
   } else {
@@ -247,9 +248,9 @@ function paint(){
   const u0 = urg[0];
   if (u0) {
     const d0 = FD.daysLeftOf(u0);
-    $("#d-urgent-name").textContent = u0.name;
+    $("#d-urgent-name").textContent = (FD.byId[u0.cat] && FD.byId[u0.cat].cn) || u0.name;
     $("#d-urgent-days").textContent = d0 <= 0 ? "0" : String(d0);
-    $("#d-urgent-unit").textContent = d0 <= 0 ? "use today" : (d0 === 1 ? "day left" : "days left");
+    $("#d-urgent-unit").textContent = d0 <= 0 ? "今天要吃" : "天后过期";
     $("#d-urgent-icon").innerHTML = window.FD_ICON(u0.cat, 38);
     const soonCount = items.filter(i => FD.daysLeftOf(i) <= 2).length;
     $("#d-more").innerHTML = soonCount > 1 ? `<b>+${soonCount-1} more</b>` : "";
@@ -263,7 +264,8 @@ function paint(){
     .map(i => { const d = FD.daysLeftOf(i);
                 return `<span class="${d<=0?"r":(d<=2?"k":"")}"></span>`; }).join("");
   $("#d-urgent-list").innerHTML = items.slice().sort((a,b)=>FD.daysLeftOf(a)-FD.daysLeftOf(b)).slice(0,3)
-    .map(i => `${i.name.toLowerCase()} <b>${FD.daysLeftOf(i)}d</b>`).join(" · ");
+    .map(i => { const f = FD.byId[i.cat];
+                return `${(f && f.cn) || i.name} <b>${FD.daysLeftOf(i)} 天</b>`; }).join(" · ");
 
   paintDots();
   paintTally();

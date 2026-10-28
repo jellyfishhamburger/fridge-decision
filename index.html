@@ -26,14 +26,15 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:12px 0;box-shadow:var(--shadow)}
   .card h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
   .count{font-size:12px;color:var(--muted);font-weight:400}
-  .items{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fbfcfb;
-    border-radius:999px;padding:8px 12px;font-size:14px;line-height:1}
-  .chip svg{flex:0 0 auto;color:var(--green)}
+  .items{display:flex;flex-direction:column;gap:8px}
+  .chip{display:flex;align-items:center;gap:10px;width:100%;border:1px solid var(--line);background:#fbfcfb;
+    border-radius:14px;padding:13px 14px;font-size:17.5px;line-height:1;font-weight:600}
+  .chip svg{flex:0 0 auto;color:var(--green);width:22px;height:22px}
   .chip.warn svg{color:var(--amber)} .chip.urgent svg{color:var(--red)}
-  .chip .d{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .chip .d{font-size:13.5px;color:var(--muted);font-variant-numeric:tabular-nums;font-weight:500;
+    margin-left:auto}
   .chip.warn .d{color:var(--amber)} .chip.urgent .d{color:var(--red);font-weight:600}
-  .chip button{border:0;background:none;padding:0 0 0 2px;margin:0;color:#9aa8a1;font-size:16px;line-height:1;cursor:pointer}
+  .chip button{border:0;background:none;padding:0 0 0 2px;margin:0;color:#b7c1bb;font-size:18px;line-height:1;cursor:pointer}
   .empty{font-size:13px;color:var(--muted);padding:6px 0}
   .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:14px;
     padding:16px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}
@@ -103,7 +104,8 @@
   </header>
 
   <section class="card">
-    <h2>In your fridge <span class="count" id="cnt">0 items</span></h2>
+    <h2>冰箱里现在有 <span class="count" id="cnt">0 items</span></h2>
+    <div style="font-size:12.5px;color:var(--muted);margin:-4px 0 10px">右边数字＝还能放几天。越红越要先吃。</div>
     <div class="items" id="items"></div>
     <p class="empty" id="emptyNote">Nothing logged yet — add something below.</p>
     <div class="row" style="margin-top:14px">
@@ -165,7 +167,11 @@ function saveItems(){ FD.saveItems(items); }
 
 /* ---------- fridge list ---------- */
 function expiryClass(d){ return d <= 2 ? "urgent" : d <= 5 ? "warn" : ""; }
-function expiryText(d){ return d <= 0 ? "today" : d + "d"; }
+function expiryText(d){
+  if (d <= 0) return "今天到期";
+  if (d === 1) return "还剩 1 天";
+  return `还剩 ${d} 天`;
+}
 
 function renderItems(){
   const box = $("#items"); box.innerHTML = "";
