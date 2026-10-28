@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f7a5a">
+<title>Fridge Decision</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  :root{
+    --bg:#f6f7f5; --card:#fff; --ink:#16211c; --muted:#6b7a72; --line:#e2e7e3;
+    --green:#0f7a5a; --green-soft:#e6f2ed; --amber:#b26a00; --amber-soft:#fdf1e0;
+    --red:#b3261e; --red-soft:#fbe9e7; --shadow:0 1px 2px rgba(16,33,28,.06),0 8px 24px rgba(16,33,28,.06);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-text-size-adjust:100%}
+  body{padding:0 0 96px}
+  .wrap{max-width:520px;margin:0 auto;padding:0 16px}
+  header{padding:20px 0 8px}
+  h1{font-size:22px;line-height:1.2;margin:0 0 4px;letter-spacing:-.02em}
+  .sub{font-size:13px;color:var(--muted);line-height:1.5}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:12px 0;box-shadow:var(--shadow)}
+  .card h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .count{font-size:12px;color:var(--muted);font-weight:400}
+  .items{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fbfcfb;
+    border-radius:999px;padding:8px 12px;font-size:14px;line-height:1}
+  .chip .dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:0 0 auto}
+  .chip .d{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .chip.warn .dot{background:var(--amber)} .chip.warn .d{color:var(--amber)}
+  .chip.urgent .dot{background:var(--red)} .chip.urgent .d{color:var(--red);font-weight:600}
+  .chip button{border:0;background:none;padding:0 0 0 2px;margin:0;color:#9aa8a1;font-size:16px;line-height:1;cursor:pointer}
+  .empty{font-size:13px;color:var(--muted);padding:6px 0}
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:14px;
+    padding:16px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}
+  .btn.primary{background:var(--green);color:#fff;box-shadow:0 6px 18px rgba(15,122,90,.28)}
+  .btn.primary:active{transform:translateY(1px)}
+  .btn.ghost{background:#fff;color:var(--green);border:1px solid var(--green)}
+  .btn.quiet{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
+  .row{display:flex;gap:10px}
+  .row > *{flex:1}
+  /* decision */
+  .verdict{background:var(--green);color:#fff;border-radius:20px;padding:20px;margin:12px 0;box-shadow:0 12px 32px rgba(15,122,90,.24)}
+  .verdict .kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.8}
+  .verdict h3{font-size:26px;margin:6px 0 8px;line-height:1.15;letter-spacing:-.02em}
+  .verdict .meta{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;opacity:.95}
+  .verdict .meta b{font-weight:600}
+  .why{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;font-size:14px;line-height:1.6;color:#2b3a33}
+  .why ul{margin:8px 0 0;padding-left:18px} .why li{margin:4px 0}
+  .alt{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid var(--line);font-size:14px}
+  .alt:first-of-type{border-top:0}
+  .alt .t{color:var(--muted);font-size:12px;margin-top:2px}
+  .alt .go{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;color:var(--green);cursor:pointer;font-family:inherit}
+  .steps{font-size:14px;line-height:1.7;color:#2b3a33;margin:10px 0 0;padding-left:20px}
+  .steps li{margin:6px 0}
+  /* sheet */
+  .scrim{position:fixed;inset:0;background:rgba(12,22,18,.42);display:none;z-index:40}
+  .scrim.on{display:block}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;border-radius:20px 20px 0 0;
+    padding:18px 16px calc(18px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .22s ease;
+    max-width:520px;margin:0 auto}
+  .sheet.on{transform:translateY(0)}
+  .sheet h3{font-size:17px;margin:0 0 4px}
+  .sheet .hint{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 14px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 16px;max-height:38vh;overflow:auto}
+  .pick{border:1px solid var(--line);border-radius:12px;background:#fbfcfb;padding:12px 8px;font-size:13.5px;
+    text-align:center;cursor:pointer;font-family:inherit;line-height:1.25}
+  .pick.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44;font-weight:600}
+  .field{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;font-size:14px}
+  input[type=range]{width:58%;accent-color:var(--green)}
+  .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(-16px);top:14px;background:#16211c;color:#fff;
+    font-size:13.5px;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:86%;
+    box-shadow:0 8px 24px rgba(12,22,18,.24)}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+  .foot{font-size:11.5px;color:#93a29a;text-align:center;line-height:1.6;padding:18px 8px 0}
+  .tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:999px;background:var(--green-soft);color:#0b5c44;vertical-align:middle}
+  .tag.a{background:var(--amber-soft);color:var(--amber)}
+  .tag.r{background:var(--red-soft);color:var(--red)}
+  .cam{width:100%;border-radius:14px;background:#0d1512;display:none;margin-bottom:10px}
+  .cam.on{display:block}
+  .note{font-size:12px;color:var(--muted);line-height:1.55;margin:8px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>What can I cook tonight?</h1>
+    <div class="sub">One decision, not another list. Built from 18 fridge interviews.</div>
+  </header>
+
+  <section class="card">
+    <h2>In your fridge <span class="count" id="cnt">0 items</span></h2>
+    <div class="items" id="items"></div>
+    <p class="empty" id="emptyNote">Nothing logged yet — add something below.</p>
+    <div class="row" style="margin-top:14px">
+      <button class="btn ghost" id="addBtn">+ Add item</button>
+      <button class="btn quiet" id="demoBtn">Load demo fridge</button>
+    </div>
+  </section>
+
+  <button class="btn primary" id="decideBtn" style="margin-top:4px">Decide for me →</button>
+
+  <div id="result"></div>
+
+  <div class="foot">
+    Prototype v0 · decision layer only · no hardware, no recognition<br>
+    Data stays on this phone (localStorage)
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<div class="sheet" id="sheet">
+  <h3 id="sheetTitle">Add what you just put in</h3>
+  <p class="hint" id="sheetHint">Pick a category — the prototype does not guess for you yet. Auto-storage time is preset per category, adjust if you want.</p>
+  <video class="cam" id="cam" playsinline muted></video>
+  <div class="row" id="camRow" style="margin-bottom:10px">
+    <button class="btn quiet" id="snapBtn">Open camera</button>
+  </div>
+  <div class="grid" id="picks"></div>
+  <div class="field">
+    <span>Use within <b id="daysLbl">3 days</b></span>
+    <input type="range" id="days" min="1" max="21" value="3">
+  </div>
+  <button class="btn primary" id="saveBtn">Add to fridge</button>
+  <button class="btn quiet" id="cancelBtn" style="margin-top:8px">Cancel</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ---------- data ---------- */
+const CATALOG = [
+  {id:"tofu",   name:"Tofu",           tag:"protein", life:5},
+  {id:"shrimp", name:"Shrimp",         tag:"protein", life:2},
+  {id:"egg",    name:"Eggs",           tag:"protein", life:21},
+  {id:"chicken",name:"Chicken",        tag:"protein", life:3},
+  {id:"pork",   name:"Pork",           tag:"protein", life:3},
+  {id:"greens", name:"Leafy greens",   tag:"greens",  life:3},
+  {id:"tomato", name:"Tomato",         tag:"greens",  life:6},
+  {id:"onion",  name:"Onion",          tag:"veg",     life:21},
+  {id:"carrot", name:"Carrot",         tag:"veg",     life:14},
+  {id:"mushroom",name:"Mushrooms",     tag:"veg",     life:4},
+  {id:"rice",   name:"Cooked rice",    tag:"carb",    life:2},
+  {id:"noodle", name:"Noodles",        tag:"carb",    life:10},
+  {id:"dumpling",name:"Frozen dumplings",tag:"carb",  life:30},
+  {id:"milk",   name:"Milk",           tag:"dairy",   life:5},
+  {id:"cheese", name:"Cheese",         tag:"dairy",   life:14}
+];
+
+/* each dish names the exact catalogue items it consumes, so the reason line can never
+   name an ingredient the dish does not actually use */
+const DISHES = [
+  {id:"tofu_greens",  name:"Tofu & greens stir-fry",        needs:["tofu","greens"],      time:15, greens:true,
+   steps:["Cube tofu, pat dry","Blanch greens 40s, drain","Stir-fry garlic, add tofu, then greens","Season with soy + a pinch of sugar"]},
+  {id:"shrimp_greens",name:"Shrimp with greens",             needs:["shrimp","greens"],    time:12, greens:true,
+   steps:["Sear shrimp 2 min a side, set aside","Stir-fry greens 2 min","Return shrimp, season, plate"]},
+  {id:"tomato_egg",   name:"Tomato & egg",                   needs:["tomato","egg"],       time:10, greens:true,
+   steps:["Scramble eggs, set aside","Cook tomato until it collapses","Fold eggs back in, season"]},
+  {id:"egg_rice",     name:"Egg fried rice",                 needs:["egg","rice"],         time:10, greens:false,
+   steps:["Fry egg hard in hot oil","Add rice, break it up","Soy + white pepper, toss 1 min"]},
+  {id:"noodle_greens",name:"Noodle soup with greens",        needs:["noodle","greens"],    time:10, greens:true,
+   steps:["Boil water with stock or soy","Noodles 3 min","Greens in for the last 40s"]},
+  {id:"dumpling_grns",name:"Dumplings + a plate of greens",   needs:["dumpling","greens"],  time:12, greens:true,
+   steps:["Boil or pan-fry dumplings","Blanch greens, drizzle oyster sauce","Eat together — the greens are the point"]},
+  {id:"pork_onion",   name:"Onion & pork stir-fry",           needs:["pork","onion"],      time:18, greens:false,
+   steps:["Slice onion, pork thin","Sear pork, remove","Onion until sweet, return pork, soy"]},
+  {id:"mushroom_tofu",name:"Mushroom & tofu braise",          needs:["mushroom","tofu"],   time:18, greens:false,
+   steps:["Sear tofu golden","Add mushroom + soy + splash of water","Braise 6 min"]},
+  {id:"cheese_egg",   name:"Cheese omelette",                 needs:["egg","cheese"],      time:8,  greens:false,
+   steps:["Beat eggs, low heat","Cheese in, fold","60 seconds more"]},
+  {id:"chicken_grns", name:"Chicken with greens",             needs:["chicken","greens"],  time:16, greens:true,
+   steps:["Slice chicken thin, marinate in soy 5 min","Sear chicken, remove","Greens in the same pan, return chicken"]}
+];
+
+const LS_ITEMS = "fd.items.v1";
+const LS_GOAL  = "fd.goal.v1";
+
+/* ---------- state ---------- */
+let items = load(LS_ITEMS, []);
+let goal  = load(LS_GOAL, {greensPerDay:1, maxMinutes:20});
+let picked = null, pendingDays = 3, stream = null;
+
+function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
+function save(){
+  try{ localStorage.setItem(LS_ITEMS, JSON.stringify(items)); localStorage.setItem(LS_GOAL, JSON.stringify(goal)); }catch(e){}
+}
+const uid = () => Math.random().toString(36).slice(2,9);
+const today = () => new Date().toISOString().slice(0,10);
+
+/* ---------- rendering ---------- */
+const $ = s => document.querySelector(s);
+
+function expiryClass(d){ return d <= 0 ? "urgent" : d <= 2 ? "urgent" : d <= 4 ? "warn" : ""; }
+function expiryText(d){ return d <= 0 ? "today" : d + "d"; }
+
+function renderItems(){
+  const box = $("#items");
+  box.innerHTML = "";
+  const sorted = items.slice().sort((a,b)=>a.daysLeft-b.daysLeft);
+  sorted.forEach(it=>{
+    const el = document.createElement("span");
+    el.className = "chip " + expiryClass(it.daysLeft);
+    el.innerHTML = `<span class="dot"></span><span>${it.name}</span>
+      <span class="d">${expiryText(it.daysLeft)}</span>
+      <button aria-label="remove ${it.name}" data-del="${it.id}">×</button>`;
+    box.appendChild(el);
+  });
+  $("#cnt").textContent = items.length + (items.length === 1 ? " item" : " items");
+  $("#emptyNote").style.display = items.length ? "none" : "block";
+}
+
+/* ---------- decision engine ---------- */
+function itemsByCat(){
+  const m = {};
+  items.forEach(i=>{ (m[i.cat] = m[i.cat] || []).push(i); });
+  return m;
+}
+
+function scoreDish(d){
+  const byCat = itemsByCat();
+  const used = [];
+  for(const c of d.needs){
+    const list = byCat[c];
+    if(!list || !list.length) return null;               // dish is not possible right now
+    used.push(list.slice().sort((a,b)=>a.daysLeft-b.daysLeft)[0]);  // the most urgent one
+  }
+  const urgency     = used.reduce((s,i)=>s + Math.max(0, 8 - i.daysLeft) * 0.9, 0);
+  const timePenalty = Math.max(0, d.time - goal.maxMinutes) * 1.4;
+  const greensBonus = (d.greens && goal.greensPerDay > 0) ? 4 : 0;
+  return {dish:d, score: urgency + greensBonus - timePenalty, used, urgency, greensBonus, timePenalty};
+}
+
+function decide(){
+  return DISHES.map(d=>scoreDish(d)).filter(Boolean).sort((a,b)=>b.score-a.score);
+}
+
+function reasons(r){
+  const out = [];
+  const names = r.used.map(i=>`<b>${i.name.toLowerCase()}</b> — ${i.daysLeft <= 0 ? "today" : i.daysLeft + " day" + (i.daysLeft===1?"":"s")}`).join(", ");
+  out.push(`Uses ${names}, so nothing is wasted by choosing this.`);
+  if(r.greensBonus) out.push(`Counts as today's greens — the thing you skip when you're tired.`);
+  if(r.dish.time <= 15) out.push(`<b>${r.dish.time} minutes</b>, one pan — short enough to beat ordering in.`);
+  else out.push(`<b>${r.dish.time} minutes</b> — at or under your ${goal.maxMinutes}-minute limit.`);
+  if(r.timePenalty > 0) out.push(`Over your ${goal.maxMinutes}-minute limit, so it is ranked down.`);
+  return out;
+}
+
+function renderResult(list){
+  const box = $("#result");
+  if(!list.length){
+    box.innerHTML = `<div class="card"><h2>No combination yet</h2>
+      <p class="empty">Your fridge needs at least one protein or carb plus a vegetable to make a call.
+      Add something, or load the demo fridge.</p></div>`;
+    return;
+  }
+  const top = list[0], alts = list.slice(1,3);
+  box.innerHTML = `
+    <div class="verdict">
+      <div class="kicker">Tonight</div>
+      <h3>${top.dish.name}</h3>
+      <div class="meta">
+        <span>⏱ <b>${top.dish.time} min</b></span>
+        <span>🍳 <b>1 pan</b></span>
+        <span>🥬 <b>${top.dish.greens ? "greens ✓" : "no greens"}</b></span>
+      </div>
+    </div>
+    <div class="why">
+      <b>Why this one</b>
+      <ul>${reasons(top).map(r=>`<li>${r}</li>`).join("")}</ul>
+      <ol class="steps">${top.dish.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+    </div>
+    ${alts.length ? `<div class="card"><h2>Or these <span class="count">also possible right now</span></h2>
+      ${alts.map(a=>`<div class="alt"><div><div>${a.dish.name}</div>
+        <div class="t">${a.dish.time} min · ${a.dish.greens?"greens ✓":"no greens"}</div></div>
+        <button class="go" data-pick="${a.dish.id}">use this</button></div>`).join("")}
+    </div>` : ""}
+  `;
+  box.querySelectorAll("[data-pick]").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const d = DISHES.find(x=>x.id===b.dataset.pick);
+      const r = scoreDish(d);
+      if(r) { renderResult([r, ...list.filter(x=>x.dish.id!==d.id)]); window.scrollTo({top:0,behavior:"smooth"}); }
+    });
+  });
+}
+
+/* ---------- sheet ---------- */
+function openSheet(){
+  $("#scrim").classList.add("on");
+  $("#sheet").classList.add("on");
+  picked = null; pendingDays = 3;
+  const g = $("#picks");
+  g.innerHTML = "";
+  CATALOG.forEach(c=>{
+    const b = document.createElement("button");
+    b.className = "pick"; b.type="button"; b.textContent = c.name;
+    b.addEventListener("click", ()=>{
+      picked = c; pendingDays = c.life;
+      g.querySelectorAll(".pick").forEach(x=>x.classList.remove("on"));
+      b.classList.add("on");
+      $("#days").value = c.life; $("#daysLbl").textContent = c.life + " days";
+    });
+    g.appendChild(b);
+  });
+  $("#days").value = 3; $("#daysLbl").textContent = "3 days";
+}
+function closeSheet(){
+  $("#scrim").classList.remove("on");
+  $("#sheet").classList.remove("on");
+  stopCam();
+}
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove("on"), 1900);
+}
+async function startCam(){
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
+    const v = $("#cam"); v.srcObject = stream; v.classList.add("on"); await v.play();
+    $("#snapBtn").textContent = "Photo taken — now pick a category";
+  }catch(e){
+    toast("Camera needs HTTPS + permission — pick a category below instead");
+  }
+}
+function stopCam(){
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
+  $("#cam").classList.remove("on");
+}
+
+/* ---------- events ---------- */
+$("#addBtn").addEventListener("click", openSheet);
+$("#cancelBtn").addEventListener("click", closeSheet);
+$("#scrim").addEventListener("click", closeSheet);
+$("#snapBtn").addEventListener("click", startCam);
+$("#days").addEventListener("input", e=>{ pendingDays = +e.target.value; $("#daysLbl").textContent = pendingDays + " days"; });
+
+$("#saveBtn").addEventListener("click", ()=>{
+  if(!picked){ toast("Pick a category first"); return; }
+  items.push({id:uid(), cat:picked.id, name:picked.name, tag:picked.tag, daysLeft:pendingDays, addedAt:today()});
+  save(); renderItems(); closeSheet();
+  toast(picked.name + " added · use within " + pendingDays + "d");
+});
+
+$("#decideBtn").addEventListener("click", ()=>{
+  renderResult(decide());
+  const r = $("#result");
+  if(r) window.scrollTo({top:r.offsetTop - 80, behavior:"smooth"});
+});
+
+$("#demoBtn").addEventListener("click", ()=>{
+  items = [
+    {id:uid(), cat:"tofu",     name:"Tofu",             tag:"protein", daysLeft:2,  addedAt:today()},
+    {id:uid(), cat:"shrimp",   name:"Shrimp",           tag:"protein", daysLeft:1,  addedAt:today()},
+    {id:uid(), cat:"greens",   name:"Leafy greens",     tag:"greens",  daysLeft:2,  addedAt:today()},
+    {id:uid(), cat:"onion",    name:"Onion",            tag:"veg",     daysLeft:14, addedAt:today()},
+    {id:uid(), cat:"dumpling", name:"Frozen dumplings", tag:"carb",    daysLeft:30, addedAt:today()},
+    {id:uid(), cat:"egg",      name:"Eggs",             tag:"protein", daysLeft:9,  addedAt:today()}
+  ];
+  save(); renderItems(); toast("Demo fridge loaded — the interview personas' actual leftovers");
+});
+
+$("#items").addEventListener("click", e=>{
+  const b = e.target.closest("[data-del]");
+  if(!b) return;
+  items = items.filter(i=>i.id!==b.dataset.del);
+  save(); renderItems();
+});
+
+/* ---------- boot ---------- */
+renderItems();
+if(!items.length) window.addEventListener("load", ()=>setTimeout(()=>toast("Tip: tap “Load demo fridge” to see a decision"), 900));
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+</script>
+</body>
+</html>
