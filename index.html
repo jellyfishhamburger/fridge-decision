@@ -453,6 +453,8 @@ const highFibre = r => r.needs.some(n => FIBRE.has(n));
 const TITLES = {fridge:"title.fridge", discover:"title.discover", build:"title.build"};
 const t = (k, v) => I18N.t(k, v);
 function show(view){
+  /* 「自己做主」现在就是「今天的锅」这一页：先挑食材，再决定要不要加限制 */
+  if(view === "build"){ location.href = "cook.html"; return; }
   $$(".view").forEach(v => v.classList.toggle("on", v.id === "view-" + view));
   $$(".nav button").forEach(b => b.classList.toggle("on", b.dataset.view === view));
   $("#pageTitle").textContent = t(TITLES[view]);
