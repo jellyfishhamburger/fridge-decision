@@ -87,7 +87,30 @@
   <h1 data-i18n="set.title">设置</h1>
   <p class="sub" data-i18n="set.sub"></p>
 
-  <section class="card">
+    <details class="card" id="cloudCard" open>
+    <summary style="cursor:pointer;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:#6b7a72;font-weight:700">
+      云端同步 / Cloud sync <span id="cloudPill" class="pill">未连接</span>
+    </summary>
+    <p class="hint" style="margin-top:10px">填上 Supabase 的 Project URL 和 anon public key，这台设备就连上家庭共享。留空则和现在完全一样 —— 只存在本机。</p>
+    <div class="row" style="margin-top:10px">
+      <input class="inp" id="sbUrl" placeholder="https://xxxx.supabase.co" style="flex:1;min-width:0">
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input class="inp" id="sbKey" placeholder="anon public key（eyJ...）" style="flex:1;min-width:0">
+    </div>
+    <div class="row" style="margin-top:10px">
+      <span class="hint" style="flex:0 0 auto">家庭码</span>
+      <b id="hhCode" style="letter-spacing:.14em;font-size:15px">—</b>
+      <button class="btn tiny" id="hhNew">重新生成</button>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn primary" id="sbSave">保存并连接</button>
+      <button class="btn" id="sbTest">测试连接</button>
+    </div>
+    <div class="hint" id="sbMsg" style="margin-top:8px"></div>
+  </details>
+
+<section class="card">
     <h2 data-i18n="set.langH">语言 / Language</h2>
     <p class="hint" data-i18n="set.langHint"></p>
     <div class="seg" id="langSeg">
@@ -198,28 +221,6 @@
   <a class="btn ghost" href="display.html" style="text-decoration:none" data-i18n="set.toStrip"></a>
   <a class="btn quiet" href="stack.html" style="text-decoration:none">架构 / Stack</a>
 
-  <details class="card" id="cloudCard" open>
-    <summary style="cursor:pointer;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:#6b7a72;font-weight:700">
-      云端同步 / Cloud sync <span id="cloudPill" class="pill">未连接</span>
-    </summary>
-    <p class="hint" style="margin-top:10px">填上 Supabase 的 Project URL 和 anon public key，这台设备就连上家庭共享。留空则和现在完全一样 —— 只存在本机。</p>
-    <div class="row" style="margin-top:10px">
-      <input class="inp" id="sbUrl" placeholder="https://xxxx.supabase.co" style="flex:1;min-width:0">
-    </div>
-    <div class="row" style="margin-top:8px">
-      <input class="inp" id="sbKey" placeholder="anon public key（eyJ...）" style="flex:1;min-width:0">
-    </div>
-    <div class="row" style="margin-top:10px">
-      <span class="hint" style="flex:0 0 auto">家庭码</span>
-      <b id="hhCode" style="letter-spacing:.14em;font-size:15px">—</b>
-      <button class="btn tiny" id="hhNew">重新生成</button>
-    </div>
-    <div class="row" style="margin-top:12px">
-      <button class="btn primary" id="sbSave">保存并连接</button>
-      <button class="btn" id="sbTest">测试连接</button>
-    </div>
-    <div class="hint" id="sbMsg" style="margin-top:8px"></div>
-  </details>
 
   <div class="foot" data-i18n="set.foot"></div>
   <div class="version" id="ver"></div>
