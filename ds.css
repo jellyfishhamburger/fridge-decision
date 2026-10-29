@@ -1,0 +1,148 @@
+/* ============================================================
+   ds.css — Fridge Decision 设计系统
+   ------------------------------------------------------------
+   这是全站唯一一份「变量 + 通用组件」。
+   index.html / cook.html / settings.html 都先加载它，页面自己的 <style>
+   只写布局，不再各自定义颜色、圆角、字号 —— 以前三页三套色（冰箱暖米白、
+   锅页奶油纸、设置页冷灰），切页时底色和绿都不一样。
+
+   一、颜色：奶油纸底 + 鼠尾草绿 + 深绿 + 番茄红 + 黄油色。
+       任何新颜色先在这里加变量，不要在页面里写十六进制。
+   二、字号：页面大标题 24 / 区块标题 17 / 卡片标题 15 / 正文 15 /
+       辅助 13 / 极小 11.5。标题用衬线（书页感），正文用系统无衬线。
+   三、圆角：卡片 22 / 面板 18 / 输入与小块 14 / 小徽章 11 / 胶囊 999。
+   四、间距：4 / 8 / 12 / 16 / 24 / 32，不写 5、7、13、19。
+   五、图标：一套线描（stroke-only，viewBox 24，线宽 1.7），行内 20、
+      卡片 26、导航 23。只从 icons.js / cook-art.js / COOK_STEPS 取，
+      不混用 emoji、不混用填充式图标。
+   六、动效：位移 360ms 用 --ease，颜色 200ms 线性；按下 scale(.98)；
+      尊重 prefers-reduced-motion。
+   ============================================================ */
+
+:root{
+  /* 表面 */
+  --bg:#FAF6EC; --card:#FFFDF7; --card-2:#F7F2E4; --card-3:#F1F4EF;
+  --ink:#1F3B2D; --ink-2:#3A473F; --muted:#79857A; --muted-2:#9AA69C;
+  --line:#E9E1CF; --line-soft:#F0EBDE;
+
+  /* 品牌色 */
+  --green:#2F6B4F; --green-2:#377257; --green-soft:#DDE9D6; --green-line:#CFE3D9;
+  --sage:#7E9C82; --sage-dk:#5F7C64; --sage-bg:#E7EEE4;
+  --tomato:#D4553F; --tomato-soft:#FBE7E3;
+  --butter:#F2C14E; --butter-bg:#FBEFD2;
+  --amber:#B26A00; --amber-soft:#FBEEDC;
+  --red:#A93B33; --red-soft:#FBE7E3;
+
+  /* 圆角 */
+  --r:22px; --r-lg:24px; --r-md:18px; --r-sm:14px; --r-xs:11px; --r-pill:999px;
+
+  /* 间距 */
+  --sp1:4px; --sp2:8px; --sp3:12px; --sp4:16px; --sp5:24px; --sp6:32px;
+
+  /* 阴影：同一束光，从右上打下来，颜色偏绿褐而不是纯黑 */
+  --shadow:0 1px 2px rgba(47,60,45,.05), 0 10px 28px rgba(47,60,45,.07);
+  --shadow-2:0 12px 26px rgba(43,95,71,.26);
+  --shadow-up:0 -16px 34px -24px rgba(51,48,42,.9);
+
+  /* 字体 */
+  --font-ui:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  --font-display:Georgia,"Songti SC","Noto Serif SC",serif;
+  --fs-h1:24px; --fs-h2:17px; --fs-h3:15px; --fs-body:15px; --fs-sm:13px; --fs-xs:11.5px;
+  --lh-tight:1.22; --lh-body:1.55;
+
+  /* 图标 */
+  --icon-stroke:1.7; --icon-nav:23px; --icon-row:20px; --icon-card:26px; --icon-btn:20px;
+
+  /* 动效 */
+  --ease:cubic-bezier(.22,1,.36,1); --spring:cubic-bezier(.34,1.56,.64,1);
+  --dur-move:360ms; --dur-color:200ms;
+}
+
+/* ---------- 排版：一页里只有这四级标题 ---------- */
+.ds-h1{
+  font-family:var(--font-display); font-size:var(--fs-h1); font-weight:600;
+  letter-spacing:-.01em; line-height:var(--lh-tight); color:var(--ink); margin:0;
+}
+.ds-h2{ font-size:var(--fs-h2); font-weight:700; letter-spacing:-.01em; color:var(--ink); margin:0 }
+.ds-h3{ font-size:var(--fs-h3); font-weight:700; color:var(--ink); margin:0 }
+.ds-sub{ font-size:var(--fs-sm); color:var(--muted); line-height:var(--lh-body); margin:0 }
+
+/* ---------- 搜索框：冰箱、菜谱共用一个 ---------- */
+.ds-search{
+  display:flex; align-items:center; gap:var(--sp2); height:42px;
+  border:1px solid var(--line); background:var(--card); border-radius:var(--r-sm);
+  padding:0 10px; transition:border-color var(--dur-color), box-shadow var(--dur-color);
+}
+.ds-search:focus-within{ border-color:var(--green); box-shadow:0 0 0 3px var(--green-soft) }
+.ds-search > svg{ width:18px; height:18px; flex:none; color:var(--muted-2) }
+.ds-search input{
+  flex:1; min-width:0; height:100%; border:0; background:none; padding:0;
+  font-family:inherit; font-size:var(--fs-sm); color:var(--ink); -webkit-appearance:none;
+}
+.ds-search input::placeholder{ color:var(--muted-2) }
+.ds-search input:focus{ outline:none }
+.ds-search input::-webkit-search-cancel-button{ display:none }
+.ds-search .ds-clear{
+  width:24px; height:24px; flex:none; border:0; border-radius:50%; background:var(--card-3);
+  color:var(--muted); font-size:13px; line-height:1; cursor:pointer; font-family:inherit;
+  display:grid; place-items:center;
+}
+.ds-search .ds-clear[hidden]{ display:none }
+
+/* ---------- 分段控件（排序、切换视图） ---------- */
+.ds-seg{
+  display:inline-flex; flex:none; border:1px solid var(--line); border-radius:var(--r-pill);
+  background:var(--card); padding:2px; gap:2px;
+}
+.ds-seg button{
+  border:0; background:none; border-radius:var(--r-pill); padding:6px 11px;
+  font-family:inherit; font-size:var(--fs-xs); font-weight:600; color:var(--muted); cursor:pointer;
+  transition:background var(--dur-color), color var(--dur-color);
+}
+.ds-seg button.on{ background:var(--green-soft); color:var(--green) }
+.ds-seg button:active{ transform:scale(.97) }
+
+/* ---------- 状态胶囊：同一件事只有一种颜色 ---------- */
+.ds-pill{
+  display:inline-flex; align-items:center; gap:4px; border-radius:8px; padding:3px 7px;
+  font-size:var(--fs-xs); font-weight:600; line-height:1.3;
+  background:var(--card-3); color:var(--ink-2);
+}
+.ds-pill.ok{ background:var(--green-soft); color:#0B5C44 }
+.ds-pill.warn{ background:var(--amber-soft); color:#7A4A05 }
+.ds-pill.hot{ background:var(--red-soft); color:var(--red) }
+
+/* ---------- 可折叠分组：冰箱的「蔬菜 / 蛋白 / …」 ---------- */
+.ds-grp{ border-bottom:1px solid var(--line) }
+.ds-grp:last-child{ border-bottom:0 }
+.ds-grp > summary{
+  display:flex; align-items:center; gap:var(--sp2); list-style:none; cursor:pointer;
+  padding:15px 2px 9px; -webkit-tap-highlight-color:transparent;
+}
+.ds-grp > summary::-webkit-details-marker{ display:none }
+.ds-grp > summary .gt{ font-size:12.5px; font-weight:700; letter-spacing:.05em; color:var(--muted) }
+.ds-grp > summary .gc{
+  font-size:var(--fs-xs); font-weight:600; color:var(--muted);
+  background:var(--card-3); border-radius:var(--r-pill); padding:1px 7px;
+  font-variant-numeric:tabular-nums;
+}
+.ds-grp > summary .gm{ margin-left:auto; font-size:var(--fs-xs); color:var(--muted-2) }
+.ds-grp > summary::after{
+  content:""; width:8px; height:8px; margin-right:2px; flex:none;
+  border-right:1.7px solid var(--muted-2); border-bottom:1.7px solid var(--muted-2);
+  transform:rotate(45deg) translateY(-2px); transition:transform var(--dur-color);
+}
+.ds-grp[open] > summary::after{ transform:rotate(225deg) translateY(-2px) }
+
+/* ---------- 空状态：一句解释 + 一个动作，不留白板 ---------- */
+.ds-empty{
+  font-size:var(--fs-sm); color:var(--muted); line-height:var(--lh-body);
+  padding:var(--sp3) 0; margin:0;
+}
+
+/* ---------- 无障碍：键盘能看见焦点，动效可以关 ---------- */
+:focus-visible{ outline:2px solid var(--green); outline-offset:2px; border-radius:6px }
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important;
+    transition-duration:.001ms !important; scroll-behavior:auto !important }
+}

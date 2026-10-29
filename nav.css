@@ -20,6 +20,7 @@
   --nav-accent:var(--green, #2F6B4F);
   --nav-pill:rgba(47,107,79,.10);
   --nav-pill:color-mix(in srgb, var(--green, #2F6B4F) 12%, transparent);
+  --nav-h:64px;              /* 实际高度由 nav.js 量出来写回这里（字号/安全区会变） */
   --nav-dur:300ms;
   --nav-ease:cubic-bezier(.22,1,.36,1);
 }

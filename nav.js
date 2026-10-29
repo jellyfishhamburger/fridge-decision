@@ -50,8 +50,15 @@
     pill.classList.add("on");
   }
 
+  /* 把真实高度写成 --nav-h：锅页的固定面板贴在这条线上，写死 70px 会留一道缝，
+     缝里会露出橱柜最后一行的小字。 */
+  function setH(){
+    var h = Math.round(nav.getBoundingClientRect().height);
+    if(h) document.documentElement.style.setProperty("--nav-h", h + "px");
+  }
+
   // 1. 初次定位（等一帧，避免量到还没排好版的大小）
-  requestAnimationFrame(function(){ place(active(), false); });
+  requestAnimationFrame(function(){ place(active(), false); setH(); });
   // 字体加载完宽度会变，重新量一次
   if(document.fonts && document.fonts.ready){
     document.fonts.ready.then(function(){ place(active(), false); });
@@ -60,8 +67,9 @@
   var rt;
   addEventListener("resize", function(){
     clearTimeout(rt);
-    rt = setTimeout(function(){ place(active(), false); }, 120);
+    rt = setTimeout(function(){ place(active(), false); setH(); }, 120);
   });
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(setH); }
 
   // 2. 任何来源把 .on 换了（页面自己的 show()、hash 路由、脚本），都跟着滑
   var last = null;
