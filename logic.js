@@ -294,15 +294,10 @@
       })();
       setInterval(async () => {
         if (document.hidden) return;
-        try {
-          const rows = await global.SYNC.pull(me.code());
-          if (!Array.isArray(rows)) return;
-          if (JSON.stringify(snap(rows)) !== JSON.stringify(snap(read(LS_ITEMS, [])))) {
-            lastCloud = snap(rows);
-            write(LS_ITEMS, rows);
-            onChange && onChange();
-          }
-        } catch (e) {}
+        const before = JSON.stringify(snap(read(LS_ITEMS, [])));
+        try { await me.pull(); } catch (e) { return; }   /* offline: keep local, retry next tick */
+        const after = JSON.stringify(snap(read(LS_ITEMS, [])));
+        if (before !== after) onChange && onChange();
       }, ms || 5000);
       return true;
     }
