@@ -16,7 +16,7 @@
   /* 第 9 类是 unknown：模型自己学会说"这不是我认识的那 8 样"，
      比事后用阈值去猜"它是不是在硬掰"可靠。 */
   const LABELS = ["chili", "egg", "greens", "milk", "mushroom", "pork", "tofu", "tomato", "unknown"];
-  const MODEL = "./models/food9b_u8.tflite";
+  const MODEL = "./models/food9d_u8.tflite";
   const BUNDLE = "./vendor/mediapipe/vision_bundle.mjs";
   const WASM = "./vendor/mediapipe/wasm";
 
