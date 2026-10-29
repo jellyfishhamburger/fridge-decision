@@ -218,6 +218,15 @@
   .pick, .pf, .chip button{touch-action:manipulation}
   .pick svg{color:var(--green);display:block}
   .field{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;font-size:14px}
+  /* 保质期：按食物自己的范围调，不再用一根 1–60 的通用滑条 */
+  .keep{margin:12px 0 14px;padding:12px 12px 10px;border:1px solid var(--line);border-radius:14px;background:#fbfcfb}
+  .keep-top{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px}
+  .keep-lbl{color:#3a473f}
+  .keep-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .kchip{border:1px solid var(--line);background:#fff;color:#42504a;border-radius:9px;
+    padding:6px 11px;font-size:12.5px;font-family:inherit;cursor:pointer;line-height:1.2}
+  .kchip.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44;font-weight:600}
+  .keep-note{margin:9px 0 0;font-size:11.5px;line-height:1.5;color:var(--muted);min-height:17px}
   input[type=range]{accent-color:var(--green)}
   .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(-16px);top:14px;background:#16211c;color:#fff;
     font-size:13.5px;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:86%;
@@ -360,6 +369,19 @@
   <button class="btn quiet" id="scanBtn" style="display:none;margin-bottom:10px" data-i18n="sheet.scan">扫商品条码</button>
   <p class="cammsg" id="camMsg" data-i18n="sheet.camMsg"></p>
   <div class="grid" id="picks"></div>
+  <div class="keep" id="keepBox">
+    <div class="keep-top">
+      <span class="keep-lbl">可以放到</span>
+      <span class="step2">
+        <button type="button" id="dMinus">−</button>
+        <span id="daysLbl">3 天</span>
+        <button type="button" id="dPlus">＋</button>
+      </span>
+    </div>
+    <div class="keep-chips" id="keepChips"></div>
+    <p class="keep-note" id="keepNote"></p>
+    <input type="hidden" id="days" value="3">
+  </div>
   <div class="qtyrow">
     <span data-i18n="sheet.qty">这次带回来几份</span>
     <span class="step2">
@@ -367,10 +389,6 @@
       <span id="qtyLbl">1 份</span>
       <button type="button" id="qPlus">＋</button>
     </span>
-  </div>
-  <div class="field">
-    <span id="daysLbl">3 天后</span>
-    <input type="range" id="days" min="1" max="60" value="3">
   </div>
   <div class="sheet-foot" id="sheetFoot">
     <button class="btn primary" id="saveBtn" data-i18n="sheet.save">加进冰箱</button>
@@ -809,12 +827,23 @@ function openSheetLegacy(){
       picked = c; pendingDays = c.days;
       g.querySelectorAll(".pick").forEach(x=>x.classList.remove("on"));
       b.classList.add("on");
-      $("#days").value = c.days; $("#daysLbl").innerHTML = t("sheet.keepFor",{n:c.days});
+      paintKeep();                                    /* 换成这类食物自己的天数范围 */
+      /* 选完食物把保质期这一块带到眼前：格子有 19 个，不然要往下翻很久才找得到。
+         滚完再校正一次，避免它被贴底按钮压住一点。 */
+      setTimeout(() => {
+        const kb = $("#keepBox"), sf = $("#sheetFoot"), sh = $("#sheet");
+        if(!kb || !sh) return;
+        kb.scrollIntoView({block:"center", behavior:"smooth"});
+        setTimeout(() => {
+          const d = kb.getBoundingClientRect().bottom - (sf ? sf.getBoundingClientRect().top : innerHeight);
+          if(d > -12) sh.scrollTop += d + 16;
+        }, 280);
+      }, 80);
       pendingQty = 1; paintQty();
     });
     g.appendChild(b);
   });
-  $("#days").value = 3; $("#daysLbl").innerHTML = t("sheet.keepFor",{n:3}); pendingDays = 3;
+  pendingDays = 3; paintKeep();
   pendingQty = 1; paintQty();
 
   /* 编辑既有条目 / 指定某条待确认：把已有状态填回面板 */
@@ -824,13 +853,13 @@ function openSheetLegacy(){
       pendingQty = editTarget.qty == null ? 1 : editTarget.qty;
       const b = [...g.querySelectorAll(".pick")].find(x => x.textContent.includes(I18N.foodName(c.id)));
       if(b) b.classList.add("on");
-      $("#days").value = pendingDays; $("#daysLbl").innerHTML = t("sheet.keepFor",{n:pendingDays});
+      paintKeep();
       paintQty();
     }
   } else if(sheetFor && sheetFor.label && sheetFor.label !== "unknown"){
     const c = FD.CATALOG.find(x => x.id === sheetFor.label);
     if(c){ picked = c; pendingDays = c.days; $("#pickHint") && ($("#pickHint").textContent = t("sheet.forPending"));
-      $("#days").value = c.days; $("#daysLbl").innerHTML = t("sheet.keepFor",{n:c.days}); paintQty(); }
+      paintKeep(); paintQty(); }
   }
   shotURL = null; $("#shot").classList.remove("on"); $("#snapBtn").textContent = t("sheet.cam");
   if("BarcodeDetector" in window) $("#scanBtn").style.display = "none";
@@ -842,6 +871,57 @@ function paintQty(){
 }
 $("#qMinus").addEventListener("click", ()=>{ pendingQty = Math.max(1, pendingQty - 1); paintQty(); });
 $("#qPlus").addEventListener("click", ()=>{ pendingQty = Math.min(99, pendingQty + 1); paintQty(); });
+
+/* ---------- 保质期：按食物自己的范围 ----------
+   「一根 1–60 的滑条」对速冻水饺（默认 90 天）和绿叶菜（4 天）是同一把尺子，
+   两头都难调。改成：默认值 = 这类食物的常识天数，范围 = 它的 1/2 ~ 2 倍，
+   再用几个「N 天」的快捷块，最后用日期（而不是"N 天后"）告诉用户哪天前吃掉。 */
+function keepMax(c){
+  const base = c && c.days ? c.days : 14;
+  return Math.min(365, Math.max(14, base * 2));
+}
+function paintKeep(){
+  const c = picked;
+  const max = keepMax(c);
+  pendingDays = Math.min(Math.max(1, pendingDays || 1), max);
+  const el = $("#days"); if(el) el.value = pendingDays;
+
+  const en = I18N.getLang() === "en";
+  if($("#daysLbl")) $("#daysLbl").textContent = en ? `${pendingDays} d` : `${pendingDays} 天`;
+
+  const note = $("#keepNote");
+  if(note){
+    if(!c){ note.textContent = en ? "Pick a food first" : "先选一样食物，这里会按它的常识保质期给你默认值"; }
+    else {
+      const d = new Date(); d.setDate(d.getDate() + pendingDays);
+      const ds = en ? d.toISOString().slice(0,10)
+                    : `${d.getMonth()+1}月${d.getDate()}日`;
+      const name = I18N.foodName(c.id);
+      note.textContent = en
+        ? `Use by ${ds} · ${name} usually keeps about ${c.days} days`
+        : `${ds} 前吃掉 · ${name}通常能放 ${c.days} 天`;
+    }
+  }
+
+  const box = $("#keepChips");
+  if(box){
+    const base = c ? c.days : 7;
+    const opts = [...new Set([
+      Math.max(1, Math.round(base / 2)),
+      base,
+      Math.min(max, base * 2),
+      ...[7, 14, 30, 90].filter(v => v <= max && v > base)
+    ])].filter(v => v >= 1 && v <= max).sort((a, b) => a - b);
+    box.innerHTML = opts.map(n =>
+      `<button type="button" class="kchip${n === pendingDays ? " on" : ""}" data-keep="${n}">${n} 天</button>`
+    ).join("");
+    box.querySelectorAll("[data-keep]").forEach(b => b.addEventListener("click", () => {
+      pendingDays = +b.dataset.keep; paintKeep();
+    }));
+  }
+}
+$("#dMinus").addEventListener("click", ()=>{ pendingDays = Math.max(1, pendingDays - 1); paintKeep(); });
+$("#dPlus").addEventListener("click", ()=>{ pendingDays = Math.min(keepMax(picked), pendingDays + 1); paintKeep(); });
 
 function closeSheet(){
   $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); stopCam();
@@ -949,7 +1029,7 @@ $("#zoom").addEventListener("input", async e=>{
   try{ await camTrack.applyConstraints({advanced:[{zoom:z}]}); }catch(err){}
 });
 $("#scanBtn").addEventListener("click", scanBarcode);
-$("#days").addEventListener("input", e=>{ pendingDays = +e.target.value; $("#daysLbl").innerHTML = t("sheet.keepFor",{n:pendingDays}); });
+/* 保质期不再用滑条：见 paintKeep()（#days 只作为隐藏值保留） */
 
 $("#saveBtn").addEventListener("click", ()=>{
   if(!picked){ toast(t("sheet.pickFirst")); return; }
@@ -1037,7 +1117,7 @@ function applyLang(){
   if(view === "discover") renderDiscover();
   if(view === "build") renderBuild();
   if($("#result").innerHTML) renderResult(FD.decide(items, goal));
-  $("#daysLbl") && ($("#daysLbl").innerHTML = t("sheet.keepFor", {n: pendingDays}));
+  if($("#keepBox")) paintKeep();
 }
 $("#langBtn").addEventListener("click", ()=>{
   I18N.setLang(I18N.getLang() === "en" ? "zh" : "en");
