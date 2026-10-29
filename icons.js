@@ -38,6 +38,15 @@
              <path d="M14.8 6.2l3.4-2.4M14.8 6.2l.6-4M14.8 6.2l4.2 1"/>`,
     mushroom: `<path d="M3.6 12.2a8.4 6.6 0 0116.8 0z"/><path d="M9.4 12.2v5.4h5.2v-5.4"/>`,
 
+    chili: `<path d="M11.4 8.6c3.4-.6 6.6 2 6.9 5.6.3 3.9-2.9 6.6-6.4 6-3.4-.6-5.3-3.6-4.6-6.9"/>
+            <path d="M11.4 8.6c.2-1.6-.2-2.6-1.2-3.2M11.4 8.6c1.2-.6 2-1.6 2.2-2.8"/>`,
+    potato: `<path d="M12.2 5.6c4 0 6.8 3 6.8 6.6 0 3.8-3 6.4-6.9 6.2-3.6-.2-6.2-2.8-6.2-6.4 0-3.7 2.6-6.4 6.3-6.4z"/>
+             <circle cx="10" cy="10.4" r=".9"/><circle cx="14.4" cy="13.2" r=".9"/><circle cx="11.8" cy="15" r=".8"/>`,
+    eggplant: `<path d="M11.6 8.4c2.6 0 5.6 2.4 5.6 5.8 0 3.4-2.8 5.6-6 5.6-3.1 0-5.4-2.2-5.4-5.4 0-3.3 2.7-6 5.8-6z"/>
+               <path d="M11.6 8.4l-.6-2.6M11 5.8l-2.6.6M11 5.8l2.4.8"/>`,
+    cola: `<path d="M8.4 7.6h7.2v11.2a1.6 1.6 0 01-1.6 1.6h-4a1.6 1.6 0 01-1.6-1.6z"/>
+           <path d="M8.4 7.6h7.2M11 11.4c1.4-.6 2.2.6 2.2.6"/>`,
+
     /* carbs */
     rice: `<path d="M2.8 12.6h18.4a9.2 6.4 0 01-18.4 0z"/>
            <path d="M6.6 12.6c.6-3 2.8-4.6 5.4-4.6s4.8 1.6 5.4 4.6"/>`,
@@ -63,6 +72,7 @@
     greens:"greens", broccoli:"broccoli", tomato:"tomato", onion:"onion",
     carrot:"carrot", mushroom:"mushroom",
     rice:"rice", noodle:"noodle", dumpling:"dumpling", bread:"bread",
+    chili:"chili", potato:"potato", eggplant:"eggplant", cola:"cola",
     milk:"milk", cheese:"cheese", yogurt:"yogurt"
   };
 
