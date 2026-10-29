@@ -182,7 +182,11 @@
   .scrim.on{display:block}
   .sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;border-radius:20px 20px 0 0;
     padding:18px 16px calc(18px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .22s ease;
-    max-width:520px;margin:0 auto;max-height:88vh;overflow:auto}
+    max-width:520px;margin:0 auto;max-height:88vh;max-height:88dvh;overflow:auto;
+    -webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  /* 保存按钮贴底：19 个格子滚到底才找得到按钮，在手机上很难受 */
+  #saveBtn{position:sticky;bottom:0;margin-top:6px;box-shadow:0 -14px 18px 6px #fff}
+  #cancelBtn{position:relative;z-index:1}
   .sheet.on{transform:translateY(0)}
   .sheet h3{font-size:17px;margin:0 0 4px}
   .sheet .hint{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 12px}
