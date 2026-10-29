@@ -94,7 +94,7 @@
       "sheet.camReady": "拍下来之后请选下面哪一种食物 —— 原型还不会自动认。",
       "sheet.camFail": "相机打不开（需要 HTTPS + 授权）。可以直接在下面选食物。",
       "sheet.camDone": "拍到了。原型还不会替你认 —— 在下面选是哪一种（这是有意的限制，不是 bug）。",
-      "sheet.qty": "这次带回来几份", "sheet.qtyUnit": "{n} {unit}",
+      "sheet.qty": "这次带回来几份", "sheet.keep": "可以放", "sheet.qtyUnit": "{n} {unit}",
       "sheet.keepFor": "可以放到 <b>{n} 天后</b>", "sheet.save": "加进冰箱", "sheet.cancel": "取消",
       "sheet.pickFirst": "先选一样食物",
 
@@ -232,7 +232,7 @@
       "sheet.camReady": "Shoot, then pick which food it was — recognition is not implemented.",
       "sheet.camFail": "Camera blocked (needs HTTPS + permission). Pick the food below instead.",
       "sheet.camDone": "Captured. The prototype still will not recognise it — choose below (a deliberate limit, not a bug).",
-      "sheet.qty": "How many did you bring home", "sheet.qtyUnit": "{n} {unit}",
+      "sheet.qty": "How many did you bring home", "sheet.keep": "Keeps for", "sheet.qtyUnit": "{n} {unit}",
       "sheet.keepFor": "Good until <b>{n} days from now</b>", "sheet.save": "Add to fridge", "sheet.cancel": "Cancel",
       "sheet.pickFirst": "Pick a food first",
 

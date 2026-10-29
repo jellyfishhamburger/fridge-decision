@@ -338,9 +338,12 @@ body.past-fridge .backtop{opacity:1;pointer-events:auto}
 .pref-toggle .pico{color:var(--sage-dk);font-size:15px;line-height:1}
 .pref-toggle .plabel{font-size:10.5px;letter-spacing:.02em}
 .pref-toggle[aria-expanded="true"]{background:var(--sage-bg);border-color:#D3E0CF;color:var(--sage-dk)}
-.prefs-body{position:absolute;right:48px;bottom:calc(100% + 8px);width:238px;
-  background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0 12px 8px;
-  box-shadow:0 20px 44px -22px rgba(51,48,42,.65);height:0;overflow:hidden;will-change:height}
+/* 筛选面板：以整张锅卡为基准居中，浮在它上方 —— 不再贴着右边（右不右中不中） */
+.prefs-body{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(100% + 12px);
+  width:min(332px, calc(100vw - 34px));max-height:70vh;
+  background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 14px 10px;
+  box-shadow:0 22px 48px -24px rgba(51,48,42,.6), 0 2px 8px -2px rgba(51,48,42,.12);
+  height:0;overflow:hidden;will-change:height}
 .prefs-body .psum-line{font-size:12px;color:var(--sage-dk);font-weight:600;margin:10px 0 2px}
 .prefs-body .prow{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink);margin:10px 0 4px}
 .prefs-body .prow b{color:var(--sage-dk)}

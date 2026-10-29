@@ -339,6 +339,46 @@ window.FD_DATA = {
    "id": "sesame",
    "cn": "芝麻",
    "name": "sesame"
+  },
+  {
+   "id": "dark_soy",
+   "cn": "老抽",
+   "name": "dark soy sauce"
+  },
+  {
+   "id": "sesame_oil",
+   "cn": "香油",
+   "name": "sesame oil"
+  },
+  {
+   "id": "white_vinegar",
+   "cn": "白醋",
+   "name": "white vinegar"
+  },
+  {
+   "id": "chili_garlic_sauce",
+   "cn": "蒜蓉辣酱",
+   "name": "chilli garlic sauce"
+  },
+  {
+   "id": "bird_chili",
+   "cn": "小米辣",
+   "name": "bird's eye chilli"
+  },
+  {
+   "id": "star_anise",
+   "cn": "八角",
+   "name": "star anise"
+  },
+  {
+   "id": "dried_shrimp",
+   "cn": "虾皮",
+   "name": "dried shrimp"
+  },
+  {
+   "id": "peanut",
+   "cn": "花生",
+   "name": "peanuts"
   }
  ],
  "recipes": [
@@ -436,7 +476,8 @@ window.FD_DATA = {
    "pantry": [
     "salt",
     "oil"
-   ],
+   ,
+    "sesame_oil"],
    "minutes": 10,
    "kcal": 151,
    "greens": false,
@@ -465,7 +506,8 @@ window.FD_DATA = {
     "ginger",
     "wine",
     "scallion"
-   ],
+   ,
+    "dark_soy"],
    "minutes": 20,
    "kcal": 960,
    "greens": false,
@@ -500,7 +542,9 @@ window.FD_DATA = {
     "oil",
     "sesame",
     "doubanjiang"
-   ],
+   ,
+    "dark_soy",
+    "peanut"],
    "minutes": 20,
    "kcal": 1790,
    "greens": false,
@@ -554,7 +598,8 @@ window.FD_DATA = {
     "oyster",
     "garlic",
     "ginger"
-   ],
+   ,
+    "douchi"],
    "minutes": 30,
    "kcal": 425,
    "greens": false,
@@ -620,7 +665,8 @@ window.FD_DATA = {
     "ginger",
     "scallion",
     "garlic"
-   ],
+   ,
+    "dark_soy"],
    "minutes": 20,
    "kcal": 608,
    "greens": false,
@@ -650,7 +696,9 @@ window.FD_DATA = {
     "pepper_corn",
     "salt",
     "soy"
-   ],
+   ,
+    "bird_chili",
+    "chili_garlic_sauce"],
    "minutes": 20,
    "kcal": 476,
    "greens": false,
@@ -678,7 +726,9 @@ window.FD_DATA = {
     "oil",
     "salt",
     "garlic"
-   ],
+   ,
+    "sesame_oil",
+    "msg"],
    "minutes": 15,
    "kcal": 258,
    "greens": true,
@@ -741,7 +791,8 @@ window.FD_DATA = {
     "soy",
     "sugar",
     "oil"
-   ],
+   ,
+    "white_vinegar"],
    "minutes": 20,
    "kcal": 654,
    "greens": true,
@@ -769,7 +820,8 @@ window.FD_DATA = {
     "garlic",
     "soy",
     "oil"
-   ],
+   ,
+    "sesame_oil"],
    "minutes": 10,
    "kcal": 343,
    "greens": false,
@@ -819,7 +871,9 @@ window.FD_DATA = {
    "pantry": [
     "soy",
     "oil"
-   ],
+   ,
+    "star_anise",
+    "dried_shrimp"],
    "minutes": 20,
    "kcal": 610,
    "greens": false,
@@ -849,7 +903,11 @@ window.FD_DATA = {
    "needs": [
     "greens"
    ],
-   "pantry": [],
+   "pantry": [
+    "garlic",
+    "oil",
+    "salt",
+    "sugar"],
    "minutes": 10,
    "kcal": 152,
    "greens": true,
@@ -881,7 +939,8 @@ window.FD_DATA = {
     "garlic",
     "salt",
     "soy"
-   ],
+   ,
+    "sugar"],
    "minutes": 15,
    "kcal": 440,
    "greens": true,

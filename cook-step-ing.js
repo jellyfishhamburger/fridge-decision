@@ -38,25 +38,25 @@
     "微波炉蒸蛋#2": [],
     "微波炉蒸蛋#3": ["egg"],
     "微波炉蒸蛋#4": ["egg"],
-    "微波炉蒸蛋#5": ["egg", "sesame", "scallion"],
+    "微波炉蒸蛋#5": ["egg", "sesame_oil", "scallion"],
 
     /* 可乐鸡翅 */
     "可乐鸡翅#0": ["chicken", "ginger", "wine"],
     "可乐鸡翅#1": ["chicken", "soy"],
     "可乐鸡翅#2": ["chicken", "ginger", "oil"],
     "可乐鸡翅#3": ["chicken", "cola", "scallion"],
-    "可乐鸡翅#4": ["chicken", "salt", "sugar", "soy"],
+    "可乐鸡翅#4": ["chicken", "salt", "sugar", "soy", "dark_soy"],
     "可乐鸡翅#5": ["chicken", "cola", "scallion", "ginger"],
     "可乐鸡翅#6": ["chicken"],
 
     /* 宫保鸡丁 */
     "宫保鸡丁#0": ["chicken"],
-    "宫保鸡丁#1": ["scallion", "ginger"],
-    "宫保鸡丁#2": ["chicken", "salt", "soy", "wine", "starch", "scallion", "ginger"],
+    "宫保鸡丁#1": ["scallion", "ginger", "peanut"],
+    "宫保鸡丁#2": ["chicken", "salt", "dark_soy", "wine", "starch", "scallion", "ginger"],
     "宫保鸡丁#3": ["dried_chili", "pepper_corn"],
     "宫保鸡丁#4": ["chicken", "oil"],
     "宫保鸡丁#5": ["chicken", "scallion", "ginger"],
-    "宫保鸡丁#6": ["chicken", "dried_chili", "pepper_corn", "msg", "vinegar", "sugar"],
+    "宫保鸡丁#6": ["chicken", "dried_chili", "pepper_corn", "msg", "vinegar", "sugar", "peanut"],
     "宫保鸡丁#7": ["starch"],
 
     /* 洋葱炒猪肉 */
@@ -90,19 +90,19 @@
     "香菇滑鸡#2": ["chicken"],
     "香菇滑鸡#3": ["mushroom"],
     "香菇滑鸡#4": ["chicken"],
-    "香菇滑鸡#5": ["chicken", "wine", "soy", "salt"],
+    "香菇滑鸡#5": ["chicken", "wine", "soy", "salt", "dark_soy"],
     "香菇滑鸡#6": ["chicken", "oil"],
     "香菇滑鸡#7": ["mushroom", "scallion", "ginger", "garlic", "oil"],
 
     /* 麻婆豆腐 */
     "麻婆豆腐#0": ["garlic", "ginger"],
-    "麻婆豆腐#1": [],
+    "麻婆豆腐#1": ["bird_chili"],
     "麻婆豆腐#2": ["pork"],
     "麻婆豆腐#3": ["pork", "salt", "soy"],
     "麻婆豆腐#4": [],
     "麻婆豆腐#5": ["tofu"],
     "麻婆豆腐#6": ["oil"],
-    "麻婆豆腐#7": ["garlic", "ginger", "pepper_corn"],
+    "麻婆豆腐#7": ["garlic", "ginger", "pepper_corn", "chili_garlic_sauce"],
 
     /* 西红柿鸡蛋汤 */
     "西红柿鸡蛋汤#0": ["tomato"],
@@ -111,7 +111,7 @@
     "西红柿鸡蛋汤#3": ["oil", "scallion", "ginger", "garlic"],
     "西红柿鸡蛋汤#4": ["tomato"],
     "西红柿鸡蛋汤#5": ["tomato", "salt"],
-    "西红柿鸡蛋汤#6": ["egg", "msg", "sesame"],
+    "西红柿鸡蛋汤#6": ["egg", "msg", "sesame_oil"],
     "西红柿鸡蛋汤#7": ["tomato", "egg"],
 
     /* 蛋炒饭 */
@@ -128,7 +128,7 @@
     "西红柿鸡蛋挂面#0": ["scallion"],
     "西红柿鸡蛋挂面#1": ["tomato"],
     "西红柿鸡蛋挂面#2": ["chili"],
-    "西红柿鸡蛋挂面#3": ["egg", "vinegar"],
+    "西红柿鸡蛋挂面#3": ["egg", "white_vinegar"],
     "西红柿鸡蛋挂面#4": ["oil"],
     "西红柿鸡蛋挂面#5": ["egg"],
     "西红柿鸡蛋挂面#6": ["egg"],
@@ -141,7 +141,7 @@
     "凉拌豆腐#3": ["tofu"],
     "凉拌豆腐#4": ["scallion"],
     "凉拌豆腐#5": ["garlic"],
-    "凉拌豆腐#6": ["soy", "sesame", "vinegar", "sugar"],
+    "凉拌豆腐#6": ["soy", "sesame_oil", "vinegar", "sugar"],
     "凉拌豆腐#7": ["garlic"],
 
     /* 洋葱炒鸡蛋 */
@@ -152,11 +152,11 @@
     /* 炒茄子 */
     "炒茄子#0": ["eggplant"],
     "炒茄子#1": ["scallion"],
-    "炒茄子#2": [],
+    "炒茄子#2": ["star_anise"],
     "炒茄子#3": ["oil"],
     "炒茄子#4": [],
     "炒茄子#5": ["oil"],
-    "炒茄子#6": ["scallion", "oil"],
+    "炒茄子#6": ["scallion", "oil", "star_anise", "dried_shrimp"],
     "炒茄子#7": ["oil"],
 
     /* 炒青菜 */

@@ -218,6 +218,9 @@
     padding:6px 11px;font-size:12.5px;font-family:inherit;cursor:pointer;line-height:1.2}
   .kchip.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44;font-weight:600}
   .keep-note{margin:9px 0 0;font-size:11.5px;line-height:1.5;color:var(--muted);min-height:17px}
+  /* 「这次带回来几份」和「可以放」用同一个框，视觉成对 */
+  .qtyrow.keep{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    font-size:14px;margin:10px 0 20px;padding:12px}
   input[type=range]{accent-color:var(--green)}
   .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(14px);top:auto;bottom:calc(96px + env(safe-area-inset-bottom));bottom-anchor:unset;background:#16211c;color:#fff;
     font-size:13.5px;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:86%;
@@ -313,47 +316,75 @@
   @keyframes steamB{0%,100%{opacity:.4;transform:translateY(2px) scaleY(.92)}
                     50%{opacity:.85;transform:translateY(-3px) scaleY(1.06)}}
 
-  /* ---------- 冰箱门 ----------
-     这门只有 19px 宽。3D rotateY 在这个尺寸下会先把门压成一条边，看起来像"抽一下"
-     ——我试过（rotateY 58° 时投影只剩 10px），所以退回 2.5D：
-       门绕右门轴向左甩出去 → 横向收窄到近乎侧立 → 顺势淡出；
-       同时内胆亮起来、门轴处出现一道影子。
-     全部只动 transform / opacity / filter，不碰布局。 */
-  .hot[data-go="fridge"] .door{transform-box:fill-box;transform-origin:right center}
-  /* 门往「观察者这边」甩开：整块门板向左移出冰箱轮廓并顺势倾斜，
-     不是把它压窄——压窄在正面视角里看起来像被冰箱吞掉（这就是"抽一下"）。 */
-  .hot[data-go="fridge"].acting .door{
-    animation:doorSwing .78s cubic-bezier(.34,.72,.24,1) both}
-  @keyframes doorSwing{
-    0%  {transform:translate(0,0) rotate(0deg)}
-    35% {transform:translate(-5px,-1px) rotate(-6deg)}
-    70% {transform:translate(-13px,-2px) rotate(-15deg)}
-    86% {transform:translate(-21px,-2px) rotate(-23deg)}
-    100%{transform:translate(-19px,-2px) rotate(-21deg)}
-  }
-  .cavity-glow{opacity:0}
-  .hot[data-go="fridge"].acting .cavity-glow{animation:cavityGlow .42s ease both}
-  @keyframes cavityGlow{0%{opacity:0}30%{opacity:.2}70%{opacity:.8}100%{opacity:.55}}
-  .hot[data-go="fridge"].acting .cavity{animation:cavity .42s ease both}
-  @keyframes cavity{0%{filter:brightness(1)}45%{filter:brightness(1.16)}100%{filter:brightness(1.07)}}
+  /* ---------- 场景里的两个主角：冰箱 / 菜谱书 ----------
+     两级动作，和锅页一个逻辑：
+       悬停 = 预备（冰箱开灯 / 书页先动一下）
+       点击 = 完成（开门 / 翻开书）→ 再跳页
+     全部只动 transform / opacity / filter，补间交 CSS，JS 不插帧。 */
 
-  /* ---------- 菜谱：像翻开一本书 ----------
-     旧版把右页 scaleX 缩到 .06，所以看起来"书少了一半"。
-     现在左右两页各自以书脊为轴、向两边张开一个角度（像 V 字打开）：
-     尺寸不变、永远不会缺一块，44px 的页面宽度也能看清。 */
-  .hot[data-go="discover"] .pg-l{transform-box:fill-box;transform-origin:right center}
-  .hot[data-go="discover"] .pg-r{transform-box:fill-box;transform-origin:left center}
-  .hot[data-go="discover"].acting .pg-l{animation:bookLeft .56s cubic-bezier(.32,.9,.24,1) both}
-  .hot[data-go="discover"].acting .pg-r{animation:bookRight .56s cubic-bezier(.32,.9,.24,1) both}
-  @keyframes bookLeft{
-    0%  {transform:rotate(0deg) translateY(0)}
-    100%{transform:rotate(-12deg) translateY(1.5px)}
+  /* 门只在 hinge（右门轴）上转，不横向漂移 —— 之前 translate(-19px) 把门板从冰箱上
+     拽下来，看着像门掉了。现在最多 13°，门始终贴着门框。 */
+  .hot[data-go="fridge"] .door{transform-box:fill-box;transform-origin:right center;
+    transition:transform .45s cubic-bezier(.22,1,.36,1),filter .45s ease}
+  .cavity-glow{opacity:0;transition:opacity .55s ease}
+  .cavity{transition:filter .55s ease}
+  .fridge-halo{opacity:0;transition:opacity .55s ease}
+  .door-spill{opacity:0;transition:opacity .4s ease}
+  .hinge-sh{opacity:0;transition:opacity .45s ease}
+  .door-inner{opacity:0;transition:opacity .45s ease}
+  .hot[data-go="fridge"].acting .door-inner{opacity:.9}
+  .hot[data-go="fridge"].acting .hinge-sh{opacity:1}
+
+  /* 悬停：灯先亮（门不开） */
+  @media (hover:hover) and (pointer:fine){
+    .hot[data-go="fridge"]:hover .cavity-glow{opacity:.92}
+    .hot[data-go="fridge"]:hover .cavity{filter:brightness(1.1) saturate(1.02)}
+    .hot[data-go="fridge"]:hover .fridge-halo{opacity:.95}
+    .hot[data-go="fridge"]:hover .door{transform:rotate(-2.5deg);filter:brightness(1.03)}
   }
-  @keyframes bookRight{
-    0%  {transform:rotate(0deg) translateY(0)}
-    100%{transform:rotate(12deg) translateY(1.5px)}
+
+  /* 点击：灯全亮 + 门在门轴上往外让开一点，光从门缝里洒到台面 */
+  .hot[data-go="fridge"].acting .cavity-glow{opacity:1}
+  .hot[data-go="fridge"].acting .cavity{filter:brightness(1.09)}
+  .hot[data-go="fridge"].acting .fridge-halo{opacity:1}
+  .hot[data-go="fridge"].acting .door{transform:translate(-21px,-1.5px) rotate(-7deg);filter:brightness(.95)}
+  .hot[data-go="fridge"].acting .door-spill{opacity:.85}
+
+  /* ---------- 菜谱书 ---------- */
+  .hot[data-go="discover"] .pg-l{transform-box:fill-box;transform-origin:right center;
+    transition:transform .4s cubic-bezier(.22,1,.36,1)}
+  .hot[data-go="discover"] .pg-r{transform-box:fill-box;transform-origin:left center;
+    transition:transform .4s cubic-bezier(.22,1,.36,1)}
+  .hot[data-go="discover"] .book-sh{transition:opacity .4s ease}
+  .flypg{opacity:0}
+  .hot[data-go="discover"] .book-body{transition:transform .45s cubic-bezier(.22,1,.36,1)}
+  .hot[data-go="discover"] .book-body{transform-box:fill-box;transform-origin:50% 100%}
+
+  /* 悬停：右页像被风掀一下（一次性，不循环抖） */
+  @media (hover:hover) and (pointer:fine){
+    .hot[data-go="discover"]:hover .pg-r{animation:pageFlutter 1.05s cubic-bezier(.33,.9,.28,1) both}
+    .hot[data-go="discover"]:hover .book-body{transform:translateY(-1px)}
+    .hot[data-go="discover"]:hover .book-sh{opacity:.85}
   }
-  @keyframes bookLift{0%,100%{opacity:1}55%{opacity:.55}}
+  @keyframes pageFlutter{
+    0%  {transform:rotate(0deg) skewY(0deg)}
+    32% {transform:rotate(-7deg) skewY(-3deg)}
+    62% {transform:rotate(2.5deg) skewY(1deg)}
+    100%{transform:rotate(0deg) skewY(0deg)}
+  }
+
+  /* 点击：左右页张开成 V，整本书抬起来，两张纸片飞出去 */
+  .hot[data-go="discover"].acting .pg-l{transform:rotate(-24deg) translateY(2px)}
+  .hot[data-go="discover"].acting .pg-r{transform:rotate(24deg) translateY(2px)}
+  .hot[data-go="discover"].acting .book-body{transform:translateY(-4px) scale(1.04)}
+  .hot[data-go="discover"].acting .book-sh{opacity:1}
+  .hot[data-go="discover"].acting .flypg{animation:flyUp .68s cubic-bezier(.3,.8,.3,1) both}
+  .hot[data-go="discover"].acting .flypg.b{animation-delay:.08s}
+  @keyframes flyUp{
+    0%  {opacity:0;transform:translate(0,0) rotate(0deg)}
+    25% {opacity:.95}
+    100%{opacity:0;transform:translate(-9px,-26px) rotate(-16deg)}
+  }
 
   /* 锅：气泡上升 + 锅体轻晃 */
   .hot[data-go="cook"].acting .bubbles circle{animation:bub .58s ease-out both}
@@ -417,7 +448,6 @@
   .row-i .del{width:26px;height:26px;border-radius:8px;border:0;background:none;color:#B9C2BB;
     font-size:16px;line-height:1;cursor:pointer;font-family:inherit}
   .row-i .del:hover,.row-i .del:active{background:#f7ece9;color:var(--red)}
-  .shelf-tag{font-size:10.5px;color:#A6B0A8;border:1px solid var(--line);border-radius:5px;padding:0 4px}
 
 
   /* 调味料 */
@@ -526,6 +556,11 @@
           <linearGradient id="gPot" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stop-color="#BED5C4"/><stop offset="1" stop-color="#9CBEA6"/>
           </linearGradient>
+          <radialGradient id="gHalo" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stop-color="#FFE9B4" stop-opacity=".95"/>
+            <stop offset="55%" stop-color="#FFD98F" stop-opacity=".45"/>
+            <stop offset="100%" stop-color="#FFD98F" stop-opacity="0"/>
+          </radialGradient>
           <linearGradient id="gPage" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stop-color="#FFFDF7"/><stop offset="1" stop-color="#F8EFDB"/>
           </linearGradient>
@@ -566,12 +601,16 @@
 
         <!-- ===== 冰箱（点击 → 冰箱页） ===== -->
         <g class="hot" data-go="fridge" tabindex="0" role="button" aria-label="打开冰箱，查看存货">
+          <ellipse class="fridge-halo" cx="70" cy="128" rx="66" ry="92" fill="url(#gHalo)"/>
           <ellipse cx="70" cy="205" rx="56" ry="6" fill="#3A4A3E" opacity=".1" filter="url(#soft)"/>
+          <ellipse class="door-spill" cx="44" cy="203" rx="38" ry="5.4" fill="#FFE9B8" filter="url(#soft)"/>
           <g class="door">
             <path d="M30 54 L11 45 L11 197 L30 205 Z" fill="url(#gDoor)"/>
             <path d="M14 50 L27 57 L27 197 L14 191 Z" fill="#ABC9B3" opacity=".5"/>
             <rect x="16.5" y="108" width="3.4" height="19" rx="1.7" fill="#F4EDDC" opacity=".95"/>
           </g>
+          <rect class="hinge-sh" x="24" y="58" width="8" height="143" rx="3" fill="#6E8B72" opacity=".4"/>
+          <rect class="door-inner" x="30" y="58" width="7" height="143" rx="3" fill="#E9DCC0"/>
           <rect x="30" y="54" width="84" height="151" rx="14" fill="url(#gFridge)"/>
           <rect class="cavity" x="38" y="62" width="68" height="135" rx="8" fill="#FBF4E5"/>
           <rect class="cavity-glow" x="38" y="62" width="68" height="135" rx="8" fill="#FFF6DC"/>
@@ -603,6 +642,8 @@
         <!-- ===== 菜谱书（点击 → 菜谱页） ===== -->
         <g class="hot" data-go="discover" tabindex="0" role="button" aria-label="翻翻菜谱">
           <ellipse cx="177" cy="205" rx="52" ry="5.2" fill="#3A4A3E" opacity=".1" filter="url(#soft)"/>
+          <ellipse class="book-sh" cx="177" cy="205" rx="56" ry="6" fill="#3A4A3E" opacity=".12" filter="url(#soft)"/>
+          <g class="book-body">
           <path d="M123 205 L130 194 L225 194 L232 205 Z" fill="#E6CC9F"/>
           <path d="M126 205 L132 197 L223 197 L229 205 Z" fill="#D8B98A" opacity=".55"/>
           <g class="pg-l">
@@ -622,6 +663,11 @@
             <path d="M197.4 187.8 h7" stroke="#E6D8BC" stroke-width="1.8" stroke-linecap="round"/>
           </g>
           <path d="M177 163 L177 194" stroke="#E3D3B4" stroke-width="1.3"/>
+          <g class="flypg"><path d="M177 168 c8 -2.4 14 -1.4 20 2 l0 9.6 c-7 -1.8 -13 -2.6 -20 -.8z"
+                fill="#FFFDF7" stroke="#E6D8BC" stroke-width="1"/></g>
+          <g class="flypg b"><path d="M170 170 c-7 -1 -12 .8 -16 3.6 l0 8.4 c5 -2 10 -2.8 16 -1.6z"
+                fill="#FBF2DE" stroke="#E6D8BC" stroke-width="1"/></g>
+          </g>
           <text x="177" y="222" text-anchor="middle" font-size="10.5" font-weight="600"
                 fill="#7A8578" pointer-events="none" data-i18n="home.book">翻翻菜谱</text>
         </g>
@@ -855,7 +901,7 @@
   <div class="grid" id="picks"></div>
   <div class="keep" id="keepBox">
     <div class="keep-top">
-      <span class="keep-lbl">可以放</span>
+      <span class="keep-lbl" data-i18n="sheet.keep">可以放</span>
       <span class="step2">
         <button type="button" id="dMinus">−</button>
         <span id="daysLbl">3 天</span>
@@ -866,7 +912,7 @@
     <p class="keep-note" id="keepNote"></p>
     <input type="hidden" id="days" value="3">
   </div>
-  <div class="qtyrow">
+  <div class="keep qtyrow">
     <span data-i18n="sheet.qty">这次带回来几份</span>
     <span class="step2">
       <button type="button" id="qMinus">−</button>
@@ -898,10 +944,10 @@
 <div class="toast" id="toast"></div>
 
 <script src="motion.js?v=20261030-4"></script>
-<script src="data.js?v=20261029-17"></script>
+<script src="data.js?v=20261030-18"></script>
 <script src="cook-art.js?v=20261030-6"></script>
 <script src="cook-steps.js?v=20261030-6"></script>
-<script src="cook-step-ing.js?v=20261030-7"></script>
+<script src="cook-step-ing.js?v=20261030-9"></script>
 <script src="icons.js?v=20261029-17"></script>
 <script src="dish-photos.js?v=20261029-19"></script>
 <script src="sync.js?v=20261029-17"></script>
@@ -948,6 +994,8 @@ const highFibre = r => r.needs.some(n => FIBRE.has(n));
 const TITLES = {home:"title.home", fridge:"title.fridge", discover:"title.discover", build:"title.build"};
 const t = (k, v) => I18N.t(k, v);
 function show(view){
+  /* 每次换页都把场景动画状态复位 —— 之前 acting 加上去不摘，回主页后第二次点没反应 */
+  document.querySelectorAll("[data-go]").forEach(el => el.classList.remove("acting"));
   /* 「自己做主」现在就是「今天的锅」这一页：先挑食材，再决定要不要加限制 */
   if(view === "build"){ location.href = "cook.html"; return; }
   document.body.classList.toggle("home-mode", view === "home");
@@ -1026,8 +1074,11 @@ $$("[data-go]").forEach(el=>{
   el.addEventListener("click", () => {
     if(el.classList.contains("acting")) return;      // 连点只响应一次
     if(REDUCE){ jump(); return; }
+    /* 先把别的物件复位，再演自己的，避免两个物件同时 acting */
+    document.querySelectorAll("[data-go]").forEach(o => { if(o !== el) o.classList.remove("acting"); });
     el.classList.add("acting");
-    setTimeout(jump, 300);                            // 动效播到一半就跳，不等它演完
+    /* 冰箱开门 0.45s / 书翻开 0.45s：留够 460ms 再跳，用户能看见"开了"这一步 */
+    setTimeout(() => { el.classList.remove("acting"); jump(); }, 460);
   });
   el.addEventListener("keydown", e => {
     if(e.key === "Enter" || e.key === " "){ e.preventDefault(); jump(); }
@@ -1206,7 +1257,6 @@ function renderItems(){
 function itemRow(it){
   const d = FD.daysLeftOf(it);
   const q = it.qty == null ? 1 : it.qty;
-  const shelf = SHELVES.find(s => s.id === shelfOf(it));
   const el = document.createElement("div");
   el.className = "row-i";
   el.dataset.id = it.id;
@@ -1214,7 +1264,7 @@ function itemRow(it){
     `<span class="ic">${window.FD_ICON(it.cat, 20)}</span>
      <span class="mid">
        <span class="nm">${cnOf(it.cat)}${q > 1 ? `<span class="q">×${q}</span>` : ""}</span>
-       <span class="meta"><span class="shelf-tag">${tt(shelf.key, shelf.fallback)}</span>${it.by ? " · " + it.by : ""}</span>
+       ${it.by ? `<span class="meta">${it.by}</span>` : ""}
      </span>
      <span class="d ${daysClass(d)}">${expiryText(d)}</span>
      <button class="del" aria-label="${tt("fridge.del", "删除")}" data-del="${it.id}">×</button>`;
