@@ -16,7 +16,7 @@
   /* 第 9 类是 unknown：模型自己学会说"这不是我认识的那 8 样"，
      比事后用阈值去猜"它是不是在硬掰"可靠。 */
   const LABELS = ["chili", "egg", "greens", "milk", "mushroom", "pork", "tofu", "tomato", "unknown"];
-  const MODEL = "./models/food9_u8.tflite";
+  const MODEL = "./models/food9b_u8.tflite";
   const BUNDLE = "./vendor/mediapipe/vision_bundle.mjs";
   const WASM = "./vendor/mediapipe/wasm";
 
@@ -54,8 +54,10 @@
     const ctx = c.getContext("2d", { willReadFrequently: true });
     const w = src.videoWidth || src.naturalWidth || src.width;
     const h = src.videoHeight || src.naturalHeight || src.height;
-    const side = Math.min(w, h);
-    ctx.drawImage(src, (w - side) / 2, (h - side) / 2, side, side, 0, 0, 224, 224);
+    /* 整幅拉伸到 224×224，不做居中裁切：
+       训练时用的就是 resize（会轻微变形），浏览器保持同一套才不会掉精度。
+       cropToHand 给的已经是正方形，拉伸等于恒等。 */
+    ctx.drawImage(src, 0, 0, w, h, 0, 0, 224, 224);
     return c;
   }
 
