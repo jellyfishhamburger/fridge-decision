@@ -1,4 +1,4 @@
-const CACHE = "fridge-decision-v4";
+const CACHE = "fridge-decision-v5";
 const ASSETS = ["./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", e => {
@@ -20,8 +20,8 @@ self.addEventListener("fetch", e => {
   if (url.origin !== self.location.origin) return;      // let the API straight through
 
   const path = url.pathname;
-  // 文档和脚本都必须网络优先：否则改了 logic.js，用户拿到的还是旧函数
-  const isDoc = e.request.mode === "navigate" || /\.(html|js)$/.test(path);
+  // 文档、脚本、样式都必须网络优先：否则改了 cook.css，用户拿到的还是旧版（导航图标会失控）
+  const isDoc = e.request.mode === "navigate" || /\.(html|js|css)$/.test(path);
   if (isDoc) {
     e.respondWith(
       fetch(e.request).then(res => {
