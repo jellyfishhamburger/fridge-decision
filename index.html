@@ -162,6 +162,10 @@
     display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;padding:4px 0}
   .nav button svg{width:23px;height:23px}
   .nav button.on{color:var(--green);font-weight:600}
+  .nav .navset{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;
+    padding:4px 0;color:var(--muted);text-decoration:none}
+  .nav .navset svg{width:23px;height:23px}
+  .nav .navset:active{color:var(--green)}
 
   /* ---------- sheet ---------- */
   .scrim{position:fixed;inset:0;background:rgba(12,22,18,.42);display:none;z-index:40}
@@ -198,12 +202,6 @@
   <div class="topin">
     <h1 id="pageTitle">冰箱里有什么</h1>
     <button class="gear" id="langBtn" aria-label="language" style="font-size:13px;font-weight:700">中</button>
-    <a class="gear" href="settings.html" aria-label="设置">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
-        <circle cx="12" cy="12" r="3.2"/>
-        <path d="M12 3.6v2.2M12 18.2v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M3.6 12h2.2M18.2 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/>
-      </svg>
-    </a>
   </div>
 </div>
 
@@ -293,10 +291,18 @@
     </button>
     <button data-view="build">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
-        <path d="M4 7.5h16M4 12h16M4 16.5h10"/><circle cx="18.4" cy="16.5" r="1.6"/>
+        <path d="M4 6.5h11M4 12h11M4 17.5h11"/>
+        <path d="M18.4 5l1.5 1.6-1.5 1.6-1.5-1.6z"/><path d="M18.4 15l1.5 1.6-1.5 1.6-1.5-1.6z"/>
       </svg>
       <span data-i18n="nav.build">自己选</span>
     </button>
+    <a class="navset" href="settings.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <path d="M4 7h16M4 17h16"/>
+        <circle cx="9" cy="7" r="2.1"/><circle cx="15.5" cy="17" r="2.1"/>
+      </svg>
+      <span data-i18n="nav.settings">设置</span>
+    </a>
   </div>
 </nav>
 
