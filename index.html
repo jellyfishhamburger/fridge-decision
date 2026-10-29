@@ -133,7 +133,7 @@
   .note{font-size:12px;color:var(--muted);line-height:1.55;margin:8px 0 0}
 
   /* ---------- quantity stepper ---------- */
-  .qtyrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;font-size:14px}
+  .qtyrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0 22px;font-size:14px}
   .step2{display:flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:11px;overflow:hidden}
   .step2 button{width:42px;height:40px;border:0;background:#fff;font-size:19px;color:var(--ink);cursor:pointer;font-family:inherit}
   .step2 span{min-width:74px;text-align:center;font-size:15px;font-weight:600;border-left:1px solid var(--line);border-right:1px solid var(--line);height:40px;line-height:40px}
@@ -200,8 +200,9 @@
     max-width:520px;margin:0 auto;max-height:88vh;max-height:88dvh;overflow:auto;
     -webkit-overflow-scrolling:touch;overscroll-behavior:contain}
   /* 保存 + 取消一起贴底：格子滚到哪都看得见按钮，取消也不会掉到屏幕外 */
-  .sheet-foot{position:sticky;bottom:0;z-index:2;margin:6px -16px 0;
-    padding:10px 16px calc(20px + env(safe-area-inset-bottom));background:#fff;
+  .sheet-foot{position:sticky;bottom:0;z-index:2;margin:8px -16px 0;
+    padding:16px 16px calc(20px + env(safe-area-inset-bottom));background:#fff;
+    border-top:1px solid #eef1ee;
     box-shadow:0 -14px 18px 6px #fff}
   #cancelBtn{position:relative;z-index:1;width:100%}
   .sheet.on{transform:translateY(0)}
@@ -371,7 +372,7 @@
   <div class="grid" id="picks"></div>
   <div class="keep" id="keepBox">
     <div class="keep-top">
-      <span class="keep-lbl">可以放到</span>
+      <span class="keep-lbl">可以放</span>
       <span class="step2">
         <button type="button" id="dMinus">−</button>
         <span id="daysLbl">3 天</span>
