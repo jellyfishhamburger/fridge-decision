@@ -94,6 +94,18 @@
   .f.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44;font-weight:600}
   .rc{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:0 0 10px;box-shadow:var(--shadow)}
   .rc h4{margin:0 0 6px;font-size:17px;letter-spacing:-.01em;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  /* 成品照：贴在卡片顶端，撑满左右；没有可靠图源时退回食材插画 */
+  .rc .ph{position:relative;margin:-14px -14px 12px;overflow:hidden;background:#f1efe8}
+  .rc .ph img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+  .rc .ph .cr{position:absolute;right:6px;bottom:5px;font-size:9.5px;line-height:1.4;color:#fff;
+    background:rgba(28,32,30,.46);padding:1px 5px;border-radius:5px}
+  .rc .ph .cr a{color:#fff;text-decoration:none}
+  .rc .ph.art{display:flex;align-items:center;justify-content:center;gap:22px;height:auto;
+    padding:16px 14px 14px;margin:-14px -14px 12px;background:#F7F2E4;
+    border-bottom:1px solid #EDE6D4}
+  .rc .ph.art .ic{display:flex;flex-direction:column;align-items:center;gap:4px;color:#6f7f74}
+  .rc .ph.art .ic svg{width:26px;height:26px;stroke-width:1.6}
+  .rc .ph.art .ic i{font-style:normal;font-size:10.5px;color:#8b8574;letter-spacing:.01em}
   .rc .tags{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
   .tg{background:#f2f5f3;border-radius:7px;padding:3px 7px}
   .tg.g{background:var(--green-soft);color:#0b5c44}
@@ -136,6 +148,9 @@
   .ck-top button{margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:10px;
     width:38px;height:38px;font-size:16px;cursor:pointer;font-family:inherit;color:var(--ink)}
   .ck-body{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;text-align:center}
+  .ck-photo{width:100%;max-width:300px;border-radius:14px;overflow:hidden;background:#f1efe8;flex:none}
+  .ck-photo img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+  .ck-photo:empty{display:none}
   .ck-icon svg{width:96px;height:96px;color:var(--green);stroke-width:1.3}
   .ck-text{font-size:23px;line-height:1.5;font-weight:600;letter-spacing:-.01em;max-width:22em}
   .ck-count{font-size:13px;color:var(--muted);letter-spacing:.08em}
@@ -361,6 +376,7 @@
 <div class="cook" id="cook">
   <div class="ck-top"><span data-i18n="cook.title">做饭模式</span> · <b id="ck-name">菜名</b><button id="ck-close">✕</button></div>
   <div class="ck-body">
+    <div class="ck-photo" id="ck-photo"></div>
     <div class="ck-icon" id="ck-icon"></div>
     <div class="ck-text" id="ck-text">…</div>
     <div class="ck-count" id="ck-count">1 / 5</div>
@@ -376,6 +392,7 @@
 
 <script src="data.js?v=20261029-17"></script>
 <script src="icons.js?v=20261029-17"></script>
+<script src="dish-photos.js?v=20261029-19"></script>
 <script src="sync.js?v=20261029-17"></script>
 <script src="logic.js?v=20261029-17"></script>
 <script src="i18n.js?v=20261029-17"></script>
@@ -593,12 +610,26 @@ function renderResult(list){
 }
 
 /* ============ view 2: discover ============ */
+/* 成品照：有开放图源就放照片（右下角标作者/许可证，可点回原页），
+   没有就退回这道的食材插画——比放一张错的照片诚实。 */
+function dishPhoto(recipe){
+  const p = window.DISH_PHOTO && DISH_PHOTO.get(recipe.name);
+  if(p && p.src){
+    return `<div class="ph"><img src="${p.src}" alt="${recipe.name}" loading="lazy" decoding="async">`
+      + `<span class="cr"><a href="${p.page}" target="_blank" rel="noopener">${p.credit} · ${p.license}</a></span></div>`;
+  }
+  const ids = (recipe.needs || []).slice(0,3);
+  const row = ids.map(id => `<span class="ic">${window.FD_ICON ? FD_ICON(id, 26) : ""}<i>${cnOf(id)}</i></span>`).join("");
+  return `<div class="ph art">${row}</div>`;
+}
+
 function recipeCard(r, opts){
   opts = opts || {};
   const sep = I18N.getLang()==="en" ? ", " : "、";
   const used = r.used.map(i=>`${cnOf(i.cat)} (${t("days.n",{n:FD.daysLeftOf(i)})})`).join(sep);
   const missing = r.missing.length ? `<span class="tg a">${t("disc.gapN",{n:r.missing.length})}: ${r.missing.map(cnOf).join(sep)}</span>` : "";
   return `<div class="rc">
+    ${dishPhoto(r.recipe)}
     <h4>${I18N.recipeName(r.recipe)}</h4>
     <div class="tags">
       <span class="tg">${t("card.min",{n:r.recipe.minutes})}</span>
@@ -703,6 +734,9 @@ function openCook(recipeId){
   if(!cookRecipe) return;
   cookStep = 0;
   $("#ck-name").textContent = I18N.recipeName(cookRecipe);
+  const ph = window.DISH_PHOTO && DISH_PHOTO.get(cookRecipe.name);
+  const phBox = $("#ck-photo");
+  if(phBox) phBox.innerHTML = (ph && ph.src) ? `<img src="${ph.src}" alt="${cookRecipe.name}">` : "";
   renderCook();
   $("#cook").classList.add("on");
 }
