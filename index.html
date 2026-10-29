@@ -376,6 +376,89 @@
     .scene .steam path,.hot.acting .door,.hot.acting .pg-r,
     .hot.acting .bubbles circle,.hot.acting .potbody,.hot.acting .cavity{animation:none!important}
   }
+
+  /* ================= 冰箱页 v2：摘要 / 先吃这些 / 紧凑清单 / 整理 / 调味料 ================= */
+  .fsum{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);
+    margin:0 0 12px}
+  .fsum b{font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums;margin-right:3px}
+  .fsum .warn b{color:var(--red)}
+  .fsum .warn{color:var(--red)}
+
+  .soon{margin:0 0 14px}
+  .soon .fhd{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 8px}
+  .soonrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .wc{display:flex;align-items:center;gap:9px;min-width:0;text-align:left;
+    border:1px solid var(--line);background:var(--card);border-radius:14px;padding:9px 10px;
+    font-family:inherit;cursor:pointer;transition:transform .18s ease,border-color .2s}
+  .wc:active{transform:scale(.98)}
+  .wc .wi{flex:none;display:grid;place-items:center;color:var(--green)}
+  .wc .wt{min-width:0;display:flex;flex-direction:column;gap:1px}
+  .wc .wd{font-size:17px;line-height:1.1;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+  .wc .wd b{font-size:17px;font-weight:700}
+  .wc .wn{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wc.hot b{color:var(--red)} .wc.warm b{color:var(--amber)} .wc.ok b{color:var(--green)}
+  .wc.hot{border-color:#f0cfc9;background:#fdf5f3}
+
+  .fblock{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 14px 12px}
+  .fbhd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+  .fbhd h2{font-size:15px;margin:0}
+  .tidy{font-size:12.5px;font-weight:600;color:var(--green);background:var(--green-soft);
+    border:1px solid #cfe3d9;border-radius:999px;padding:6px 12px;cursor:pointer;font-family:inherit}
+  .tidy.on{background:var(--green);border-color:var(--green);color:#fff}
+  .tidy-hint{margin:2px 0 10px}
+
+  .items{display:flex;flex-direction:column}
+  .row-i{display:grid;grid-template-columns:36px minmax(0,1fr) auto 26px;gap:10px;align-items:center;
+    padding:10px 2px;border-bottom:1px solid var(--line);background:none;cursor:pointer}
+  .row-i:last-child{border-bottom:0}
+  .row-i .ic{width:36px;height:36px;border-radius:11px;background:#F1F4EF;display:grid;place-items:center;color:var(--green)}
+  .row-i .mid{min-width:0;display:flex;flex-direction:column;gap:2px}
+  .row-i .nm{font-size:14.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:6px}
+  .row-i .q{font-size:11.5px;font-weight:600;color:var(--muted);background:#eef2ef;border-radius:6px;padding:1px 6px}
+  .row-i .meta{font-size:11.5px;color:#9AA69C}
+  .row-i .d{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .row-i .d.hot{color:var(--red)} .row-i .d.warm{color:var(--amber)} .row-i .d.ok{color:var(--green)}
+  .row-i .del{width:26px;height:26px;border-radius:8px;border:0;background:none;color:#B9C2BB;
+    font-size:16px;line-height:1;cursor:pointer;font-family:inherit}
+  .row-i .del:hover,.row-i .del:active{background:#f7ece9;color:var(--red)}
+  .shelf-tag{font-size:10.5px;color:#A6B0A8;border:1px solid var(--line);border-radius:5px;padding:0 4px}
+
+  /* 整理模式：三层货架 + 拖拽 */
+  .items.is-tidy{gap:8px}
+  .zone{border:1.5px dashed #DCE3DA;border-radius:14px;padding:8px 8px 4px;min-height:58px;
+    transition:background .18s,border-color .18s}
+  .zone h3{font-size:11px;letter-spacing:.05em;color:#A6B0A8;font-weight:600;margin:0 0 6px}
+  .zone.over{background:#EDF4E9;border-color:var(--green)}
+  .zone .row-i{border-bottom:0;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:8px 8px;margin-bottom:6px;box-shadow:0 1px 2px rgba(24,40,30,.04)}
+  .items.is-tidy .row-i{grid-template-columns:32px minmax(0,1fr) auto;touch-action:none}
+  .items.is-tidy .row-i .del{display:none}
+  .items.is-tidy .row-i.drag-i{opacity:.45}
+  body.dragging-i{user-select:none;-webkit-user-select:none}
+  .ghost-i{position:fixed;left:0;top:0;width:270px;z-index:90;pointer-events:none;
+    display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;
+    background:var(--card);border:1px solid var(--green);border-radius:12px;padding:9px 10px;
+    box-shadow:0 14px 30px -14px rgba(24,40,30,.5);transform:translate(0,0)}
+
+  /* 调味料 */
+  .pantry{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .pantry summary{display:flex;align-items:center;gap:8px;padding:13px 14px;cursor:pointer;list-style:none}
+  .pantry summary::-webkit-details-marker{display:none}
+  .pantry .pt{font-size:14px;font-weight:600;color:var(--ink)}
+  .pantry .pcount{margin-left:auto;font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted);
+    background:#F1F4EF;border-radius:999px;padding:2px 8px}
+  .pantry summary::after{content:"⌄";color:var(--muted);font-size:12px;transition:transform .22s}
+  .pantry[open] summary::after{transform:rotate(180deg)}
+  .pantry .hint{padding:0 14px;margin:0 0 10px}
+  .pantryChips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 14px}
+  .pe{font-size:12.5px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);
+    background:#F7F9F6;color:var(--muted);cursor:pointer;font-family:inherit;
+    transition:background .18s,color .18s,border-color .18s}
+  .pe.on{background:var(--green-soft);border-color:#cfe3d9;color:var(--green);font-weight:600}
+
+  .findlink{display:inline-flex;align-items:center;gap:6px;margin:16px 0 4px;padding:6px 0;
+    background:none;border:0;color:var(--green);font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit}
+  .findlink:active{transform:translateY(1px)}
 </style>
 </head>
 <body>
@@ -591,28 +674,52 @@
 
   <!-- ============ view 1: fridge ============ -->
   <section class="view" id="view-fridge">
-    <p class="lede" data-i18n="fridge.lede">右边数字＝还能放几天，越红越要先吃。数据存在这台设备里。</p>
+
+    <!-- 1 · 紧凑摘要 -->
+    <div class="fsum" id="fsum"></div>
+
     <div class="undo" id="undoBar">
       <span id="undoText"></span>
       <button id="undoBtn" data-i18n="undo.btn">撤销</button>
     </div>
-    <div class="card">
+
+    <!-- 2 · 先吃这些 -->
+    <div class="soon" id="soonBox"></div>
+
+    <!-- 3 · 主清单 + 整理模式 -->
+    <div class="fblock">
+      <div class="fbhd">
+        <h2 data-i18n="fridge.stock">存货</h2>
+        <button class="tidy" id="tidyBtn" data-i18n="fridge.tidy">整理冰箱</button>
+      </div>
+      <p class="hint tidy-hint" id="tidyHint" hidden data-i18n="fridge.tidyHint">按住食材拖到别的层，摆好点「完成」。只改位置，数量不变。</p>
+
       <div id="pendCard" style="display:none">
-        <h2><span data-i18n="pend.title">待确认</span> <span class="count" id="pendCnt">0</span></h2>
+        <h3><span data-i18n="pend.title">待确认</span> <span class="count" id="pendCnt">0</span></h3>
         <p class="hint" data-i18n="pend.hint">门口拍到但拿不准的。点一下确认，或换一个。</p>
         <div id="pendList"></div>
       </div>
 
-      <h2><span data-i18n="fridge.stock">存货</span> <span class="count" id="cnt">0</span></h2>
       <div class="items" id="items"></div>
       <p class="empty" id="emptyNote" data-i18n="fridge.empty">还没记录任何东西 —— 用下面的按钮加一样。</p>
-      <div class="row" style="margin-top:14px">
+      <div class="row" style="margin-top:12px">
         <button class="btn ghost" id="addBtn" data-i18n="fridge.add">＋ 加一样</button>
         <button class="btn quiet" id="demoBtn" data-i18n="fridge.demo">载入示例</button>
       </div>
     </div>
-    <button class="btn primary" id="decideBtn" data-i18n="fridge.decide">今晚吃什么 →</button>
-    <div id="result" style="margin-top:14px"></div>
+
+    <!-- 5 · 我的调味料（默认折叠） -->
+    <details class="pantry" id="pantryBox">
+      <summary>
+        <span class="pt" data-i18n="fridge.pantryH">我的调味料</span>
+        <span class="pcount" id="pantryCount"></span>
+      </summary>
+      <p class="hint" data-i18n="fridge.pantryHint">调味料不算冰箱里的菜。勾上的才算「家里有」，影响推荐里「还差什么」。</p>
+      <div class="pantryChips" id="pantryChips"></div>
+    </details>
+
+    <!-- 6 · 次级入口 -->
+    <button class="findlink" id="findDish" data-i18n="fridge.find">根据现有食材找菜 →</button>
   </section>
 
   <!-- ============ view 2: discover ============ -->
@@ -969,28 +1076,223 @@ function addFromCat(catId, qty, days, msg){
   return c;
 }
 
-function renderItems(){
-  const box = $("#items"); box.innerHTML = "";
-  items.slice().sort((a,b)=>FD.daysLeftOf(a)-FD.daysLeftOf(b)).forEach(it=>{
-    const d = FD.daysLeftOf(it);
-    const el = document.createElement("div");
-    el.className = "chip " + expiryClass(d);
-    const q = (it.qty == null ? 1 : it.qty);
-    el.innerHTML = `${window.FD_ICON(it.cat,22)}<span>${cnOf(it.cat)}</span>
-      ${q > 1 ? `<span class="q">×${q}</span>` : ""}
-      <span class="d">${expiryText(d)}</span>
-      <button aria-label="remove" data-del="${it.id}">×</button>`;
-    /* 用 click 而不是 pointerdown：手指在列表上滑动时 pointerdown 会先触发，
-       一滑就弹出编辑面板，看起来像"自己一直弹" */
-    el.addEventListener("click", ev => {
-      if(ev.target.closest("button")) return;         // × 是删除，别跟编辑打架
-      openSheet(it, null);                            // 点行 = 编辑这一条
-    });
-    box.appendChild(el);
-  });
-  $("#cnt").textContent = t("fridge.count", {n: items.length});
-  $("#emptyNote").style.display = items.length ? "none" : "block";
+/* ============ 冰箱页：摘要 / 先吃这些 / 紧凑清单 / 整理 / 调味料 ============
+   职责边界：这一页只管「有什么、还能放几天、怎么整理」。
+   决定今晚吃什么留在首页；找菜谱有推荐页；这里只放一个次级的文字入口。 */
+const SHELVES = [
+  {id:0, key:"fridge.shelf0", fallback:"上层", tags:["protein"]},
+  {id:1, key:"fridge.shelf1", fallback:"中层", tags:["veg", "greens"]},
+  {id:2, key:"fridge.shelf2", fallback:"下层", tags:["carb", "dairy", "other", ""]}
+];
+const LS_LAYOUT = "fd.layout.v1";                 /* 只存摆放位置，不进库存、不进云端 */
+const layout = () => FD.read(LS_LAYOUT, {}) || {};
+const saveLayout = m => FD.write(LS_LAYOUT, m);
+function defaultShelf(it){
+  const s = SHELVES.find(x => x.tags.includes(it.tag));
+  return s ? s.id : 2;
 }
+function shelfOf(it, lay){
+  const l = (lay || layout())[it.id];
+  return (l && typeof l.shelf === "number") ? l.shelf : defaultShelf(it);
+}
+function posOf(it, lay){
+  const l = (lay || layout())[it.id];
+  return (l && typeof l.pos === "number") ? l.pos : 999;
+}
+let tidying = false;
+const daysClass = d => d <= 1 ? "hot" : (d <= 3 ? "warm" : "ok");
+
+function renderItems(){
+  const lay = layout();
+  const sorted = items.slice().sort((a, b) => FD.daysLeftOf(a) - FD.daysLeftOf(b));
+  const soon = sorted.filter(i => FD.daysLeftOf(i) <= 3);
+
+  /* 1 · 摘要 */
+  const sum = $("#fsum");
+  if(sum) sum.innerHTML =
+    `<span><b>${items.length}</b>${tt("fridge.sumItems", "样存货")}</span>` +
+    `<span class="${soon.length ? "warn" : ""}"><b>${soon.length}</b>${tt("fridge.sumSoon", "样该先吃")}</span>`;
+
+  /* 2 · 先吃这些（最多三条，按现有排序规则：先到期先上） */
+  const soonBox = $("#soonBox");
+  if(soonBox){
+    if(!items.length){ soonBox.innerHTML = ""; soonBox.hidden = true; }
+    else{
+      soonBox.hidden = false;
+      const top = (soon.length ? soon : sorted).slice(0, 3);
+      soonBox.innerHTML = `<h3 class="fhd">${tt("fridge.soonH", "先吃这些")}</h3>` +
+        `<div class="soonrow">` + top.map(it => {
+          const d = FD.daysLeftOf(it);
+          return `<button class="wc ${daysClass(d)}" data-edit="${it.id}">
+            <span class="wi">${window.FD_ICON(it.cat, 20)}</span>
+            <span class="wt">
+              <span class="wd"><b>${d <= 0 ? "0" : d}</b>${d <= 0 ? "" : tt("fridge.daysLeft", "天")}</span>
+              <span class="wn">${cnOf(it.cat)}</span>
+            </span>
+          </button>`;
+        }).join("") + `</div>`;
+      soonBox.querySelectorAll("[data-edit]").forEach(btn => btn.addEventListener("click", () => {
+        const it = items.find(x => x.id === btn.dataset.edit);
+        if(it) openSheet(it, null);
+      }));
+    }
+  }
+
+  /* 3 · 清单（浏览=按到期排序；整理=按货架） */
+  const box = $("#items");
+  box.innerHTML = "";
+  box.classList.toggle("is-tidy", tidying);   /* 别和按钮的 .tidy 撞名，否则整块列表会拿到按钮的胶囊底色 */
+  if(tidying){
+    SHELVES.forEach(sh => {
+      const zone = document.createElement("div");
+      zone.className = "zone";
+      zone.dataset.shelf = sh.id;
+      zone.innerHTML = `<h3>${tt(sh.key, sh.fallback)} · ${items.filter(it => shelfOf(it, lay) === sh.id).length}</h3>`;
+      items.filter(it => shelfOf(it, lay) === sh.id)
+        .sort((a, b) => posOf(a, lay) - posOf(b, lay) || FD.daysLeftOf(a) - FD.daysLeftOf(b))
+        .forEach(it => zone.appendChild(itemRow(it, true, lay)));
+      box.appendChild(zone);
+    });
+  }else{
+    sorted.forEach(it => box.appendChild(itemRow(it, false, lay)));
+  }
+
+  const cnt = $("#cnt"); if(cnt) cnt.textContent = t("fridge.count", {n: items.length});
+  const empty = $("#emptyNote"); if(empty) empty.style.display = items.length ? "none" : "block";
+  const tb = $("#tidyBtn");
+  if(tb){
+    tb.textContent = tidying ? tt("fridge.tidyDone", "完成") : tt("fridge.tidy", "整理冰箱");
+    tb.classList.toggle("on", tidying);
+  }
+  const th = $("#tidyHint"); if(th) th.hidden = !tidying;
+  paintPantry();
+}
+
+function itemRow(it, inTidy, lay){
+  const d = FD.daysLeftOf(it);
+  const q = it.qty == null ? 1 : it.qty;
+  const shelf = SHELVES.find(s => s.id === shelfOf(it, lay));
+  const el = document.createElement("div");
+  el.className = "row-i" + (inTidy ? " draggable" : "");
+  el.dataset.id = it.id;
+  el.innerHTML =
+    `<span class="ic">${window.FD_ICON(it.cat, 20)}</span>
+     <span class="mid">
+       <span class="nm">${cnOf(it.cat)}${q > 1 ? `<span class="q">×${q}</span>` : ""}</span>
+       <span class="meta">${inTidy ? (it.unit || "") : `<span class="shelf-tag">${tt(shelf.key, shelf.fallback)}</span>${it.by ? " · " + it.by : ""}`}</span>
+     </span>
+     <span class="d ${daysClass(d)}">${expiryText(d)}</span>
+     <button class="del" aria-label="${tt("fridge.del", "删除")}" data-del="${it.id}">×</button>`;
+  el.addEventListener("click", ev => {
+    if(tidying) return;                       /* 整理模式下点行不弹编辑 */
+    if(ev.target.closest("button")) return;   /* × 是删除 */
+    openSheet(it, null);                      /* 点行 = 编辑这一条 */
+  });
+  if(inTidy) attachShelfDrag(el, it);
+  return el;
+}
+
+/* 整理模式：长按拖动（触摸）/ 直接拖（鼠标）把食材换层。只写 fd.layout.v1。 */
+function attachShelfDrag(el, it){
+  const HOLD = 140, MOVE = 8;
+  let pid = null, sx = 0, sy = 0, ghost = null, dragging = false, hold = null, touch = false;
+
+  const zones = () => Array.from(document.querySelectorAll("#items .zone"));
+  const zoneAt = (x, y) => zones().find(z => {
+    const r = z.getBoundingClientRect();
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  });
+  const moveGhost = (x, y) => { if(ghost) ghost.style.transform = `translate(${x - 135}px,${y - 24}px)`; };
+
+  function start(x, y){
+    dragging = true;
+    el.classList.add("drag-i");
+    document.body.classList.add("dragging-i");
+    ghost = el.cloneNode(true);
+    ghost.classList.add("ghost-i");
+    ghost.querySelector(".del") && ghost.querySelector(".del").remove();
+    document.body.appendChild(ghost);
+    moveGhost(x, y);
+  }
+
+  el.addEventListener("pointerdown", e => {
+    if(e.button > 0) return;
+    pid = e.pointerId; touch = e.pointerType === "touch";
+    sx = e.clientX; sy = e.clientY;
+    try{ el.setPointerCapture(pid); }catch(_){}
+    if(touch) hold = setTimeout(() => start(sx, sy), HOLD);
+  });
+
+  el.addEventListener("pointermove", e => {
+    if(e.pointerId !== pid) return;
+    if(!dragging){
+      if(Math.hypot(e.clientX - sx, e.clientY - sy) < MOVE) return;
+      if(touch){ clearTimeout(hold); pid = null; return; }   /* 没长按就滑 = 让页面滚 */
+      start(sx, sy);
+    }
+    e.preventDefault();
+    moveGhost(e.clientX, e.clientY);
+    const z = zoneAt(e.clientX, e.clientY);
+    zones().forEach(x => x.classList.toggle("over", x === z));
+  }, {passive:false});
+
+  function end(e){
+    if(e.pointerId !== pid) return;
+    clearTimeout(hold);
+    if(dragging){
+      const z = zoneAt(e.clientX, e.clientY);
+      zones().forEach(x => x.classList.remove("over"));
+      if(ghost){ ghost.remove(); ghost = null; }
+      el.classList.remove("drag-i");
+      document.body.classList.remove("dragging-i");
+      if(z && +z.dataset.shelf !== shelfOf(it)) moveToShelf(it.id, +z.dataset.shelf);
+    }
+    dragging = false; pid = null;
+  }
+  el.addEventListener("pointerup", end);
+  el.addEventListener("pointercancel", end);
+}
+
+function moveToShelf(id, shelf){
+  const lay = layout();
+  lay[id] = {shelf, pos: Object.keys(lay).length + 1};    /* 放到这一层最后 */
+  saveLayout(lay);
+  renderItems();                                          /* 只重排视觉，不碰 items / 库存 */
+  toast(tt("fridge.moved", "已挪到这一层"));
+}
+
+/* 我的调味料：和设置页用的是同一份 FD.pantry() / FD.savePantry()，没有第二套数据 */
+function paintPantry(){
+  const box = $("#pantryChips"); if(!box) return;
+  const have = new Set(FD.pantry());
+  box.innerHTML = FD.PANTRY.map(p =>
+    `<button class="pe ${have.has(p.id) ? "on" : ""}" data-p="${p.id}">${I18N.getLang() === "en" ? p.name : p.cn}</button>`
+  ).join("");
+  const c = $("#pantryCount");
+  if(c) c.textContent = `${have.size}/${FD.PANTRY.length}`;
+}
+
+$("#pantryChips") && $("#pantryChips").addEventListener("click", e => {
+  const el = e.target.closest("[data-p]"); if(!el) return;
+  const have = new Set(FD.pantry());
+  have.has(el.dataset.p) ? have.delete(el.dataset.p) : have.add(el.dataset.p);
+  FD.savePantry([...have]);
+  pantry = [...have];                       /* 页面里那份也同步，别让推荐用旧值 */
+  paintPantry();
+  $("#view-discover").classList.contains("on") && renderDiscover();
+});
+
+$("#tidyBtn") && $("#tidyBtn").addEventListener("click", () => {
+  tidying = !tidying;
+  renderItems();
+  if(tidying){
+    const box = $("#items");
+    box && box.scrollIntoView({block:"nearest", behavior:"smooth"});
+    toast(tt("fridge.tidyOn", "整理模式：按住食材拖到别的层"));
+  }
+});
+
+$("#findDish") && $("#findDish").addEventListener("click", () => show("discover"));
 
 function reasons(r){
   const out = [];
@@ -1501,7 +1803,7 @@ $("#saveBtn").addEventListener("click", ()=>{
   toast(t("toast.added", {name: I18N.foodName(picked.id), n: pendingQty, days: pendingDays}));
 });
 
-$("#decideBtn").addEventListener("click", ()=>{
+if($("#decideBtn")) $("#decideBtn").addEventListener("click", ()=>{
   renderResult(FD.decide(items, goal));
   const r = $("#result"); if(r) window.scrollTo({top:r.offsetTop - 70, behavior:"smooth"});
 });
@@ -1554,7 +1856,7 @@ function applyLang(){
   if(view === "home") renderHome();
   if(view === "discover") renderDiscover();
   if(view === "build") renderBuild();
-  if($("#result").innerHTML) renderResult(FD.decide(items, goal));
+  const rbox = $("#result"); if(rbox && rbox.innerHTML) renderResult(FD.decide(items, goal));
   if($("#keepBox")) paintKeep();
 }
 $("#langBtn").addEventListener("click", ()=>{
@@ -1585,7 +1887,7 @@ if (FD.cloudOn()) {
     setInterval(pullPending, 6000);      /* 门口那块屏加的东西，6 秒内出现在手机上 */
   }
   FD.sync.start(() => { items = FD.items(); renderItems(); renderHome(); renderPending();
-    if ($("#result").innerHTML) renderResult(FD.decide(items, goal)); });
+    const rb = $("#result"); if (rb && rb.innerHTML) renderResult(FD.decide(items, goal)); });
 }
 // 从设置页底部导航跳回来时，直接落到对应标签
 (function(){
