@@ -19,6 +19,8 @@
   const LS_LOG       = "fd.log.v1";
   const LS_PANTRY    = "fd.pantry.v1";
   const LS_HOUSEHOLD = "fd.household.v1";
+  const LS_DIRTY      = "fd.dirty.v1";     /* ids written here, not yet confirmed by the server */
+  const LS_TOMB       = "fd.tomb.v1";      /* ids deleted here, not yet confirmed by the server */
 
   const DEFAULT_SETTINGS = {
     screens: [0, 1, 2],
@@ -233,21 +235,42 @@
         global.SYNC.add(code, {
           id: it.id, cat: it.cat, name: it.name, tag: it.tag, qty: it.qty, unit: it.unit,
           life: it.life, addedAt: it.addedAt, daysLeft: daysOf(it), by: it.by
-        }).catch(() => { if (lastCloud) delete lastCloud[id]; });
+        }).then(() => clearDirty([id])).catch(() => { if (lastCloud) delete lastCloud[id]; });
       } else if (a.join("|") !== b.join("|")) {
-        global.SYNC.update(code, id, { qty: b[3], days_left: b[7] }).catch(() => {
+        global.SYNC.update(code, id, { qty: b[3], days_left: b[7] }).then(() => clearDirty([id])).catch(() => {
           /* keep it dirty: the next poll re-pushes it */
           if (lastCloud && lastCloud[id]) lastCloud[id] = [null];
         });
       }
     });
     Object.keys(before).forEach(id => {
-      if (!now[id]) global.SYNC.remove(code, id).catch(() => { if (lastCloud) lastCloud[id] = before[id]; });
+      if (!now[id]) {
+        const t = tombMap(); t[id] = 1; write(LS_TOMB, t);
+        global.SYNC.remove(code, id).then(() => clearDirty([id]))
+          .catch(() => { if (lastCloud) lastCloud[id] = before[id]; });
+      }
     });
     lastCloud = now;
   }
 
+  const dirtyMap = () => read(LS_DIRTY, {}) || {};
+  const tombMap  = () => read(LS_TOMB, {}) || {};
+  const clearDirty = ids => {
+    if (!ids || !ids.length) return;
+    const d = dirtyMap(); ids.forEach(id => delete d[id]); write(LS_DIRTY, d);
+    const t = tombMap();  ids.forEach(id => delete t[id]); write(LS_TOMB, t);
+  };
+
   const saveItems = list => {
+    const prev = {};
+    (read(LS_ITEMS, []) || []).forEach(i => { prev[i.id] = i; });
+    const d = dirtyMap();
+    (list || []).forEach(i => {
+      const o = prev[i.id];
+      if (!o || o.qty !== i.qty || o.life !== i.life || o.addedAt !== i.addedAt) d[i.id] = 1;
+    });
+    (read(LS_ITEMS, []) || []).forEach(i => { if (!(list || []).some(x => x.id === i.id)) d[i.id] = 1; });
+    write(LS_DIRTY, d);
     write(LS_ITEMS, list);
     try { pushDiff(list); } catch (e) {}
     return true;
@@ -265,21 +288,28 @@
       const rows = await global.SYNC.pull(sync.code());
       if (!Array.isArray(rows)) return false;
       const local = read(LS_ITEMS, []) || [];
+      const dirty = dirtyMap(), tomb = tombMap();
       connOK = true;
-      if (!rows.length && local.length) {
-        /* first round trip on a fresh household: seed the cloud from this device */
-        lastCloud = {};
-        pushDiff(local);
-        return true;
-      }
-      /* merge: cloud rows win; items that only exist here are pushed up */
-      const have = {};
-      rows.forEach(r => have[r.id] = 1);
-      const extra = local.filter(i => !have[i.id]);
+
+      /* a household with nothing in the cloud yet: adopt what this device has */
+      if (!rows.length && local.length) local.forEach(i => { dirty[i.id] = 1; });
+
+      const have = {}, localById = {};
+      rows.forEach(r => { have[r.id] = 1; });
+      local.forEach(i => { localById[i.id] = i; });
+
+      /* cloud rows, except ones this device just deleted */
+      const merged = rows.filter(r => !tomb[r.id]).map(r =>
+        (dirty[r.id] && localById[r.id]) ? localById[r.id] : r);
+
+      /* local-only: keep & push if we wrote it here, drop if it was deleted elsewhere */
+      local.forEach(i => {
+        if (!have[i.id] && dirty[i.id] && !tomb[i.id]) merged.push(i);
+      });
+
       lastCloud = snap(rows);
-      extra.forEach(i => { delete lastCloud[i.id]; });   /* local-only = not yet on the server */
-      write(LS_ITEMS, rows.concat(extra));
-      if (extra.length) pushDiff(rows.concat(extra));
+      write(LS_ITEMS, merged);
+      if (merged.length) pushDiff(merged);
       return true;
     },
     start(onChange, ms) {
