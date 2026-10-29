@@ -567,7 +567,20 @@
 
   /* ---------- 启动 ---------- */
   $("#demoBtn").addEventListener("click", loadDemo);
-  $("#askBtn").addEventListener("click", pick);
+  /* 手机上「帮我做一道菜」第一次点常被吞掉：iOS 在固定底栏 + 平滑滚动的组合下会丢 click。
+     改成触摸一抬手就响应（pointerup），click 再兜底，用时间戳去重。 */
+  let askAt = 0;
+  function askOnce(){
+    const now = Date.now();
+    if (now - askAt < 500) return;
+    askAt = now;
+    pick();
+  }
+  $("#askBtn").addEventListener("click", askOnce);
+  $("#askBtn").addEventListener("pointerup", e => {
+    if (e.pointerType === "mouse") return;      // 鼠标仍走 click，避免双触发
+    askOnce();
+  });
   $("#langBtn").addEventListener("click", () => {
     I18N.setLang(I18N.getLang() === "en" ? "zh" : "en");
     applyLang();

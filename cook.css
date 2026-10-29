@@ -319,3 +319,12 @@ body.is-dragging .tile{transition:border-color .2s,background .2s}
 .rcard .rphoto.art .ic{display:flex;flex-direction:column;align-items:center;gap:3px;color:#6f7f74}
 .rcard .rphoto.art .ic svg{width:24px;height:24px}
 .rcard .rphoto.art .ic i{font-style:normal;font-size:10.5px;color:#8b8574}
+
+/* 顶部：删掉多余返回圈后，用一个不可见的占位保持标题居中 */
+.spacer{width:46px;flex:none}
+/* 「帮我做一道菜」：手机上第一次点容易被吞，改成触摸一抬手就响应 */
+#askBtn{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.pot-sec{z-index:41}
+
+/* 滚到客制化面板时别被吸顶标题盖住 */
+#goalPanel{scroll-margin-top:76px}
