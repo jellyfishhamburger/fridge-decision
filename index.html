@@ -954,7 +954,7 @@
   </section>
 
   <div class="foot">
-    <span data-i18n="foot.line">原型 · 无硬件、无图像识别</span> · build 20261029-10<br>
+    <span data-i18n="foot.line">原型 · 无硬件、无图像识别</span> · build 20261031-1<br>
     <a href="gate.html" data-i18n="foot.gate">门口摄像头 →</a> · <a href="disc.html" data-i18n="foot.disc">圆片 →</a> · <a href="display.html" data-i18n="foot.strip">长条屏 →</a> · <a href="settings.html" data-i18n="foot.settings">设置 →</a>
   </div>
 </div>
@@ -1310,10 +1310,18 @@ const daysClass = d => d <= 1 ? "hot" : (d <= 3 ? "warm" : "ok");
 function cleanSteps(recipe){
   return (I18N.recipeSteps(recipe) || []).filter(s => s && !/^!\[/.test(String(s).trim()));
 }
+/* 菜谱正文来自 HowToCook 的 markdown：**加粗**、# 标题这些标记不该原样印出来 */
+function stepRich(s){
+  return String(s || "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/^\s*#{1,6}\s*/, "")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")      /* [文字](链接) → 只留文字 */
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+}
 function stepsHtml(recipe){
   return cleanSteps(recipe).map((s, i) => {
     const a = COOK_STEPS.of(s, recipe.id + "#" + i);
-    return `<li data-act="${a.id}"><span class="n">${i + 1}</span><span class="act">${COOK_STEPS.svg(a.id)}</span><span class="tx">${s}</span></li>`;
+    return `<li data-act="${a.id}"><span class="n">${i + 1}</span><span class="act">${COOK_STEPS.svg(a.id)}</span><span class="tx">${stepRich(s)}</span></li>`;
   }).join("");
 }
 function actionStrip(recipe){
@@ -1522,7 +1530,7 @@ function renderResult(list, sel){
     <div class="why">
       <b>${t("card.why")}</b>
       <ul>${reasons(top).map(r=>`<li>${r}</li>`).join("")}</ul>
-      <ol class="steps">${I18N.recipeSteps(top.recipe).map(s=>`<li>${s}</li>`).join("")}</ol>
+      <ol class="steps">${I18N.recipeSteps(top.recipe).map(s=>`<li>${stepRich(s)}</li>`).join("")}</ol>
       ${top.pantryMissing.length?pantryLine(top.pantryMissing):""}
       <div class="srcline">${t("card.src")}<a href="${top.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · ${t("card.srcNote")}</div>
       <button class="btn primary" style="margin-top:12px" data-cook="${top.recipe.id}">${t("disc.cook")}</button>
@@ -1880,7 +1888,7 @@ function renderCook(){
   const act = COOK_STEPS.of(text, cookRecipe.id + "#" + cookStep);
   $("#ck-icon").innerHTML = `<span style="display:inline-block;animation:ckPulse 2.6s ease-in-out infinite">
       ${COOK_STEPS.svg(act.id, "ck-act")}</span>`;
-  $("#ck-text").textContent = text;
+  $("#ck-text").innerHTML = stepRich(text);
   /* 这一步要用：只显示这一步真会用到的东西 —— 食材带插画，调料是文字小标签 */
   const box = $("#ck-ing");
   if(box){
