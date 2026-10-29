@@ -51,7 +51,7 @@
   <h2>2. 拍（<span id="cnt">0</span> / <span id="total">0</span> 张）</h2>
   <div class="bar"><i id="prog"></i></div>
   <div class="thumbs" id="thumbs"></div>
-  <p class="hint" id="tip">先选一个品类，再点下面的「拍一张」。</p>
+  <p class="hint" id="tip">先选一个品类，再点下面的「拍一张」。选「不认识」就拍水果、包装食品、饮料这类。</p>
 
   <h2>怎么拍（重要）</h2>
   <p class="hint" style="line-height:1.75">
@@ -77,7 +77,7 @@
 const CLASSES = [
   ["chili", "青椒"], ["egg", "鸡蛋"], ["greens", "青菜"], ["milk", "牛奶"],
   ["mushroom", "香菇"], ["pork", "猪肉"], ["tofu", "豆腐"], ["tomato", "番茄"],
-  ["unknown", "不认识（水果/包装/饮料…）"]
+  ["unknown", "不认识"]
 ];
 const TARGET = 20;
 const DB = "fd_samples", STORE = "shots";
@@ -120,7 +120,7 @@ function paintShoot(){
   const name = (CLASSES.find(c => c[0] === current) || [])[1];
   $("#tip").textContent = current
     ? `正在拍：${name}（已 ${n} 张）`
-    : "先选一个品类，再点下面的「拍一张」。";
+    : "先选一个品类，再点下面的「拍一张」。选「不认识」就拍水果、包装食品、饮料这类。";
 }
 
 function renderThumbs(){
