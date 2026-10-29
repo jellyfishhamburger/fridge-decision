@@ -218,10 +218,11 @@
   };
 
   let lastCloud = null;
+  let connOK = false;                      /* only true after a successful round trip */
   const cloudOn = () => !!(global.SYNC && global.SYNC.enabled && global.SYNC.enabled());
 
   function pushDiff(list) {
-    if (!cloudOn()) return;
+    if (!cloudOn() || !connOK) return;
     const code = household().code; if (!code) return;
     const now = snap(list);
     const before = lastCloud || {};
@@ -258,14 +259,31 @@
       if (!cloudOn()) return false;
       const rows = await global.SYNC.pull(sync.code());
       if (!Array.isArray(rows)) return false;
+      const local = read(LS_ITEMS, []) || [];
+      connOK = true;
+      if (!rows.length && local.length) {
+        /* first round trip on a fresh household: seed the cloud from this device */
+        lastCloud = {};
+        pushDiff(local);
+        return true;
+      }
+      /* merge: cloud rows win; items that only exist here are pushed up */
+      const have = {};
+      rows.forEach(r => have[r.id] = 1);
+      const extra = local.filter(i => !have[i.id]);
       lastCloud = snap(rows);
-      write(LS_ITEMS, rows);          /* raw write: never echo back what we just got */
+      write(LS_ITEMS, rows.concat(extra));
+      if (extra.length) pushDiff(rows.concat(extra));
       return true;
     },
     start(onChange, ms) {
       if (!cloudOn()) return false;
       const me = this;
       (async () => {
+        try {
+          const p = await global.SYNC.ping();
+          if (!p.ok) { console.warn("[sync] staying local:", p.reason); return; }
+        } catch (e) { console.warn("[sync] staying local:", e.message); return; }
         try { await global.SYNC.ensureHousehold(me.code()); } catch (e) {}
         try { await me.pull(); onChange && onChange(); } catch (e) {}
       })();

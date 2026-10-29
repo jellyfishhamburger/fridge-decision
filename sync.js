@@ -12,8 +12,8 @@
 (function (g) {
   "use strict";
 
-  const SUPABASE_URL = "";        // e.g. "https://abcdefgh.supabase.co"
-  const SUPABASE_KEY = "";        // "anon public" key
+  const SUPABASE_URL = "https://zbrvcwxwecorjdzqltxg.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_If5WBRuG6b6qacugNXQZVw_FrMpY1o_";  // publishable key: safe in a browser
   const TABLE_ITEMS  = "items";
   const TABLE_LOGS   = "logs";
   const TABLE_HH     = "households";
