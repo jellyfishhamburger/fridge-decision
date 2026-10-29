@@ -196,12 +196,14 @@
   .scrim{position:fixed;inset:0;background:rgba(12,22,18,.42);display:none;z-index:40}
   .scrim.on{display:block}
   .sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;border-radius:20px 20px 0 0;
-    padding:18px 16px calc(18px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .22s ease;
+    padding:18px 16px 0;transform:translateY(105%);transition:transform .22s ease;
     max-width:520px;margin:0 auto;max-height:88vh;max-height:88dvh;overflow:auto;
     -webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-  /* 保存按钮贴底：19 个格子滚到底才找得到按钮，在手机上很难受 */
-  #saveBtn{position:sticky;bottom:0;margin-top:6px;box-shadow:0 -14px 18px 6px #fff}
-  #cancelBtn{position:relative;z-index:1}
+  /* 保存 + 取消一起贴底：格子滚到哪都看得见按钮，取消也不会掉到屏幕外 */
+  .sheet-foot{position:sticky;bottom:0;z-index:2;margin:6px -16px 0;
+    padding:10px 16px calc(20px + env(safe-area-inset-bottom));background:#fff;
+    box-shadow:0 -14px 18px 6px #fff}
+  #cancelBtn{position:relative;z-index:1;width:100%}
   .sheet.on{transform:translateY(0)}
   .sheet h3{font-size:17px;margin:0 0 4px}
   .sheet .hint{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 12px}
@@ -370,8 +372,10 @@
     <span id="daysLbl">3 天后</span>
     <input type="range" id="days" min="1" max="60" value="3">
   </div>
-  <button class="btn primary" id="saveBtn" data-i18n="sheet.save">加进冰箱</button>
-  <button class="btn quiet" id="cancelBtn" style="margin-top:8px" data-i18n="sheet.cancel">取消</button>
+  <div class="sheet-foot" id="sheetFoot">
+    <button class="btn primary" id="saveBtn" data-i18n="sheet.save">加进冰箱</button>
+    <button class="btn quiet" id="cancelBtn" style="margin-top:8px" data-i18n="sheet.cancel">取消</button>
+  </div>
 </div>
 <div class="cook" id="cook">
   <div class="ck-top"><span data-i18n="cook.title">做饭模式</span> · <b id="ck-name">菜名</b><button id="ck-close">✕</button></div>
@@ -522,9 +526,10 @@ function renderItems(){
       ${q > 1 ? `<span class="q">×${q}</span>` : ""}
       <span class="d">${expiryText(d)}</span>
       <button aria-label="remove" data-del="${it.id}">×</button>`;
-    el.addEventListener("pointerdown", ev => {
+    /* 用 click 而不是 pointerdown：手指在列表上滑动时 pointerdown 会先触发，
+       一滑就弹出编辑面板，看起来像"自己一直弹" */
+    el.addEventListener("click", ev => {
       if(ev.target.closest("button")) return;         // × 是删除，别跟编辑打架
-      ev.preventDefault();
       openSheet(it, null);                            // 点行 = 编辑这一条
     });
     box.appendChild(el);
@@ -781,7 +786,7 @@ let editTarget = null, sheetFor = null;   // editTarget=正在编辑的条目；
 function tt(k, fallback){ const v = t(k); return (v === k || v == null) ? fallback : v; }
 
 function openSheet(item, pendItem){
-  editTarget = item || null;
+  editTarget = (item && item.id) ? item : null;   /* 只认真正的条目；别把 click 事件当成条目 */
   sheetFor = pendItem || null;
   openSheetLegacy();                       /* 建网格 + 回填状态 */
   /* 编辑既有条目时不需要相机（东西已经在冰箱里了） */
@@ -925,7 +930,7 @@ async function scanBarcode(){
 }
 
 /* ---------- events ---------- */
-$("#addBtn").addEventListener("click", openSheet);
+$("#addBtn").addEventListener("click", () => openSheet(null, null));
 $("#cancelBtn").addEventListener("click", closeSheet);
 $("#scrim").addEventListener("click", closeSheet);
 $("#snapBtn").addEventListener("click", ()=>{
