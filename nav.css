@@ -1,0 +1,78 @@
+/* ============================================================
+   nav.css — 全站唯一的一套底部导航
+   以前 index(520) / cook(520) / settings(560) 各写一份，宽度和颜色都不同，
+   所以切页时导航会"变大变小"。现在三页共用这一个文件：
+     · 尺寸写死在一处（max-width 520 / padding 8 / 图标 23 / 字号 11.5）
+     · 一块会滑的胶囊（--nav-pill），在选中的那一项后面平移
+     · 跨页切换用 View Transition：导航原地不动，内容淡入，
+       不再整页闪一下（不支持的浏览器自动退化成普通跳转）
+   滑块的实现参考 transitions.dev（Jakubantalik/transitions.dev，MIT）
+   的 tabs-sliding：JS 只写 offsetLeft / offsetWidth，补间交给 CSS。
+   ============================================================ */
+:root{
+  --nav-max:520px;
+  --nav-pad:8px;
+  --nav-icon:23px;
+  --nav-fs:11.5px;
+  --nav-bg:rgba(255,253,247,.97);
+  --nav-line:#E9E1CF;
+  --nav-muted:var(--muted, #79857A);          /* 跟着每页的主题色走，尺寸才是写死的 */
+  --nav-accent:var(--green, #2F6B4F);
+  --nav-pill:rgba(47,107,79,.10);
+  --nav-pill:color-mix(in srgb, var(--green, #2F6B4F) 12%, transparent);
+  --nav-dur:300ms;
+  --nav-ease:cubic-bezier(.22,1,.36,1);
+}
+
+.nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  background:var(--nav-bg);border-top:1px solid var(--nav-line);
+  padding:var(--nav-pad) 0 calc(var(--nav-pad) + env(safe-area-inset-bottom));
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  view-transition-name:bottom-nav;
+}
+.navin{position:relative;max-width:var(--nav-max);margin:0 auto;display:flex;align-items:stretch}
+
+/* 会滑的那一块 */
+.nav-pill{
+  position:absolute;top:2px;bottom:2px;left:0;width:0;border-radius:14px;
+  background:var(--nav-pill);pointer-events:none;opacity:0;
+  transform:translateX(0);
+  transition:transform var(--nav-dur) var(--nav-ease),
+             width     var(--nav-dur) var(--nav-ease),
+             opacity   .18s linear;
+  will-change:transform,width;
+}
+.nav-pill.on{opacity:1}
+
+/* 每一项：尺寸只有这一处，三页完全一致 */
+.nav a,.nav button{
+  position:relative;z-index:1;flex:1 1 0;min-width:0;
+  border:0;background:none;font-family:inherit;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:4px 0;font-size:var(--nav-fs);line-height:1.15;
+  color:var(--nav-muted);text-decoration:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:color var(--nav-dur) var(--nav-ease);
+}
+.nav svg{
+  width:var(--nav-icon);height:var(--nav-icon);flex:none;
+  transition:transform var(--nav-dur) var(--nav-ease);
+}
+.nav a.on,.nav button.on,.nav .on{color:var(--nav-accent);font-weight:600}
+.nav a.on svg,.nav button.on svg,.nav .on svg{transform:translateY(-1px) scale(1.02)}
+.nav a:active,.nav button:active{color:var(--nav-accent)}
+.nav a:focus-visible,.nav button:focus-visible{outline:2px solid var(--nav-accent);outline-offset:-4px;border-radius:12px}
+
+/* 跨页面：导航留在原地，内容淡入淡出 */
+@view-transition{navigation:auto}
+::view-transition-group(bottom-nav){animation-duration:var(--nav-dur);animation-timing-function:var(--nav-ease)}
+::view-transition-old(root){animation:navOut .18s ease both}
+::view-transition-new(root){animation:navIn .26s var(--nav-ease) both}
+@keyframes navOut{to{opacity:0}}
+@keyframes navIn{from{opacity:0;transform:translateY(8px)}}
+
+@media (prefers-reduced-motion:reduce){
+  .nav-pill,.nav a,.nav button,.nav svg{transition:none!important}
+  ::view-transition-old(root),::view-transition-new(root),::view-transition-group(bottom-nav){animation:none!important}
+}

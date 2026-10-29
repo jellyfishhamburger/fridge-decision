@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0f7a5a">
 <title>Fridge Decision</title>
 <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="nav.css?v=20261030-5">
 <style>
   :root{
     --bg:#f6f7f5; --card:#fff; --ink:#16211c; --muted:#6b7a72; --line:#e2e7e3;
@@ -178,19 +179,8 @@
   .zoomrow.on{display:flex}
   .zoomrow input{width:58%;accent-color:var(--green)}
 
-  /* ---------- bottom nav ---------- */
-  .nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.97);
-    border-top:1px solid var(--line);padding:8px 0 calc(8px + env(safe-area-inset-bottom));
-    backdrop-filter:blur(10px)}
-  .navin{max-width:520px;margin:0 auto;display:flex}
-  .nav button{flex:1;border:0;background:none;font-family:inherit;cursor:pointer;color:var(--muted);
-    display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;padding:4px 0}
-  .nav button svg{width:23px;height:23px}
-  .nav button.on{color:var(--green);font-weight:600}
-  .nav .navset{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;
-    padding:4px 0;color:var(--muted);text-decoration:none}
-  .nav .navset svg{width:23px;height:23px}
-  .nav .navset:active{color:var(--green)}
+  /* ---------- bottom nav ----------
+     尺寸/滑块/跨页过渡统一在 nav.css，三个页面共用一份，别再往这里加。 */
 
   /* ---------- sheet ---------- */
   .scrim{position:fixed;inset:0;background:rgba(12,22,18,.42);display:none;z-index:40}
@@ -323,25 +313,47 @@
   @keyframes steamB{0%,100%{opacity:.4;transform:translateY(2px) scaleY(.92)}
                     50%{opacity:.85;transform:translateY(-3px) scaleY(1.06)}}
 
-  /* 冰箱：门向外开，内部亮一下 */
-  .hot[data-go="fridge"].acting .door{transform-origin:right center;
-    animation:doorOpen .46s cubic-bezier(.22,.9,.24,1) both}
-  @keyframes doorOpen{
-    0%{transform:scaleX(1) rotate(0deg);opacity:1}
-    55%{transform:scaleX(.52) rotate(-2.5deg);opacity:.92}
-    100%{transform:scaleX(.34) rotate(-4deg);opacity:.85}
+  /* ---------- 冰箱门 ----------
+     这门只有 19px 宽。3D rotateY 在这个尺寸下会先把门压成一条边，看起来像"抽一下"
+     ——我试过（rotateY 58° 时投影只剩 10px），所以退回 2.5D：
+       门绕右门轴向左甩出去 → 横向收窄到近乎侧立 → 顺势淡出；
+       同时内胆亮起来、门轴处出现一道影子。
+     全部只动 transform / opacity / filter，不碰布局。 */
+  .hot[data-go="fridge"] .door{transform-box:fill-box;transform-origin:right center}
+  /* 门往「观察者这边」甩开：整块门板向左移出冰箱轮廓并顺势倾斜，
+     不是把它压窄——压窄在正面视角里看起来像被冰箱吞掉（这就是"抽一下"）。 */
+  .hot[data-go="fridge"].acting .door{
+    animation:doorSwing .78s cubic-bezier(.34,.72,.24,1) both}
+  @keyframes doorSwing{
+    0%  {transform:translate(0,0) rotate(0deg)}
+    35% {transform:translate(-5px,-1px) rotate(-6deg)}
+    70% {transform:translate(-13px,-2px) rotate(-15deg)}
+    86% {transform:translate(-21px,-2px) rotate(-23deg)}
+    100%{transform:translate(-19px,-2px) rotate(-21deg)}
   }
-  .hot[data-go="fridge"].acting .cavity{animation:cavity .5s ease both}
-  @keyframes cavity{0%{filter:brightness(1)}45%{filter:brightness(1.13)}100%{filter:brightness(1.05)}}
+  .cavity-glow{opacity:0}
+  .hot[data-go="fridge"].acting .cavity-glow{animation:cavityGlow .42s ease both}
+  @keyframes cavityGlow{0%{opacity:0}30%{opacity:.2}70%{opacity:.8}100%{opacity:.55}}
+  .hot[data-go="fridge"].acting .cavity{animation:cavity .42s ease both}
+  @keyframes cavity{0%{filter:brightness(1)}45%{filter:brightness(1.16)}100%{filter:brightness(1.07)}}
 
-  /* 菜谱：右页翻向书脊 */
-  .hot[data-go="discover"].acting .pg-r{transform-origin:left center;
-    animation:pageTurn .44s cubic-bezier(.4,.1,.3,1) both}
-  @keyframes pageTurn{
-    0%{transform:scaleX(1) rotate(0deg);opacity:1}
-    55%{transform:scaleX(.42) rotate(-3deg);opacity:.85}
-    100%{transform:scaleX(.06) rotate(-6deg);opacity:0}
+  /* ---------- 菜谱：像翻开一本书 ----------
+     旧版把右页 scaleX 缩到 .06，所以看起来"书少了一半"。
+     现在左右两页各自以书脊为轴、向两边张开一个角度（像 V 字打开）：
+     尺寸不变、永远不会缺一块，44px 的页面宽度也能看清。 */
+  .hot[data-go="discover"] .pg-l{transform-box:fill-box;transform-origin:right center}
+  .hot[data-go="discover"] .pg-r{transform-box:fill-box;transform-origin:left center}
+  .hot[data-go="discover"].acting .pg-l{animation:bookLeft .56s cubic-bezier(.32,.9,.24,1) both}
+  .hot[data-go="discover"].acting .pg-r{animation:bookRight .56s cubic-bezier(.32,.9,.24,1) both}
+  @keyframes bookLeft{
+    0%  {transform:rotate(0deg) translateY(0)}
+    100%{transform:rotate(-12deg) translateY(1.5px)}
   }
+  @keyframes bookRight{
+    0%  {transform:rotate(0deg) translateY(0)}
+    100%{transform:rotate(12deg) translateY(1.5px)}
+  }
+  @keyframes bookLift{0%,100%{opacity:1}55%{opacity:.55}}
 
   /* 锅：气泡上升 + 锅体轻晃 */
   .hot[data-go="cook"].acting .bubbles circle{animation:bub .58s ease-out both}
@@ -451,6 +463,7 @@
           </g>
           <rect x="30" y="54" width="84" height="151" rx="14" fill="url(#gFridge)"/>
           <rect class="cavity" x="38" y="62" width="68" height="135" rx="8" fill="#FBF4E5"/>
+          <rect class="cavity-glow" x="38" y="62" width="68" height="135" rx="8" fill="#FFF6DC"/>
           <rect x="38" y="62" width="9" height="135" rx="4" fill="#EEE0C5" opacity=".55"/>
           <rect x="38" y="90" width="68" height="2.6" fill="#E5D5B8"/>
           <rect x="38" y="118" width="68" height="2.6" fill="#E5D5B8"/>
@@ -869,7 +882,7 @@ $$("[data-go]").forEach(el=>{
     if(el.classList.contains("acting")) return;      // 连点只响应一次
     if(REDUCE){ jump(); return; }
     el.classList.add("acting");
-    setTimeout(jump, 430);                            // 动效快一半就跳，不等它播完
+    setTimeout(jump, 300);                            // 动效播到一半就跳，不等它演完
   });
   el.addEventListener("keydown", e => {
     if(e.key === "Enter" || e.key === " "){ e.preventDefault(); jump(); }
@@ -1587,6 +1600,9 @@ if (FD.cloudOn()) {
 if(!items.length) setTimeout(()=>toast(t("toast.tip")), 900);
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 /* 每个按钮都该有按下去的手感（和锅页同一套弹簧） */
+</script>
+<script src="nav.js?v=20261030-5" defer></script>
+<script>
 if(window.MOTION){
   [".btn", ".go", ".nav button", ".navset", ".filter", ".f", "#langBtn"].forEach(function(sel){
     document.querySelectorAll(sel).forEach(function(el){ MOTION.press(el); });
