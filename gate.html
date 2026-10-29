@@ -125,9 +125,9 @@
   </div>
 </div>
 
-<script src="data.js"></script>
-<script src="icons.js"></script>
-<script src="logic.js"></script>
+<script src="data.js?v=20261029-5"></script>
+<script src="icons.js?v=20261029-5"></script>
+<script src="logic.js?v=20261029-5"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -381,9 +381,10 @@ function commit(c){
     const same = list.find(i => i.cat === c.id && FD.daysLeftOf(i) === c.days);
     if(same){ same.qty = (same.qty == null ? 1 : same.qty) + 1; }
     else{
+      const unit = (typeof FD.unitOf === "function") ? FD.unitOf(c.id) : "份";
+      const today = (typeof FD.localDate === "function") ? FD.localDate() : new Date().toISOString().slice(0,10);
       list.push({id:Math.random().toString(36).slice(2,9), cat:c.id, name:c.name, tag:c.tag,
-                 qty:1, unit:FD.unitOf(c.id), daysLeft:c.days, life:c.days,
-                 addedAt:FD.localDate(), via:"gate"});
+                 qty:1, unit:unit, daysLeft:c.days, life:c.days, addedAt:today, via:"gate"});
     }
     FD.saveItems(FD.mergeItems(list));
     addLog(`<b>${c.cn}</b><span class="badge">已入库</span>　来源：门口闸机`);
@@ -438,6 +439,7 @@ $("#useHand").addEventListener("change", e=>{
 });
 
 buildPicks();
+addLog("构建版本 20261029-5 已加载（如果这行看不到新版号，说明浏览器还在用缓存）");
 </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const CACHE = "fridge-decision-v2";
+const CACHE = "fridge-decision-v3";
 const ASSETS = ["./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", e => {
@@ -16,7 +16,9 @@ self.addEventListener("activate", e => {
 // cache-first for static assets so the app still opens offline.
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
-  const isDoc = e.request.mode === "navigate" || /\.html$/.test(new URL(e.request.url).pathname);
+  const path = new URL(e.request.url).pathname;
+  // 文档和脚本都必须网络优先：否则改了 logic.js，用户拿到的还是旧函数
+  const isDoc = e.request.mode === "navigate" || /\.(html|js)$/.test(path);
   if (isDoc) {
     e.respondWith(
       fetch(e.request).then(res => {
