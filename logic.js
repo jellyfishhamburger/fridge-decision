@@ -284,7 +284,6 @@
           const p = await global.SYNC.ping();
           if (!p.ok) { console.warn("[sync] staying local:", p.reason); return; }
         } catch (e) { console.warn("[sync] staying local:", e.message); return; }
-        try { await global.SYNC.ensureHousehold(me.code()); } catch (e) {}
         try { await me.pull(); onChange && onChange(); } catch (e) {}
       })();
       setInterval(async () => {
