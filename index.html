@@ -269,7 +269,7 @@
   </section>
 
   <div class="foot">
-    <span data-i18n="foot.line">原型 · 无硬件、无图像识别</span><br>
+    <span data-i18n="foot.line">原型 · 无硬件、无图像识别</span> · build 20261029-7<br>
     <a href="disc.html" data-i18n="foot.disc">圆片 →</a> · <a href="display.html" data-i18n="foot.strip">长条屏 →</a> · <a href="settings.html" data-i18n="foot.settings">设置 →</a>
   </div>
 </div>
@@ -864,6 +864,16 @@ $("#langBtn").addEventListener("click", ()=>{
 
 /* ---------- boot ---------- */
 applyLang();
+// 从设置页底部导航跳回来时，直接落到对应标签
+(function(){
+  const h = (location.hash || "").replace("#","");
+  if(["fridge","discover","build"].includes(h)) show(h);
+})();
+// 从设置页底部导航跳回来时，直接落到对应标签
+(function(){
+  const h = (location.hash || "").replace("#","");
+  if(["fridge","discover","build"].includes(h)) show(h);
+})();
 if(!items.length) setTimeout(()=>toast(t("toast.tip")), 900);
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 </script>
