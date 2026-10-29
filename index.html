@@ -110,6 +110,36 @@
   .switch input{width:20px;height:20px;accent-color:var(--green)}
   .note{font-size:12px;color:var(--muted);line-height:1.55;margin:8px 0 0}
 
+  /* ---------- quantity stepper ---------- */
+  .qtyrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;font-size:14px}
+  .step2{display:flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .step2 button{width:42px;height:40px;border:0;background:#fff;font-size:19px;color:var(--ink);cursor:pointer;font-family:inherit}
+  .step2 span{min-width:74px;text-align:center;font-size:15px;font-weight:600;border-left:1px solid var(--line);border-right:1px solid var(--line);height:40px;line-height:40px}
+  .chip .q{font-size:13px;color:var(--muted);background:#eef2ef;border-radius:7px;padding:3px 7px;margin-left:6px;font-weight:600}
+
+  /* ---------- cooking mode ---------- */
+  .cook{position:fixed;inset:0;z-index:70;background:#fbfcfa;display:none;flex-direction:column;
+    padding:calc(14px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))}
+  .cook.on{display:flex}
+  .ck-top{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--muted)}
+  .ck-top b{color:var(--ink);font-size:16px}
+  .ck-top button{margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:10px;
+    width:38px;height:38px;font-size:16px;cursor:pointer;font-family:inherit;color:var(--ink)}
+  .ck-body{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;text-align:center}
+  .ck-icon svg{width:96px;height:96px;color:var(--green);stroke-width:1.3}
+  .ck-text{font-size:23px;line-height:1.5;font-weight:600;letter-spacing:-.01em;max-width:22em}
+  .ck-count{font-size:13px;color:var(--muted);letter-spacing:.08em}
+  .ck-bar{display:flex;gap:10px}
+  .ck-bar button{flex:1;border:1px solid var(--line);background:#fff;border-radius:12px;padding:14px;
+    font-size:15px;font-family:inherit;cursor:pointer;color:var(--ink);font-weight:600}
+  .ck-bar button:disabled{opacity:.4}
+  .ck-done{margin-top:10px}
+  .undo{display:none;align-items:center;gap:10px;background:#16211c;color:#fff;border-radius:12px;
+    padding:12px 14px;font-size:13.5px;margin:0 0 12px;line-height:1.45}
+  .undo.on{display:flex}
+  .undo button{margin-left:auto;border:1px solid rgba(255,255,255,.4);background:transparent;color:#fff;
+    border-radius:9px;padding:7px 12px;font-size:13px;font-family:inherit;cursor:pointer;flex:0 0 auto}
+
   /* ---------- bottom nav ---------- */
   .nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.97);
     border-top:1px solid var(--line);padding:8px 0 calc(8px + env(safe-area-inset-bottom));
@@ -165,6 +195,10 @@
   <!-- ============ view 1: fridge ============ -->
   <section class="view on" id="view-fridge">
     <p class="lede">右边数字＝还能放几天，越红越要先吃。数据存在这台设备里。</p>
+    <div class="undo" id="undoBar">
+      <span id="undoText">做好了</span>
+      <button id="undoBtn">撤销</button>
+    </div>
     <div class="card">
       <h2>存货 <span class="count" id="cnt">0 items</span></h2>
       <div class="items" id="items"></div>
@@ -258,6 +292,14 @@
     <button class="btn quiet" id="snapBtn">打开相机</button>
   </div>
   <div class="grid" id="picks"></div>
+  <div class="qtyrow">
+    <span>这次带回来几份</span>
+    <span class="step2">
+      <button type="button" id="qMinus">−</button>
+      <span id="qtyLbl">1 份</span>
+      <button type="button" id="qPlus">＋</button>
+    </span>
+  </div>
   <div class="field">
     <span>可以放到 <b id="daysLbl">3 天后</b></span>
     <input type="range" id="days" min="1" max="60" value="3">
@@ -265,6 +307,20 @@
   <button class="btn primary" id="saveBtn">加进冰箱</button>
   <button class="btn quiet" id="cancelBtn" style="margin-top:8px">取消</button>
 </div>
+<div class="cook" id="cook">
+  <div class="ck-top"><span>做饭模式 ·</span><b id="ck-name">菜名</b><button id="ck-close">✕</button></div>
+  <div class="ck-body">
+    <div class="ck-icon" id="ck-icon"></div>
+    <div class="ck-text" id="ck-text">…</div>
+    <div class="ck-count" id="ck-count">1 / 5</div>
+  </div>
+  <div class="ck-bar">
+    <button id="ck-prev">上一步</button>
+    <button id="ck-next">下一步</button>
+  </div>
+  <button class="btn primary ck-done" id="ck-done">做完了 · 扣减库存</button>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="data.js"></script>
@@ -277,7 +333,8 @@ const $$ = s => [...document.querySelectorAll(s)];
 let items  = FD.items();
 let goal   = FD.settings();
 let pantry = FD.pantry();
-let picked = null, pendingDays = 3, stream = null;
+let picked = null, pendingDays = 3, pendingQty = 1, stream = null;
+let cookRecipe = null, cookStep = 0, lastUndo = null;
 let discFilter = "all", buildPicks = new Set();
 
 const uid = () => Math.random().toString(36).slice(2, 9);
@@ -316,7 +373,9 @@ function renderItems(){
     const d = FD.daysLeftOf(it);
     const el = document.createElement("div");
     el.className = "chip " + expiryClass(d);
+    const q = (it.qty == null ? 1 : it.qty);
     el.innerHTML = `${window.FD_ICON(it.cat,22)}<span>${cnOf(it.cat)}</span>
+      ${q > 1 ? `<span class="q">×${q}</span>` : ""}
       <span class="d">${expiryText(d)}</span>
       <button aria-label="remove" data-del="${it.id}">×</button>`;
     box.appendChild(el);
@@ -371,6 +430,7 @@ function renderResult(list){
       <ol class="steps">${top.recipe.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
       ${top.pantryMissing.length?pantryLine(top.pantryMissing):""}
       <div class="srcline">菜谱与热量：<a href="${top.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · 个人份估算，非实测</div>
+      <button class="btn primary" style="margin-top:12px" data-cook="${top.recipe.id}">开始做（一步一屏）</button>
     </div>
     ${alts.length?`<div class="card"><h2>其他选择 <span class="count">不一定马上能做</span></h2>
       ${alts.map(a=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)">
@@ -386,6 +446,7 @@ function renderResult(list){
       if(r){ renderResult([r,...list.filter(x=>x!==r)]); window.scrollTo({top:0,behavior:"smooth"}); }
     });
   });
+  box.querySelectorAll("[data-cook]").forEach(b=>b.addEventListener("click", ()=> openCook(b.dataset.cook)));
   box.querySelectorAll("[data-pantry]").forEach(b=>{
     b.addEventListener("click", ()=>{
       const id = b.dataset.pantry;
@@ -414,7 +475,7 @@ function recipeCard(r, opts){
     <details><summary>看做法</summary><ol>${r.recipe.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
       <div class="src">来源：<a href="${r.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · 热量为个人份估算</div>
     </details>
-    <button class="go" data-take="${r.recipe.id}">就吃这个</button>
+    <button class="go" data-take="${r.recipe.id}">开始做（一步一屏）</button>
   </div>`;
 }
 
@@ -428,10 +489,7 @@ function renderDiscover(){
   box.innerHTML = list.length
     ? list.map(r=>recipeCard(r)).join("")
     : `<div class="card"><p class="empty">这个条件下没有菜。换个筛选，或者往冰箱里再加一样。</p></div>`;
-  box.querySelectorAll("[data-take]").forEach(b=>b.addEventListener("click", ()=>{
-    FD.log("take", b.dataset.take);
-    toast("记下了 —— 采纳率 +1");
-  }));
+  box.querySelectorAll("[data-take]").forEach(b=>b.addEventListener("click", ()=> openCook(b.dataset.take)));
 }
 
 /* ============ view 3: build ============ */
@@ -471,15 +529,80 @@ function renderBuild(){
     ? list.map(r=>recipeCard(r)).join("")
     : `<div class="card"><p class="empty">条件太紧了 —— 把热量上限调高，或者取消"必须绿叶菜"。</p></div>`)
     + `<p class="note" style="text-align:center">共 ${list.length} 道符合。</p>`;
-  box.querySelectorAll("[data-take]").forEach(b=>b.addEventListener("click", ()=>{
-    FD.log("take", b.dataset.take); toast("记下了 —— 采纳率 +1");
-  }));
+  box.querySelectorAll("[data-take]").forEach(b=>b.addEventListener("click", ()=> openCook(b.dataset.take)));
 }
 $("#kcal").addEventListener("input", renderBuild);
 $("#mins").addEventListener("input", renderBuild);
 $("#mustGreens").addEventListener("change", renderBuild);
 $("#highFiber").addEventListener("change", renderBuild);
 $("#clearPick").addEventListener("click", ()=>{ buildPicks.clear(); renderBuild(); });
+
+/* ---------- step pictograms: one action mark per step ---------- */
+const STEP_ICONS = {
+  cut:`<path d="M4 20l9-9M13 11l4-4a2.4 2.4 0 013.4 3.4l-4 4z"/><path d="M9 15l-2 2"/>`,
+  pan:`<path d="M3.6 11.4h11.2a1.6 1.6 0 011.6 1.6 5.6 5.6 0 01-5.6 5.6H8.8a5.2 5.2 0 01-5.2-5.2z"/><path d="M16.4 12.4H21"/>`,
+  pot:`<path d="M4 10.6h16v3.2a5 5 0 01-5 5H9a5 5 0 01-5-5z"/><path d="M7.6 7.4c0-1 1-1.6 1-2.6M12 7.4c0-1 1-1.6 1-2.6M16.4 7.4c0-1 1-1.6 1-2.6"/>`,
+  season:`<path d="M10.2 9.6h3.6l.8 10.4H9.4z"/><path d="M10.8 6.6h2.4v3h-2.4z"/><path d="M14.6 8l3.4-2.6"/>`,
+  wash:`<path d="M12 4.4c3 3.6 4.6 5.8 4.6 8a4.6 4.6 0 01-9.2 0c0-2.2 1.6-4.4 4.6-8z"/><path d="M9.4 13.4c.4 1.2 1.3 1.9 2.6 1.9"/>`,
+  plate:`<circle cx="12" cy="12" r="7.4"/><circle cx="12" cy="12" r="3.6"/>`,
+  dot:`<circle cx="12" cy="12" r="3"/>`
+};
+function stepIcon(text){
+  const t = text || "";
+  let k = "dot";
+  if (/切|片|丁|丝|段|拍|剁|去骨|滚刀/.test(t)) k = "cut";
+  else if (/洗|泡|冲洗/.test(t)) k = "wash";
+  else if (/炒|煎|炸|煸|爆香|翻炒|收汁/.test(t)) k = "pan";
+  else if (/煮|蒸|炖|烧|焖|焯|水开|锅.*水/.test(t)) k = "pot";
+  else if (/腌|调|酱|盐|糖|油|码味|拌匀|淀粉/.test(t)) k = "season";
+  else if (/盛|装|摆|出锅|淋/.test(t)) k = "plate";
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+    stroke-linecap="round" stroke-linejoin="round">${STEP_ICONS[k]}</svg>`;
+}
+
+/* ---------- cooking mode ---------- */
+function openCook(recipeId){
+  cookRecipe = FD.RECIPES.find(r => r.id === recipeId);
+  if(!cookRecipe) return;
+  cookStep = 0;
+  $("#ck-name").textContent = cookRecipe.name;
+  renderCook();
+  $("#cook").classList.add("on");
+}
+function renderCook(){
+  const steps = cookRecipe.steps;
+  $("#ck-icon").innerHTML = stepIcon(steps[cookStep]);
+  $("#ck-text").textContent = steps[cookStep];
+  $("#ck-count").textContent = `${cookStep + 1} / ${steps.length}`;
+  $("#ck-prev").disabled = cookStep === 0;
+  $("#ck-next").disabled = cookStep >= steps.length - 1;
+  $("#ck-next").textContent = cookStep >= steps.length - 1 ? "最后一步" : "下一步";
+}
+$("#ck-prev").addEventListener("click", ()=>{ if(cookStep > 0){ cookStep--; renderCook(); } });
+$("#ck-next").addEventListener("click", ()=>{ if(cookStep < cookRecipe.steps.length - 1){ cookStep++; renderCook(); } });
+$("#ck-close").addEventListener("click", ()=> $("#cook").classList.remove("on"));
+
+$("#ck-done").addEventListener("click", ()=>{
+  const before = items.slice();
+  const res = FD.consume(items, cookRecipe);
+  lastUndo = {items: before, dish: cookRecipe.name};
+  items = res.items;
+  FD.saveItems(items);
+  FD.log("take", cookRecipe.id);
+  renderItems();
+  $("#cook").classList.remove("on");
+  const usedTxt = res.used.map(u => `${cnOf(u.cat)}×${u.qty}${u.left === 0 ? "（用完）" : `（剩 ${u.left}）`}`).join("、");
+  $("#undoText").textContent = `${cookRecipe.name} 做好了 · 扣减 ${usedTxt || "无"}`;
+  $("#undoBar").classList.add("on");
+  if(cookStep >= 0) show("fridge");
+});
+$("#undoBtn").addEventListener("click", ()=>{
+  if(!lastUndo) return;
+  items = lastUndo.items; FD.saveItems(items); renderItems();
+  $("#undoBar").classList.remove("on");
+  toast("已撤销扣减");
+  lastUndo = null;
+});
 
 /* ---------- add sheet ---------- */
 function openSheet(){
@@ -495,11 +618,20 @@ function openSheet(){
       g.querySelectorAll(".pick").forEach(x=>x.classList.remove("on"));
       b.classList.add("on");
       $("#days").value = c.days; $("#daysLbl").textContent = c.days + " 天后";
+      pendingQty = 1; paintQty();
     });
     g.appendChild(b);
   });
   $("#days").value = 3; $("#daysLbl").textContent = "3 天后"; pendingDays = 3;
+  pendingQty = 1; paintQty();
 }
+function paintQty(){
+  const unit = picked ? FD.unitOf(picked.id) : "份";
+  $("#qtyLbl").textContent = pendingQty + " " + unit;
+}
+$("#qMinus").addEventListener("click", ()=>{ pendingQty = Math.max(1, pendingQty - 1); paintQty(); });
+$("#qPlus").addEventListener("click", ()=>{ pendingQty = Math.min(99, pendingQty + 1); paintQty(); });
+
 function closeSheet(){
   $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); stopCam();
 }
@@ -526,10 +658,11 @@ $("#saveBtn").addEventListener("click", ()=>{
   if(!picked){ toast("先选一样食物"); return; }
   const hh = FD.household();
   items.push({id:uid(), cat:picked.id, name:picked.name, tag:picked.tag,
+              qty:pendingQty, unit:FD.unitOf(picked.id),
               daysLeft:pendingDays, life:pendingDays, addedAt:today(),
               by: hh.members.length ? hh.members[0] : null});
   FD.saveItems(items); renderItems(); closeSheet();
-  toast(picked.cn + " 已加入 · 放 " + pendingDays + " 天");
+  toast(`${picked.cn} ×${pendingQty} 已加入 · 放 ${pendingDays} 天`);
 });
 
 $("#decideBtn").addEventListener("click", ()=>{
@@ -538,9 +671,10 @@ $("#decideBtn").addEventListener("click", ()=>{
 });
 
 $("#demoBtn").addEventListener("click", ()=>{
-  const mk = (cat, days) => { const f = FD.byId[cat];
-    return {id:uid(), cat, name:f.name, tag:f.tag, daysLeft:days, life:days, addedAt:today()}; };
-  items = [mk("pork",3), mk("chili",5), mk("egg",9), mk("greens",2), mk("rice",2), mk("tofu",3)];
+  const mk = (cat, days, qty) => { const f = FD.byId[cat];
+    return {id:uid(), cat, name:f.name, tag:f.tag, qty:qty||1, unit:FD.unitOf(cat),
+            daysLeft:days, life:days, addedAt:today()}; };
+  items = [mk("pork",3,1), mk("chili",7,3), mk("egg",21,10), mk("greens",4,1), mk("rice",3,2), mk("tofu",4,1)];
   FD.saveItems(items); renderItems();
   toast("示例：猪肉、青椒、鸡蛋、青菜、米饭、豆腐");
 });

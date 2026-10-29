@@ -15,8 +15,16 @@ thing the research says people are missing — *a decision*, not another invento
 | `logic.js` | The decision rule, the date maths, user settings, and the take/skip log. |
 | `icons.js` | 16 line drawings covering all 21 foods, drawn for a 296×128 three-colour panel. |
 | `index.html` | Phone app, three tabs + settings gear: **fridge** (stock, countdown) · **discover** (ranked recipes, filters) · **build** (pick what you want, then narrow by kcal / time / greens / fibre). |
-| `display.html` | 2.9″ e-paper simulation with three physical buttons. |
+| `display.html` | 2.9″ e-paper strip simulation with three physical buttons. |
+| `disc.html` | The round puck (240×240 / 1.54″): a red-amber-green ring for how much is about to go off. |
 | `settings.html` | What the panel shows, how fast it rotates, and the goals that drive ranking. |
+
+## Cooking consumes stock
+
+`FD.consume(items, recipe)` runs when the cooking mode finishes: every ingredient the
+recipe uses loses one unit, and an item at zero is removed. One unit per ingredient is a
+deliberate simplification — only 4 of 20 recipes parse reliable gram amounts, so the UI
+says "扣减 1 份" instead of implying exact quantities. The action is undoable.
 
 ## The decision rule
 
