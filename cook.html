@@ -12,7 +12,7 @@
 <body>
 
 <header class="top">
-  <a class="back" href="index.html" aria-label="回到冰箱">←<span data-i18n="cook.back">冰箱</span></a>
+  <span class="back" aria-hidden="true"></span>
   <h1 data-i18n="cook.title">今天的锅</h1>
   <button class="lang" id="langBtn" aria-label="切换语言">EN</button>
 </header>
@@ -76,8 +76,41 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- bottom nav：和冰箱页同一套 -->
+<nav class="nav">
+  <div class="navin">
+    <a href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <rect x="6" y="3.2" width="12" height="17.6" rx="2.6"/><path d="M6 9.6h12M9 5.6v2M9 11.8v2.4"/>
+      </svg>
+      <span>冰箱</span>
+    </a>
+    <a href="index.html#discover">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <path d="M12 3.4l2.2 5.4 5.8.5-4.4 3.8 1.3 5.7L12 15.7 7.1 18.8l1.3-5.7L4 9.3l5.8-.5z"/>
+      </svg>
+      <span>推荐</span>
+    </a>
+    <a class="on" href="cook.html" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.6 10.4h16.8c0 4.6-3 7.2-6.6 7.2H10.2c-3.6 0-6.6-2.6-6.6-7.2z"/>
+        <path d="M2 9.8h20"/><path d="M6 9.8V8.2M18 9.8V8.2"/>
+        <path d="M9.4 5.4c-.8-1 .6-1.6 0-2.6M14.6 5.4c-.8-1 .6-1.6 0-2.6"/>
+      </svg>
+      <span>自己选</span>
+    </a>
+    <a href="settings.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.1"/><circle cx="15.5" cy="17" r="2.1"/>
+      </svg>
+      <span>设置</span>
+    </a>
+  </div>
+</nav>
+
 <script src="data.js"></script>
 <script src="icons.js"></script>
+<script src="dish-photos.js"></script>
 <script src="cook-art.js"></script>
 <script src="cook-steps.js"></script>
 <script src="sync.js"></script>

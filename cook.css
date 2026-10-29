@@ -289,3 +289,33 @@ body.is-dragging .tile{transition:border-color .2s,background .2s}
 @media (max-width:879px){
   .wrap{padding-bottom:calc(196px + env(safe-area-inset-bottom))}
 }
+
+/* ---------- 底部导航：和冰箱页同一套 ---------- */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(255,255,255,.97);
+  border-top:1px solid var(--line);padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+  backdrop-filter:blur(10px)}
+.navin{max-width:520px;margin:0 auto;display:flex}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;
+  padding:4px 0;color:#8A8172;text-decoration:none}
+.nav a svg{width:23px;height:23px}
+.nav a.on{color:var(--sage-dk);font-weight:600}
+.nav a:active{color:var(--sage-dk)}
+
+/* 手机上锅是固定底栏：现在要叠在导航上面 */
+@media (max-width:879px){
+  .pot-sec{bottom:calc(70px + env(safe-area-inset-bottom))}
+  .wrap{padding-bottom:calc(276px + env(safe-area-inset-bottom))}
+}
+
+/* 结果卡顶部的成品照（和冰箱页同一套图源与署名） */
+.rcard{overflow:hidden}
+.rcard .rphoto{position:relative;margin:-18px -18px 12px;background:#EFE7D6}
+.rcard .rphoto img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+.rcard .rphoto .cr{position:absolute;right:6px;bottom:5px;font-size:9.5px;line-height:1.4;
+  color:#fff;background:rgba(28,32,30,.46);padding:1px 5px;border-radius:5px}
+.rcard .rphoto .cr a{color:#fff;text-decoration:none}
+.rcard .rphoto.art{display:flex;align-items:center;justify-content:center;gap:20px;padding:14px;
+  background:#F6F0E1;border-bottom:1px solid #EDE6D4}
+.rcard .rphoto.art .ic{display:flex;flex-direction:column;align-items:center;gap:3px;color:#6f7f74}
+.rcard .rphoto.art .ic svg{width:24px;height:24px}
+.rcard .rphoto.art .ic i{font-style:normal;font-size:10.5px;color:#8b8574}

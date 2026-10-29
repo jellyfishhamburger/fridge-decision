@@ -480,7 +480,12 @@
             <span class="tx">${s}</span>
           </li>`;
         }).join("");
+      const dp = window.DISH_PHOTO && DISH_PHOTO.get(r.recipe.name);
+      const photo = dp ? { src: dp.src, credit: dp.credit, license: dp.license, page: dp.page } : null;
+      const arts = (r.recipe.needs || []).slice(0,3)
+        .map(id => `<span class="ic">${art(id)}<i>${foodName(id)}</i></span>`).join("");
       card.innerHTML = `
+        ${photo ? `<div class="rphoto"><img src="${photo.src}" alt="${I18N.recipeName(r.recipe)}" loading="lazy" decoding="async"><span class="cr"><a href="${photo.page}" target="_blank" rel="noopener">${photo.credit} · ${photo.license}</a></span></div>` : `<div class="rphoto art">${arts}</div>`}
         <h3>${I18N.recipeName(r.recipe)}</h3>
         <div class="meta">
           ${status}
