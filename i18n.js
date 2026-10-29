@@ -11,8 +11,24 @@
 
   const STR = {
     zh: {
-      "nav.fridge": "冰箱", "nav.discover": "推荐", "nav.build": "自己选", "nav.settings": "设置",
-      "title.fridge": "冰箱里有什么", "title.discover": "今晚吃什么", "title.build": "自己做主",
+      "nav.home": "首页", "nav.fridge": "冰箱", "nav.discover": "菜谱", "nav.build": "自己选", "nav.settings": "设置",
+      "title.home": "今晚吃什么", "title.fridge": "冰箱里有什么", "title.discover": "菜谱", "title.build": "自己做主",
+
+      "home.title": "今晚吃什么",
+      "home.sub": "冰箱里有 {n} 样，{u} 样该先吃",
+      "home.subEmpty": "冰箱还是空的 —— 先加一样东西",
+      "home.badge": "{n} 样 · {u} 样急",
+      "home.badgeEmpty": "空冰箱",
+      "home.cta": "帮我决定今晚吃什么",
+      "home.ctaSub": "根据库存、临期和你的口味",
+      "home.cook": "今晚能做",
+      "home.seeAll": "查看全部 →",
+      "home.soon": "先吃这些",
+      "home.need": "差 {x}",
+      "home.none": "现在还没有能做的菜 —— 再加一两样。",
+      "home.soonEmpty": "还没有快到期的食材。",
+      "home.book": "翻翻菜谱",
+      "home.pot": "今天下锅",
 
       "fridge.lede": "右边数字＝还能放几天，越红越要先吃。数据存在这台设备里。",
       "fridge.stock": "存货", "fridge.count": "{n} 样",
@@ -123,8 +139,24 @@
     },
 
     en: {
-      "nav.fridge": "Fridge", "nav.discover": "Tonight", "nav.build": "Build", "nav.settings": "Settings",
-      "title.fridge": "What's in your fridge", "title.discover": "What can I cook", "title.build": "You choose",
+      "nav.home": "Home", "nav.fridge": "Fridge", "nav.discover": "Recipes", "nav.build": "Build", "nav.settings": "Settings",
+      "title.home": "What's for dinner", "title.fridge": "What's in your fridge", "title.discover": "Recipes", "title.build": "You choose",
+
+      "home.title": "What's for dinner",
+      "home.sub": "{n} items in, {u} to eat first",
+      "home.subEmpty": "The fridge is empty — add something first",
+      "home.badge": "{n} items · {u} urgent",
+      "home.badgeEmpty": "Empty",
+      "home.cta": "Decide my dinner",
+      "home.ctaSub": "By stock, expiry and your taste",
+      "home.cook": "Cookable tonight",
+      "home.seeAll": "See all →",
+      "home.soon": "Eat these first",
+      "home.need": "missing {x}",
+      "home.none": "Nothing cookable yet — add one or two more items.",
+      "home.soonEmpty": "Nothing close to expiring.",
+      "home.book": "Recipes",
+      "home.pot": "Cook now",
 
       "fridge.lede": "The number is how many days are left. The redder, the sooner it must be eaten.",
       "fridge.stock": "In stock", "fridge.count": "{n} items",

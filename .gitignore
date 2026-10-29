@@ -15,3 +15,13 @@ models/*.h5
 __pycache__/
 .DS_Store
 Thumbs.db
+
+# home rebuild scratch
+index.backup.html
+.realcrop/
+models/food*_u8.tflite
+models/food*_export/
+models/food*_savedmodel/
+models/food*_report.json
+# whole training workspace (venv + 1.9GB)
+training/

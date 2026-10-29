@@ -229,12 +229,141 @@
   .kchip.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44;font-weight:600}
   .keep-note{margin:9px 0 0;font-size:11.5px;line-height:1.5;color:var(--muted);min-height:17px}
   input[type=range]{accent-color:var(--green)}
-  .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(-16px);top:14px;background:#16211c;color:#fff;
+  .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(14px);top:auto;bottom:calc(96px + env(safe-area-inset-bottom));bottom-anchor:unset;background:#16211c;color:#fff;
     font-size:13.5px;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:86%;
     box-shadow:0 8px 24px rgba(12,22,18,.24)}
   .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
   .foot{font-size:11.5px;color:#93a29a;text-align:center;line-height:1.8;padding:18px 8px 0}
   .foot a{color:#0f7a5a}
+
+  /* ---------- theme v2 · warm kitchen (2026-10 mockup) ---------- */
+  :root{
+    --bg:#FAF6EC; --card:#FFFDF7; --ink:#1F3B2D; --muted:#79857A; --line:#E9E1CF;
+    --green:#2F6B4F; --green-soft:#DDE9D6; --amber:#B26A00; --amber-soft:#FBEEDC;
+    --red:#A93B33; --red-soft:#FBE7E3;
+    --shadow:0 1px 2px rgba(47,60,45,.05), 0 10px 28px rgba(47,60,45,.07);
+    --r:22px;
+  }
+  body{background:var(--bg);color:var(--ink)}
+  .top{background:rgba(250,246,236,.94)}
+  .topin h1{font-size:25px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+  .card{border-radius:var(--r);border-color:var(--line)}
+  .btn{border-radius:999px;padding:15px 18px;font-weight:700;letter-spacing:.01em}
+  .btn.primary{background:var(--green);box-shadow:0 10px 24px rgba(47,107,79,.24)}
+  .btn.ghost{border-color:var(--green);color:var(--green);background:transparent}
+  .nav{background:rgba(255,253,247,.98);border-top-color:var(--line)}
+  .chip{background:#FFFDF7;border-color:var(--line);border-radius:18px}
+  .gear{background:#FFFDF7;border-color:var(--line);border-radius:14px}
+  .sheet{background:#FFFDF7}
+  .sheet-foot{background:#FFFDF7}
+
+  /* ================= 首页（2026-10 参考稿重做） ================= */
+  .home-mode .top{background:transparent;border-bottom:0;position:absolute;top:0;left:0;right:0;z-index:25}
+  .home-mode .topin{justify-content:flex-end;padding:12px 16px 0}
+  .home-mode .topin h1{display:none}
+  .home-mode #view-home{padding-top:52px}
+
+  .hero{position:relative;margin:0 0 2px}
+  .hero-title{font-size:31px;line-height:1.1;font-weight:800;letter-spacing:-.035em;margin:0 0 7px;color:var(--ink)}
+  .hero-sub{font-size:13.5px;color:var(--muted);margin:0 0 2px;line-height:1.45}
+  .scene{display:block;width:100%;height:auto;margin:2px -4px 0;overflow:visible}
+  .scene text{font-family:inherit}
+  .hot{cursor:pointer;transition:transform .18s ease, filter .18s ease;transform-box:fill-box;transform-origin:center bottom}
+  .hot:hover,.hot:focus-visible{transform:translateY(-2px);filter:brightness(1.03)}
+  .hot:active{transform:translateY(0) scale(.985)}
+  .hot:focus{outline:none}
+
+  .cta{display:flex;align-items:center;gap:13px;width:100%;margin:6px 0 0;padding:17px 18px;
+    border:0;border-radius:24px;cursor:pointer;text-align:left;color:#fff;font-family:inherit;
+    background:linear-gradient(180deg,#377257 0%,#2B5F47 100%);
+    box-shadow:0 12px 26px rgba(43,95,71,.26),inset 0 1px 0 rgba(255,255,255,.14)}
+  .cta:active{transform:translateY(1px);box-shadow:0 8px 18px rgba(43,95,71,.24)}
+  .cta .ic{width:32px;height:32px;flex:0 0 auto;opacity:.95}
+  .cta .tx{flex:1;min-width:0}
+  .cta .t{display:block;font-size:18.5px;font-weight:800;letter-spacing:-.01em;line-height:1.25}
+  .cta .s{display:block;font-size:12.5px;opacity:.8;margin-top:3px;line-height:1.3}
+  .cta .ar{width:20px;height:20px;flex:0 0 auto;opacity:.9}
+
+  .hb{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:24px 0 10px}
+  .hb h2{font-size:17.5px;font-weight:800;margin:0;letter-spacing:-.01em}
+  .hb button{border:0;background:none;font-family:inherit;font-size:13px;font-weight:600;
+    color:var(--green);cursor:pointer;padding:2px 0}
+  .hcards{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .hcard{padding:0;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:var(--card);
+    box-shadow:var(--shadow);cursor:pointer;font-family:inherit;text-align:left;display:block;width:100%}
+  .hcard:active{transform:scale(.985)}
+  .hcard img{display:block;width:100%;aspect-ratio:1.35;object-fit:cover;background:#EFE7D5}
+  .hcard .hart{display:flex;align-items:center;justify-content:center;gap:6px;aspect-ratio:1.35;
+    background:linear-gradient(160deg,#F4F8F0,#EAF1E4);color:var(--green)}
+  .hcard .hart svg{width:26px;height:26px}
+  .hcard .m{display:block;padding:10px 12px 12px}
+  .hcard b{display:block;font-size:14px;font-weight:700;line-height:1.3;color:var(--ink)}
+  .hcard .mt{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:5px;
+    font-size:11.5px;color:var(--muted)}
+  .hcard .miss{color:var(--amber);font-weight:600}
+  .hsoon{display:flex;gap:8px;flex-wrap:wrap}
+  .soonc{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
+    border-radius:999px;padding:8px 13px 8px 9px;font-size:13px;font-weight:600}
+  .soonc svg{width:19px;height:19px;color:var(--green)}
+  .soonc i{font-style:normal;font-size:11.5px;font-weight:700;color:var(--amber);
+    font-variant-numeric:tabular-nums}
+  .soonc.urgent i{color:var(--red)}
+  .soonc.urgent{border-color:#F0D9D3;background:#FEF7F5}
+  #homeResult:empty{display:none}
+  #homeResult{margin-top:14px}
+
+  /* ================= 场景动效 ================= */
+  .scene g,.scene path,.scene circle,.scene rect{transform-box:fill-box}
+  .scene .steam path{transform-origin:center bottom}
+  .scene .steam path:nth-child(1){animation:steamA 5.4s ease-in-out infinite}
+  .scene .steam path:nth-child(2){animation:steamB 6.2s ease-in-out infinite .5s}
+  .scene .steam path:nth-child(3){animation:steamA 5.8s ease-in-out infinite 1s}
+  @keyframes steamA{0%,100%{opacity:.45;transform:translateY(1px) scaleY(.94)}
+                    50%{opacity:.9;transform:translateY(-2.5px) scaleY(1.04)}}
+  @keyframes steamB{0%,100%{opacity:.4;transform:translateY(2px) scaleY(.92)}
+                    50%{opacity:.85;transform:translateY(-3px) scaleY(1.06)}}
+
+  /* 冰箱：门向外开，内部亮一下 */
+  .hot[data-go="fridge"].acting .door{transform-origin:right center;
+    animation:doorOpen .46s cubic-bezier(.22,.9,.24,1) both}
+  @keyframes doorOpen{
+    0%{transform:scaleX(1) rotate(0deg);opacity:1}
+    55%{transform:scaleX(.52) rotate(-2.5deg);opacity:.92}
+    100%{transform:scaleX(.34) rotate(-4deg);opacity:.85}
+  }
+  .hot[data-go="fridge"].acting .cavity{animation:cavity .5s ease both}
+  @keyframes cavity{0%{filter:brightness(1)}45%{filter:brightness(1.13)}100%{filter:brightness(1.05)}}
+
+  /* 菜谱：右页翻向书脊 */
+  .hot[data-go="discover"].acting .pg-r{transform-origin:left center;
+    animation:pageTurn .44s cubic-bezier(.4,.1,.3,1) both}
+  @keyframes pageTurn{
+    0%{transform:scaleX(1) rotate(0deg);opacity:1}
+    55%{transform:scaleX(.42) rotate(-3deg);opacity:.85}
+    100%{transform:scaleX(.06) rotate(-6deg);opacity:0}
+  }
+
+  /* 锅：气泡上升 + 锅体轻晃 */
+  .hot[data-go="cook"].acting .bubbles circle{animation:bub .58s ease-out both}
+  .hot[data-go="cook"].acting .bubbles circle:nth-child(2){animation-delay:.08s}
+  .hot[data-go="cook"].acting .bubbles circle:nth-child(3){animation-delay:.16s}
+  @keyframes bub{
+    0%{opacity:0;transform:translateY(4px) scale(.45)}
+    30%{opacity:.95}
+    100%{opacity:0;transform:translateY(-13px) scale(1.05)}
+  }
+  .hot[data-go="cook"].acting .potbody{animation:wob .5s ease both}
+  @keyframes wob{0%,100%{transform:rotate(0)}35%{transform:rotate(-1.6deg)}70%{transform:rotate(1.2deg)}}
+  .hot[data-go="cook"].acting .steam path{animation-duration:1.1s}
+
+  /* CTA 按下 */
+  .cta .ar{transition:transform .2s ease}
+  .cta:active .ar{transform:translateX(3px)}
+
+  @media (prefers-reduced-motion: reduce){
+    .scene .steam path,.hot.acting .door,.hot.acting .pg-r,
+    .hot.acting .bubbles circle,.hot.acting .potbody,.hot.acting .cavity{animation:none!important}
+  }
 </style>
 </head>
 <body>
@@ -248,8 +377,207 @@
 
 <div class="wrap">
 
+
+  <!-- ============ view 0: home ============ -->
+  <section class="view on" id="view-home">
+
+    <div class="hero">
+      <h1 class="hero-title" data-i18n="home.title">今晚吃什么</h1>
+      <p class="hero-sub" id="homeSub">冰箱里有 12 样，3 样该先吃</p>
+
+      <svg class="scene" viewBox="0 0 360 244" role="img" aria-label="厨房场景：冰箱、菜谱书与汤锅">
+        <defs>
+          <linearGradient id="gWall" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FEFBF2"/><stop offset="1" stop-color="#F7EFDD"/>
+          </linearGradient>
+          <linearGradient id="gSun" x1="1" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FFF0C9" stop-opacity=".95"/>
+            <stop offset="1" stop-color="#FFF0C9" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="gFridge" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#B8D2BE"/><stop offset="1" stop-color="#9CBEA5"/>
+          </linearGradient>
+          <linearGradient id="gDoor" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#8CAF95"/><stop offset="1" stop-color="#A8C8B0"/>
+          </linearGradient>
+          <linearGradient id="gPot" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#BED5C4"/><stop offset="1" stop-color="#9CBEA6"/>
+          </linearGradient>
+          <linearGradient id="gPage" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FFFDF7"/><stop offset="1" stop-color="#F8EFDB"/>
+          </linearGradient>
+          <filter id="soft" x="-45%" y="-70%" width="190%" height="240%">
+            <feGaussianBlur stdDeviation="3.4"/>
+          </filter>
+          <filter id="drop" x="-30%" y="-40%" width="160%" height="200%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2.2" flood-color="#41503F" flood-opacity=".18"/>
+          </filter>
+        </defs>
+
+        <!-- 墙与侧光 -->
+        <rect x="0" y="0" width="360" height="244" fill="url(#gWall)"/>
+        <path d="M360 0 L360 158 L196 244 L104 244 Z" fill="url(#gSun)"/>
+
+        <!-- 墙上置物板 -->
+        <g>
+          <rect x="190" y="86" width="162" height="6" rx="3" fill="#E8D2AB"/>
+          <rect x="190" y="92" width="162" height="2.6" rx="1.3" fill="#D9C096" opacity=".65"/>
+          <rect x="196" y="59" width="16" height="27" rx="4" fill="#F2E6CF"/>
+          <rect x="193" y="55" width="22" height="6" rx="3" fill="#D9C29B"/>
+          <rect x="223" y="65" width="13" height="21" rx="3.5" fill="#DCE8D5"/>
+          <rect x="221" y="61" width="17" height="5" rx="2.5" fill="#B9D2BF"/>
+          <path d="M250 86 a15 10 0 0 0 30 0z" fill="#E4EDDA"/>
+          <ellipse cx="265" cy="86" rx="15" ry="3.4" fill="#F1F5EA"/>
+          <path d="M253 79 a12 8 0 0 0 24 0z" fill="#D6E4CE"/>
+          <ellipse cx="265" cy="79" rx="12" ry="2.9" fill="#EDF2E5"/>
+          <path d="M296 76 h20 l-3 10 h-14z" fill="#D9B98C"/>
+          <path d="M306 76 c-9 -1 -12 -9 -8 -16 c7 2 9 9 8 16z" fill="#7FA98A"/>
+          <path d="M302 76 c-8 1 -13 -5 -12 -12 c7 0 11 5 12 12z" fill="#94B79B"/>
+          <path d="M308 74 c7 -1 10 -8 7 -14 c-6 2 -8 8 -7 14z" fill="#A9C7AE"/>
+        </g>
+
+        <!-- 台面：所有物件的共同地平線 -->
+        <rect x="0" y="204" width="360" height="40" fill="#F4E8D0"/>
+        <rect x="0" y="204" width="360" height="2.4" fill="#E7D4B2"/>
+        <rect x="0" y="206.4" width="360" height="7" fill="#EFE0C2" opacity=".6"/>
+
+        <!-- ===== 冰箱（点击 → 冰箱页） ===== -->
+        <g class="hot" data-go="fridge" tabindex="0" role="button" aria-label="打开冰箱，查看存货">
+          <ellipse cx="70" cy="205" rx="56" ry="6" fill="#3A4A3E" opacity=".1" filter="url(#soft)"/>
+          <g class="door">
+            <path d="M30 54 L11 45 L11 197 L30 205 Z" fill="url(#gDoor)"/>
+            <path d="M14 50 L27 57 L27 197 L14 191 Z" fill="#ABC9B3" opacity=".5"/>
+            <rect x="16.5" y="108" width="3.4" height="19" rx="1.7" fill="#F4EDDC" opacity=".95"/>
+          </g>
+          <rect x="30" y="54" width="84" height="151" rx="14" fill="url(#gFridge)"/>
+          <rect class="cavity" x="38" y="62" width="68" height="135" rx="8" fill="#FBF4E5"/>
+          <rect x="38" y="62" width="9" height="135" rx="4" fill="#EEE0C5" opacity=".55"/>
+          <rect x="38" y="90" width="68" height="2.6" fill="#E5D5B8"/>
+          <rect x="38" y="118" width="68" height="2.6" fill="#E5D5B8"/>
+          <rect x="38" y="146" width="68" height="2.6" fill="#E5D5B8"/>
+          <ellipse cx="49" cy="85" rx="4.3" ry="5.5" fill="#F9EFDA"/>
+          <ellipse cx="59" cy="85" rx="4.3" ry="5.5" fill="#F9EFDA"/>
+          <ellipse cx="69" cy="85" rx="4.3" ry="5.5" fill="#F9EFDA"/>
+          <circle cx="51" cy="113" r="5.3" fill="#E08A6E"/>
+          <circle cx="63" cy="113" r="5.3" fill="#E58F72"/>
+          <circle cx="49.4" cy="111.4" r="1.4" fill="#F6C3AE" opacity=".85"/>
+          <path d="M45 145 c0 -8.5 6.5 -12.5 13 -12.5 s13 4 13 12.5z" fill="#7FA98A"/>
+          <path d="M51 145 c0 -6 3 -9 7 -9 s7 3 7 9z" fill="#94B79B"/>
+          <rect x="77" y="158" width="17" height="23" rx="4" fill="#DCE8D5"/>
+          <rect x="76" y="155" width="19" height="4.5" rx="2.2" fill="#B9D2BF"/>
+          <rect x="34" y="192" width="76" height="10" rx="4" fill="#8FB199" opacity=".45"/>
+          <rect x="104" y="100" width="3.4" height="22" rx="1.7" fill="#7FA98A"/>
+        </g>
+
+        <!-- 冰箱库存徽标 -->
+        <g filter="url(#drop)" pointer-events="none">
+          <rect x="6" y="21" width="106" height="25" rx="12.5" fill="#FFFDF7"/>
+        </g>
+        <text id="sceneBadge" x="59" y="37.6" text-anchor="middle" font-size="11" font-weight="700"
+              fill="#2F6B4F" pointer-events="none">12 样 · 3 样急</text>
+
+        <!-- ===== 菜谱书（点击 → 菜谱页） ===== -->
+        <g class="hot" data-go="discover" tabindex="0" role="button" aria-label="翻翻菜谱">
+          <ellipse cx="177" cy="205" rx="52" ry="5.2" fill="#3A4A3E" opacity=".1" filter="url(#soft)"/>
+          <path d="M123 205 L130 194 L225 194 L232 205 Z" fill="#E6CC9F"/>
+          <path d="M126 205 L132 197 L223 197 L229 205 Z" fill="#D8B98A" opacity=".55"/>
+          <g class="pg-l">
+            <path d="M177 165 C159 158 140 161 129 168 L129 197 C141 192 160 191 177 197 Z" fill="#8FB199"/>
+            <path d="M177 163 C160 157 143 160 133 167 L133 194 C143 189 160 188 177 194 Z" fill="url(#gPage)"/>
+            <path d="M133 172 C145 168 160 167 177 170" stroke="#EFE3CA" stroke-width="1.2" fill="none"/>
+            <circle cx="152" cy="179" r="5" fill="#E08A6E"/>
+            <path d="M147.4 184 h9.2" stroke="#E6D8BC" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M147.4 187.8 h7" stroke="#E6D8BC" stroke-width="1.8" stroke-linecap="round"/>
+          </g>
+          <g class="pg-r">
+            <path d="M177 165 C195 158 214 161 225 168 L225 197 C213 192 194 191 177 197 Z" fill="#7FA98A"/>
+            <path d="M177 163 C194 157 211 160 221 167 L221 194 C211 189 194 188 177 194 Z" fill="#FBF2DE"/>
+            <path d="M221 172 C209 168 194 167 177 170" stroke="#EFE3CA" stroke-width="1.2" fill="none"/>
+            <circle cx="202" cy="179" r="5" fill="#7FA98A"/>
+            <path d="M197.4 184 h9.2" stroke="#E6D8BC" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M197.4 187.8 h7" stroke="#E6D8BC" stroke-width="1.8" stroke-linecap="round"/>
+          </g>
+          <path d="M177 163 L177 194" stroke="#E3D3B4" stroke-width="1.3"/>
+          <text x="177" y="222" text-anchor="middle" font-size="10.5" font-weight="600"
+                fill="#7A8578" pointer-events="none" data-i18n="home.book">翻翻菜谱</text>
+        </g>
+
+        <!-- 散落的小道具：把两件东西连起来 -->
+        <circle cx="120" cy="201" r="4.2" fill="#E08A6E"/>
+        <path d="M116.5 198.4 c1.6 -1.6 5.4 -1.6 7 0" stroke="#7FA98A" stroke-width="1.6"
+              fill="none" stroke-linecap="round"/>
+        <g opacity=".9">
+          <ellipse cx="242" cy="201" rx="5.2" ry="4.2" fill="#F7EFDC"/>
+          <path d="M239 198.6 c1.6 -2 4.4 -2 6 0" stroke="#D9C096" stroke-width="1.4"
+                fill="none" stroke-linecap="round"/>
+        </g>
+
+        <!-- ===== 汤锅（点击 → 今天的锅） ===== -->
+        <g class="hot" data-go="cook" tabindex="0" role="button" aria-label="今天下锅">
+          <ellipse cx="291" cy="205" rx="40" ry="5" fill="#3A4A3E" opacity=".1" filter="url(#soft)"/>
+          <rect x="256" y="198" width="70" height="7" rx="3.5" fill="#4A564E" opacity=".7"/>
+          <g class="steam" stroke="#C9DCCB" stroke-width="2.8" fill="none" stroke-linecap="round" opacity=".85">
+            <path d="M277 158 c-5.5 -6.5 5.5 -10 0 -17"/>
+            <path d="M291 155 c-5.5 -7.5 5.5 -12 0 -20"/>
+            <path d="M305 158 c-5.5 -6.5 5.5 -10 0 -17"/>
+          </g>
+          <rect x="246" y="174" width="13" height="6.5" rx="3.2" fill="#4A564E"/>
+          <rect x="323" y="174" width="13" height="6.5" rx="3.2" fill="#4A564E"/>
+          <rect class="potbody" x="258" y="170" width="66" height="27" rx="11" fill="url(#gPot)"/>
+          <rect x="254" y="165" width="74" height="8.5" rx="4.2" fill="#8FB199"/>
+          <g class="bubbles" pointer-events="none">
+            <circle cx="277" cy="164" r="2.8" fill="#FFFDF7" opacity="0"/>
+            <circle cx="291" cy="163.4" r="2.2" fill="#FFFDF7" opacity="0"/>
+            <circle cx="304" cy="164" r="2.5" fill="#FFFDF7" opacity="0"/>
+          </g>
+          <ellipse cx="291" cy="169" rx="32" ry="2.8" fill="#7C9E86" opacity=".4"/>
+          <path d="M266 176 v14" stroke="#FFFDF7" stroke-opacity=".28" stroke-width="3.6"
+                stroke-linecap="round"/>
+          <circle cx="283" cy="182" r="1.8" fill="#2F6B4F" opacity=".45"/>
+          <circle cx="300" cy="182" r="1.8" fill="#2F6B4F" opacity=".45"/>
+          <path d="M286 188.5 q5.5 4.5 11 0" stroke="#2F6B4F" stroke-width="1.7" fill="none"
+                stroke-linecap="round" opacity=".4"/>
+          <text x="291" y="222" text-anchor="middle" font-size="10.5" font-weight="600"
+                fill="#7A8578" pointer-events="none" data-i18n="home.pot">今天下锅</text>
+        </g>
+      </svg>
+    </div>
+
+    <!-- 核心决策 CTA -->
+    <button class="cta" id="homeDecide">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 12.5a4.2 4.2 0 0 1 -1.6 -8.1a3 3 0 0 1 5.6 -1a3 3 0 0 1 5.6 1a4.2 4.2 0 0 1 -1.6 8.1z"/>
+        <path d="M8.2 12.5v5.2a1.4 1.4 0 0 0 1.4 1.4h4.8a1.4 1.4 0 0 0 1.4 -1.4v-5.2"/>
+        <path d="M10.4 14.6v1.8M13.6 14.6v1.8"/>
+      </svg>
+      <span class="tx">
+        <span class="t" data-i18n="home.cta">帮我决定今晚吃什么</span>
+        <span class="s" data-i18n="home.ctaSub">根据库存、临期和你的口味</span>
+      </span>
+      <svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h13"/><path d="M12.5 6.2 18.6 12l-6.1 5.8"/>
+      </svg>
+    </button>
+
+    <div id="homeResult"></div>
+
+    <div class="hb">
+      <h2 data-i18n="home.cook">今晚能做</h2>
+      <button data-goto="discover" data-i18n="home.seeAll">查看全部 →</button>
+    </div>
+    <div class="hcards" id="homeCook"></div>
+
+    <div class="hb">
+      <h2 data-i18n="home.soon">先吃这些</h2>
+    </div>
+    <div class="hsoon" id="homeSoon"></div>
+
+  </section>
+
   <!-- ============ view 1: fridge ============ -->
-  <section class="view on" id="view-fridge">
+  <section class="view" id="view-fridge">
     <p class="lede" data-i18n="fridge.lede">右边数字＝还能放几天，越红越要先吃。数据存在这台设备里。</p>
     <div class="undo" id="undoBar">
       <span id="undoText"></span>
@@ -324,22 +652,31 @@
 <!-- bottom nav -->
 <nav class="nav">
   <div class="navin">
-    <button class="on" data-view="fridge">
+    <button class="on" data-view="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.8 11.4 12 4.4l8.2 7"/><path d="M6.3 10.2v9.2h11.4v-9.2"/>
+        <path d="M10 19.4v-4.6h4v4.6"/>
+      </svg>
+      <span data-i18n="nav.home">首页</span>
+    </button>
+    <button data-view="fridge">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
         <rect x="6" y="3.2" width="12" height="17.6" rx="2.6"/><path d="M6 9.6h12M9 5.6v2M9 11.8v2.4"/>
       </svg>
       <span data-i18n="nav.fridge">冰箱</span>
     </button>
     <button data-view="discover">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
-        <path d="M12 3.4l2.2 5.4 5.8.5-4.4 3.8 1.3 5.7L12 15.7 7.1 18.8l1.3-5.7L4 9.3l5.8-.5z"/>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 6.6C10.2 5.3 7.7 4.8 5 5.1v12.4c2.7-.3 5.2.2 7 1.5 1.8-1.3 4.3-1.8 7-1.5V5.1c-2.7-.3-5.2.2-7 1.5z"/>
+        <path d="M12 6.6v12.4"/>
       </svg>
       <span data-i18n="nav.discover">推荐</span>
     </button>
     <button data-view="build">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
-        <path d="M4 6.5h11M4 12h11M4 17.5h11"/>
-        <path d="M18.4 5l1.5 1.6-1.5 1.6-1.5-1.6z"/><path d="M18.4 15l1.5 1.6-1.5 1.6-1.5-1.6z"/>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.6 10.4h16.8c0 4.6-3 7.2-6.6 7.2H10.2c-3.6 0-6.6-2.6-6.6-7.2z"/>
+        <path d="M2 9.8h20"/><path d="M6 9.8V8.2M18 9.8V8.2"/>
+        <path d="M9.4 5.4c-.8-1 .6-1.6 0-2.6M14.6 5.4c-.8-1 .6-1.6 0-2.6"/>
       </svg>
       <span data-i18n="nav.build">自己选</span>
     </button>
@@ -451,19 +788,101 @@ const FIBRE = new Set(["greens","broccoli","eggplant","mushroom","carrot","tomat
 const highFibre = r => r.needs.some(n => FIBRE.has(n));
 
 /* ============ view switching ============ */
-const TITLES = {fridge:"title.fridge", discover:"title.discover", build:"title.build"};
+const TITLES = {home:"title.home", fridge:"title.fridge", discover:"title.discover", build:"title.build"};
 const t = (k, v) => I18N.t(k, v);
 function show(view){
   /* 「自己做主」现在就是「今天的锅」这一页：先挑食材，再决定要不要加限制 */
   if(view === "build"){ location.href = "cook.html"; return; }
+  document.body.classList.toggle("home-mode", view === "home");
   $$(".view").forEach(v => v.classList.toggle("on", v.id === "view-" + view));
   $$(".nav button").forEach(b => b.classList.toggle("on", b.dataset.view === view));
   $("#pageTitle").textContent = t(TITLES[view]);
   window.scrollTo({top:0});
+  if(view === "home") renderHome();
   if(view === "discover") renderDiscover();
   if(view === "build") renderBuild();
+  if(location.hash !== "#" + view) history.replaceState(null, "", "#" + view);
 }
 $$(".nav button").forEach(b => b.addEventListener("click", () => show(b.dataset.view)));
+
+
+/* ============ view 0: home ============ */
+function homeDaysUrgent(){
+  return items.filter(i => FD.daysLeftOf(i) <= 3).length;
+}
+
+function renderHome(){
+  const n = items.length, u = homeDaysUrgent();
+  const badge = $("#sceneBadge"), subEl = $("#homeSub");
+  if(badge) badge.textContent = n ? t("home.badge", {n:n, u:u}) : t("home.badgeEmpty");
+  if(subEl) subEl.textContent = n ? t("home.sub", {n:n, u:u}) : t("home.subEmpty");
+
+  /* 今晚能做：优先「现在就能做」，没有就退到「差一样」 */
+  const ranked = FD.decide(items, goal);
+  let list = ranked.filter(r => r.status === "ready").slice(0,2);
+  if(!list.length) list = ranked.filter(r => r.status === "shop1").slice(0,2);
+
+  const box = $("#homeCook");
+  if(box){
+    box.innerHTML = list.length ? list.map(r=>{
+      const p = window.DISH_PHOTO && DISH_PHOTO.get(r.recipe.name);
+      const art = (p && p.src)
+        ? `<img src="${p.src}" alt="" loading="lazy" decoding="async">`
+        : `<span class="hart">${(r.recipe.needs||[]).slice(0,3).map(id => window.FD_ICON ? FD_ICON(id,26) : "").join("")}</span>`;
+      const sep = I18N.getLang() === "en" ? " / " : "、";
+      const miss = r.status === "shop1"
+        ? `<span class="miss">${t("home.need", {x:r.missing.map(cnOf).join(sep)})}</span>` : "";
+      return `<button class="hcard" data-take="${r.recipe.id}">
+        ${art}
+        <span class="m">
+          <b>${I18N.recipeName(r.recipe)}</b>
+          <span class="mt">${t("card.min", {n:r.recipe.minutes})}${miss}</span>
+        </span>
+      </button>`;
+    }).join("") : `<p class="empty" style="margin:0">${t("home.none")}</p>`;
+    box.querySelectorAll("[data-take]").forEach(b =>
+      b.addEventListener("click", () => openCook(b.dataset.take)));
+  }
+
+  /* 先吃这些 */
+  const soon = FD.urgent(items, 3);
+  const soonBox = $("#homeSoon");
+  if(soonBox){
+    soonBox.innerHTML = soon.length ? soon.map(i=>{
+      const d = FD.daysLeftOf(i);
+      return `<span class="soonc ${d <= 2 ? "urgent" : ""}">
+        ${window.FD_ICON ? FD_ICON(i.cat, 19) : ""}<b>${cnOf(i.cat)}</b>
+        <i>${t("days.n", {n:d})}</i></span>`;
+    }).join("") : `<p class="empty" style="margin:0">${t("home.soonEmpty")}</p>`;
+  }
+}
+
+/* 场景里三个物件的入口 */
+const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+$$("[data-go]").forEach(el=>{
+  const go = el.dataset.go;
+  const jump = () => {
+    if(go === "cook"){ location.href = "cook.html"; return; }
+    show(go);
+  };
+  el.addEventListener("click", () => {
+    if(el.classList.contains("acting")) return;      // 连点只响应一次
+    if(REDUCE){ jump(); return; }
+    el.classList.add("acting");
+    setTimeout(jump, 430);                            // 动效快一半就跳，不等它播完
+  });
+  el.addEventListener("keydown", e => {
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); jump(); }
+  });
+});
+
+$("#homeDecide").addEventListener("click", ()=>{
+  renderResult(FD.decide(items, goal), "#homeResult");
+  const r = $("#homeResult");
+  window.scrollTo({top: r.offsetTop - 12, behavior:"smooth"});
+});
+
+$$("[data-goto]").forEach(b => b.addEventListener("click", () => show(b.dataset.goto)));
 
 /* ============ view 1: fridge ============ */
 function expiryClass(d){ return d <= 2 ? "urgent" : d <= 5 ? "warn" : ""; }
@@ -584,8 +1003,8 @@ function pantryLine(missingIds){
   return `<div class="pantryline">${t("card.pantry")}${names}<br><span style="font-size:12px">${t("card.pantryHint")}</span></div>`;
 }
 
-function renderResult(list){
-  const box = $("#result");
+function renderResult(list, sel){
+  const box = $(sel || "#result");
   const usable = list.filter(r => r.status !== "blocked");
   if(!usable.length){
     box.innerHTML = `<div class="card"><h2>${t("disc.none")}</h2>
@@ -1114,10 +1533,12 @@ function applyLang(){
   $("#toast").textContent = "";      // 别让上一句中文留在 DOM 里
   $("#langBtn").textContent = I18N.getLang() === "en" ? "EN" : "中";
   const active = $$(".nav button").find(b => b.classList.contains("on"));
-  const view = active ? active.dataset.view : "fridge";
+  const view = active ? active.dataset.view : "home";
+  document.body.classList.toggle("home-mode", view === "home");
   $("#pageTitle").textContent = t(TITLES[view]);
   $("#qtyLbl") && paintQty();
   renderItems();
+  if(view === "home") renderHome();
   if(view === "discover") renderDiscover();
   if(view === "build") renderBuild();
   if($("#result").innerHTML) renderResult(FD.decide(items, goal));
@@ -1130,6 +1551,17 @@ $("#langBtn").addEventListener("click", ()=>{
 
 /* ---------- boot ---------- */
 applyLang();
+/* 跨页链接：cook.html / settings.html 里的 index.html#fridge 之类 */
+(function routeFromHash(){
+  const h = (location.hash || "").replace("#", "");
+  if(h === "cook"){ location.replace("cook.html"); return; }
+  if(h && ["fridge", "discover", "build"].includes(h)) show(h);
+})();
+window.addEventListener("hashchange", () => {
+  const h = (location.hash || "").replace("#", "");
+  if(h === "cook"){ location.replace("cook.html"); return; }
+  if(["home", "fridge", "discover", "build"].includes(h)) show(h);
+});
 // 有后端就跟着云端走：别的手机加的东西 5 秒内出现在这里
 if (FD.cloudOn()) {
   items = FD.items();
@@ -1139,7 +1571,7 @@ if (FD.cloudOn()) {
     pullPending();
     setInterval(pullPending, 6000);      /* 门口那块屏加的东西，6 秒内出现在手机上 */
   }
-  FD.sync.start(() => { items = FD.items(); renderItems(); renderPending();
+  FD.sync.start(() => { items = FD.items(); renderItems(); renderHome(); renderPending();
     if ($("#result").innerHTML) renderResult(FD.decide(items, goal)); });
 }
 // 从设置页底部导航跳回来时，直接落到对应标签

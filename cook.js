@@ -593,7 +593,7 @@
   function applyLang() {
     I18N.apply();
     if ($("#prefToggle")) paintPrefs();
-    $("#langBtn").textContent = I18N.getLang() === "en" ? "中文" : "EN";
+    $("#langBtn").textContent = I18N.getLang() === "en" ? "EN" : "中";
     renderFridge();
     if (cooked) renderResult([]);           // 换语言时清掉旧结果，避免中英混排
   }

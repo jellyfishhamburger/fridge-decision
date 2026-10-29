@@ -39,12 +39,13 @@ h1,h2{font-family:Georgia,"Songti SC","Noto Serif SC",serif;font-weight:400;lett
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);
 }
-.top h1{font-size:20px;flex:1;text-align:center}
+.top h1{font-size:21px;flex:1;text-align:left;letter-spacing:-.02em;font-weight:800;margin:0}
 .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2);text-decoration:none;
   padding:6px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
 .back:hover{color:var(--ink)}
-.lang{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--sage-dk);
-  padding:7px 12px;border-radius:99px;background:var(--sage-bg);border:1px solid #D3E0CF}
+.lang{flex:0 0 auto;min-width:44px;height:40px;padding:0 12px;font-family:inherit;
+  font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--ink);cursor:pointer;
+  border-radius:12px;background:#FFFDF7;border:1px solid var(--line)}
 
 /* ---------- 版式 ---------- */
 .wrap{max-width:1100px;margin:0 auto;padding:22px 18px 40px;
