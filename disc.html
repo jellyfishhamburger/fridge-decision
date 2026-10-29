@@ -72,6 +72,10 @@
   </div>
 
   <div class="ctl">
+    <button class="btn on" id="modeCount">环口径：按数量占比</button>
+    <button class="btn" id="modeItem">环口径：每样食物一扇区</button>
+  </div>
+  <div class="ctl">
     <button class="btn on" id="v240">240 px（1.28″ 圆屏）</button>
     <button class="btn" id="v152">152 px（1.54″ 圆形墨水屏）</button>
     <button class="btn" id="seed">载入示例</button>
@@ -119,6 +123,8 @@ function itemsNow(){
   return DEMO;
 }
 
+let ringMode = "count";   // count = 三段占比（原概念）; item = 每样一扇区
+
 function paint(){
   const items = itemsNow();
   const ranked = FD.decide(items.map(i => ({
@@ -131,17 +137,29 @@ function paint(){
   const green = items.filter(i => i.daysLeft > 5).length;
   const total = Math.max(1, red + amber + green);
 
-  const segs = [
-    {n:red,   color:"#b3261e"},
-    {n:amber, color:"#b8860b"},
-    {n:green, color:"#2f7d4f"}
-  ];
+  let segs;
+  if (ringMode === "count") {
+    segs = [
+      {n:red,   color:"#b3261e"},
+      {n:amber, color:"#b8860b"},
+      {n:green, color:"#2f7d4f"}
+    ];
+  } else {
+    // 每样食物一个等宽扇区：谁快坏了，谁就是红的 —— 一眼数得出来
+    const shown = items.slice().sort((a,b)=>a.daysLeft-b.daysLeft).slice(0, 12);
+    segs = shown.map(i => ({
+      n: 1,
+      color: i.daysLeft <= 2 ? "#b3261e" : (i.daysLeft <= 5 ? "#b8860b" : "#2f7d4f")
+    }));
+    if (items.length > 12) segs.push({n: items.length - 12, color: "#cdc6b8"});
+  }
+  const unitTotal = Math.max(1, segs.reduce((s,x)=>s+x.n, 0));
   let offset = 0, html = "";
-  segs.forEach(s => {
-    if(!s.n) return;
-    const len = (s.n / total) * C;
-    html += `<circle cx="120" cy="120" r="${R}" fill="none" stroke="${s.color}" stroke-width="22"
-      stroke-dasharray="${Math.max(0, len - 2)} ${C - Math.max(0, len - 2)}"
+  segs.forEach(sg => {
+    if(!sg.n) return;
+    const len = (sg.n / unitTotal) * C;
+    html += `<circle cx="120" cy="120" r="${R}" fill="none" stroke="${sg.color}" stroke-width="22"
+      stroke-dasharray="${Math.max(0, len - 3)} ${C - Math.max(0, len - 3)}"
       stroke-dashoffset="${-offset}" stroke-linecap="butt"></circle>`;
     offset += len;
   });
@@ -180,6 +198,14 @@ $("#seed").addEventListener("click", ()=>{
   paint();
   document.querySelector(".disc").animate(
     [{opacity:.4},{opacity:1}], {duration:220});
+});
+$("#modeCount").addEventListener("click", ()=>{
+  ringMode = "count"; paint();
+  $("#modeCount").classList.add("on"); $("#modeItem").classList.remove("on");
+});
+$("#modeItem").addEventListener("click", ()=>{
+  ringMode = "item"; paint();
+  $("#modeItem").classList.add("on"); $("#modeCount").classList.remove("on");
 });
 paint();
 </script>

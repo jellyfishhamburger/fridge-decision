@@ -287,10 +287,18 @@
 <div class="sheet" id="sheet">
   <h3>加入一样东西</h3>
   <p class="hint">选食物 —— 原型还不会替你认。保质期按食物预设，可以自己改。</p>
-  <video class="cam" id="cam" playsinline muted></video>
+  <video class="cam" id="cam" playsinline muted autoplay></video>
+  <img class="shotpreview" id="shot" alt="刚拍的照片">
   <div class="row" style="margin-bottom:10px">
     <button class="btn quiet" id="snapBtn">打开相机</button>
+    <button class="btn quiet" id="flipBtn" style="display:none">换镜头</button>
   </div>
+  <div class="zoomrow" id="zoomRow">
+    <span>焦距 <b id="zoomLbl">1×</b></span>
+    <input type="range" id="zoom" min="1" max="8" step="0.1" value="1">
+  </div>
+  <button class="btn quiet" id="scanBtn" style="display:none;margin-bottom:10px">扫商品条码</button>
+  <p class="cammsg" id="camMsg">原型还不会认食物：拍下来之后请选下面是哪一种。条码能扫的商品可以直接出名字。</p>
   <div class="grid" id="picks"></div>
   <div class="qtyrow">
     <span>这次带回来几份</span>
@@ -330,7 +338,11 @@
 "use strict";
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
-let items  = FD.items();
+let items  = (() => {
+  const m = FD.migrate(FD.items());
+  if (m.changed) FD.saveItems(m.items);
+  return m.items;
+})();
 let goal   = FD.settings();
 let pantry = FD.pantry();
 let picked = null, pendingDays = 3, pendingQty = 1, stream = null;
@@ -624,6 +636,8 @@ function openSheet(){
   });
   $("#days").value = 3; $("#daysLbl").textContent = "3 天后"; pendingDays = 3;
   pendingQty = 1; paintQty();
+  shotURL = null; $("#shot").classList.remove("on"); $("#snapBtn").textContent = "打开相机";
+  if("BarcodeDetector" in window) $("#scanBtn").style.display = "none";
 }
 function paintQty(){
   const unit = picked ? FD.unitOf(picked.id) : "份";
@@ -635,23 +649,108 @@ $("#qPlus").addEventListener("click", ()=>{ pendingQty = Math.min(99, pendingQty
 function closeSheet(){
   $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); stopCam();
 }
-async function startCam(){
+let cams = [], camPos = 0, camTrack = null, shotURL = null;
+
+async function startCam(preferIdex){
   try{
-    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
-    const v = $("#cam"); v.srcObject = stream; v.classList.add("on"); await v.play();
-    $("#snapBtn").textContent = "拍好了 —— 现在选是哪种食物";
-  }catch(e){ toast("相机需要 HTTPS + 权限，先手选吧"); }
+    const constraints = {
+      video: {
+        facingMode: {ideal: "environment"},
+        width: {ideal: 1920}, height: {ideal: 1080}
+      }, audio: false
+    };
+    if (camPos && cams[camPos] && cams[camPos].deviceId) {
+      constraints.video = {deviceId: {exact: cams[camPos].deviceId}, width:{ideal:1920}, height:{ideal:1080}};
+    }
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    camTrack = stream.getVideoTracks()[0];
+    const v = $("#cam");
+    v.srcObject = stream; v.classList.add("on"); $("#shot").classList.remove("on");
+    await v.play();
+
+    // 列出所有镜头（第一次授权后 label 才可读），让她能避开默认的微距镜头
+    const devs = await navigator.mediaDevices.enumerateDevices();
+    cams = devs.filter(d => d.kind === "videoinput");
+    $("#flipBtn").style.display = cams.length > 1 ? "flex" : "none";
+    $("#flipBtn").textContent = "换镜头（" + (camPos % Math.max(1, cams.length) + 1) + "/" + cams.length + "）";
+
+    // 支不支持数码变焦（Android Chrome 支持，iOS Safari 通常不支持）
+    const caps = camTrack.getCapabilities ? camTrack.getCapabilities() : {};
+    if (caps && caps.zoom) {
+      $("#zoomRow").classList.add("on");
+      const z = $("#zoom");
+      z.min = caps.zoom.min; z.max = caps.zoom.max; z.step = caps.zoom.step || 0.1;
+      z.value = caps.zoom.min;
+      $("#zoomLbl").textContent = caps.zoom.min + "×";
+    } else {
+      $("#zoomRow").classList.remove("on");
+    }
+    $("#snapBtn").textContent = "拍摄";
+    $("#camMsg").textContent = "拍下来之后请选下面哪一种食物 —— 原型还不会自动认。";
+    if ("BarcodeDetector" in window) $("#scanBtn").style.display = "flex";
+  }catch(e){
+    $("#camMsg").textContent = "相机打不开（需要 HTTPS + 授权）。可以直接在下面选食物。";
+  }
 }
+
 function stopCam(){
   if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
+  camTrack = null;
   $("#cam").classList.remove("on");
+  $("#zoomRow").classList.remove("on");
+}
+
+function snap(){
+  const v = $("#cam");
+  if(!v.videoWidth){ return; }
+  const c = document.createElement("canvas");
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext("2d").drawImage(v, 0, 0);
+  shotURL = c.toDataURL("image/jpeg", 0.85);
+  const img = $("#shot"); img.src = shotURL; img.classList.add("on");
+  stopCam();
+  $("#snapBtn").textContent = "重拍";
+  $("#camMsg").textContent = "拍到了。原型还不会替你认 —— 在下面选是哪一种（这是有意的限制，不是 bug）。";
+}
+
+/* 条码：只在支持的浏览器里给，不假装全都行 */
+async function scanBarcode(){
+  if(!shotURL || !("BarcodeDetector" in window)) return;
+  try{
+    const det = new BarcodeDetector({formats:["ean_13","ean_8","upc_a","upc_e","code_128"]});
+    const img = new Image(); img.src = shotURL; await img.decode();
+    const codes = await det.detect(img);
+    if(codes && codes.length){
+      $("#camMsg").textContent = "扫到了条码 " + codes[0].rawValue + " —— 商品名查询还没接；先在下面选品类。";
+      toast("条码：" + codes[0].rawValue);
+    } else {
+      $("#camMsg").textContent = "这张里没扫到条码。把包装上的条码放平再拍一次。";
+    }
+  }catch(e){
+    $("#camMsg").textContent = "条码识别失败：" + (e.message || e);
+  }
 }
 
 /* ---------- events ---------- */
 $("#addBtn").addEventListener("click", openSheet);
 $("#cancelBtn").addEventListener("click", closeSheet);
 $("#scrim").addEventListener("click", closeSheet);
-$("#snapBtn").addEventListener("click", startCam);
+$("#snapBtn").addEventListener("click", ()=>{
+  if(shotURL){ shotURL = null; $("#shot").classList.remove("on"); startCam(); }
+  else if(stream){ snap(); }
+  else { startCam(); }
+});
+$("#flipBtn").addEventListener("click", ()=>{
+  camPos = (camPos + 1) % Math.max(1, cams.length);
+  stopCam(); startCam();
+});
+$("#zoom").addEventListener("input", async e=>{
+  if(!camTrack || !camTrack.applyConstraints) return;
+  const z = +e.target.value;
+  $("#zoomLbl").textContent = z.toFixed(1) + "×";
+  try{ await camTrack.applyConstraints({advanced:[{zoom:z}]}); }catch(err){}
+});
+$("#scanBtn").addEventListener("click", scanBarcode);
 $("#days").addEventListener("input", e=>{ pendingDays = +e.target.value; $("#daysLbl").textContent = pendingDays + " 天后"; });
 
 $("#saveBtn").addEventListener("click", ()=>{
@@ -691,6 +790,18 @@ $("#discFilters").addEventListener("click", e=>{
   $$("#discFilters .f").forEach(x=>x.classList.toggle("on", x===b));
   renderDiscover();
 });
+
+/* ---------- keep the clock honest ----------
+   剩余天数是按日期算的，但如果页面一直开着（装到主屏的 PWA 就是），
+   就不会重算。每分钟 + 每次回到前台都重算一次。 */
+function refreshClock(){
+  renderItems();
+  if($("#view-discover").classList.contains("on")) renderDiscover();
+  if($("#view-build").classList.contains("on")) renderBuild();
+}
+setInterval(refreshClock, 60000);
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refreshClock(); });
+window.addEventListener("focus", refreshClock);
 
 /* ---------- boot ---------- */
 renderItems();

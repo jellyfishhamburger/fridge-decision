@@ -165,6 +165,23 @@
     return {items: next, removed, used};
   }
 
+  /* Old records (created before quantities existed) carry a frozen daysLeft and no
+     addedAt — so they would sit there at "2 days" forever. Give them a start date of
+     today so they begin ticking now, instead of silently never expiring. */
+  function migrate(list) {
+    let changed = false;
+    const out = (list || []).map(it => {
+      if (it.addedAt && typeof it.life === "number") return it;
+      const left = typeof it.daysLeft === "number" ? it.daysLeft : 3;
+      changed = true;
+      return Object.assign({}, it, {
+        qty: it.qty == null ? 1 : it.qty,
+        daysLeft: left, life: left, addedAt: localDate()
+      });
+    });
+    return {items: out, changed};
+  }
+
   /* ---------- items ---------- */
   const items = () => {
     const v = read(LS_ITEMS, []);
@@ -192,7 +209,7 @@
     CATALOG, RECIPES, PANTRY, byId, pantryById, DB,
     LS_ITEMS, LS_SETTINGS, LS_LOG, LS_PANTRY, LS_HOUSEHOLD,
     read, write,
-    items, saveItems, unitOf, consumptionOf, consume,
+    items, saveItems, unitOf, consumptionOf, consume, migrate,
     settings, saveSettings, DEFAULT_SETTINGS,
     pantry, savePantry,
     household, saveHousehold, newCode,
