@@ -61,7 +61,7 @@
       "sheet.editTitle": "修改这一条", "sheet.saveEdit": "保存修改",
       "sheet.forPending": "这是哪一样？选好后会加进冰箱", "toast.edited": "已改成 {name}",
       "sheet.title": "加入一样东西",
-      "sheet.hint": "选食物 —— 原型还不会替你认。保质期按食物预设，可以自己改。",
+      "sheet.hint": "选一样食物；保质期按食物预设，可以自己改。",
       "sheet.cam": "打开相机", "sheet.flip": "换镜头", "sheet.shoot": "拍摄", "sheet.reshoot": "重拍",
       "sheet.zoom": "焦距", "sheet.scan": "扫商品条码",
       "sheet.camMsg": "原型还不会认食物：拍下来之后请选下面是哪一种。条码能扫的商品可以直接出名字。",

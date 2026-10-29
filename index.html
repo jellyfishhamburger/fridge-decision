@@ -750,6 +750,11 @@ function openSheet(item, pendItem){
   editTarget = item || null;
   sheetFor = pendItem || null;
   openSheetLegacy();                       /* 建网格 + 回填状态 */
+  /* 编辑既有条目时不需要相机（东西已经在冰箱里了） */
+  const editing = !!item;
+  ["#snapBtn", "#zoomRow", "#scanBtn", "#camMsg", "#pickHint"].forEach(sel => {
+    const el = $(sel); if(el) el.style.display = editing ? "none" : "";
+  });
   if($("#sheetTitle")) $("#sheetTitle").textContent = item ? tt("sheet.editTitle", "修改这一条") : tt("sheet.title", "加入一样东西");
   if($("#saveBtn")) $("#saveBtn").textContent = item ? tt("sheet.saveEdit", "保存修改") : tt("sheet.save", "加进冰箱");
 }
