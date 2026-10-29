@@ -7,12 +7,12 @@
 <meta name="description" content="把冰箱里的食材拖进锅里，看今晚能做什么菜。">
 <meta name="theme-color" content="#FBF6EC">
 <link rel="icon" href="icon.svg">
-<link rel="stylesheet" href="cook.css?v=20261030-2">
+<link rel="stylesheet" href="cook.css?v=20261030-3">
 </head>
 <body>
 
 <header class="top">
-  <span class="spacer" aria-hidden="true"></span>
+  <button class="backtop" id="backTop" aria-label="回到冰箱">↑ 冰箱</button>
   <h1 data-i18n="cook.title">今天的锅</h1>
   <button class="lang" id="langBtn" aria-label="切换语言">EN</button>
 </header>
@@ -66,6 +66,26 @@
       <p class="pot-hint" id="potHint" data-i18n="cook.dropHint">把食材拖进来</p>
     </div>
 
+    <!-- 偏好常驻在这里，不随每次生成弹窗 -->
+    <div class="prefs" id="prefs">
+      <button type="button" class="pref-toggle" id="prefToggle" aria-expanded="false" aria-controls="prefsBody">
+        <span class="pico" aria-hidden="true">☰</span>
+        <span class="psum" id="prefSummary"></span>
+        <span class="pchev" aria-hidden="true">▾</span>
+      </button>
+      <div class="prefs-body" id="prefsBody">
+        <div class="prow"><span data-i18n="cook.kcalCap">热量上限</span><b id="kLbl">600 kcal</b></div>
+        <input type="range" id="kRange" min="200" max="900" step="50" value="600">
+        <p class="pnote" data-i18n="cook.kcalNote">每人每餐的估算值</p>
+        <div class="prow"><span data-i18n="cook.timeCap">最多用时</span><b id="mLbl">30 分钟</b></div>
+        <input type="range" id="mRange" min="10" max="60" step="5" value="30">
+        <div class="pchips">
+          <button type="button" class="pf" id="pfGreens" aria-pressed="false" data-i18n="cook.greens">必须有绿叶菜</button>
+          <button type="button" class="pf" id="pfFibre" aria-pressed="false" data-i18n="cook.fibre">纤维倾向较高</button>
+        </div>
+      </div>
+    </div>
+
     <button class="primary" id="askBtn" disabled data-i18n="cook.ask">帮我做一道菜</button>
     <p class="sync" id="syncNote"></p>
   </aside>
@@ -116,6 +136,6 @@
 <script src="sync.js?v=20261030-1"></script>
 <script src="logic.js?v=20261030-1"></script>
 <script src="i18n.js?v=20261030-1"></script>
-<script src="cook.js?v=20261030-2"></script>
+<script src="cook.js?v=20261030-3"></script>
 </body>
 </html>

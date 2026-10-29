@@ -39,6 +39,7 @@
     "cook.skip": "不用限制，直接推荐",
     "cook.applied": "已按：{s}",
     "cook.match": "锅里匹配 {a}/{b} 样",
+    "cook.noPrefs": "不设限制",
     "cook.empty": "冰箱还是空的。先载入一份示例，看看这个玩法长什么样。",
     "cook.demo": "载入示例",
     "cook.demoDone": "已载入示例库存",
@@ -90,6 +91,7 @@
     "cook.skip": "Skip — just recommend",
     "cook.applied": "Applied: {s}",
     "cook.match": "{a}/{b} in the pot",
+    "cook.noPrefs": "No filters",
     "cook.empty": "The fridge is empty. Load the sample stock to see how this works.",
     "cook.demo": "Load sample",
     "cook.demoDone": "Sample stock loaded",
@@ -362,53 +364,55 @@
     return !!(r.greens || (r.needs || []).some(id => ["broccoli","eggplant","mushroom","carrot","greens"].includes(id)));
   }
 
-  function openGoal(){
-    if (!sel.size) { toast(t("cook.none")); return; }
-    const st = FD.settings();
-    const d = lastGoal || { kcalMax: 600, maxMinutes: 30, greens: false, fibre: false };
-    const box = $("#result");
-    box.innerHTML = `
-      <div class="rcard goal" id="goalPanel">
-        <h3>${t("cook.goalTitle")} <span class="opt">${t("cook.goalOpt")}</span></h3>
-        <p class="meta">${t("cook.goalHint")}</p>
+  /* ---------- 偏好：常驻在锅下方，不再每次弹窗 ---------- */
+  const GOAL_KEY = "fd.cook.goal";
+  let goal = (function(){
+    try { return Object.assign({ kcalMax: 600, maxMinutes: 30, greens: false, fibre: false },
+                               JSON.parse(localStorage.getItem(GOAL_KEY) || "{}")); }
+    catch (e) { return { kcalMax: 600, maxMinutes: 30, greens: false, fibre: false }; }
+  })();
+  function saveGoal(){ try { localStorage.setItem(GOAL_KEY, JSON.stringify(goal)); } catch (e) {} }
 
-        <div class="grow"><span>${t("cook.kcalCap")}</span><b id="kLbl">${d.kcalMax} kcal</b></div>
-        <input type="range" id="kRange" min="200" max="900" step="50" value="${d.kcalMax}">
-        <p class="meta small">${t("cook.kcalNote")}</p>
-
-        <div class="grow"><span>${t("cook.timeCap")}</span><b id="mLbl">${d.maxMinutes} ${t("cook.minUnit")}</b></div>
-        <input type="range" id="mRange" min="10" max="60" step="5" value="${d.maxMinutes}">
-
-        <div class="prefs">
-          <button type="button" class="pf${d.greens ? " on" : ""}" id="pfGreens" aria-pressed="${d.greens}">＋ ${t("cook.greens")}</button>
-          <button type="button" class="pf${d.fibre ? " on" : ""}" id="pfFibre" aria-pressed="${d.fibre}">＋ ${t("cook.fibre")}</button>
-        </div>
-
-        <button class="primary" id="genBtn">${t("cook.gen")}</button>
-        <button class="ghost" id="skipBtn">${t("cook.skip")}</button>
-      </div>`;
-
-    const kR = $("#kRange"), mR = $("#mRange");
-    kR.addEventListener("input", () => { $("#kLbl").textContent = kR.value + " kcal"; });
-    mR.addEventListener("input", () => { $("#mLbl").textContent = mR.value; });
-
-    const toggle = (btn) => {
-      const on = btn.getAttribute("aria-pressed") !== "true";
-      btn.setAttribute("aria-pressed", String(on));
-      btn.classList.toggle("on", on);
-    };
-    $("#pfGreens").addEventListener("click", () => toggle($("#pfGreens")));
-    $("#pfFibre").addEventListener("click", () => toggle($("#pfFibre")));
-
-    const read = () => ({
-      kcalMax: +kR.value,
-      maxMinutes: +mR.value,
-      greens: $("#pfGreens").getAttribute("aria-pressed") === "true",
-      fibre: $("#pfFibre").getAttribute("aria-pressed") === "true"
+  function paintPrefs(){
+    const k = $("#kRange"), m = $("#mRange");
+    if (!k || !m) return;
+    k.value = goal.kcalMax; m.value = goal.maxMinutes;
+    $("#kLbl").textContent = goal.kcalMax + " kcal";
+    $("#mLbl").textContent = goal.maxMinutes + " " + t("cook.minUnit");
+    [["pfGreens", goal.greens], ["pfFibre", goal.fibre]].forEach(function(pair){
+      const b = $("#" + pair[0]);
+      if (!b) return;
+      b.classList.toggle("on", !!pair[1]);
+      b.setAttribute("aria-pressed", String(!!pair[1]));
     });
-    $("#genBtn").addEventListener("click", () => { lastGoal = read(); generate(lastGoal); });
-    $("#skipBtn").addEventListener("click", () => { lastGoal = null; generate({ kcalMax: 0, maxMinutes: 60, greens: false, fibre: false }); });
-    $("#goalPanel").scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
+    const parts = [];
+    if (goal.kcalMax < 900) parts.push("≤" + goal.kcalMax + " kcal");
+    if (goal.maxMinutes < 60) parts.push("≤" + goal.maxMinutes + " " + t("cook.minUnit"));
+    if (goal.greens) parts.push(t("cook.greens"));
+    if (goal.fibre) parts.push(t("cook.fibre"));
+    const sum = $("#prefSummary");
+    if (sum) sum.textContent = parts.length ? parts.join(" · ") : t("cook.noPrefs");
+  }
+
+  function bindPrefs(){
+    const k = $("#kRange"), m = $("#mRange");
+    if (!k || !m) return;
+    k.addEventListener("input", function(e){ goal.kcalMax = +e.target.value; saveGoal(); paintPrefs(); });
+    m.addEventListener("input", function(e){ goal.maxMinutes = +e.target.value; saveGoal(); paintPrefs(); });
+    [["pfGreens","greens"], ["pfFibre","fibre"]].forEach(function(pair){
+      const b = $("#" + pair[0]);
+      if (b) b.addEventListener("click", function(){
+        goal[pair[1]] = !goal[pair[1]]; saveGoal(); paintPrefs();
+      });
+    });
+    const tg = $("#prefToggle");
+    if (tg) tg.addEventListener("click", function(e){
+      e.preventDefault();
+      const body = $("#prefsBody");
+      const open = body.classList.toggle("on");
+      tg.setAttribute("aria-expanded", String(open));
+    });
+    paintPrefs();
   }
 
   function generate(goal) {
@@ -435,7 +439,7 @@
 
   function pick() {
     if (!sel.size) { toast(t("cook.none")); return; }
-    openGoal();
+    generate(goal);            /* 偏好已经常驻，直接生成 */
   }
 
   function renderResult(list, goal) {
@@ -560,6 +564,7 @@
 
   function applyLang() {
     I18N.apply();
+    if ($("#prefToggle")) paintPrefs();
     $("#langBtn").textContent = I18N.getLang() === "en" ? "中文" : "EN";
     renderFridge();
     if (cooked) renderResult([]);           // 换语言时清掉旧结果，避免中英混排
@@ -590,6 +595,41 @@
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); }
   });
 
+
+  /* ---------- 滚动：橱柜看不见时把锅收成一条；标题栏下滑隐藏 ---------- */
+  function setupScroll(){
+    const fridge = document.querySelector(".fridge-sec");
+    const potSec = $("#potSec");
+    if (fridge && potSec && "IntersectionObserver" in window) {
+      new IntersectionObserver(function(entries){
+        const away = !entries[0].isIntersecting;
+        potSec.classList.toggle("compact", away);
+        document.body.classList.toggle("past-fridge", away);
+      }, { threshold: 0 }).observe(fridge);
+    }
+    let lastY = window.scrollY, ticking = false;
+    window.addEventListener("scroll", function(){
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function(){
+        const y = window.scrollY, top = document.querySelector(".top");
+        if (top) {
+          if (y < 40) top.classList.remove("tuck");
+          else if (y > lastY + 10) top.classList.add("tuck");
+          else if (y < lastY - 6) top.classList.remove("tuck");
+        }
+        lastY = y; ticking = false;
+      });
+    }, { passive: true });
+
+    const back = $("#backTop");
+    if (back) back.addEventListener("click", function(){
+      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    });
+  }
+
+  bindPrefs();
+  setupScroll();
   renderFridge();
   applyLang();
 })();
