@@ -435,6 +435,15 @@ function trigger(reason){
   grab();
 }
 
+/* ---------------- 已知易混对 ----------------
+   模型在这对上的差别只有塑料反光，靠模型硬猜不如问一句。
+   有实测依据：她的牛奶照片里背景就有蛋托，3 折里 milk→egg 是唯一稳定错误。 */
+const CONFUSABLE = [["egg", "milk"]];
+function isConfusable(a, b){
+  if(!a || !b) return false;
+  return CONFUSABLE.some(([x, y]) => (a === x && b === y) || (a === y && b === x));
+}
+
 /* ---------------- 分类 + 决策 ---------------- */
 async function process(shots){
   const ranked = shots.map(c => ({c, s: sharpness(c)})).sort((a, b) => b.s - a.s);
@@ -462,7 +471,7 @@ async function process(shots){
   };
 
   /* ① 很确定 —— 直接入库，弹可撤销提示，完全不打扰 */
-  if(v.ok && !v.unknown && v.votes >= 3 && v.conf >= 0.55){
+  if(v.ok && !v.unknown && v.votes >= 3 && v.conf >= 0.55 && !isConfusable(v.label, v.second)){
     const c = FD.CATALOG.find(x => x.id === v.label);
     if(c && addItem(c)){
       score.auto++; paintScore();
@@ -524,16 +533,21 @@ function renderPending(){
   };
   list.innerHTML = pending.map(p => {
     const top = p.v.label === "unknown" ? (p.v.second || "unknown") : p.v.label;
-    const cand = p.v.label === "unknown"
-      ? `猜不出 · 也许是 <b>${nameOf(top)}</b>`
-      : `<b>${nameOf(p.v.label)}</b> ${Math.round(p.v.conf*100)}%`;
+    const pair = isConfusable(p.v.label, p.v.second) && p.v.conf2 > 0.12;
+    const cand = pair
+      ? `分不清是 <b>${nameOf(p.v.label)}</b> 还是 <b>${nameOf(p.v.second)}</b>`
+      : (p.v.label === "unknown"
+          ? `猜不出 · 也许是 <b>${nameOf(top)}</b>`
+          : `<b>${nameOf(p.v.label)}</b> ${Math.round(p.v.conf*100)}%`);
     const cTop = FD.CATALOG.find(x => x.id === top);
+    const cSec = pair ? FD.CATALOG.find(x => x.id === p.v.second) : null;
     return `<div class="prow" data-id="${p.id}">
       <img src="${p.thumb}" alt="">
       <div class="info">${cand}<br><span style="color:#7d8f86">${p.v.reason || ""}</span></div>
       <div class="acts">
-        ${cTop ? `<button data-cat="${cTop.id}">就是它</button>` : ""}
-        <button class="ghost" data-other="1">换一个</button>
+        ${cSec ? `<button data-cat="${cSec.id}">${cSec.cn}</button>` : ""}
+        ${cTop ? `<button data-cat="${cTop.id}">${cSec ? cTop.cn : "就是它"}</button>` : ""}
+        <button class="ghost" data-other="1">${cSec ? "都不是" : "换一个"}</button>
         <button class="ghost" data-drop="1">忽略</button>
       </div>
     </div>`;
@@ -725,7 +739,7 @@ $("#useHand").addEventListener("change", e=>{
 });
 
 buildPicks();
-addLog("构建版本 20261029-14 已加载（如果这行看不到新版号，说明浏览器还在用缓存）");
+addLog("构建版本 20261029-15 已加载（如果这行看不到新版号，说明浏览器还在用缓存）");
 </script>
 </body>
 </html>
