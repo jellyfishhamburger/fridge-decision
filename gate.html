@@ -80,6 +80,15 @@
     </div>
 
     <div class="card">
+      <h2>框住门口</h2>
+      <div class="slider"><span>框的位置 <b id="gyLbl">中</b></span>
+        <input type="range" id="gy" min="0" max="40" step="2" value="28"></div>
+      <div class="slider"><span>框的大小 <b id="ghLbl">64</b></span>
+        <input type="range" id="gh" min="30" max="80" step="2" value="62"></div>
+      <p class="note">把虚线框拖到「门口」那一片：手和手里的东西穿过这里就会被抓拍。</p>
+    </div>
+
+    <div class="card">
       <h2>灵敏度</h2>
       <div class="slider"><span>触发阈值 <b id="thLbl">中</b></span>
         <input type="range" id="th" min="1" max="3" step="1" value="2"></div>
@@ -323,6 +332,14 @@ $("#stop").addEventListener("click", stop);
 $("#th").addEventListener("input", e=>{
   threshold = +e.target.value;
   $("#thLbl").textContent = ["", "低", "中", "高"][threshold];
+});
+$("#gy").addEventListener("input", e=>{
+  gate.y = (+e.target.value) / 100;
+  $("#gyLbl").textContent = e.target.value < 20 ? "上" : (e.target.value > 33 ? "下" : "中");
+});
+$("#gh").addEventListener("input", e=>{
+  gate.h = Math.min(0.9 - gate.y, (+e.target.value) / 100);
+  $("#ghLbl").textContent = e.target.value;
 });
 
 buildPicks();
