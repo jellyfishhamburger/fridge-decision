@@ -376,9 +376,20 @@ async function guess(shots, crop){
     if(crop) res.push(await FDCLS.classify(crop));
     if(seq !== guessSeq) return;                       // 又有新抓拍，丢弃旧结果
     const v = FDCLS.vote(res);
-    const nameOf = id => { const c = FD.CATALOG.find(x => x.id === id); return c ? c.cn : id; };
+    const nameOf = id => {
+      if (id === "unknown") return "不认识的东西";
+      const c = FD.CATALOG.find(x => x.id === id);
+      return c ? c.cn : id;
+    };
     document.querySelectorAll(".pick.sugg").forEach(el => el.classList.remove("sugg"));
 
+    if(v.unknown && v.votes >= Math.ceil(v.total / 2)){
+      box.className = "guess off";
+      box.innerHTML = `不是模型认识的那 8 样（置信度 ${Math.round(v.conf*100)}%）。` +
+                      `<br><span style="color:#8fa89b">可能是水果、包装食品，或者根本不在清单里 —— 直接手动选，或者点「忽略这次」。</span>`;
+      addLog(`识别：<b>不认识</b> ${Math.round(v.conf*100)}%，${v.votes}/${v.total} 帧一致`);
+      return;
+    }
     if(v.ok){
       const el = document.querySelector('.pick[data-cat="' + v.label + '"]');
       if(el) el.classList.add("sugg");
