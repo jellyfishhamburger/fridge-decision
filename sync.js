@@ -17,6 +17,7 @@
   const TABLE_ITEMS  = "items";
   const TABLE_LOGS   = "logs";
   const TABLE_HH     = "households";
+  const TABLE_PEND   = "pending";
   const LS_CFG       = "fd.sb.v1";
 
   function cfg() { try { return JSON.parse(localStorage.getItem(LS_CFG) || "{}") || {}; } catch (e) { return {}; } }
@@ -102,6 +103,44 @@
     return { ok: true };
   }
 
+  /* ---- 待确认队列（跨设备）---- */
+  async function pullPending(code) {
+    if (!enabled()) return { disabled: true };
+    const res = await fetch(endpoint(TABLE_PEND,
+      "?household=eq." + encodeURIComponent(code) + "&select=*&order=ts.desc&limit=8"), { headers: headers() });
+    if (!res.ok) throw new Error("pending pull " + res.status);
+    return (await res.json()).map(r => ({
+      id: r.id, label: r.label, conf: r.conf, second: r.second, conf2: r.conf2,
+      unknown: !!r.unknown, reason: r.reason, thumb: r.thumb, ts: r.ts, from: r.source
+    }));
+  }
+
+  async function addPendingRow(code, p) {
+    if (!enabled()) return { disabled: true };
+    const res = await fetch(endpoint(TABLE_PEND), {
+      method: "POST",
+      headers: headers({ "Prefer": "resolution=merge-duplicates,return=minimal" }),
+      body: JSON.stringify({
+        id: p.id, household: code, label: p.label, conf: p.conf,
+        second: p.second || null, conf2: p.conf2 || null,
+        unknown: !!p.unknown, reason: p.reason || null,
+        thumb: p.thumb || null, ts: new Date(p.ts || Date.now()).toISOString(),
+        source: p.from || "gate"
+      })
+    });
+    if (!res.ok) throw new Error("pending add " + res.status);
+    return { ok: true };
+  }
+
+  async function delPendingRow(code, id) {
+    if (!enabled()) return { disabled: true };
+    const res = await fetch(endpoint(TABLE_PEND,
+      "?household=eq." + encodeURIComponent(code) + "&id=eq." + encodeURIComponent(id)),
+      { method: "DELETE", headers: headers({ "Prefer": "return=minimal" }) });
+    if (!res.ok) throw new Error("pending del " + res.status);
+    return { ok: true };
+  }
+
   async function log(code, action, recipeId) {
     if (!enabled()) return { disabled: true };
     const res = await fetch(endpoint(TABLE_LOGS), {
@@ -124,5 +163,6 @@
     return () => { alive = false; };
   }
 
-  g.SYNC = { enabled, configure, cfg, ensureHousehold, ping, pull, add, update, remove, log, watch };
+  g.SYNC = { enabled, configure, cfg, ensureHousehold, ping, pull, add, update, remove, log, watch,
+             pullPending, addPendingRow, delPendingRow };
 })(window);

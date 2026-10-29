@@ -509,7 +509,7 @@ const PENDING_MAX = 8;
 function pushPending(v, canvas, nameOf){
   FD.addPending({
     id: Math.random().toString(36).slice(2, 8),
-    thumb: canvas.toDataURL("image/jpeg", 0.7),
+    thumb: FD.shrinkThumb(canvas, 128),
     label: v.label, conf: v.conf, second: v.second, conf2: v.conf2,
     unknown: !!v.unknown, reason: v.reason,
     ts: Date.now(), from: "gate"
@@ -717,6 +717,10 @@ function addLog(html){
 }
 
 paintScore();
+if (typeof FD !== "undefined" && FD.cloudOn && FD.cloudOn()) {
+  const pullPending = async () => { try { await FD.pullPendingCloud(); renderPending(); } catch(e){} };
+  pullPending(); setInterval(pullPending, 6000);
+}
 $("#start").addEventListener("click", start);
 $("#stop").addEventListener("click", stop);
 $("#sim").addEventListener("click", ()=>{ if(loopOn) trigger("手动模拟（演示用）"); });

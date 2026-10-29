@@ -62,13 +62,44 @@
      这样门口那块屏和手机看的是同一份：设备负责提议，手机负责裁决。 */
   const pending      = () => { const v = read(LS_PENDING, null); return Array.isArray(v) ? v : []; };
   const savePending  = list => { write(LS_PENDING, (list || []).slice(-8)); return pending(); };
-  const addPending   = it => { const l = pending(); l.push(it); return savePending(l); };
-  const removePending = id => savePending(pending().filter(p => p.id !== id));
+  /* 缩略图压到 96×96 再上云：dataURL 太大，一行能有几十 KB */
+  function shrinkThumb(canvas, size){
+    try{
+      const c = document.createElement("canvas");
+      c.width = size; c.height = size;
+      c.getContext("2d").drawImage(canvas, 0, 0, size, size);
+      return c.toDataURL("image/jpeg", 0.6);
+    }catch(e){ return canvas && canvas.toDataURL ? canvas.toDataURL("image/jpeg", 0.5) : null; }
+  }
+
+  const addPending   = it => {
+    const l = pending(); l.push(it); const out = savePending(l);
+    try { if (cloudOn()) global.SYNC.addPendingRow(household().code, it).catch(() => {}); } catch (e) {}
+    return out;
+  };
+  const removePending = id => {
+    const out = savePending(pending().filter(p => p.id !== id));
+    try { if (cloudOn()) global.SYNC.delPendingRow(household().code, id).catch(() => {}); } catch (e) {}
+    return out;
+  };
   const takePending  = id => {
     const l = pending(); const it = l.find(p => p.id === id) || null;
-    if (it) savePending(l.filter(p => p.id !== id));
+    if (it) removePending(id);
     return it;
   };
+
+  /* 从云端合并待确认：服务端为准，本地独有的保留，最多 8 条 */
+  async function pullPendingCloud(){
+    if (!cloudOn()) return false;
+    try{
+      const rows = await global.SYNC.pullPending(household().code);
+      if (!Array.isArray(rows)) return false;
+      const have = {}; rows.forEach(r => have[r.id] = 1);
+      const extra = pending().filter(p => !have[p.id]);
+      write(LS_PENDING, rows.concat(extra).slice(-8));
+      return true;
+    }catch(e){ return false; }     /* 表还没建 / 没网：安静退回本地 */
+  }
 
   /* ---------- dates ---------- */
   function localDate(d) {
@@ -371,6 +402,7 @@
     pantry, savePantry,
     household, saveHousehold, newCode, sync, cloudOn,
     LS_PENDING, pending, savePending, addPending, removePending, takePending,
+    pullPendingCloud, shrinkThumb,
     localDate, daysLeftOf,
     evaluate, decide, urgent, shoppingHint,
     log, stats

@@ -1011,6 +1011,11 @@ applyLang();
 if (FD.cloudOn()) {
   items = FD.items();
   renderPending();
+  if (FD.cloudOn()) {
+    const pullPending = async () => { try { await FD.pullPendingCloud(); renderPending(); } catch(e){} };
+    pullPending();
+    setInterval(pullPending, 6000);      /* 门口那块屏加的东西，6 秒内出现在手机上 */
+  }
   FD.sync.start(() => { items = FD.items(); renderItems(); renderPending();
     if ($("#result").innerHTML) renderResult(FD.decide(items, goal)); });
 }
