@@ -478,6 +478,11 @@
     border:1px solid #DCE4D8;border-radius:999px;padding:4px 11px 4px 5px;font-size:12.5px;color:#41514A;font-weight:500}
   .ck-ing .ii .art{width:24px;height:24px}
   .ck-ing .ii.dim{opacity:.72;font-weight:400}
+  /* 这一步要下的那几样：一圈鼠尾草绿 + 一个点，其余稍淡 */
+  .ck-ing .ii.on{background:#DCEBD0;border:1.5px solid #79A16A;color:#1F3A2B;font-weight:700;
+    box-shadow:0 2px 8px -4px rgba(63,96,52,.45);transition:background .25s,border-color .25s}
+  .ck-ing .ii.on .dot{width:7px;height:7px;border-radius:99px;background:#4F7A42;display:inline-block}
+  .ck-ing .ii.off{opacity:.5}
   .ck-ing .lb{font-size:11.5px;color:#9AA69C;align-self:center;margin-right:2px}
 
 
@@ -898,6 +903,7 @@
 <script src="data.js?v=20261029-17"></script>
 <script src="cook-art.js?v=20261030-6"></script>
 <script src="cook-steps.js?v=20261030-6"></script>
+<script src="cook-step-ing.js?v=20261030-7"></script>
 <script src="icons.js?v=20261029-17"></script>
 <script src="dish-photos.js?v=20261029-19"></script>
 <script src="sync.js?v=20261029-17"></script>
@@ -1453,13 +1459,19 @@ function renderCook(){
       ${COOK_STEPS.svg(act.id, "ck-act")}</span>`;
   $("#ck-text").textContent = text;
   /* 这一步用到的食材：文字里提到了就只显示这几样，没提到就退回整道菜的主料（并标灰） */
-  /* 一步一屏只放一样东西：这道菜要用哪些（固定，不随步骤变，避免"一会儿这一步一会儿整道菜"） */
+  /* 食材那一行永远是「这道菜要用」；这一步真要用到的会亮起来（人工标注，没有标注就不亮） */
   const box = $("#ck-ing");
   if(box){
     const list = cookRecipe.needs.slice(0, 6);
+    const stepIds = window.stepIngredients ? window.stepIngredients(cookRecipe.id, cookStep) : null;
+    const mark = stepIds && stepIds.length ? stepIds : null;   /* null = 不做高亮 */
     box.innerHTML = list.length
       ? `<span class="lb">${tt("cook.usesDish", "这道菜要用")}</span>` +
-        list.map(id => `<span class="ii">${window.COOK_ART ? COOK_ART.svg(id) : ""}${cnOf(id)}</span>`).join("")
+        list.map(id => {
+          const on = mark && mark.indexOf(id) >= 0;
+          const off = mark && !on;
+          return `<span class="ii ${on ? "on" : ""} ${off ? "off" : ""}">${window.COOK_ART ? COOK_ART.svg(id) : ""}${cnOf(id)}${on ? '<i class="dot" aria-hidden="true"></i>' : ""}</span>`;
+        }).join("")
       : "";
   }
 
