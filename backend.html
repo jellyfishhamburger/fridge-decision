@@ -84,7 +84,7 @@
       <li class="step">去 <code>supabase.com</code> 注册（GitHub 账号一键登录），新建一个 project，区域选 Singapore。</li>
       <li class="step">进 <b>SQL Editor</b>，把下面这段粘进去执行 —— 三张表和权限一次建好。</li>
       <li class="step">进 <b>Project Settings → API</b>，复制 <code>Project URL</code> 和 <code>anon public</code> 两个值。</li>
-      <li class="step">把这两个值填进 <code>sync.js</code> 顶部两行，前端再加一句 <code>&lt;script src="sync.js"&gt;</code> —— 后端就通了，其余代码不用动。</li>
+      <li class="step">打开 App → <b>设置 → 云端同步</b>，把两个值粘进去，点「保存并连接」—— 连接成功会显示"云端这个家庭现有 N 样东西"。<br><span class="note">（也可以写死在 <code>sync.js</code> 顶部两行，这样每台设备都不用再填。）</span></li>
     </ol>
     <pre><code>-- 一个家庭 = 一个家庭码；物品挂在家庭下
 create table households (
