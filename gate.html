@@ -64,6 +64,23 @@
   .badge{display:inline-block;background:#1d8f68;color:#fff;border-radius:7px;padding:2px 7px;
     font-size:11px;font-weight:700;margin-left:6px}
   .confirmCard{border-color:#2f7d4f;box-shadow:0 0 0 1px rgba(47,125,79,.4)}
+  .prow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #22302a}
+  .prow:last-child{border-bottom:0}
+  .prow img{width:56px;height:56px;border-radius:10px;object-fit:cover;background:#0d1613;flex:0 0 auto}
+  .prow .info{flex:1;min-width:0;font-size:13px;line-height:1.45;color:#cfe3d8}
+  .prow .info b{color:#fff}
+  .prow .acts{display:flex;gap:6px;flex:0 0 auto}
+  .prow button{background:#1d8f68;border:0;color:#fff;font:inherit;font-size:12.5px;font-weight:600;
+    padding:7px 11px;border-radius:9px;cursor:pointer}
+  .prow button.ghost{background:transparent;border:1px solid #2f4a40;color:#9fb3a9}
+  .toast{position:fixed;left:12px;right:12px;bottom:14px;z-index:60;display:flex;align-items:center;
+    justify-content:space-between;gap:10px;background:#10251d;border:1px solid #2f7d4f;color:#dff2e7;
+    border-radius:14px;padding:12px 14px;font-size:13.5px;opacity:0;transform:translateY(14px);
+    transition:opacity .18s ease, transform .18s ease;pointer-events:none}
+  .toast.on{opacity:1;transform:translateY(0);pointer-events:auto}
+  .toast b{color:#fff}
+  .toast button{background:#1d8f68;border:0;color:#fff;font:inherit;font-weight:700;
+    padding:7px 13px;border-radius:9px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -96,9 +113,15 @@
       <button class="btn" id="sim" disabled>模拟一次（演示用）</button>
     </div>
 
+    <div class="card" id="pendingWrap" style="display:none">
+      <h2>待确认 <span id="pendingCount" style="color:#52d68c">0</span></h2>
+      <div id="pendingList"></div>
+      <p class="note">检测不会停：认不准的先放这儿，你什么时候点都行。超过 5 条自动丢最早的。</p>
+    </div>
+
     <div class="card" id="confirmWrap" style="display:none">
       <div class="card confirmCard" id="capCard">
-        <h2>刚才放进去的是什么？</h2>
+        <h2>这是哪一样？</h2>
         <img id="shot" alt="抓拍到的一帧">
         <div id="guess" class="guess off">识别未开启</div>
         <div class="grid" id="picks"></div>
@@ -267,8 +290,8 @@ function loop(){
   prev = cur;
   $("#delta").textContent = "Δ " + changed;
 
-  // 等你确认时，不做任何检测（这是上次"点不了"的原因）
-  if(state === "conf") return;
+  // 等你确认、或正在抓拍识别时，不做新的检测
+  if(state === "busy") return;               // 抓拍+识别的 0.5 秒里不做新检测
 
   const wantHand = $("#useHand").checked && handReady;
   const now = performance.now();
@@ -279,6 +302,7 @@ function loop(){
     try{ res = landmarker.detectForVideo(v, now); }catch(e){}
     const hands = res && res.landmarks ? res.landmarks : [];
     $("#hand").textContent = "手 ×" + hands.length;
+    updateHandBox(hands);
 
     // 手是否在门口框内（用掌心点判断）
     let inGate = 0;
@@ -311,30 +335,86 @@ function loop(){
 }
 
 /* ---------------- 实测记分板 ----------------
-   每次确认记一笔：模型说的 vs 人选的。就是为了测完能报数字，不靠回忆。 */
-const score = { hit: 0, miss: 0, unknown: 0, skipped: 0 };
-let lastGuess = null;          // {label, unknown, ok}
+   每次确认记一笔：模型说的 vs 人选的；自动入库的单独计数，撤销就算误判。 */
+const score = { hit: 0, miss: 0, unknown: 0, skipped: 0, auto: 0, undone: 0 };
+let lastGuess = null;          // {label, unknown, ok, conf}
 
 function paintScore(){
   const el = $("#score");
   if(!el) return;
-  el.textContent = `命中 ${score.hit} · 误判 ${score.miss} · 不认识 ${score.unknown}` +
-    (score.skipped ? ` · 忽略 ${score.skipped}` : "");
+  el.textContent = `自动 ${score.auto} · 确认 ${score.hit + score.miss} · 不认识 ${score.unknown}` +
+    (score.skipped ? ` · 忽略 ${score.skipped}` : "") +
+    (score.undone ? ` · 撤销 ${score.undone}` : "");
 }
 
 function recordGuess(chosenCat){
   if(!lastGuess) return;
-  if(lastGuess.unknown){ score.unknown++; addLog(`记分：模型说<b>不认识</b>，你选了 <b>${chosenCat}</b>（未知类 ${score.unknown}）`); }
-  else if(lastGuess.label === chosenCat){ score.hit++; addLog(`记分：模型说 <b>${lastGuess.label}</b> → 命中（${score.hit}）`); }
-  else { score.miss++; addLog(`记分：模型说 <b>${lastGuess.label}</b>，你选了 <b>${chosenCat}</b> → 误判（${score.miss}）`); }
+  if(lastGuess.unknown){ score.unknown++; addLog(`记分：模型说<b>不认识</b>，你选了 <b>${chosenCat}</b>`); }
+  else if(lastGuess.label === chosenCat){ score.hit++; addLog(`记分：模型说 <b>${lastGuess.label}</b> → 命中`); }
+  else { score.miss++; addLog(`记分：模型说 <b>${lastGuess.label}</b>，你选了 <b>${chosenCat}</b> → 误判`); }
   paintScore();
 }
 
-/* ---------------- 抓拍 ---------------- */
+/* ---------------- 手部包围盒 ----------------
+   真视频实测：整帧分类只有 3/42 帧判对，裁到手那一块是 24/42。
+   东西在手里时占据画面很小，整帧分类等于让模型看冰箱。 */
+let handBox = null, handBoxAt = 0;
+
+function updateHandBox(hands){
+  if(!hands || !hands.length){ return; }
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  hands.forEach(lm => lm.forEach(p => {
+    x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y);
+    x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y);
+  }));
+  const w = Math.max(x1 - x0, y1 - y0) * 1.45;      // 手 + 手里的东西，留余量
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  handBox = {
+    x: Math.max(0, cx - w/2), y: Math.max(0, cy - w/2),
+    w: Math.min(w, 1), h: Math.min(w, 1)
+  };
+  handBoxAt = performance.now();
+}
+
+/* 裁到手的区域；没有手就退回门口框那一块（也比整帧强） */
+function cropToHand(src){
+  const W = src.width, H = src.height;
+  let box = handBox;
+  if(!box || performance.now() - handBoxAt > 1500){
+    box = {x: gate.x, y: gate.y, w: gate.w, h: gate.h};
+  }
+  const side = Math.min(box.w * W, box.h * H);
+  const sx = Math.max(0, Math.min(W - side, box.x * W));
+  const sy = Math.max(0, Math.min(H - side, box.y * H));
+  const out = document.createElement("canvas");
+  out.width = 320; out.height = 320;
+  out.getContext("2d").drawImage(src, sx, sy, side, side, 0, 0, 320, 320);
+  return out;
+}
+
+/* ---------------- 清晰度 ---------------- */
+function sharpness(c){
+  const s = document.createElement("canvas"); s.width = 96; s.height = 72;
+  const sc = s.getContext("2d", {willReadFrequently:true});
+  sc.drawImage(c, 0, 0, 96, 72);
+  const d = sc.getImageData(0, 0, 96, 72).data;
+  let e = 0;
+  for(let y=1;y<71;y++) for(let x=1;x<95;x++){
+    const a=(y*96+x)*4, b=(y*96+x+1)*4;
+    e += Math.abs((d[a]+d[a+1]+d[a+2])/3 - (d[b]+d[b+1]+d[b+2])/3);
+  }
+  return e;
+}
+
+/* ---------------- 抓拍 ----------------
+   6 帧而不是 3 帧：手上动作快，多抓几帧才有机会碰到不糊的那张。 */
+const FRAMES = 6, FRAME_GAP = 60;
+let queue = [];                 // 卡片开着时拍的，等确认完再处理
+
 function trigger(reason){
-  if(state === "conf") return;
+  if(state === "busy") return;          // 正在抓拍识别，忽略这一下
   events++; $("#count").textContent = events + " 次";
-  setState("conf");
+  setState("busy");
   octx.strokeStyle = "rgba(255,90,70,.95)"; octx.setLineDash([]);
   octx.lineWidth = 4; octx.strokeRect(gate.x*ov.width, gate.y*ov.height, gate.w*ov.width, gate.h*ov.height);
   addLog("触发：" + reason);
@@ -349,97 +429,218 @@ function trigger(reason){
     c.width = v.videoWidth || 1280; c.height = v.videoHeight || 720;
     c.getContext("2d").drawImage(v, 0, 0);
     shots.push(c);
-    if(++i < 3) setTimeout(grab, 120);
-    else finish();
+    if(++i < FRAMES) setTimeout(grab, FRAME_GAP);
+    else process(shots);
   };
-  const sharpness = c => {
-    const s = document.createElement("canvas"); s.width = 96; s.height = 72;
-    const sc = s.getContext("2d", {willReadFrequently:true});
-    sc.drawImage(c, 0, 0, 96, 72);
-    const d = sc.getImageData(0,0,96,72).data;
-    let e = 0;
-    for(let y=1;y<71;y++) for(let x=1;x<95;x++){
-      const a=(y*96+x)*4, b=(y*96+x+1)*4;
-      e += Math.abs((d[a]+d[a+1]+d[a+2])/3 - (d[b]+d[b+1]+d[b+2])/3);
-    }
-    return e;
-  };
-  const finish = () => {
-    shots.sort((a,b)=>sharpness(b)-sharpness(a));
-    const best = shots[0];
-    // 只截门口框那一块，放大给人看
-    const crop = document.createElement("canvas");
-    const sx = gate.x*best.width, sy = gate.y*best.height;
-    const sw = gate.w*best.width, sh = gate.h*best.height;
-    crop.width = Math.min(720, sw); crop.height = Math.round(crop.width * sh / sw);
-    crop.getContext("2d").drawImage(best, sx, sy, sw, sh, 0, 0, crop.width, crop.height);
-    $("#shot").src = crop.toDataURL("image/jpeg", 0.9);
-    $("#shot").classList.add("on");
-    $("#confirmWrap").style.display = "block";
-    $("#capNote").textContent = "只裁了门口框那一块（" + Math.round(pick(sw)) + "×" + Math.round(pick(sh)) + " px）。确认或忽略后检测继续。";
-    addLog("抓了 3 帧，选了最清楚的一帧，等你确认");
-    guess(shots, crop);
-  };
-  const pick = x => Math.round(x);
   grab();
 }
 
-/* ---------------- 识别：3 帧投票 ---------------- */
-let guessSeq = 0;
-async function guess(shots, crop){
-  const box = $("#guess");
-  const seq = ++guessSeq;
-  if(!box) return;
-  if(!window.FDCLS){ box.className = "guess off"; box.textContent = "识别器没加载（classifier.js 未就位）"; return; }
-  box.className = "guess"; box.textContent = "正在识别…";
+/* ---------------- 分类 + 决策 ---------------- */
+async function process(shots){
+  const ranked = shots.map(c => ({c, s: sharpness(c)})).sort((a, b) => b.s - a.s);
+  const best = ranked.slice(0, 3);
+  const crop = cropToHand(best[0].c);
+
+  if(!window.FDCLS){ addLog('<span style="color:#ffbd6b">识别器没加载，跳过这次</span>'); return resume(); }
+
+  let v = null;
   try{
     const res = [];
-    for(const f of shots) res.push(await FDCLS.classify(f));
-    if(crop) res.push(await FDCLS.classify(crop));
-    if(seq !== guessSeq) return;                       // 又有新抓拍，丢弃旧结果
-    const v = FDCLS.vote(res);
-    const nameOf = id => {
-      if (id === "unknown") return "不认识的东西";
-      const c = FD.CATALOG.find(x => x.id === id);
-      return c ? c.cn : id;
-    };
-    document.querySelectorAll(".pick.sugg").forEach(el => el.classList.remove("sugg"));
-
-    lastGuess = {label: v.label, unknown: !!v.unknown, ok: !!v.ok, conf: v.conf};
-    if(v.unknown && v.votes >= Math.ceil(v.total / 2)){
-      box.className = "guess off";
-      box.innerHTML = `不是模型认识的那 8 样（置信度 ${Math.round(v.conf*100)}%）。` +
-                      `<br><span style="color:#8fa89b">可能是水果、包装食品，或者根本不在清单里 —— 直接手动选，或者点「忽略这次」。</span>`;
-      addLog(`识别：<b>不认识</b> ${Math.round(v.conf*100)}%，${v.votes}/${v.total} 帧一致`);
-      return;
-    }
-    if(v.ok){
-      const el = document.querySelector('.pick[data-cat="' + v.label + '"]');
-      if(el) el.classList.add("sugg");
-      box.className = "guess";
-      box.innerHTML = `看起来是 <b>${nameOf(v.label)}</b> · 置信度 ${Math.round(v.conf*100)}%（${v.votes}/${v.total} 帧一致）` +
-                      `<br><span style="color:#8fa89b">点下面的格子确认；点错了就是点错了，改一下就好。</span>`;
-      addLog(`识别：<b>${nameOf(v.label)}</b> ${Math.round(v.conf*100)}%，${v.votes}/${v.total} 帧一致`);
-    }else{
-      box.className = "guess off";
-      const second = v.second && v.conf2 > 0.2 ? ` 或 <b>${nameOf(v.second)}</b>（${Math.round(v.conf2*100)}%）` : "";
-      box.innerHTML = `认不出是什么（${v.reason}）——可能看起来像 <b>${nameOf(v.label)}</b>（${Math.round(v.conf*100)}%）${second}` +
-                      `<br><span style="color:#8fa89b">手动选一下，这一次会被记进"识别失手"的日志。</span>`;
-      addLog(`识别不确定：${v.label} ${Math.round(v.conf*100)}%（${v.reason}）`);
-    }
+    for(const b of best) res.push(await FDCLS.classify(cropToHand(b.c)));
+    res.push(await FDCLS.classify(best[0].c));         // 整帧再投一票，防裁歪
+    v = FDCLS.vote(res);
   }catch(e){
-    if(seq !== guessSeq) return;
-    box.className = "guess off";
-    box.textContent = "识别不可用：" + (e && e.message ? e.message : e);
-    addLog('<span style="color:#ffbd6b">识别不可用：' + (e && e.message ? e.message : e) + '</span>');
+    addLog('<span style="color:#ffbd6b">识别失败：' + (e && e.message ? e.message : e) + '</span>');
+    return resume();
+  }
+
+  lastGuess = {label: v.label, unknown: !!v.unknown, ok: !!v.ok, conf: v.conf};
+  const nameOf = id => {
+    if(id === "unknown") return "不认识的东西";
+    const c = FD.CATALOG.find(x => x.id === id);
+    return c ? c.cn : id;
+  };
+
+  /* ① 很确定 —— 直接入库，弹可撤销提示，完全不打扰 */
+  if(v.ok && !v.unknown && v.votes >= 3 && v.conf >= 0.55){
+    const c = FD.CATALOG.find(x => x.id === v.label);
+    if(c && addItem(c)){
+      score.auto++; paintScore();
+      addLog(`自动入库：<b>${nameOf(v.label)}</b> ${Math.round(v.conf*100)}%（${v.votes}/${v.total}）`);
+      toast(`已记 <b>${c.cn}</b> · ${Math.round(v.conf*100)}%`, c);
+      return resume();
+    }
+  }
+
+  /* ② 很确定"不是食物" —— 静默跳过，不进列表（空拍、开关门都走这里） */
+  if(v.unknown && v.conf >= 0.5 && v.votes >= Math.ceil(v.total / 2)){
+    score.unknown++; paintScore();
+    addLog(`跳过：不像食物（${Math.round(v.conf*100)}%，${v.votes}/${v.total}）`);
+    return resume();
+  }
+
+  /* ③ 抓拍时根本没有手（开门、走动、光影）—— 静默跳过，别污染待确认列表 */
+  const handFresh = handBox && (performance.now() - handBoxAt < 1500);
+  if(!handFresh){
+    score.skipped++; paintScore();
+    addLog("跳过：抓拍时没检测到手");
+    return resume();
+  }
+
+  /* ④ 其余全部进待确认列表 —— 宁可不问，也不要静默丢掉真东西 */
+  pushPending(v, crop, nameOf);
+  addLog(`进待确认：${nameOf(v.label)} ${Math.round(v.conf*100)}%（${v.reason}）`);
+  resume();
+}
+
+/* ---------------- 待确认列表 ---------------- */
+const pending = [];
+const PENDING_MAX = 5;
+
+function pushPending(v, canvas, nameOf){
+  const item = {
+    id: Math.random().toString(36).slice(2, 8),
+    thumb: canvas.toDataURL("image/jpeg", 0.7),
+    v
+  };
+  pending.push(item);
+  while(pending.length > PENDING_MAX){
+    const drop = pending.shift();
+    addLog("待确认满了，丢掉最早的一条（" + nameOf(drop.v.label) + "）");
+  }
+  renderPending();
+}
+
+function renderPending(){
+  const wrap = $("#pendingWrap"), list = $("#pendingList");
+  if(!wrap || !list) return;
+  if(!pending.length){ wrap.style.display = "none"; list.innerHTML = ""; return; }
+  wrap.style.display = "block";
+  $("#pendingCount").textContent = pending.length;
+  const nameOf = id => {
+    if(id === "unknown") return "不认识";
+    const c = FD.CATALOG.find(x => x.id === id);
+    return c ? c.cn : id;
+  };
+  list.innerHTML = pending.map(p => {
+    const top = p.v.label === "unknown" ? (p.v.second || "unknown") : p.v.label;
+    const cand = p.v.label === "unknown"
+      ? `猜不出 · 也许是 <b>${nameOf(top)}</b>`
+      : `<b>${nameOf(p.v.label)}</b> ${Math.round(p.v.conf*100)}%`;
+    const cTop = FD.CATALOG.find(x => x.id === top);
+    return `<div class="prow" data-id="${p.id}">
+      <img src="${p.thumb}" alt="">
+      <div class="info">${cand}<br><span style="color:#7d8f86">${p.v.reason || ""}</span></div>
+      <div class="acts">
+        ${cTop ? `<button data-cat="${cTop.id}">就是它</button>` : ""}
+        <button class="ghost" data-other="1">换一个</button>
+        <button class="ghost" data-drop="1">忽略</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function takePending(id){
+  const i = pending.findIndex(p => p.id === id);
+  return i < 0 ? null : pending.splice(i, 1)[0];
+}
+
+function resolvePending(row, cat){
+  const id = row.dataset.id;
+  const p = takePending(id);
+  renderPending();
+  if(!p) return;
+  const c = FD.CATALOG.find(x => x.id === cat);
+  if(!c) return;
+  if(addItem(c)){
+    addLog(`确认入库：<b>${c.cn}</b>`);
+    recordGuess(c.id);
   }
 }
 
+$("#pendingList").addEventListener("pointerdown", e => {
+  const row = e.target.closest(".prow");
+  if(!row) return;
+  const btn = e.target.closest("button");
+  if(!btn) return;
+  e.preventDefault(); e.stopPropagation();
+  if(btn.dataset.drop){
+    const p = takePending(row.dataset.id);
+    renderPending();
+    if(p){ score.skipped++; paintScore(); addLog("已忽略一条待确认"); }
+    return;
+  }
+  if(btn.dataset.other){
+    const p = takePending(row.dataset.id);
+    renderPending();
+    if(!p) return;
+    currentPending = p;
+    $("#shot").src = p.thumb; $("#shot").classList.add("on");
+    $("#capNote").textContent = "这一条是哪一样？点下面格子。";
+    $("#confirmWrap").style.display = "block";
+    return;
+  }
+  if(btn.dataset.cat) resolvePending(row, btn.dataset.cat);
+});
+
+let currentPending = null;
+
+/* ---------------- 入库 + 撤销 ---------------- */
+let lastAdded = null;
+function addItem(c){
+  try{
+    const list = FD.items();
+    const same = list.find(i => i.cat === c.id && FD.daysLeftOf(i) === c.days);
+    let id;
+    if(same){ same.qty = (same.qty == null ? 1 : same.qty) + 1; id = same.id; }
+    else{
+      id = Math.random().toString(36).slice(2, 9);
+      const unit = (typeof FD.unitOf === "function") ? FD.unitOf(c.id) : "份";
+      const today = (typeof FD.localDate === "function") ? FD.localDate() : new Date().toISOString().slice(0,10);
+      list.push({id, cat:c.id, name:c.name, tag:c.tag, qty:1, unit,
+                 daysLeft:c.days, life:c.days, addedAt:today, via:"gate"});
+    }
+    FD.saveItems(FD.mergeItems(list));
+    lastAdded = {id, cat: c.id};
+    return true;
+  }catch(err){
+    addLog('<span style="color:#ff8a7a">写入失败：' + (err && err.message ? err.message : err) + '</span>');
+    return false;
+  }
+}
+
+function undoAdd(){
+  if(!lastAdded) return;
+  const list = FD.items();
+  const it = list.find(i => i.id === lastAdded.id);
+  if(it && it.qty > 1){ it.qty -= 1; FD.saveItems(list); }
+  else { FD.saveItems(list.filter(i => i.id !== lastAdded.id)); }
+  score.undone++;
+  if(score.auto > 0) score.auto--;
+  paintScore();
+  addLog("已撤销上一笔自动入库");
+  lastAdded = null;
+  $("#toast") && $("#toast").classList.remove("on");
+}
+
+function toast(html, c){
+  let el = $("#toast");
+  if(!el){
+    el = document.createElement("div");
+    el.id = "toast"; el.className = "toast";
+    el.innerHTML = '<span id="toastMsg"></span><button id="toastUndo">撤销</button>';
+    document.body.appendChild(el);
+    $("#toastUndo").addEventListener("pointerdown", e => { e.preventDefault(); undoAdd(); });
+  }
+  $("#toastMsg").innerHTML = html;
+  el.classList.add("on");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.classList.remove("on"); lastAdded = null; }, 5000);
+}
+
 function resume(){
-  $("#confirmWrap").style.display = "none";
-  $("#shot").classList.remove("on");
   handFrames = 0;
-  setState("mon");
+  setState("mon");          // 检测立刻继续，不等任何人确认
 }
 
 /* ---------------- 确认 / 忽略 ---------------- */
@@ -464,27 +665,19 @@ function buildPicks(){
 }
 
 function commit(c){
-  try{
-    const list = FD.items();
-    const same = list.find(i => i.cat === c.id && FD.daysLeftOf(i) === c.days);
-    if(same){ same.qty = (same.qty == null ? 1 : same.qty) + 1; }
-    else{
-      const unit = (typeof FD.unitOf === "function") ? FD.unitOf(c.id) : "份";
-      const today = (typeof FD.localDate === "function") ? FD.localDate() : new Date().toISOString().slice(0,10);
-      list.push({id:Math.random().toString(36).slice(2,9), cat:c.id, name:c.name, tag:c.tag,
-                 qty:1, unit:unit, daysLeft:c.days, life:c.days, addedAt:today, via:"gate"});
-    }
-    FD.saveItems(FD.mergeItems(list));
-    addLog(`<b>${c.cn}</b><span class="badge">已入库</span>　来源：门口闸机`);
-    recordGuess(c.id);
-    resume();
-  }catch(err){
-    addLog('<span style="color:#ff8a7a">写入失败：' + (err && err.message ? err.message : err) + '</span>');
-    showDebug("出错：" + (err && err.message ? err.message : err));
+  if(!addItem(c)){
+    addLog('<span style="color:#ff8a7a">写入失败，请看下面的调试条</span>');
+    showDebug("写入失败");
+    return;
   }
+  addLog(`<b>${c.cn}</b><span class="badge">已入库</span>　来源：门口闸机`);
+  recordGuess(c.id);
+  currentPending = null;
+  $("#confirmWrap").style.display = "none";
+  $("#shot").classList.remove("on");
+  resume();
 }
 
-/* 页面左下角一行调试信息：真出问题时她截图给我就能定位 */
 function showDebug(msg){
   let el = document.getElementById("dbg");
   if(!el){
