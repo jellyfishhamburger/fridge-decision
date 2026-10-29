@@ -479,18 +479,7 @@
   .ck-ing .ii .art{width:24px;height:24px}
   .ck-ing .ii.dim{opacity:.72;font-weight:400}
   .ck-ing .lb{font-size:11.5px;color:#9AA69C;align-self:center;margin-right:2px}
-  /* 锅里已有：随着步骤往前，慢慢变满，刚放进去的那几样亮一下 */
-  .ck-pot{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;align-items:center;
-    margin-top:12px;min-height:38px;padding-top:10px;border-top:1px dashed var(--line)}
-  .ck-pot .plb{font-size:11px;color:#A9B3AB;letter-spacing:.02em}
-  .ck-pot .pb{width:38px;height:38px;border-radius:12px;background:#F7FAF4;border:1px solid #D8E0D4;
-    display:grid;place-items:center;position:relative;transition:background .3s,border-color .3s,transform .3s}
-  .ck-pot .pb .art{width:27px;height:27px}
-  .ck-pot .pb.in{background:#EFF5EA;border-color:#C9D9C2}
-  .ck-pot .pb.new{background:#E3EFDC;border-color:#8FB183;box-shadow:0 0 0 3px rgba(143,177,131,.18);
-    animation:pbPop .5s cubic-bezier(.34,1.56,.64,1)}
-  .ck-pot .pb.off{background:#F7FAF4;opacity:.45;filter:grayscale(.75)}
-  @keyframes pbPop{0%{transform:scale(.6)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+
 
   .findlink{display:inline-flex;align-items:center;gap:6px;margin:16px 0 4px;padding:6px 0;
     background:none;border:0;color:var(--green);font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit}
@@ -894,7 +883,6 @@
     <div class="ck-icon" id="ck-icon"></div>
     <div class="ck-text" id="ck-text">…</div>
     <div class="ck-ing" id="ck-ing"></div>
-    <div class="ck-pot" id="ck-pot" aria-live="polite"></div>
     <div class="ck-count" id="ck-count">1 / 5</div>
   </div>
   <div class="ck-bar">
@@ -1465,34 +1453,16 @@ function renderCook(){
       ${COOK_STEPS.svg(act.id, "ck-act")}</span>`;
   $("#ck-text").textContent = text;
   /* 这一步用到的食材：文字里提到了就只显示这几样，没提到就退回整道菜的主料（并标灰） */
-  const ing = ingredientsInStep(cookRecipe, text);
+  /* 一步一屏只放一样东西：这道菜要用哪些（固定，不随步骤变，避免"一会儿这一步一会儿整道菜"） */
   const box = $("#ck-ing");
   if(box){
-    const list = ing.ids.length ? ing.ids : ing.all;
+    const list = cookRecipe.needs.slice(0, 6);
     box.innerHTML = list.length
-      ? `<span class="lb">${ing.ids.length ? tt("cook.usesHere", "这一步用到") : tt("cook.usesAll", "整道菜用到")}</span>` +
-        list.map(id => `<span class="ii ${ing.ids.length ? "" : "dim"}">${window.COOK_ART ? COOK_ART.svg(id) : ""}${cnOf(id)}</span>`).join("")
+      ? `<span class="lb">${tt("cook.usesDish", "这道菜要用")}</span>` +
+        list.map(id => `<span class="ii">${window.COOK_ART ? COOK_ART.svg(id) : ""}${cnOf(id)}</span>`).join("")
       : "";
   }
 
-  /* 锅里的进度：已经下过锅的食材亮着，这一步刚放进去的弹一下，还没用到的压暗 */
-  const potBox = $("#ck-pot");
-  if(potBox){
-    const all = cleanSteps(cookRecipe);
-    const inPot = new Set(), addedNow = new Set();
-    for(let k = 0; k <= cookStep && k < all.length; k++){
-      ingredientsInStep(cookRecipe, all[k]).ids.forEach(id => {
-        if(!inPot.has(id)){ inPot.add(id); if(k === cookStep) addedNow.add(id); }
-      });
-    }
-    const whole = cookRecipe.needs.slice(0, 6);
-    potBox.innerHTML = whole.length
-      ? `<span class="plb">${tt("cook.potNow", "锅里已有")}</span>` + whole.map(id => {
-          const cls = inPot.has(id) ? (addedNow.has(id) ? "new" : "in") : "off";
-          return `<span class="pb ${cls}" title="${cnOf(id)}">${window.COOK_ART ? COOK_ART.svg(id) : ""}</span>`;
-        }).join("")
-      : "";
-  }
   $("#ck-count").textContent = `${cookStep + 1} / ${steps.length}`;
   $("#ck-prev").disabled = cookStep === 0;
   $("#ck-next").disabled = cookStep >= steps.length - 1;
