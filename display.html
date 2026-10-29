@@ -95,7 +95,7 @@
 
           <!-- 1 · decision -->
           <div class="scr on" data-scr="0">
-            <div class="hd"><span>今晚吃这个 · <b id="d-time">12 分钟</b></span><span id="d-alt"></span></div>
+            <div class="hd"><span id="d-tonight">今晚吃这个 · <b id="d-time">12</b></span><span id="d-alt"></span></div>
             <div class="body">
               <div class="big two" id="d-dish">Shrimp<br><span class="plus">+ greens</span></div>
               <div class="pix" id="d-pix"></div>
@@ -108,7 +108,7 @@
 
           <!-- 2 · countdown -->
           <div class="scr" data-scr="1">
-            <div class="hd"><span>先吃这个</span><span id="d-more"></span></div>
+            <div class="hd"><span id="d-first">先吃这个</span><span id="d-more"></span></div>
             <div class="body">
               <div id="d-urgent-icon" style="color:var(--ink)"></div>
               <div>
@@ -120,21 +120,21 @@
               </div>
             </div>
             <div class="ft">
-              <span>in tonight's suggestion</span>
+              <span id="d-firstsub">in tonight's suggestion</span>
               <span class="dots" data-dots="1"></span>
             </div>
           </div>
 
           <!-- 3 · glance -->
           <div class="scr" data-scr="2">
-            <div class="hd"><span>冰箱里</span><span id="d-count">0 items</span></div>
+            <div class="hd"><span id="d-in">冰箱里</span><span id="d-count">0 items</span></div>
             <div class="body" style="align-items:flex-start;flex-direction:column;gap:0;justify-content:center">
               <div class="big" id="d-glance">all good this week</div>
               <div class="bars" id="d-bars"></div>
               <div class="tick" id="d-urgent-list"></div>
             </div>
             <div class="ft">
-              <span>details &amp; recipes → app</span>
+              <span id="d-detail">details &amp; recipes → app</span>
               <span class="dots" data-dots="2"></span>
             </div>
           </div>
@@ -185,9 +185,13 @@
 <script src="data.js?v=20261029-5"></script>
 <script src="icons.js?v=20261029-5"></script>
 <script src="logic.js?v=20261029-5"></script>
+<script src="i18n.js?v=20261029-6"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
+const L = (zh, en) => (window.I18N && I18N.getLang() === "en") ? en : zh;
+const rname = r => (window.I18N ? I18N.recipeName(r) : r.name);
+const fname = id => (window.I18N ? I18N.foodName(id) : (FD.byId[id]||{}).cn || id);
 const S = FD.settings();
 
 const DEMO = [
@@ -230,11 +234,17 @@ function paint(){
   /* 1 — decision */
   if (ranked.length) {
     const pick = ranked[Math.min(altIndex, ranked.length - 1)];
-    $("#d-dish").innerHTML = twoLines(pick.recipe.name);
-    $("#d-time").textContent = pick.recipe.minutes + " 分钟" + (pick.status === "shop1" ? " · 差1样" : "");
+    $("#d-dish").innerHTML = twoLines(rname(pick.recipe));
+    $("#d-time").textContent = pick.recipe.minutes + L(" 分钟", " min") +
+      (pick.status === "shop1" ? L(" · 差1样", " · 1 short") : "");
+    $("#d-tonight").firstChild.textContent = L("今晚吃这个 · ", "Tonight · ");
+    $("#d-first").textContent = L("先吃这个", "Use first");
+    $("#d-in").textContent = L("冰箱里", "In the fridge");
+    $("#d-firstsub").textContent = L("今晚的推荐会用到它", "it is in tonight's suggestion");
+    $("#d-detail").textContent = L("详情 / 菜谱 → app", "details / recipes → app");
     $("#d-uses").innerHTML = "uses " + pick.used
-      .map(u => { const f = FD.byId[u.cat];
-                  return `${(f && f.cn) || u.name} <b>${FD.daysLeftOf(u)} 天</b>`; }).join("、");
+      .map(u => `${fname(u.cat)} <b>${FD.daysLeftOf(u)}${L(" 天", " d")}</b>`)
+      .join(L("、", ", "));
     $("#d-pix").innerHTML = window.FD_ICON(pick.used[0].cat, 38);
     $("#d-alt").innerHTML = altIndex ? `<b>alt ${altIndex+1}</b>` : "";
   } else {
@@ -248,9 +258,9 @@ function paint(){
   const u0 = urg[0];
   if (u0) {
     const d0 = FD.daysLeftOf(u0);
-    $("#d-urgent-name").textContent = (FD.byId[u0.cat] && FD.byId[u0.cat].cn) || u0.name;
+    $("#d-urgent-name").textContent = fname(u0.cat);
     $("#d-urgent-days").textContent = d0 <= 0 ? "0" : String(d0);
-    $("#d-urgent-unit").textContent = d0 <= 0 ? "今天要吃" : "天后过期";
+    $("#d-urgent-unit").textContent = d0 <= 0 ? L("今天要吃", "use today") : L("天后过期", "days left");
     $("#d-urgent-icon").innerHTML = window.FD_ICON(u0.cat, 38);
     const soonCount = items.filter(i => FD.daysLeftOf(i) <= 2).length;
     $("#d-more").innerHTML = soonCount > 1 ? `<b>+${soonCount-1} more</b>` : "";
@@ -259,13 +269,12 @@ function paint(){
   /* 3 — glance */
   const soon = items.filter(i => FD.daysLeftOf(i) <= 2).length;
   $("#d-count").textContent = items.length + " items";
-  $("#d-glance").textContent = soon ? `${soon} need using soon` : "all good this week";
+  $("#d-glance").textContent = soon ? L(`${soon} 样要赶紧吃`, `${soon} need using soon`) : L("这周都还好", "all good this week");
   $("#d-bars").innerHTML = items.slice().sort((a,b)=>FD.daysLeftOf(a)-FD.daysLeftOf(b)).slice(0,12)
     .map(i => { const d = FD.daysLeftOf(i);
                 return `<span class="${d<=0?"r":(d<=2?"k":"")}"></span>`; }).join("");
   $("#d-urgent-list").innerHTML = items.slice().sort((a,b)=>FD.daysLeftOf(a)-FD.daysLeftOf(b)).slice(0,3)
-    .map(i => { const f = FD.byId[i.cat];
-                return `${(f && f.cn) || i.name} <b>${FD.daysLeftOf(i)} 天</b>`; }).join(" · ");
+    .map(i => `${fname(i.cat)} <b>${FD.daysLeftOf(i)}${L(" 天", " d")}</b>`).join(" · ");
 
   paintDots();
   paintTally();

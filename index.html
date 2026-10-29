@@ -197,6 +197,7 @@
 <div class="top">
   <div class="topin">
     <h1 id="pageTitle">冰箱里有什么</h1>
+    <button class="gear" id="langBtn" aria-label="language" style="font-size:13px;font-weight:700">中</button>
     <a class="gear" href="settings.html" aria-label="设置">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
         <circle cx="12" cy="12" r="3.2"/>
@@ -210,68 +211,68 @@
 
   <!-- ============ view 1: fridge ============ -->
   <section class="view on" id="view-fridge">
-    <p class="lede">右边数字＝还能放几天，越红越要先吃。数据存在这台设备里。</p>
+    <p class="lede" data-i18n="fridge.lede">右边数字＝还能放几天，越红越要先吃。数据存在这台设备里。</p>
     <div class="undo" id="undoBar">
-      <span id="undoText">做好了</span>
-      <button id="undoBtn">撤销</button>
+      <span id="undoText"></span>
+      <button id="undoBtn" data-i18n="undo.btn">撤销</button>
     </div>
     <div class="card">
-      <h2>存货 <span class="count" id="cnt">0 items</span></h2>
+      <h2><span data-i18n="fridge.stock">存货</span> <span class="count" id="cnt">0</span></h2>
       <div class="items" id="items"></div>
-      <p class="empty" id="emptyNote">还没记录任何东西 —— 用下面的按钮加一样。</p>
+      <p class="empty" id="emptyNote" data-i18n="fridge.empty">还没记录任何东西 —— 用下面的按钮加一样。</p>
       <div class="row" style="margin-top:14px">
-        <button class="btn ghost" id="addBtn">＋ 加一样</button>
-        <button class="btn quiet" id="demoBtn">载入示例</button>
+        <button class="btn ghost" id="addBtn" data-i18n="fridge.add">＋ 加一样</button>
+        <button class="btn quiet" id="demoBtn" data-i18n="fridge.demo">载入示例</button>
       </div>
     </div>
-    <button class="btn primary" id="decideBtn">给我一个决定 →</button>
+    <button class="btn primary" id="decideBtn" data-i18n="fridge.decide">给我一个决定 →</button>
     <div id="result" style="margin-top:14px"></div>
   </section>
 
   <!-- ============ view 2: discover ============ -->
   <section class="view" id="view-discover">
-    <p class="lede">按"先用掉快坏的"排序。差一样的菜也算能做饭，会告诉你去买什么。</p>
+    <p class="lede" data-i18n="disc.lede">按"先用掉快坏的"排序。</p>
     <div class="filters" id="discFilters">
-      <button class="f on" data-f="all">全部</button>
-      <button class="f" data-f="ready">现在就能做</button>
-      <button class="f" data-f="shop1">差一样</button>
-      <button class="f" data-f="greens">有绿叶菜</button>
-      <button class="f" data-f="light">≤ 500 kcal</button>
+      <button class="f on" data-f="all" data-i18n="disc.all">全部</button>
+      <button class="f" data-f="ready" data-i18n="disc.ready">现在就能做</button>
+      <button class="f" data-f="shop1" data-i18n="disc.shop1">差一样</button>
+      <button class="f" data-f="greens" data-i18n="disc.greens">有绿叶菜</button>
+      <button class="f" data-f="light" data-i18n="disc.light">≤ 500 kcal</button>
     </div>
     <div id="discList"></div>
   </section>
 
   <!-- ============ view 3: build ============ -->
   <section class="view" id="view-build">
-    <p class="lede">先选你今天想吃的（从冰箱里挑），再用条件收窄 —— 不是在搜菜谱，是在做决定。</p>
+    <p class="lede" data-i18n="build.lede">先选你今天想吃的。</p>
     <div class="card">
-      <h2>我想吃 <span class="count" id="pickCount">未选</span></h2>
+      <h2><span data-i18n="build.want">我想吃</span> <span class="count" id="pickCount"></span></h2>
       <div class="picker" id="picker"></div>
       <div class="slider">
-        <span>热量上限 <b id="kcalLbl">600 kcal</b></span>
+        <span><span data-i18n="build.kcal">热量上限</span> <b id="kcalLbl">600 kcal</b></span>
         <input type="range" id="kcal" min="200" max="1000" step="50" value="600">
       </div>
       <div class="slider">
-        <span>最多用时 <b id="minLbl">30 分钟</b></span>
+        <span><span data-i18n="build.mins">最多用时</span> <b id="minLbl">30</b></span>
         <input type="range" id="mins" min="10" max="40" step="5" value="30">
       </div>
       <div class="switch">
-        <span>必须有绿叶菜</span>
+        <span data-i18n="build.mustGreens">必须有绿叶菜</span>
         <input type="checkbox" id="mustGreens">
       </div>
       <div class="switch">
-        <span>只看纤维较高的</span>
+        <span data-i18n="build.fibre">只看纤维较高的</span>
         <input type="checkbox" id="highFiber">
       </div>
-      <p class="note">"纤维较高"是按食材推断的粗分档（含绿叶菜 / 西兰花 / 茄子 / 香菇 / 胡萝卜等），<b>不是克数</b> —— 我们的菜谱数据里没有纤维含量。</p>
-      <button class="btn quiet" id="clearPick" style="margin-top:12px">清空选择</button>
+      <p class="note" data-i18n="build.fibreNote"></p>
+      <button class="btn quiet" id="clearPick" style="margin-top:12px" data-i18n="build.clear">清空选择</button>
     </div>
     <div id="buildList"></div>
   </section>
 
   <div class="foot">
-    原型 v0.5 · 无硬件、无图像识别<br>
-    <a href="disc.html">圆片（黑色圆盘）→</a> · <a href="display.html">长条墨水屏 →</a> · <a href="settings.html">设置 →</a>
+    <span data-i18n="foot.line">原型 · 无硬件、无图像识别</span><br>
+    <a href="disc.html" data-i18n="foot.disc">圆片 →</a> · <a href="display.html" data-i18n="foot.strip">长条屏 →</a> · <a href="settings.html" data-i18n="foot.settings">设置 →</a>
   </div>
 </div>
 
@@ -282,42 +283,42 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
         <rect x="6" y="3.2" width="12" height="17.6" rx="2.6"/><path d="M6 9.6h12M9 5.6v2M9 11.8v2.4"/>
       </svg>
-      冰箱
+      <span data-i18n="nav.fridge">冰箱</span>
     </button>
     <button data-view="discover">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
         <path d="M12 3.4l2.2 5.4 5.8.5-4.4 3.8 1.3 5.7L12 15.7 7.1 18.8l1.3-5.7L4 9.3l5.8-.5z"/>
       </svg>
-      推荐
+      <span data-i18n="nav.discover">推荐</span>
     </button>
     <button data-view="build">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
         <path d="M4 7.5h16M4 12h16M4 16.5h10"/><circle cx="18.4" cy="16.5" r="1.6"/>
       </svg>
-      自己选
+      <span data-i18n="nav.build">自己选</span>
     </button>
   </div>
 </nav>
 
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet">
-  <h3>加入一样东西</h3>
-  <p class="hint">选食物 —— 原型还不会替你认。保质期按食物预设，可以自己改。</p>
+  <h3 data-i18n="sheet.title">加入一样东西</h3>
+  <p class="hint" data-i18n="sheet.hint"></p>
   <video class="cam" id="cam" playsinline muted autoplay></video>
   <img class="shotpreview" id="shot" alt="刚拍的照片">
   <div class="row" style="margin-bottom:10px">
-    <button class="btn quiet" id="snapBtn">打开相机</button>
-    <button class="btn quiet" id="flipBtn" style="display:none">换镜头</button>
+    <button class="btn quiet" id="snapBtn" data-i18n="sheet.cam">打开相机</button>
+    <button class="btn quiet" id="flipBtn" style="display:none" data-i18n="sheet.flip">换镜头</button>
   </div>
   <div class="zoomrow" id="zoomRow">
-    <span>焦距 <b id="zoomLbl">1×</b></span>
+    <span><span data-i18n="sheet.zoom">焦距</span> <b id="zoomLbl">1×</b></span>
     <input type="range" id="zoom" min="1" max="8" step="0.1" value="1">
   </div>
-  <button class="btn quiet" id="scanBtn" style="display:none;margin-bottom:10px">扫商品条码</button>
-  <p class="cammsg" id="camMsg">原型还不会认食物：拍下来之后请选下面是哪一种。条码能扫的商品可以直接出名字。</p>
+  <button class="btn quiet" id="scanBtn" style="display:none;margin-bottom:10px" data-i18n="sheet.scan">扫商品条码</button>
+  <p class="cammsg" id="camMsg" data-i18n="sheet.camMsg"></p>
   <div class="grid" id="picks"></div>
   <div class="qtyrow">
-    <span>这次带回来几份</span>
+    <span data-i18n="sheet.qty">这次带回来几份</span>
     <span class="step2">
       <button type="button" id="qMinus">−</button>
       <span id="qtyLbl">1 份</span>
@@ -325,24 +326,24 @@
     </span>
   </div>
   <div class="field">
-    <span>可以放到 <b id="daysLbl">3 天后</b></span>
+    <span id="daysLbl">3 天后</span>
     <input type="range" id="days" min="1" max="60" value="3">
   </div>
-  <button class="btn primary" id="saveBtn">加进冰箱</button>
-  <button class="btn quiet" id="cancelBtn" style="margin-top:8px">取消</button>
+  <button class="btn primary" id="saveBtn" data-i18n="sheet.save">加进冰箱</button>
+  <button class="btn quiet" id="cancelBtn" style="margin-top:8px" data-i18n="sheet.cancel">取消</button>
 </div>
 <div class="cook" id="cook">
-  <div class="ck-top"><span>做饭模式 ·</span><b id="ck-name">菜名</b><button id="ck-close">✕</button></div>
+  <div class="ck-top"><span data-i18n="cook.title">做饭模式</span> · <b id="ck-name">菜名</b><button id="ck-close">✕</button></div>
   <div class="ck-body">
     <div class="ck-icon" id="ck-icon"></div>
     <div class="ck-text" id="ck-text">…</div>
     <div class="ck-count" id="ck-count">1 / 5</div>
   </div>
   <div class="ck-bar">
-    <button id="ck-prev">上一步</button>
-    <button id="ck-next">下一步</button>
+    <button id="ck-prev" data-i18n="cook.prev">上一步</button>
+    <button id="ck-next" data-i18n="cook.next">下一步</button>
   </div>
-  <button class="btn primary ck-done" id="ck-done">做完了 · 扣减库存</button>
+  <button class="btn primary ck-done" id="ck-done" data-i18n="cook.done">做完了 · 扣减库存</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -350,6 +351,7 @@
 <script src="data.js?v=20261029-5"></script>
 <script src="icons.js?v=20261029-5"></script>
 <script src="logic.js?v=20261029-5"></script>
+<script src="i18n.js?v=20261029-6"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -369,7 +371,7 @@ let discFilter = "all", buildPicks = new Set();
 const uid = () => Math.random().toString(36).slice(2, 9);
 const today = () => FD.localDate();
 const food = id => FD.byId[id] || {cn: id, name: id};
-const cnOf = id => food(id).cn;
+const cnOf = id => I18N.foodName(id);
 
 function toast(msg){
   const t = $("#toast"); t.textContent = msg; t.classList.add("on");
@@ -381,11 +383,12 @@ const FIBRE = new Set(["greens","broccoli","eggplant","mushroom","carrot","tomat
 const highFibre = r => r.needs.some(n => FIBRE.has(n));
 
 /* ============ view switching ============ */
-const TITLES = {fridge:"冰箱里有什么", discover:"今晚吃什么", build:"自己做主"};
+const TITLES = {fridge:"title.fridge", discover:"title.discover", build:"title.build"};
+const t = (k, v) => I18N.t(k, v);
 function show(view){
   $$(".view").forEach(v => v.classList.toggle("on", v.id === "view-" + view));
   $$(".nav button").forEach(b => b.classList.toggle("on", b.dataset.view === view));
-  $("#pageTitle").textContent = TITLES[view];
+  $("#pageTitle").textContent = t(TITLES[view]);
   window.scrollTo({top:0});
   if(view === "discover") renderDiscover();
   if(view === "build") renderBuild();
@@ -394,7 +397,7 @@ $$(".nav button").forEach(b => b.addEventListener("click", () => show(b.dataset.
 
 /* ============ view 1: fridge ============ */
 function expiryClass(d){ return d <= 2 ? "urgent" : d <= 5 ? "warn" : ""; }
-function expiryText(d){ return d <= 0 ? "今天到期" : (d === 1 ? "还剩 1 天" : `还剩 ${d} 天`); }
+function expiryText(d){ return d <= 0 ? t("fridge.today") : (d === 1 ? t("fridge.oneDay") : t("fridge.left", {n: d})); }
 
 function renderItems(){
   const box = $("#items"); box.innerHTML = "";
@@ -409,63 +412,67 @@ function renderItems(){
       <button aria-label="remove" data-del="${it.id}">×</button>`;
     box.appendChild(el);
   });
-  $("#cnt").textContent = items.length + " 样";
+  $("#cnt").textContent = t("fridge.count", {n: items.length});
   $("#emptyNote").style.display = items.length ? "none" : "block";
 }
 
 function reasons(r){
   const out = [];
   if(r.used.length){
-    out.push("用掉 " + r.used.map(i=>{
+    out.push(t("card.whyUses", {items: r.used.map(i=>{
       const d = FD.daysLeftOf(i);
-      return `<b>${cnOf(i.cat)}</b>（${d<=0?"今天到期":d+" 天"}）`;
-    }).join("、"));
+      return `<b>${cnOf(i.cat)}</b> (${d<=0?t("days.today"):t("days.n",{n:d})})`;
+    }).join(I18N.getLang()==="en" ? ", " : "、")}));
   }
-  if(r.greensBonus) out.push("正好补上今天那份绿叶菜 —— 累了最容易跳过的那样。");
-  if(r.recipe.minutes <= goal.maxMinutes) out.push(`<b>${r.recipe.minutes} 分钟</b>，一口锅，比点外卖快。`);
-  else out.push(`${r.recipe.minutes} 分钟，超过你设的 ${goal.maxMinutes} 分钟上限，所以排在后面。`);
-  if(r.status === "shop1") out.push("只差一样，买了就能做，不用换计划。");
+  if(r.greensBonus) out.push(t("card.whyGreens"));
+  if(r.recipe.minutes <= goal.maxMinutes) out.push(t("card.whyTime", {n: r.recipe.minutes}));
+  else out.push(t("card.whySlow", {n: r.recipe.minutes, max: goal.maxMinutes}));
+  if(r.status === "shop1") out.push(t("card.whyGap"));
   return out;
 }
 
 function pantryLine(missingIds){
-  const names = missingIds.map(id => `<span class="ptog" data-pantry="${id}">${food(id).cn}</span>`).join("");
-  return `<div class="pantryline">这道菜还要调味：${names}<br><span style="font-size:12px">点一下标记"家里有"。</span></div>`;
+  const names = missingIds.map(id => {
+    const p = FD.pantryById[id] || {};
+    const label = I18N.getLang() === "en" ? (p.name || id) : (p.cn || id);
+    return `<span class="ptog" data-pantry="${id}">${label}</span>`;
+  }).join("");
+  return `<div class="pantryline">${t("card.pantry")}${names}<br><span style="font-size:12px">${t("card.pantryHint")}</span></div>`;
 }
 
 function renderResult(list){
   const box = $("#result");
   const usable = list.filter(r => r.status !== "blocked");
   if(!usable.length){
-    box.innerHTML = `<div class="card"><h2>还做不了菜</h2>
-      <p class="empty">冰箱里的东西凑不出任何一道菜。再加一样，或者载入示例。</p></div>`;
+    box.innerHTML = `<div class="card"><h2>${t("disc.none")}</h2>
+      <p class="empty">${t("disc.noneHint")}</p></div>`;
     return;
   }
   const top = usable[0], alts = usable.slice(1,3);
   box.innerHTML = `
     <div class="verdict ${top.status==="shop1"?"amber":""}">
-      <div class="kicker">${top.status==="shop1" ? "差一样就能做" : "今晚"}</div>
-      <h3>${top.recipe.name}</h3>
+      <div class="kicker">${top.status==="shop1" ? t("card.shop1") : t("card.tonight")}</div>
+      <h3>${I18N.recipeName(top.recipe)}</h3>
       <div class="meta">
-        <span class="badge">${top.recipe.minutes} 分钟</span>
+        <span class="badge">${t("card.min", {n: top.recipe.minutes})}</span>
         ${top.recipe.kcal?`<span class="badge">${top.recipe.kcal} kcal</span>`:""}
-        <span class="badge">${top.recipe.greens?"有绿叶菜":"无绿叶菜"}</span>
+        <span class="badge">${top.recipe.greens?t("card.greens"):t("card.noGreens")}</span>
       </div>
     </div>
-    ${top.status==="shop1"?`<div class="shop">还差一样：<b>${FD.shoppingHint(top)}</b><br>买回来就能做，不用改计划。</div>`:""}
+    ${top.status==="shop1"?`<div class="shop">${t("card.missing")}<b>${FD.shoppingHint(top)}</b><br>${t("card.missingHint")}</div>`:""}
     <div class="why">
-      <b>为什么推这道</b>
+      <b>${t("card.why")}</b>
       <ul>${reasons(top).map(r=>`<li>${r}</li>`).join("")}</ul>
-      <ol class="steps">${top.recipe.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+      <ol class="steps">${I18N.recipeSteps(top.recipe).map(s=>`<li>${s}</li>`).join("")}</ol>
       ${top.pantryMissing.length?pantryLine(top.pantryMissing):""}
-      <div class="srcline">菜谱与热量：<a href="${top.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · 个人份估算，非实测</div>
-      <button class="btn primary" style="margin-top:12px" data-cook="${top.recipe.id}">开始做（一步一屏）</button>
+      <div class="srcline">${t("card.src")}<a href="${top.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · ${t("card.srcNote")}</div>
+      <button class="btn primary" style="margin-top:12px" data-cook="${top.recipe.id}">${t("disc.cook")}</button>
     </div>
-    ${alts.length?`<div class="card"><h2>其他选择 <span class="count">不一定马上能做</span></h2>
+    ${alts.length?`<div class="card"><h2>${t("disc.other")} <span class="count">${t("disc.otherSub")}</span></h2>
       ${alts.map(a=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)">
-        <div><div>${a.recipe.name} ${a.status==="shop1"?`<span style="color:#b26a00;font-size:12px">· 差 1 样</span>`:""}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:2px">${a.recipe.minutes} 分钟${a.recipe.kcal?` · ${a.recipe.kcal} kcal`:""}${a.recipe.greens?" · 绿叶菜":""}</div></div>
-        <button class="go" data-pick="${a.recipe.id}" style="border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;color:var(--green);font-family:inherit">看这个</button>
+        <div><div>${I18N.recipeName(a.recipe)} ${a.status==="shop1"?`<span style="color:#b26a00;font-size:12px">· ${t("disc.gapN",{n:1})}</span>`:""}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${t("card.min",{n:a.recipe.minutes})}${a.recipe.kcal?` · ${a.recipe.kcal} kcal`:""}${a.recipe.greens?" · "+t("card.greens"):""}</div></div>
+        <button class="go" data-pick="${a.recipe.id}" style="border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;color:var(--green);font-family:inherit">${t("card.seeThis")}</button>
       </div>`).join("")}
     </div>`:""}`;
 
@@ -488,23 +495,24 @@ function renderResult(list){
 /* ============ view 2: discover ============ */
 function recipeCard(r, opts){
   opts = opts || {};
-  const used = r.used.map(i=>`${cnOf(i.cat)}（${FD.daysLeftOf(i)} 天）`).join("、");
-  const missing = r.missing.length ? `<span class="tg a">差 ${r.missing.map(cnOf).join("、")}</span>` : "";
+  const sep = I18N.getLang()==="en" ? ", " : "、";
+  const used = r.used.map(i=>`${cnOf(i.cat)} (${t("days.n",{n:FD.daysLeftOf(i)})})`).join(sep);
+  const missing = r.missing.length ? `<span class="tg a">${t("disc.gapN",{n:r.missing.length})}: ${r.missing.map(cnOf).join(sep)}</span>` : "";
   return `<div class="rc">
-    <h4>${r.recipe.name}</h4>
+    <h4>${I18N.recipeName(r.recipe)}</h4>
     <div class="tags">
-      <span class="tg">${r.recipe.minutes} 分钟</span>
+      <span class="tg">${t("card.min",{n:r.recipe.minutes})}</span>
       ${r.recipe.kcal?`<span class="tg">${r.recipe.kcal} kcal</span>`:""}
-      ${r.recipe.greens?`<span class="tg g">绿叶菜</span>`:""}
-      ${highFibre(r.recipe)?`<span class="tg">纤维较高</span>`:""}
+      ${r.recipe.greens?`<span class="tg g">${t("card.greens")}</span>`:""}
+      ${highFibre(r.recipe)?`<span class="tg">${I18N.getLang()==="en"?"higher fibre":"纤维较高"}</span>`:""}
       ${missing}
-      ${r.status==="ready"?`<span class="tg g">现在能做</span>`:""}
+      ${r.status==="ready"?`<span class="tg g">${t("disc.ready1")}</span>`:""}
     </div>
-    ${used?`<p class="uses">用掉：${used}</p>`:""}
-    <details><summary>看做法</summary><ol>${r.recipe.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
-      <div class="src">来源：<a href="${r.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · 热量为个人份估算</div>
+    ${used?`<p class="uses">${t("disc.uses")}${used}</p>`:""}
+    <details><summary>${t("disc.steps")}</summary><ol>${I18N.recipeSteps(r.recipe).map(s=>`<li>${s}</li>`).join("")}</ol>
+      <div class="src">${t("card.src")}<a href="${r.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · ${t("card.srcNote")}</div>
     </details>
-    <button class="go" data-take="${r.recipe.id}">开始做（一步一屏）</button>
+    <button class="go" data-take="${r.recipe.id}">${t("disc.cook")}</button>
   </div>`;
 }
 
@@ -517,7 +525,7 @@ function renderDiscover(){
   const box = $("#discList");
   box.innerHTML = list.length
     ? list.map(r=>recipeCard(r)).join("")
-    : `<div class="card"><p class="empty">这个条件下没有菜。换个筛选，或者往冰箱里再加一样。</p></div>`;
+    : `<div class="card"><p class="empty">${t("disc.empty")}</p></div>`;
   box.querySelectorAll("[data-take]").forEach(b=>b.addEventListener("click", ()=> openCook(b.dataset.take)));
 }
 
@@ -528,13 +536,13 @@ function renderPicker(){
   box.innerHTML = have.length
     ? have.map(cat => `<button class="pf ${buildPicks.has(cat)?"on":""}" data-cat="${cat}">
         ${window.FD_ICON(cat,20)}${cnOf(cat)}</button>`).join("")
-    : `<p class="empty">冰箱是空的，先去第一页加东西。</p>`;
+    : `<p class="empty">${t("build.pickFirst")}</p>`;
   box.querySelectorAll("[data-cat]").forEach(b=>b.addEventListener("click", ()=>{
     const c = b.dataset.cat;
     buildPicks.has(c) ? buildPicks.delete(c) : buildPicks.add(c);
     renderBuild();
   }));
-  $("#pickCount").textContent = buildPicks.size ? `已选 ${buildPicks.size} 样` : "未选";
+  $("#pickCount").textContent = buildPicks.size ? t("build.picked",{n:buildPicks.size}) : t("build.none");
 }
 
 function renderBuild(){
@@ -556,8 +564,8 @@ function renderBuild(){
   const box = $("#buildList");
   box.innerHTML = (list.length
     ? list.map(r=>recipeCard(r)).join("")
-    : `<div class="card"><p class="empty">条件太紧了 —— 把热量上限调高，或者取消"必须绿叶菜"。</p></div>`)
-    + `<p class="note" style="text-align:center">共 ${list.length} 道符合。</p>`;
+    : `<div class="card"><p class="empty">${t("build.empty")}</p></div>`)
+    + `<p class="note" style="text-align:center">${t("build.total",{n:list.length})}</p>`;
   box.querySelectorAll("[data-take]").forEach(b=>b.addEventListener("click", ()=> openCook(b.dataset.take)));
 }
 $("#kcal").addEventListener("input", renderBuild);
@@ -594,18 +602,18 @@ function openCook(recipeId){
   cookRecipe = FD.RECIPES.find(r => r.id === recipeId);
   if(!cookRecipe) return;
   cookStep = 0;
-  $("#ck-name").textContent = cookRecipe.name;
+  $("#ck-name").textContent = I18N.recipeName(cookRecipe);
   renderCook();
   $("#cook").classList.add("on");
 }
 function renderCook(){
-  const steps = cookRecipe.steps;
+  const steps = I18N.recipeSteps(cookRecipe);
   $("#ck-icon").innerHTML = stepIcon(steps[cookStep]);
   $("#ck-text").textContent = steps[cookStep];
   $("#ck-count").textContent = `${cookStep + 1} / ${steps.length}`;
   $("#ck-prev").disabled = cookStep === 0;
   $("#ck-next").disabled = cookStep >= steps.length - 1;
-  $("#ck-next").textContent = cookStep >= steps.length - 1 ? "最后一步" : "下一步";
+  $("#ck-next").textContent = cookStep >= steps.length - 1 ? t("cook.last") : t("cook.next");
 }
 $("#ck-prev").addEventListener("click", ()=>{ if(cookStep > 0){ cookStep--; renderCook(); } });
 $("#ck-next").addEventListener("click", ()=>{ if(cookStep < cookRecipe.steps.length - 1){ cookStep++; renderCook(); } });
@@ -620,8 +628,8 @@ $("#ck-done").addEventListener("click", ()=>{
   FD.log("take", cookRecipe.id);
   renderItems();
   $("#cook").classList.remove("on");
-  const usedTxt = res.used.map(u => `${cnOf(u.cat)}×${u.qty}${u.left === 0 ? "（用完）" : `（剩 ${u.left}）`}`).join("、");
-  $("#undoText").textContent = `${cookRecipe.name} 做好了 · 扣减 ${usedTxt || "无"}`;
+  const usedTxt = res.used.map(u => u.left === 0 ? t("undo.usedUp",{n:cnOf(u.cat),q:u.qty}) : t("undo.left",{n:cnOf(u.cat),q:u.qty,left:u.left})).join(I18N.getLang()==="en" ? ", " : "、");
+  $("#undoText").textContent = t("undo.done", {dish: I18N.recipeName(cookRecipe), items: usedTxt || "-"});
   $("#undoBar").classList.add("on");
   if(cookStep >= 0) show("fridge");
 });
@@ -629,7 +637,7 @@ $("#undoBtn").addEventListener("click", ()=>{
   if(!lastUndo) return;
   items = lastUndo.items; FD.saveItems(items); renderItems();
   $("#undoBar").classList.remove("on");
-  toast("已撤销扣减");
+  toast(t("undo.ok"));
   lastUndo = null;
 });
 
@@ -641,24 +649,25 @@ function openSheet(){
   FD.CATALOG.forEach(c=>{
     const b = document.createElement("button");
     b.className = "pick"; b.type = "button";
-    b.innerHTML = window.FD_ICON(c.id,22) + `<span>${c.cn}</span><small>${c.name}</small>`;
+    b.innerHTML = window.FD_ICON(c.id,22) + `<span>${I18N.foodName(c.id)}</span><small>${I18N.getLang()==="en" ? c.cn : c.name}</small>`;
     b.addEventListener("click", ()=>{
       picked = c; pendingDays = c.days;
       g.querySelectorAll(".pick").forEach(x=>x.classList.remove("on"));
       b.classList.add("on");
-      $("#days").value = c.days; $("#daysLbl").textContent = c.days + " 天后";
+      $("#days").value = c.days; $("#daysLbl").innerHTML = t("sheet.keepFor",{n:c.days});
       pendingQty = 1; paintQty();
     });
     g.appendChild(b);
   });
-  $("#days").value = 3; $("#daysLbl").textContent = "3 天后"; pendingDays = 3;
+  $("#days").value = 3; $("#daysLbl").innerHTML = t("sheet.keepFor",{n:3}); pendingDays = 3;
   pendingQty = 1; paintQty();
-  shotURL = null; $("#shot").classList.remove("on"); $("#snapBtn").textContent = "打开相机";
+  shotURL = null; $("#shot").classList.remove("on"); $("#snapBtn").textContent = t("sheet.cam");
   if("BarcodeDetector" in window) $("#scanBtn").style.display = "none";
 }
+const unitWord = () => I18N.getLang()==="en" ? "portion" : "份";
 function paintQty(){
-  const unit = picked ? FD.unitOf(picked.id) : "份";
-  $("#qtyLbl").textContent = pendingQty + " " + unit;
+  const unit = picked ? I18N.unit(FD.unitOf(picked.id)) : unitWord();
+  $("#qtyLbl").textContent = t("sheet.qtyUnit",{n:pendingQty, unit});
 }
 $("#qMinus").addEventListener("click", ()=>{ pendingQty = Math.max(1, pendingQty - 1); paintQty(); });
 $("#qPlus").addEventListener("click", ()=>{ pendingQty = Math.min(99, pendingQty + 1); paintQty(); });
@@ -689,7 +698,7 @@ async function startCam(preferIdex){
     const devs = await navigator.mediaDevices.enumerateDevices();
     cams = devs.filter(d => d.kind === "videoinput");
     $("#flipBtn").style.display = cams.length > 1 ? "flex" : "none";
-    $("#flipBtn").textContent = "换镜头（" + (camPos % Math.max(1, cams.length) + 1) + "/" + cams.length + "）";
+    $("#flipBtn").textContent = t("sheet.flip") + " (" + (camPos % Math.max(1, cams.length) + 1) + "/" + cams.length + ")";
 
     // 支不支持数码变焦（Android Chrome 支持，iOS Safari 通常不支持）
     const caps = camTrack.getCapabilities ? camTrack.getCapabilities() : {};
@@ -702,11 +711,11 @@ async function startCam(preferIdex){
     } else {
       $("#zoomRow").classList.remove("on");
     }
-    $("#snapBtn").textContent = "拍摄";
-    $("#camMsg").textContent = "拍下来之后请选下面哪一种食物 —— 原型还不会自动认。";
+    $("#snapBtn").textContent = t("sheet.shoot");
+    $("#camMsg").textContent = t("sheet.camReady");
     if ("BarcodeDetector" in window) $("#scanBtn").style.display = "flex";
   }catch(e){
-    $("#camMsg").textContent = "相机打不开（需要 HTTPS + 授权）。可以直接在下面选食物。";
+    $("#camMsg").textContent = t("sheet.camFail");
   }
 }
 
@@ -726,8 +735,8 @@ function snap(){
   shotURL = c.toDataURL("image/jpeg", 0.85);
   const img = $("#shot"); img.src = shotURL; img.classList.add("on");
   stopCam();
-  $("#snapBtn").textContent = "重拍";
-  $("#camMsg").textContent = "拍到了。原型还不会替你认 —— 在下面选是哪一种（这是有意的限制，不是 bug）。";
+  $("#snapBtn").textContent = t("sheet.reshoot");
+  $("#camMsg").textContent = t("sheet.camDone");
 }
 
 /* 条码：只在支持的浏览器里给，不假装全都行 */
@@ -768,10 +777,10 @@ $("#zoom").addEventListener("input", async e=>{
   try{ await camTrack.applyConstraints({advanced:[{zoom:z}]}); }catch(err){}
 });
 $("#scanBtn").addEventListener("click", scanBarcode);
-$("#days").addEventListener("input", e=>{ pendingDays = +e.target.value; $("#daysLbl").textContent = pendingDays + " 天后"; });
+$("#days").addEventListener("input", e=>{ pendingDays = +e.target.value; $("#daysLbl").innerHTML = t("sheet.keepFor",{n:pendingDays}); });
 
 $("#saveBtn").addEventListener("click", ()=>{
-  if(!picked){ toast("先选一样食物"); return; }
+  if(!picked){ toast(t("sheet.pickFirst")); return; }
   const hh = FD.household();
   const dup = items.find(i => i.cat === picked.id && FD.daysLeftOf(i) === pendingDays
                               && (i.by || null) === (hh.members.length ? hh.members[0] : null));
@@ -785,7 +794,7 @@ $("#saveBtn").addEventListener("click", ()=>{
   }
   items = FD.mergeItems(items);
   FD.saveItems(items); renderItems(); closeSheet();
-  toast(`${picked.cn} ×${pendingQty} 已加入 · 放 ${pendingDays} 天`);
+  toast(t("toast.added", {name: I18N.foodName(picked.id), n: pendingQty, days: pendingDays}));
 });
 
 $("#decideBtn").addEventListener("click", ()=>{
@@ -799,7 +808,7 @@ $("#demoBtn").addEventListener("click", ()=>{
             daysLeft:days, life:days, addedAt:today()}; };
   items = [mk("pork",3,1), mk("chili",7,3), mk("egg",21,10), mk("greens",4,1), mk("rice",3,2), mk("tofu",4,1)];
   FD.saveItems(items); renderItems();
-  toast("示例：猪肉、青椒、鸡蛋、青菜、米饭、豆腐");
+  toast(t("toast.demo"));
 });
 
 $("#items").addEventListener("click", e=>{
@@ -827,9 +836,29 @@ setInterval(refreshClock, 60000);
 document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refreshClock(); });
 window.addEventListener("focus", refreshClock);
 
+/* ---------- language ---------- */
+function applyLang(){
+  I18N.apply();
+  $("#toast").textContent = "";      // 别让上一句中文留在 DOM 里
+  $("#langBtn").textContent = I18N.getLang() === "en" ? "EN" : "中";
+  const active = $$(".nav button").find(b => b.classList.contains("on"));
+  const view = active ? active.dataset.view : "fridge";
+  $("#pageTitle").textContent = t(TITLES[view]);
+  $("#qtyLbl") && paintQty();
+  renderItems();
+  if(view === "discover") renderDiscover();
+  if(view === "build") renderBuild();
+  if($("#result").innerHTML) renderResult(FD.decide(items, goal));
+  $("#daysLbl") && ($("#daysLbl").innerHTML = t("sheet.keepFor", {n: pendingDays}));
+}
+$("#langBtn").addEventListener("click", ()=>{
+  I18N.setLang(I18N.getLang() === "en" ? "zh" : "en");
+  applyLang();
+});
+
 /* ---------- boot ---------- */
-renderItems();
-if(!items.length) setTimeout(()=>toast("提示：第一页有「载入示例」"), 900);
+applyLang();
+if(!items.length) setTimeout(()=>toast(t("toast.tip")), 900);
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 </script>
 </body>

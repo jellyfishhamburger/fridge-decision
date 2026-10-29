@@ -106,9 +106,11 @@
 <script src="data.js?v=20261029-5"></script>
 <script src="icons.js?v=20261029-5"></script>
 <script src="logic.js?v=20261029-5"></script>
+<script src="i18n.js?v=20261029-6"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
+const L = (zh, en) => (window.I18N && I18N.getLang() === "en") ? en : zh;
 const DEMO = [
   {cat:"pork", daysLeft:3}, {cat:"chili", daysLeft:7}, {cat:"egg", daysLeft:21},
   {cat:"greens", daysLeft:2}, {cat:"rice", daysLeft:3}, {cat:"tofu", daysLeft:4}
@@ -169,11 +171,11 @@ function paint(){
   const top = ranked[0];
   if(urgent){
     const f = FD.byId[urgent.cat] || {};
-    $("#k").textContent = "use first";
+    $("#k").textContent = L("先吃这个", "use first");
     $("#n").innerHTML = window.FD_ICON(urgent.cat, 34);
-    $("#u").textContent = urgent.daysLeft <= 0 ? "today" : urgent.daysLeft + " 天";
+    $("#u").textContent = urgent.daysLeft <= 0 ? L("今天", "today") : urgent.daysLeft + L(" 天", " d");
     $("#u").style.color = urgent.daysLeft <= 5 ? "var(--red)" : "var(--green)";
-    $("#d").textContent = top ? "今晚 · " + top.recipe.name : "冰箱已清空";
+    $("#d").textContent = top ? L("今晚 · ", "tonight · ") + (window.I18N ? I18N.recipeName(top.recipe) : top.recipe.name) : L("冰箱已清空", "fridge is empty");
   } else {
     $("#k").textContent = "fridge"; $("#n").textContent = "—"; $("#u").textContent = "空";
     $("#d").textContent = "先去加点东西";

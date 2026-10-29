@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -18,12 +18,13 @@
   h1{font-size:21px;margin:0 0 4px;letter-spacing:-.02em}
   .sub{font-size:13px;color:var(--muted);line-height:1.55;margin:0 0 14px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}
-  .card h2{font-size:14px;margin:0 0 4px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .card h2{font-size:13px;margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
   .card .hint{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 12px}
   .seg{display:flex;flex-wrap:wrap;gap:8px}
   .seg button{border:1px solid var(--line);background:#fbfcfb;border-radius:10px;padding:9px 12px;
     font-size:13.5px;font-family:inherit;color:var(--ink);cursor:pointer}
   .seg button.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44;font-weight:600}
+  .seg svg{pointer-events:none}
   .list{display:flex;flex-direction:column;gap:8px}
   .row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fbfcfb}
   .row .n{width:20px;height:20px;border-radius:6px;background:var(--green-soft);color:#0b5c44;
@@ -34,10 +35,7 @@
   .row .mv button{width:30px;height:30px;border:1px solid var(--line);background:#fff;border-radius:8px;
     font-size:13px;cursor:pointer;color:var(--ink);font-family:inherit}
   .row .mv button[disabled]{opacity:.35;cursor:default}
-  .sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;font-size:14px}
-  .sw + .sw{border-top:1px solid var(--line)}
-  .sw input{width:20px;height:20px;accent-color:var(--green)}
-  .num{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;font-size:14px}
+  .num{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;font-size:14px;flex-wrap:wrap}
   .num + .num{border-top:1px solid var(--line)}
   .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0 4px}
   .stat div{background:#fbfcfb;border:1px solid var(--line);border-radius:12px;padding:12px 10px;text-align:center}
@@ -47,12 +45,14 @@
     padding:13px;font-size:14.5px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:10px}
   .btn.ghost{background:#fff;border:1px solid var(--green);color:var(--green)}
   .btn.quiet{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:500}
+  .btn svg{pointer-events:none}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{text-align:left;padding:7px 4px;border-bottom:1px solid var(--line)}
   th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
-  td.r{text-align:right;font-variant-numeric:tabular-nums}
+  td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
   .pill{font-size:10.5px;padding:2px 7px;border-radius:999px;background:var(--green-soft);color:#0b5c44}
   .pill.est{background:#fdf1e0;color:var(--amber)}
+  .pantryChips{display:flex;flex-wrap:wrap;gap:6px}
   .toast{position:fixed;left:50%;top:14px;transform:translateX(-50%) translateY(-16px);background:#16211c;color:#fff;
     font-size:13.5px;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;z-index:60;pointer-events:none}
   .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -62,118 +62,121 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Settings</h1>
-  <p class="sub">What the fridge panel shows, how often, and what it is aiming for. Everything here is stored on this device.</p>
+  <h1 data-i18n="set.title">设置</h1>
+  <p class="sub" data-i18n="set.sub"></p>
 
-  <!-- panel behaviour -->
   <section class="card">
-    <h2>Fridge panel</h2>
-    <p class="hint">Three-colour e-paper. Nothing scrolls; the panel moves between screens on its own or when the button is pressed.</p>
-    <div class="seg" id="rot">
-      <button data-ms="4000">Every 4 s</button>
-      <button data-ms="6000">Every 6 s</button>
-      <button data-ms="10000">Every 10 s</button>
-      <button data-ms="20000">Every 20 s</button>
-      <button data-ms="0">Button only</button>
+    <h2 data-i18n="set.langH">语言 / Language</h2>
+    <p class="hint" data-i18n="set.langHint"></p>
+    <div class="seg" id="langSeg">
+      <button data-lang="zh">中文</button>
+      <button data-lang="en">English</button>
     </div>
   </section>
 
-  <!-- which screens, in which order -->
   <section class="card">
-    <h2>Screens &amp; order</h2>
-    <p class="hint">Untick one and it stops appearing. Use the arrows to change the order — the panel starts with the top one.</p>
+    <h2 data-i18n="set.panelH"></h2>
+    <p class="hint" data-i18n="set.panelHint"></p>
+    <div class="seg" id="rot">
+      <button data-ms="4000" data-i18n="set.rot4"></button>
+      <button data-ms="6000" data-i18n="set.rot6"></button>
+      <button data-ms="10000" data-i18n="set.rot10"></button>
+      <button data-ms="20000" data-i18n="set.rot20"></button>
+      <button data-ms="0" data-i18n="set.rotManual"></button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="set.screensH"></h2>
+    <p class="hint" data-i18n="set.screensHint"></p>
     <div class="list" id="screens"></div>
   </section>
 
-  <!-- goals that drive the decision -->
   <section class="card">
-    <h2>What it aims for</h2>
-    <p class="hint">These two numbers are what make one dish rank above another.</p>
+    <h2 data-i18n="set.goalH"></h2>
+    <p class="hint" data-i18n="set.goalHint"></p>
     <div class="num">
-      <span>Greens servings per day</span>
+      <span data-i18n="set.greens"></span>
       <span class="seg" id="greens">
-        <button data-v="0">Off</button><button data-v="1">1</button><button data-v="2">2</button>
+        <button data-v="0" data-i18n="set.off"></button>
+        <button data-v="1">1</button><button data-v="2">2</button>
       </span>
     </div>
     <div class="num">
-      <span>Longest I'll cook on a weeknight</span>
+      <span data-i18n="set.mins"></span>
       <span class="seg" id="mins">
-        <button data-v="10">10 min</button><button data-v="15">15</button>
+        <button data-v="10">10</button><button data-v="15">15</button>
         <button data-v="20">20</button><button data-v="30">30</button>
       </span>
     </div>
   </section>
 
-  <!-- the three buttons -->
   <section class="card">
-    <h2>Panel buttons</h2>
-    <p class="hint">Three physical buttons, fixed in firmware:</p>
+    <h2 data-i18n="set.keysH"></h2>
+    <p class="hint" data-i18n="set.keysHint"></p>
     <div class="list">
-      <div class="row"><span class="n">›</span><div class="t">Next<small>next screen</small></div></div>
-      <div class="row"><span class="n">✓</span><div class="t">I'll cook this<small>logs a take — this is the number that matters</small></div></div>
-      <div class="row"><span class="n">✕</span><div class="t">Not this one<small>shows the next suggestion and logs a skip</small></div></div>
+      <div class="row"><span class="n">›</span><div class="t"><span data-i18n="set.keyNext"></span><small data-i18n="set.keyNextSub"></small></div></div>
+      <div class="row"><span class="n">✓</span><div class="t"><span data-i18n="set.keyTake"></span><small data-i18n="set.keyTakeSub"></small></div></div>
+      <div class="row"><span class="n">✕</span><div class="t"><span data-i18n="set.keySkip"></span><small data-i18n="set.keySkipSub"></small></div></div>
     </div>
     <div class="stat">
-      <div><b id="s-take">0</b><span>taken</span></div>
-      <div><b id="s-skip">0</b><span>skipped</span></div>
-      <div><b id="s-rate">—</b><span>accept rate</span></div>
+      <div><b id="s-take">0</b><span data-i18n="set.taken"></span></div>
+      <div><b id="s-skip">0</b><span data-i18n="set.skipped"></span></div>
+      <div><b id="s-rate">—</b><span data-i18n="set.rate"></span></div>
     </div>
-    <button class="btn quiet" id="clearLog">Clear the log</button>
+    <button class="btn quiet" id="clearLog" data-i18n="set.clearLog"></button>
   </section>
 
-  <!-- pantry -->
   <section class="card">
-    <h2>Cupboard basics</h2>
-    <p class="hint">Condiments are not fridge contents. The app only asks about the ones a recipe needs —
-      and a dish that is otherwise one ingredient short still counts as cookable.</p>
-    <div id="pantryChips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    <h2 data-i18n="set.pantryH"></h2>
+    <p class="hint" data-i18n="set.pantryHint"></p>
+    <div class="pantryChips" id="pantryChips"></div>
   </section>
 
-  <!-- household -->
   <section class="card">
-    <h2>Household</h2>
-    <p class="hint">One panel on the fridge, several phones. Every phone joins with the same code, so
-      anyone can log a shopping trip and everyone sees the same fridge.</p>
+    <h2 data-i18n="set.hhH"></h2>
+    <p class="hint" data-i18n="set.hhHint"></p>
     <div class="stat" style="grid-template-columns:1fr 1fr">
-      <div><b id="hhCode" style="font-size:20px;letter-spacing:.16em">—</b><span>household code</span></div>
-      <div><b id="hhPanel" style="font-size:20px">—</b><span>panel bound</span></div>
+      <div><b id="hhCode" style="font-size:20px;letter-spacing:.16em">—</b><span data-i18n="set.hhCode"></span></div>
+      <div><b id="hhPanel" style="font-size:20px">—</b><span data-i18n="set.hhPanel"></span></div>
     </div>
-    <button class="btn ghost" id="hhNew">Create a household code</button>
-    <button class="btn quiet" id="hhPanelBtn">Bind this device as the panel</button>
+    <button class="btn ghost" id="hhNew" data-i18n="set.hhNew"></button>
+    <button class="btn quiet" id="hhPanelBtn" data-i18n="set.hhBind"></button>
     <div id="hhMembers" class="hint" style="margin-top:10px"></div>
-    <p class="hint" style="margin-top:8px;color:#b26a00">
-      Honest limitation: the code and the member list live on this device only. Sharing a fridge
-      between two real phones needs a backend — that is the next build, not something this page fakes.
-    </p>
+    <p class="hint" style="margin-top:8px;color:#b26a00" data-i18n="set.hhLimit"></p>
   </section>
 
-  <!-- recipes -->
   <section class="card">
-    <h2>Recipe library</h2>
-    <p class="hint" id="rcHint"></p>
-    <table>
-      <thead><tr><th>Dish</th><th class="r">Time</th><th class="r">kcal</th><th class="r">Needs</th></tr></thead>
-      <tbody id="rcRows"></tbody>
-    </table>
-    <button class="btn ghost" id="showAllRecipes">Show all recipes</button>
-  </section>
-
-  <!-- the database -->
-  <section class="card">
-    <h2>The database</h2>
+    <h2 data-i18n="set.dbH"></h2>
     <p class="hint" id="dbHint"></p>
     <table>
-      <thead><tr><th>Food</th><th>Category</th><th class="r">Good for</th><th class="r">Source</th></tr></thead>
+      <thead><tr>
+        <th data-i18n="set.foodCol"></th><th data-i18n="set.catCol"></th>
+        <th class="r" data-i18n="set.daysCol"></th><th class="r" data-i18n="set.srcCol"></th>
+      </tr></thead>
       <tbody id="dbRows"></tbody>
     </table>
-    <button class="btn ghost" id="showAll">Show all foods</button>
+    <button class="btn ghost" id="showAll"></button>
   </section>
 
-  <a class="btn ghost" href="index.html" style="text-decoration:none">← Back to the app</a>
-  <a class="btn ghost" href="display.html" style="text-decoration:none">See the strip panel →</a>
-  <a class="btn ghost" href="disc.html" style="text-decoration:none">See the round puck →</a>
+  <section class="card">
+    <h2 data-i18n="set.rcH"></h2>
+    <p class="hint" id="rcHint"></p>
+    <table>
+      <thead><tr>
+        <th data-i18n="set.rcDish"></th><th class="r" data-i18n="set.rcTime"></th>
+        <th class="r" data-i18n="set.rcKcal"></th><th class="r" data-i18n="set.rcNeeds"></th>
+      </tr></thead>
+      <tbody id="rcRows"></tbody>
+    </table>
+    <button class="btn ghost" id="showAllRecipes"></button>
+  </section>
 
-  <div class="foot">Prototype v0.2 · data in <code>data.js</code> · same file drives the app and the panel</div>
+  <a class="btn ghost" href="index.html" style="text-decoration:none" data-i18n="set.back"></a>
+  <a class="btn ghost" href="disc.html" style="text-decoration:none" data-i18n="set.toPuck"></a>
+  <a class="btn ghost" href="display.html" style="text-decoration:none" data-i18n="set.toStrip"></a>
+
+  <div class="foot" data-i18n="set.foot"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -181,182 +184,156 @@
 <script src="data.js?v=20261029-5"></script>
 <script src="icons.js?v=20261029-5"></script>
 <script src="logic.js?v=20261029-5"></script>
+<script src="i18n.js?v=20261029-6"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const t = (k, v) => I18N.t(k, v);
 let S = FD.settings();
 
-function toast(m){
-  const t=$("#toast"); t.textContent=m; t.classList.add("on");
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("on"),1500);
-}
-function save(patch, msg){
-  S = FD.saveSettings(patch);
-  paint(); if(msg) toast(msg);
-}
-
 const SCREEN_META = [
-  {i:0, name:"Tonight's decision", sub:"one dish, the reason, the time"},
-  {i:1, name:"Use first",          sub:"the single most urgent item + days left"},
-  {i:2, name:"Fridge at a glance",  sub:"how many need using soon"}
+  {i:0, zh:"今晚的决定", en:"Tonight's decision", zhSub:"一道菜 + 理由 + 用时", enSub:"one dish, the reason, the time"},
+  {i:1, zh:"先吃这个", en:"Use first", zhSub:"最紧急那一样 + 剩余天数", enSub:"the most urgent item and its days left"},
+  {i:2, zh:"冰箱概览", en:"At a glance", zhSub:"几样要赶紧吃", enSub:"how many need using soon"}
 ];
 
+function foodName(id){ return I18N.foodName(id); }
+function toast(m){ const el=$("#toast"); el.textContent=m; el.classList.add("on");
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("on"),1500); }
+function save(patch, msg){ S = FD.saveSettings(patch); paint(); if(msg) toast(msg); }
+
 function paint(){
-  /* rotation */
+  $("#langSeg").querySelectorAll("button").forEach(b=>b.classList.toggle("on", b.dataset.lang === I18N.getLang()));
   document.querySelectorAll("#rot button").forEach(b=>{
     const ms = +b.dataset.ms;
     const on = ms === 0 ? (!S.auto || S.rotMs === 0) : (S.auto && S.rotMs === ms);
     b.classList.toggle("on", on);
   });
 
-  /* screens, in stored order */
-  const list = $("#screens"); list.innerHTML="";
-  (S.screens.length ? S.screens : []).forEach((idx, pos)=>{
+  const list = $("#screens"); list.innerHTML = "";
+  const en = I18N.getLang() === "en";
+  (S.screens || []).forEach((idx, pos)=>{
     const m = SCREEN_META.find(x=>x.i===idx);
     const row = document.createElement("div");
-    row.className="row";
+    row.className = "row";
     row.innerHTML = `<span class="n">${pos+1}</span>
-      <div class="t">${m.name}<small>${m.sub}</small></div>
+      <div class="t">${en ? m.en : m.zh}<small>${en ? m.enSub : m.zhSub}</small></div>
       <div class="mv">
-        <button data-up="${pos}" ${pos===0?"disabled":""} title="move up">▲</button>
-        <button data-down="${pos}" ${pos===S.screens.length-1?"disabled":""} title="move down">▼</button>
-        <button data-rm="${pos}" title="hide">✕</button>
+        <button data-up="${pos}" ${pos===0?"disabled":""}>▲</button>
+        <button data-down="${pos}" ${pos===S.screens.length-1?"disabled":""}>▼</button>
+        <button data-rm="${pos}">✕</button>
       </div>`;
     list.appendChild(row);
   });
-  const hidden = SCREEN_META.filter(m=>!S.screens.includes(m.i));
+  const hidden = SCREEN_META.filter(m=>!(S.screens||[]).includes(m.i));
   if(hidden.length){
     const row = document.createElement("div");
-    row.className="row"; row.style.borderStyle="dashed";
-    row.innerHTML = `<div class="t" style="color:#6b7a72">Hidden: ${hidden.map(h=>h.name).join(", ")}</div>
-      <div class="mv"><button id="restore">+</button></div>`;
+    row.className = "row"; row.style.borderStyle = "dashed";
+    row.innerHTML = `<div class="t" style="color:#6b7a72">${t("set.hidden")}${hidden.map(h=>en?h.en:h.zh).join(", ")}</div>
+      <div class="mv"><button id="restore">＋</button></div>`;
     list.appendChild(row);
   }
 
-  /* goals */
   document.querySelectorAll("#greens button").forEach(b=>b.classList.toggle("on", +b.dataset.v === S.greensPerDay));
   document.querySelectorAll("#mins button").forEach(b=>b.classList.toggle("on", +b.dataset.v === S.maxMinutes));
 
-  /* log */
   const st = FD.stats();
-  $("#s-take").textContent = st.taken;
-  $("#s-skip").textContent = st.skipped;
+  $("#s-take").textContent = st.taken; $("#s-skip").textContent = st.skipped;
   $("#s-rate").textContent = st.rate === null ? "—" : st.rate + "%";
 }
 
-/* ---------- database table ---------- */
-let showAllFoods = false;
+let showAllFoods = false, allRecipes = false;
+
 function paintDB(){
   const foods = FD.CATALOG;
   const usda = foods.filter(f=>f.src==="usda").length;
-  $("#dbHint").innerHTML = `${foods.length} foods · ${FD.RECIPES.length} recipes · ` +
-    `${usda} shelf lives from the FDA/USDA cold storage chart, ${foods.length-usda} still estimates.`;
-
-  const rows = (showAllFoods ? foods : foods.slice().sort((a,b)=>a.days-b.days).slice(0,8));
+  $("#dbHint").innerHTML = t("set.dbHint", {foods: foods.length, recipes: FD.RECIPES.length, usda: usda, est: foods.length - usda});
+  const rows = showAllFoods ? foods : foods.slice().sort((a,b)=>a.days-b.days).slice(0,8);
   $("#dbRows").innerHTML = rows.map(f=>`
-    <tr>
-      <td>${f.cn} <span style="color:#93a29a">${f.name}</span></td>
-      <td style="color:#6b7a72">${f.tag}</td>
-      <td class="r">${f.days} d</td>
-      <td class="r"><span class="pill ${f.src==="usda"?"":"est"}">${f.src==="usda"?"USDA":"est."}</span></td>
-    </tr>`).join("");
-  $("#showAll").textContent = showAllFoods ? "Show the shortest-lived only" : `Show all ${foods.length} foods`;
+    <tr><td>${foodName(f.id)}</td><td style="color:#6b7a72">${f.tag}</td>
+    <td class="r">${f.days} d</td>
+    <td class="r"><span class="pill ${f.src==="usda"?"":"est"}">${f.src==="usda"?"USDA":"est."}</span></td></tr>`).join("");
+  $("#showAll").textContent = showAllFoods ? t("set.showFew") : t("set.showAll", {n: foods.length});
 }
 
-/* ---------- events ---------- */
-document.querySelectorAll("#rot button").forEach(b=>{
-  b.addEventListener("click", ()=>{
-    const ms = +b.dataset.ms;
-    save(ms === 0 ? {auto:false, rotMs:0} : {auto:true, rotMs:ms}, ms===0?"Panel will only move on the button":"Saved");
-  });
-});
-$("#screens").addEventListener("click", e=>{
-  const t = e.target;
-  if(t.id === "restore"){
-    const next = SCREEN_META.map(m=>m.i).filter(i=>!S.screens.includes(i) || S.screens.includes(i));
-    save({screens:[0,1,2]}, "All screens back");
-    return;
-  }
-  if(t.dataset.up !== undefined || t.dataset.down !== undefined || t.dataset.rm !== undefined){
-    const arr = S.screens.slice();
-    if(t.dataset.rm !== undefined){
-      if(arr.length <= 1){ toast("Keep at least one screen"); return; }
-      arr.splice(+t.dataset.rm,1); save({screens:arr}, "Screen hidden");
-    } else {
-      const pos = +(t.dataset.up ?? t.dataset.down);
-      const swap = t.dataset.up !== undefined ? pos-1 : pos+1;
-      [arr[pos], arr[swap]] = [arr[swap], arr[pos]];
-      save({screens:arr}, "Order saved");
-    }
-  }
-});
-document.querySelectorAll("#greens button").forEach(b=>b.addEventListener("click", ()=>{
-  save({greensPerDay:+b.dataset.v}, "Goal saved");
-}));
-document.querySelectorAll("#mins button").forEach(b=>b.addEventListener("click", ()=>{
-  save({maxMinutes:+b.dataset.v}, "Goal saved");
-}));
-$("#clearLog").addEventListener("click", ()=>{
-  FD.write(FD.LS_LOG, []); paint(); toast("Log cleared");
-});
-$("#showAll").addEventListener("click", ()=>{ showAllFoods = !showAllFoods; paintDB(); });
+function paintRecipes(){
+  const rs = allRecipes ? FD.RECIPES : FD.RECIPES.slice(0, 8);
+  $("#rcHint").innerHTML = t("set.rcHint", {n: FD.RECIPES.length, src: "HowToCook", lic: FD.DB.recipeSource.license});
+  $("#rcRows").innerHTML = rs.map(r=>`
+    <tr><td>${I18N.recipeName(r)}</td><td class="r">${r.minutes}′</td>
+    <td class="r">${r.kcal ?? "—"}</td>
+    <td class="r" style="color:#6b7a72">${r.needs.map(foodName).join(" ")}</td></tr>`).join("");
+  $("#showAllRecipes").textContent = allRecipes ? t("set.rcFew") : t("set.rcAll", {n: FD.RECIPES.length});
+}
 
-/* ---------- pantry ---------- */
 function paintPantry(){
   const have = new Set(FD.pantry());
   $("#pantryChips").innerHTML = FD.PANTRY.map(p =>
-    `<span class="pill ${have.has(p.id)?"":"est"}" data-p="${p.id}"
-       style="cursor:pointer;font-size:12px;padding:5px 9px">${p.cn}</span>`).join("");
+    `<span class="pill ${have.has(p.id)?"":"est"}" data-p="${p.id}" style="cursor:pointer;font-size:12px;padding:5px 9px">${I18N.getLang()==="en"?p.name:p.cn}</span>`).join("");
 }
-$("#pantryChips").addEventListener("click", e=>{
-  const el = e.target.closest("[data-p]"); if(!el) return;
-  const have = new Set(FD.pantry());
-  const id = el.dataset.p;
-  have.has(id) ? have.delete(id) : have.add(id);
-  FD.savePantry([...have]); paintPantry();
-});
 
-/* ---------- household ---------- */
 function paintHousehold(){
   const h = FD.household();
   $("#hhCode").textContent = h.code || "—";
-  $("#hhPanel").textContent = h.panel ? "yes" : "no";
-  $("#hhMembers").textContent = h.members.length
-    ? "Joined phones: " + h.members.join(", ")
-    : "No phone has joined yet.";
+  $("#hhPanel").textContent = h.panel ? (I18N.getLang()==="en"?"yes":"是") : (I18N.getLang()==="en"?"no":"否");
+  $("#hhMembers").textContent = h.members.length ? t("set.hhJoined") + h.members.join(", ") : t("set.hhNone");
 }
+
+function paintAll(){ I18N.apply(); paint(); paintDB(); paintRecipes(); paintPantry(); paintHousehold(); }
+
+/* ---------- events ---------- */
+$("#langSeg").addEventListener("click", e=>{
+  const b = e.target.closest("[data-lang]"); if(!b) return;
+  I18N.setLang(b.dataset.lang); paintAll(); toast(b.dataset.lang === "en" ? "English" : "中文");
+});
+document.querySelectorAll("#rot button").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    const ms = +b.dataset.ms;
+    save(ms === 0 ? {auto:false, rotMs:0} : {auto:true, rotMs:ms},
+         ms === 0 ? (I18N.getLang()==="en"?"Panel moves only on the button":"只按键翻页") : (I18N.getLang()==="en"?"Saved":"已保存"));
+  });
+});
+$("#screens").addEventListener("click", e=>{
+  const el = e.target;
+  if(el.id === "restore"){ save({screens:[0,1,2]}, I18N.getLang()==="en"?"All screens back":"全部恢复"); return; }
+  if(el.dataset.up !== undefined || el.dataset.down !== undefined || el.dataset.rm !== undefined){
+    const arr = (S.screens || []).slice();
+    if(el.dataset.rm !== undefined){
+      if(arr.length <= 1){ toast(I18N.getLang()==="en"?"Keep at least one screen":"至少留一屏"); return; }
+      arr.splice(+el.dataset.rm, 1); save({screens:arr}, I18N.getLang()==="en"?"Screen hidden":"已隐藏");
+    } else {
+      const pos = +(el.dataset.up ?? el.dataset.down);
+      const swap = el.dataset.up !== undefined ? pos-1 : pos+1;
+      [arr[pos], arr[swap]] = [arr[swap], arr[pos]];
+      save({screens:arr}, I18N.getLang()==="en"?"Order saved":"顺序已保存");
+    }
+  }
+});
+document.querySelectorAll("#greens button").forEach(b=>b.addEventListener("click", ()=> save({greensPerDay:+b.dataset.v})));
+document.querySelectorAll("#mins button").forEach(b=>b.addEventListener("click", ()=> save({maxMinutes:+b.dataset.v})));
+$("#clearLog").addEventListener("click", ()=>{ FD.write(FD.LS_LOG, []); paint(); toast(I18N.getLang()==="en"?"Log cleared":"已清空"); });
+$("#showAll").addEventListener("click", ()=>{ showAllFoods = !showAllFoods; paintDB(); });
+$("#showAllRecipes").addEventListener("click", ()=>{ allRecipes = !allRecipes; paintRecipes(); });
+$("#pantryChips").addEventListener("click", e=>{
+  const el = e.target.closest("[data-p]"); if(!el) return;
+  const have = new Set(FD.pantry()); const id = el.dataset.p;
+  have.has(id) ? have.delete(id) : have.add(id);
+  FD.savePantry([...have]); paintPantry();
+});
 $("#hhNew").addEventListener("click", ()=>{
   const h = FD.household();
   const code = h.code || FD.newCode();
   FD.saveHousehold({code, members: h.members.length ? h.members : ["this phone"]});
-  paintHousehold(); toast("Household code: " + code);
+  paintHousehold(); toast((I18N.getLang()==="en"?"Household code: ":"家庭码：") + code);
 });
 $("#hhPanelBtn").addEventListener("click", ()=>{
   const h = FD.household();
-  if(!h.code){ toast("Create a code first"); return; }
-  FD.saveHousehold({panel: !h.panel});
-  paintHousehold(); toast(FD.household().panel ? "This device is the panel" : "Panel unbound");
+  if(!h.code){ toast(I18N.getLang()==="en"?"Create a code first":"先创建家庭码"); return; }
+  FD.saveHousehold({panel: !h.panel}); paintHousehold();
 });
 
-/* ---------- recipes ---------- */
-let allRecipes = false;
-function paintRecipes(){
-  const rs = allRecipes ? FD.RECIPES : FD.RECIPES.slice(0, 8);
-  $("#rcHint").innerHTML = `${FD.RECIPES.length} real recipes from
-    <a href="${FD.DB.recipeSource.url}" target="_blank" rel="noopener" style="color:#0f7a5a">HowToCook</a>
-    (${FD.DB.recipeSource.license}), each carrying its own calorie estimate.`;
-  $("#rcRows").innerHTML = rs.map(r=>`
-    <tr>
-      <td>${r.name}</td>
-      <td class="r">${r.minutes}′</td>
-      <td class="r">${r.kcal ?? "—"}</td>
-      <td class="r" style="color:#6b7a72">${r.needs.map(n=>FD.byId[n]?FD.byId[n].cn:n).join(" ")}</td>
-    </tr>`).join("");
-  $("#showAllRecipes").textContent = allRecipes ? "Show the first 8" : `Show all ${FD.RECIPES.length} recipes`;
-}
-$("#showAllRecipes").addEventListener("click", ()=>{ allRecipes = !allRecipes; paintRecipes(); });
-
-paint(); paintDB(); paintPantry(); paintHousehold(); paintRecipes();
+paintAll();
 </script>
 </body>
 </html>
