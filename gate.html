@@ -44,6 +44,9 @@
   .pick{background:#16211c;border:1px solid #26332d;border-radius:11px;color:#dfe9e3;
     padding:9px 4px;font-size:12px;font-family:inherit;cursor:pointer;text-align:center;line-height:1.25;
     display:flex;flex-direction:column;align-items:center;gap:3px}
+  /* iOS Safari: 点落在按钮内的 SVG 上时不会冒泡成 click —— 让图标不接收指针事件 */
+  button svg, button svg *, .pick svg, .pick svg *{pointer-events:none}
+  .pick, .btn{touch-action:manipulation}
   .pick svg{width:20px;height:20px;color:#7fd3b4}
   .pick:active{background:#1d8f68}
   .log{font-size:12.5px;color:#9fb3a9;line-height:1.7;max-height:180px;overflow:auto}
@@ -355,9 +358,10 @@ function buildPicks(){
   const box = $("#picks"); box.innerHTML = "";
   FD.CATALOG.forEach(c=>{
     const b = document.createElement("button");
-    b.className = "pick"; b.type = "button";
+    b.className = "pick"; b.type = "button"; b.dataset.cat = c.id;
     b.innerHTML = window.FD_ICON(c.id, 20) + `<span>${c.cn}</span>`;
-    b.addEventListener("click", ()=>commit(c));
+    b.addEventListener("click", ()=>commit(c));   // 桌面/安卓
+
     box.appendChild(b);
   });
 }
@@ -371,6 +375,21 @@ function commit(c){
   resume();
 }
 $("#ignore").addEventListener("click", ()=>{ addLog("已忽略这次抓拍"); resume(); });
+
+/* 双保险：委托到容器上，避免个别 iOS 版本吞掉按钮自身的 click */
+$("#picks").addEventListener("click", e=>{
+  const btn = e.target.closest(".pick");
+  if(!btn || !btn.dataset.cat) return;
+  const c = FD.CATALOG.find(x => x.id === btn.dataset.cat);
+  if(c) commit(c);
+});
+$("#picks").addEventListener("touchend", e=>{
+  const btn = e.target.closest(".pick");
+  if(!btn || !btn.dataset.cat) return;
+  e.preventDefault();
+  const c = FD.CATALOG.find(x => x.id === btn.dataset.cat);
+  if(c) commit(c);
+}, {passive:false});
 
 function addLog(html){
   const el = $("#log");
