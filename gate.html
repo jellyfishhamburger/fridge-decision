@@ -163,7 +163,7 @@
 <script src="icons.js?v=20261029-5"></script>
 <script src="sync.js"></script>
 <script src="logic.js?v=20261029-5"></script>
-<script src="classifier.js?v=20261029-14"></script>
+<script src="classifier.js?v=20261029-16"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -503,47 +503,46 @@ async function process(shots){
 }
 
 /* ---------------- 待确认列表 ---------------- */
-const pending = [];
-const PENDING_MAX = 5;
+/* 待确认不再是本页的数组，而是 FD 里的共享数据（手机那边也读同一个） */
+const PENDING_MAX = 8;
 
 function pushPending(v, canvas, nameOf){
-  const item = {
+  FD.addPending({
     id: Math.random().toString(36).slice(2, 8),
     thumb: canvas.toDataURL("image/jpeg", 0.7),
-    v
-  };
-  pending.push(item);
-  while(pending.length > PENDING_MAX){
-    const drop = pending.shift();
-    addLog("待确认满了，丢掉最早的一条（" + nameOf(drop.v.label) + "）");
-  }
+    label: v.label, conf: v.conf, second: v.second, conf2: v.conf2,
+    unknown: !!v.unknown, reason: v.reason,
+    ts: Date.now(), from: "gate"
+  });
   renderPending();
 }
 
 function renderPending(){
   const wrap = $("#pendingWrap"), list = $("#pendingList");
   if(!wrap || !list) return;
-  if(!pending.length){ wrap.style.display = "none"; list.innerHTML = ""; return; }
+  const all = FD.pending();
+  if(!all.length){ wrap.style.display = "none"; list.innerHTML = ""; return; }
   wrap.style.display = "block";
-  $("#pendingCount").textContent = pending.length;
+  $("#pendingCount").textContent = all.length;
   const nameOf = id => {
     if(id === "unknown") return "不认识";
     const c = FD.CATALOG.find(x => x.id === id);
     return c ? c.cn : id;
   };
-  list.innerHTML = pending.map(p => {
-    const top = p.v.label === "unknown" ? (p.v.second || "unknown") : p.v.label;
-    const pair = isConfusable(p.v.label, p.v.second) && p.v.conf2 > 0.12;
+  list.innerHTML = FD.pending().map(p => {
+    const L = p.label, C = p.conf || 0, S = p.second, C2 = p.conf2 || 0;
+    const top = L === "unknown" ? (S || "unknown") : L;
+    const pair = isConfusable(L, S) && C2 > 0.12;
     const cand = pair
-      ? `分不清是 <b>${nameOf(p.v.label)}</b> 还是 <b>${nameOf(p.v.second)}</b>`
-      : (p.v.label === "unknown"
+      ? `分不清是 <b>${nameOf(L)}</b> 还是 <b>${nameOf(S)}</b>`
+      : (L === "unknown"
           ? `猜不出 · 也许是 <b>${nameOf(top)}</b>`
-          : `<b>${nameOf(p.v.label)}</b> ${Math.round(p.v.conf*100)}%`);
+          : `<b>${nameOf(L)}</b> ${Math.round(C*100)}%`);
     const cTop = FD.CATALOG.find(x => x.id === top);
-    const cSec = pair ? FD.CATALOG.find(x => x.id === p.v.second) : null;
+    const cSec = pair ? FD.CATALOG.find(x => x.id === S) : null;
     return `<div class="prow" data-id="${p.id}">
       <img src="${p.thumb}" alt="">
-      <div class="info">${cand}<br><span style="color:#7d8f86">${p.v.reason || ""}</span></div>
+      <div class="info">${cand}<br><span style="color:#7d8f86">${p.reason || ""}</span></div>
       <div class="acts">
         ${cSec ? `<button data-cat="${cSec.id}">${cSec.cn}</button>` : ""}
         ${cTop ? `<button data-cat="${cTop.id}">${cSec ? cTop.cn : "就是它"}</button>` : ""}
@@ -554,10 +553,7 @@ function renderPending(){
   }).join("");
 }
 
-function takePending(id){
-  const i = pending.findIndex(p => p.id === id);
-  return i < 0 ? null : pending.splice(i, 1)[0];
-}
+function takePending(id){ return FD.takePending(id); }
 
 function resolvePending(row, cat){
   const id = row.dataset.id;
@@ -739,7 +735,7 @@ $("#useHand").addEventListener("change", e=>{
 });
 
 buildPicks();
-addLog("构建版本 20261029-15 已加载（如果这行看不到新版号，说明浏览器还在用缓存）");
+addLog("构建版本 20261029-16 已加载（如果这行看不到新版号，说明浏览器还在用缓存）");
 </script>
 </body>
 </html>

@@ -19,6 +19,7 @@
   const LS_LOG       = "fd.log.v1";
   const LS_PANTRY    = "fd.pantry.v1";
   const LS_HOUSEHOLD = "fd.household.v1";
+  const LS_PENDING   = "fd.pending.v1";   /* 门口认出但不确定的，手机和屏幕共用这一份 */
   const LS_DIRTY      = "fd.dirty.v1";     /* ids written here, not yet confirmed by the server */
   const LS_TOMB       = "fd.tomb.v1";      /* ids deleted here, not yet confirmed by the server */
 
@@ -56,6 +57,18 @@
     write(LS_HOUSEHOLD, n);
     return n;
   }
+
+  /* ---------- pending: 认得拿不准的，放在数据里而不是某个页面里 ----------
+     这样门口那块屏和手机看的是同一份：设备负责提议，手机负责裁决。 */
+  const pending      = () => { const v = read(LS_PENDING, null); return Array.isArray(v) ? v : []; };
+  const savePending  = list => { write(LS_PENDING, (list || []).slice(-8)); return pending(); };
+  const addPending   = it => { const l = pending(); l.push(it); return savePending(l); };
+  const removePending = id => savePending(pending().filter(p => p.id !== id));
+  const takePending  = id => {
+    const l = pending(); const it = l.find(p => p.id === id) || null;
+    if (it) savePending(l.filter(p => p.id !== id));
+    return it;
+  };
 
   /* ---------- dates ---------- */
   function localDate(d) {
@@ -357,6 +370,7 @@
     settings, saveSettings, DEFAULT_SETTINGS,
     pantry, savePantry,
     household, saveHousehold, newCode, sync, cloudOn,
+    LS_PENDING, pending, savePending, addPending, removePending, takePending,
     localDate, daysLeftOf,
     evaluate, decide, urgent, shoppingHint,
     log, stats

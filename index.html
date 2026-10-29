@@ -47,6 +47,16 @@
   .chip .d{font-size:13.5px;color:var(--muted);font-variant-numeric:tabular-nums;font-weight:500;margin-left:auto}
   .chip.warn .d{color:var(--amber)} .chip.urgent .d{color:var(--red);font-weight:600}
   .chip button{border:0;background:none;padding:0 0 0 2px;margin:0;color:#b7c1bb;font-size:18px;line-height:1;cursor:pointer}
+  .chip{touch-action:manipulation}
+  .prow2{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .prow2:last-child{border-bottom:0}
+  .prow2 img{width:54px;height:54px;border-radius:10px;object-fit:cover;background:#eef2ef;flex:0 0 auto}
+  .prow2 .t{flex:1;min-width:0;font-size:13.5px;line-height:1.45}
+  .prow2 .t b{font-weight:700}
+  .prow2 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .prow2 button{font:inherit;font-size:12.5px;font-weight:600;border:0;border-radius:9px;padding:7px 11px;
+    background:var(--green);color:#fff;cursor:pointer}
+  .prow2 button.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
   .empty{font-size:13px;color:var(--muted);padding:6px 0}
   .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:14px;
     padding:15px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}
@@ -215,6 +225,12 @@
       <button id="undoBtn" data-i18n="undo.btn">撤销</button>
     </div>
     <div class="card">
+      <div id="pendCard" style="display:none">
+        <h2><span data-i18n="pend.title">待确认</span> <span class="count" id="pendCnt">0</span></h2>
+        <p class="hint" data-i18n="pend.hint">门口拍到但拿不准的。点一下确认，或换一个。</p>
+        <div id="pendList"></div>
+      </div>
+
       <h2><span data-i18n="fridge.stock">存货</span> <span class="count" id="cnt">0</span></h2>
       <div class="items" id="items"></div>
       <p class="empty" id="emptyNote" data-i18n="fridge.empty">还没记录任何东西 —— 用下面的按钮加一样。</p>
@@ -308,7 +324,7 @@
 
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet">
-  <h3 data-i18n="sheet.title">加入一样东西</h3>
+  <h3 id="sheetTitle" data-i18n="sheet.title">加入一样东西</h3>
   <p class="hint" data-i18n="sheet.hint"></p>
   <video class="cam" id="cam" playsinline muted autoplay></video>
   <img class="shotpreview" id="shot" alt="刚拍的照片">
@@ -406,6 +422,74 @@ $$(".nav button").forEach(b => b.addEventListener("click", () => show(b.dataset.
 function expiryClass(d){ return d <= 2 ? "urgent" : d <= 5 ? "warn" : ""; }
 function expiryText(d){ return d <= 0 ? t("fridge.today") : (d === 1 ? t("fridge.oneDay") : t("fridge.left", {n: d})); }
 
+/* ---------------- 待确认（数据在 FD 里，手机和门口屏幕共用）---------------- */
+function renderPending(){
+  const card = $("#pendCard"), box = $("#pendList");
+  if(!card) return;
+  const all = FD.pending();
+  if(!all.length){ card.style.display = "none"; box.innerHTML = ""; return; }
+  card.style.display = "block";
+  $("#pendCnt").textContent = all.length;
+  const nameOf = id => id === "unknown" ? t("pend.unknown") : I18N.foodName(id);
+  const pairOf = (a, b) => (a === "egg" && b === "milk") || (a === "milk" && b === "egg");
+  box.innerHTML = all.map(p => {
+    const L = p.label || "unknown", C = p.conf || 0, S = p.second, C2 = p.conf2 || 0;
+    const pair = pairOf(L, S) && C2 > 0.12;
+    const top = L === "unknown" ? (S && S !== "unknown" ? S : null) : L;
+    const line = pair
+      ? t("pend.pair", {a: nameOf(L), b: nameOf(S)})
+      : (L === "unknown"
+          ? (top ? t("pend.guess", {a: nameOf(top)}) : t("pend.none"))
+          : `<b>${nameOf(L)}</b> ${Math.round(C*100)}%`);
+    const sec = pair ? `<button data-cat="${S}" data-id="${p.id}">${nameOf(S)}</button>` : "";
+    const pri = top ? `<button data-cat="${top}" data-id="${p.id}">${pair || L === "unknown" ? nameOf(top) : t("pend.yes")}</button>` : "";
+    return `<div class="prow2" data-id="${p.id}">
+      <img src="${p.thumb || ""}" alt="">
+      <div class="t">${line}</div>
+      <div class="acts">
+        ${sec}${pri}
+        <button class="ghost" data-other="1" data-id="${p.id}">${t("pend.other")}</button>
+        <button class="ghost" data-drop="1" data-id="${p.id}">${t("pend.drop")}</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+$("#pendList") && $("#pendList").addEventListener("pointerdown", e => {
+  const btn = e.target.closest("button"); if(!btn) return;
+  e.preventDefault();
+  const id = btn.dataset.id;
+  if(btn.dataset.drop){ FD.removePending(id); renderPending(); toast(t("pend.dropped")); return; }
+  if(btn.dataset.other){
+    const it = FD.takePending(id);
+    renderPending();
+    openSheet(null, it);            // 打开网格，指定"这条待确认"
+    return;
+  }
+  const cat = btn.dataset.cat;
+  const p = FD.takePending(id);
+  renderPending();
+  if(!p || !cat) return;
+  addFromCat(cat, 1, null, t("pend.added", {name: I18N.foodName(cat)}));
+});
+
+/* 统一的一处"加进冰箱"，确认/编辑/新增都走它 */
+function addFromCat(catId, qty, days, msg){
+  const c = FD.CATALOG.find(x => x.id === catId); if(!c) return null;
+  const hh = FD.household();
+  const d = days == null ? c.days : days;
+  const dup = items.find(i => i.cat === catId && FD.daysLeftOf(i) === d
+                              && (i.by || null) === (hh.members.length ? hh.members[0] : null));
+  if(dup) dup.qty = (dup.qty == null ? 1 : dup.qty) + qty;
+  else items.push({id:uid(), cat:c.id, name:c.name, tag:c.tag, qty,
+                   unit:FD.unitOf(c.id), daysLeft:d, life:d, addedAt:today(),
+                   by: hh.members.length ? hh.members[0] : null});
+  items = FD.mergeItems(items);
+  FD.saveItems(items); renderItems();
+  if(msg) toast(msg);
+  return c;
+}
+
 function renderItems(){
   const box = $("#items"); box.innerHTML = "";
   items.slice().sort((a,b)=>FD.daysLeftOf(a)-FD.daysLeftOf(b)).forEach(it=>{
@@ -417,6 +501,11 @@ function renderItems(){
       ${q > 1 ? `<span class="q">×${q}</span>` : ""}
       <span class="d">${expiryText(d)}</span>
       <button aria-label="remove" data-del="${it.id}">×</button>`;
+    el.addEventListener("pointerdown", ev => {
+      if(ev.target.closest("button")) return;         // × 是删除，别跟编辑打架
+      ev.preventDefault();
+      openSheet(it, null);                            // 点行 = 编辑这一条
+    });
     box.appendChild(el);
   });
   $("#cnt").textContent = t("fridge.count", {n: items.length});
@@ -649,7 +738,16 @@ $("#undoBtn").addEventListener("click", ()=>{
 });
 
 /* ---------- add sheet ---------- */
-function openSheet(){
+let editTarget = null, sheetFor = null;   // editTarget=正在编辑的条目；sheetFor=要补的待确认
+
+function openSheet(item, pendItem){
+  editTarget = item || null;
+  sheetFor = pendItem || null;
+  openSheetLegacy();                       /* 建网格 + 回填状态 */
+  if($("#sheetTitle")) $("#sheetTitle").textContent = item ? t("sheet.editTitle") : t("sheet.title");
+  if($("#saveBtn")) $("#saveBtn").textContent = item ? t("sheet.saveEdit") : t("sheet.save");
+}
+function openSheetLegacy(){
   $("#scrim").classList.add("on"); $("#sheet").classList.add("on");
   picked = null;
   const g = $("#picks"); g.innerHTML = "";
@@ -668,6 +766,22 @@ function openSheet(){
   });
   $("#days").value = 3; $("#daysLbl").innerHTML = t("sheet.keepFor",{n:3}); pendingDays = 3;
   pendingQty = 1; paintQty();
+
+  /* 编辑既有条目 / 指定某条待确认：把已有状态填回面板 */
+  if(editTarget){
+    const c = FD.CATALOG.find(x => x.id === editTarget.cat);
+    if(c){ picked = c; pendingDays = Math.max(1, FD.daysLeftOf(editTarget));
+      pendingQty = editTarget.qty == null ? 1 : editTarget.qty;
+      const b = [...g.querySelectorAll(".pick")].find(x => x.textContent.includes(I18N.foodName(c.id)));
+      if(b) b.classList.add("on");
+      $("#days").value = pendingDays; $("#daysLbl").innerHTML = t("sheet.keepFor",{n:pendingDays});
+      paintQty();
+    }
+  } else if(sheetFor && sheetFor.label && sheetFor.label !== "unknown"){
+    const c = FD.CATALOG.find(x => x.id === sheetFor.label);
+    if(c){ picked = c; pendingDays = c.days; $("#pickHint") && ($("#pickHint").textContent = t("sheet.forPending"));
+      $("#days").value = c.days; $("#daysLbl").innerHTML = t("sheet.keepFor",{n:c.days}); paintQty(); }
+  }
   shotURL = null; $("#shot").classList.remove("on"); $("#snapBtn").textContent = t("sheet.cam");
   if("BarcodeDetector" in window) $("#scanBtn").style.display = "none";
 }
@@ -681,6 +795,7 @@ $("#qPlus").addEventListener("click", ()=>{ pendingQty = Math.min(99, pendingQty
 
 function closeSheet(){
   $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); stopCam();
+  editTarget = null; sheetFor = null;
 }
 let cams = [], camPos = 0, camTrack = null, shotURL = null;
 
@@ -799,6 +914,22 @@ $("#saveBtn").addEventListener("click", ()=>{
                 daysLeft:pendingDays, life:pendingDays, addedAt:today(),
                 by: hh.members.length ? hh.members[0] : null});
   }
+  if(editTarget){
+    const i = items.findIndex(x => x.id === editTarget.id);
+    if(i >= 0){
+      items[i] = Object.assign({}, items[i], {
+        cat: picked.id, name: picked.name, tag: picked.tag,
+        qty: pendingQty, unit: FD.unitOf(picked.id),
+        daysLeft: pendingDays, life: pendingDays,
+        addedAt: today()                       // 从今天重新算保质期
+      });
+    }
+    items = FD.mergeItems(items);
+    FD.saveItems(items); renderItems(); closeSheet();
+    editTarget = null;
+    toast(t("toast.edited", {name: I18N.foodName(picked.id)}));
+    return;
+  }
   items = FD.mergeItems(items);
   FD.saveItems(items); renderItems(); closeSheet();
   toast(t("toast.added", {name: I18N.foodName(picked.id), n: pendingQty, days: pendingDays}));
@@ -868,7 +999,8 @@ applyLang();
 // 有后端就跟着云端走：别的手机加的东西 5 秒内出现在这里
 if (FD.cloudOn()) {
   items = FD.items();
-  FD.sync.start(() => { items = FD.items(); renderItems();
+  renderPending();
+  FD.sync.start(() => { items = FD.items(); renderItems(); renderPending();
     if ($("#result").innerHTML) renderResult(FD.decide(items, goal)); });
 }
 // 从设置页底部导航跳回来时，直接落到对应标签

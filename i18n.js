@@ -52,6 +52,14 @@
 
       "days.today": "今天", "days.n": "{n} 天",
 
+      "pend.title": "待确认", "pend.hint": "门口拍到但拿不准的。点一下确认，或换一个。",
+      "pend.yes": "就是它", "pend.other": "换一个", "pend.drop": "忽略",
+      "pend.unknown": "不认识", "pend.none": "猜不出这是什么",
+      "pend.pair": "分不清是 <b>{a}</b> 还是 <b>{b}</b>",
+      "pend.guess": "猜不出 · 也许是 <b>{a}</b>",
+      "pend.dropped": "已忽略这一条", "pend.added": "已确认 {name}",
+      "sheet.editTitle": "修改这一条", "sheet.saveEdit": "保存修改",
+      "sheet.forPending": "这是哪一样？选好后会加进冰箱", "toast.edited": "已改成 {name}",
       "sheet.title": "加入一样东西",
       "sheet.hint": "选食物 —— 原型还不会替你认。保质期按食物预设，可以自己改。",
       "sheet.cam": "打开相机", "sheet.flip": "换镜头", "sheet.shoot": "拍摄", "sheet.reshoot": "重拍",
@@ -155,6 +163,14 @@
 
       "days.today": "today", "days.n": "{n} d",
 
+      "pend.title": "To confirm", "pend.hint": "Caught at the door but unsure. Tap to confirm, or pick another.",
+      "pend.yes": "That one", "pend.other": "Change", "pend.drop": "Ignore",
+      "pend.unknown": "Unknown", "pend.none": "No idea what this is",
+      "pend.pair": "Cannot tell <b>{a}</b> from <b>{b}</b>",
+      "pend.guess": "Not sure · maybe <b>{a}</b>",
+      "pend.dropped": "Ignored", "pend.added": "Confirmed {name}",
+      "sheet.editTitle": "Edit this item", "sheet.saveEdit": "Save changes",
+      "sheet.forPending": "Which one is it? It will be added to the fridge", "toast.edited": "Changed to {name}",
       "sheet.title": "Add something you just bought",
       "sheet.hint": "Pick the food — the prototype does not recognise it yet. Shelf life is preset per food; adjust if you like.",
       "sheet.cam": "Open camera", "sheet.flip": "Switch lens", "sheet.shoot": "Shoot", "sheet.reshoot": "Retake",
