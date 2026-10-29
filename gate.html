@@ -82,6 +82,7 @@
       <span class="pill" id="count">0 次</span>
       <span class="pill" id="delta">Δ 0</span>
       <span class="pill" id="fps">—</span>
+      <span class="pill" id="score">命中 0 · 误判 0 · 不认识 0</span>
     </div>
     <div class="gatehint">虚线框 = 门口。手进入框里停 0.2 秒才抓拍。</div>
   </div>
@@ -309,6 +310,26 @@ function loop(){
   }
 }
 
+/* ---------------- 实测记分板 ----------------
+   每次确认记一笔：模型说的 vs 人选的。就是为了测完能报数字，不靠回忆。 */
+const score = { hit: 0, miss: 0, unknown: 0, skipped: 0 };
+let lastGuess = null;          // {label, unknown, ok}
+
+function paintScore(){
+  const el = $("#score");
+  if(!el) return;
+  el.textContent = `命中 ${score.hit} · 误判 ${score.miss} · 不认识 ${score.unknown}` +
+    (score.skipped ? ` · 忽略 ${score.skipped}` : "");
+}
+
+function recordGuess(chosenCat){
+  if(!lastGuess) return;
+  if(lastGuess.unknown){ score.unknown++; addLog(`记分：模型说<b>不认识</b>，你选了 <b>${chosenCat}</b>（未知类 ${score.unknown}）`); }
+  else if(lastGuess.label === chosenCat){ score.hit++; addLog(`记分：模型说 <b>${lastGuess.label}</b> → 命中（${score.hit}）`); }
+  else { score.miss++; addLog(`记分：模型说 <b>${lastGuess.label}</b>，你选了 <b>${chosenCat}</b> → 误判（${score.miss}）`); }
+  paintScore();
+}
+
 /* ---------------- 抓拍 ---------------- */
 function trigger(reason){
   if(state === "conf") return;
@@ -317,6 +338,7 @@ function trigger(reason){
   octx.strokeStyle = "rgba(255,90,70,.95)"; octx.setLineDash([]);
   octx.lineWidth = 4; octx.strokeRect(gate.x*ov.width, gate.y*ov.height, gate.w*ov.width, gate.h*ov.height);
   addLog("触发：" + reason);
+  lastGuess = null;
   const gb = $("#guess"); if(gb){ gb.className = "guess off"; gb.textContent = "正在抓拍…"; }
   document.querySelectorAll(".pick.sugg").forEach(el => el.classList.remove("sugg"));
 
@@ -383,6 +405,7 @@ async function guess(shots, crop){
     };
     document.querySelectorAll(".pick.sugg").forEach(el => el.classList.remove("sugg"));
 
+    lastGuess = {label: v.label, unknown: !!v.unknown, ok: !!v.ok, conf: v.conf};
     if(v.unknown && v.votes >= Math.ceil(v.total / 2)){
       box.className = "guess off";
       box.innerHTML = `不是模型认识的那 8 样（置信度 ${Math.round(v.conf*100)}%）。` +
@@ -453,6 +476,7 @@ function commit(c){
     }
     FD.saveItems(FD.mergeItems(list));
     addLog(`<b>${c.cn}</b><span class="badge">已入库</span>　来源：门口闸机`);
+    recordGuess(c.id);
     resume();
   }catch(err){
     addLog('<span style="color:#ff8a7a">写入失败：' + (err && err.message ? err.message : err) + '</span>');
@@ -477,7 +501,10 @@ function showDebug(msg){
 }
 window.__tapDebug = showDebug;
 
-$("#ignore").addEventListener("click", ()=>{ addLog("已忽略这次抓拍"); resume(); });
+$("#ignore").addEventListener("click", ()=>{
+  if(lastGuess){ score.skipped++; paintScore(); }
+  addLog("已忽略这次抓拍"); resume();
+});
 
 function addLog(html){
   const el = $("#log");
@@ -486,6 +513,7 @@ function addLog(html){
   el.insertAdjacentHTML("afterbegin", `<div>${t}　${html}</div>`);
 }
 
+paintScore();
 $("#start").addEventListener("click", start);
 $("#stop").addEventListener("click", stop);
 $("#sim").addEventListener("click", ()=>{ if(loopOn) trigger("手动模拟（演示用）"); });
