@@ -70,10 +70,10 @@
     <div class="prefs" id="prefs">
       <button type="button" class="pref-toggle" id="prefToggle" aria-expanded="false" aria-controls="prefsBody">
         <span class="pico" aria-hidden="true">☰</span>
-        <span class="psum" id="prefSummary"></span>
-        <span class="pchev" aria-hidden="true">▾</span>
+        <span class="plabel" data-i18n="cook.prefsTab">筛选</span>
       </button>
       <div class="prefs-body" id="prefsBody">
+        <div class="psum-line" id="prefSummary"></div>
         <div class="prow"><span data-i18n="cook.kcalCap">热量上限</span><b id="kLbl">600 kcal</b></div>
         <input type="range" id="kRange" min="200" max="900" step="50" value="600">
         <p class="pnote" data-i18n="cook.kcalNote">每人每餐的估算值</p>

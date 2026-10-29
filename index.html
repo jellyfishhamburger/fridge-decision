@@ -402,10 +402,6 @@
   .fblock{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 14px 12px}
   .fbhd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
   .fbhd h2{font-size:15px;margin:0}
-  .tidy{font-size:12.5px;font-weight:600;color:var(--green);background:var(--green-soft);
-    border:1px solid #cfe3d9;border-radius:999px;padding:6px 12px;cursor:pointer;font-family:inherit}
-  .tidy.on{background:var(--green);border-color:var(--green);color:#fff}
-  .tidy-hint{margin:2px 0 10px}
 
   .items{display:flex;flex-direction:column}
   .row-i{display:grid;grid-template-columns:36px minmax(0,1fr) auto 26px;gap:10px;align-items:center;
@@ -423,22 +419,6 @@
   .row-i .del:hover,.row-i .del:active{background:#f7ece9;color:var(--red)}
   .shelf-tag{font-size:10.5px;color:#A6B0A8;border:1px solid var(--line);border-radius:5px;padding:0 4px}
 
-  /* 整理模式：三层货架 + 拖拽 */
-  .items.is-tidy{gap:8px}
-  .zone{border:1.5px dashed #DCE3DA;border-radius:14px;padding:8px 8px 4px;min-height:58px;
-    transition:background .18s,border-color .18s}
-  .zone h3{font-size:11px;letter-spacing:.05em;color:#A6B0A8;font-weight:600;margin:0 0 6px}
-  .zone.over{background:#EDF4E9;border-color:var(--green)}
-  .zone .row-i{border-bottom:0;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:8px 8px;margin-bottom:6px;box-shadow:0 1px 2px rgba(24,40,30,.04)}
-  .items.is-tidy .row-i{grid-template-columns:32px minmax(0,1fr) auto;touch-action:none}
-  .items.is-tidy .row-i .del{display:none}
-  .items.is-tidy .row-i.drag-i{opacity:.45}
-  body.dragging-i{user-select:none;-webkit-user-select:none}
-  .ghost-i{position:fixed;left:0;top:0;width:270px;z-index:90;pointer-events:none;
-    display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;
-    background:var(--card);border:1px solid var(--green);border-radius:12px;padding:9px 10px;
-    box-shadow:0 14px 30px -14px rgba(24,40,30,.5);transform:translate(0,0)}
 
   /* 调味料 */
   .pantry{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
@@ -455,6 +435,50 @@
     background:#F7F9F6;color:var(--muted);cursor:pointer;font-family:inherit;
     transition:background .18s,color .18s,border-color .18s}
   .pe.on{background:var(--green-soft);border-color:#cfe3d9;color:var(--green);font-weight:600}
+
+  /* ---- 步骤动作图标：和锅页同一套 9 个动作，卡片里小、跟着做里大 ---- */
+  .rcard ol, .card ol{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
+  .rcard ol li, .card ol li{display:grid;grid-template-columns:14px 26px minmax(0,1fr);gap:8px;align-items:start;
+    font-size:12.8px;line-height:1.55;color:#55635a}
+  .rcard ol .n, .card ol .n{font-size:10.5px;color:#A9B3AB;text-align:right;padding-top:6px}
+  .rcard ol .act, .card ol .act{width:26px;height:26px;border-radius:8px;background:#F2F5EF;
+    display:grid;place-items:center;flex:none}
+  .act-art{width:18px;height:18px;overflow:visible}
+  .astrip{display:inline-flex;gap:4px;align-items:center;margin-top:5px}
+  .astrip .a{width:24px;height:24px;border-radius:7px;background:#EFF3EC;display:grid;place-items:center}
+  .astrip .act-art{width:18px;height:18px}
+  /* 展开时每个动作轻轻重复一遍，别抢阅读 */
+  details[open] .act-art{animation-duration:2.6s;animation-iteration-count:infinite;animation-timing-function:ease-in-out}
+  details[open] li[data-act="cut"] .act-art,details[open] .a[data-act="cut"] .act-art{animation-name:actCut}
+  details[open] li[data-act="chop"] .act-art{animation-name:actChop}
+  details[open] li[data-act="mix"] .act-art{animation-name:actMix}
+  details[open] li[data-act="fry"] .act-art{animation-name:actFry}
+  details[open] li[data-act="boil"] .act-art{animation-name:actBoil}
+  details[open] li[data-act="pour"] .act-art{animation-name:actPour}
+  details[open] li[data-act="season"] .act-art{animation-name:actSeason}
+  details[open] li[data-act="cover"] .act-art{animation-name:actCover}
+  details[open] li[data-act="serve"] .act-art{animation-name:actServe}
+  details[open] li[data-act="wait"] .act-art{animation-name:actWait}
+  @keyframes actCut{0%,70%,100%{transform:rotate(0)}35%{transform:rotate(-16deg) translate(1px,1px)}}
+  @keyframes actChop{0%,70%,100%{transform:translateY(0)}35%{transform:translateY(-3px)}}
+  @keyframes actMix{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+  @keyframes actFry{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) translateY(-2px)}}
+  @keyframes actBoil{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.04)}}
+  @keyframes actPour{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(8deg)}}
+  @keyframes actSeason{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+  @keyframes actCover{0%,100%{transform:translateY(-2px)}50%{transform:translateY(2px)}}
+  @keyframes actServe{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+  @keyframes actWait{0%,100%{transform:rotate(0)}50%{transform:rotate(6deg)}}
+  @keyframes ckPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+
+  /* ---- 跟着做（原「一步一屏」）：大动作插画 + 这一步的食材 ---- */
+  .ck-icon .ck-act{width:112px;height:112px;overflow:visible}
+  .ck-ing{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0 2px}
+  .ck-ing .ii{display:inline-flex;align-items:center;gap:6px;background:#F3F6F0;
+    border:1px solid var(--line);border-radius:999px;padding:4px 11px 4px 5px;font-size:12.5px;color:#55635a}
+  .ck-ing .ii .art{width:24px;height:24px}
+  .ck-ing .ii.dim{opacity:.5}
+  .ck-ing .lb{font-size:11.5px;color:#9AA69C;align-self:center;margin-right:2px}
 
   .findlink{display:inline-flex;align-items:center;gap:6px;margin:16px 0 4px;padding:6px 0;
     background:none;border:0;color:var(--green);font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit}
@@ -686,13 +710,11 @@
     <!-- 2 · 先吃这些 -->
     <div class="soon" id="soonBox"></div>
 
-    <!-- 3 · 主清单 + 整理模式 -->
+    <!-- 3 · 主清单 -->
     <div class="fblock">
       <div class="fbhd">
         <h2 data-i18n="fridge.stock">存货</h2>
-        <button class="tidy" id="tidyBtn" data-i18n="fridge.tidy">整理冰箱</button>
       </div>
-      <p class="hint tidy-hint" id="tidyHint" hidden data-i18n="fridge.tidyHint">按住食材拖到别的层，摆好点「完成」。只改位置，数量不变。</p>
 
       <div id="pendCard" style="display:none">
         <h3><span data-i18n="pend.title">待确认</span> <span class="count" id="pendCnt">0</span></h3>
@@ -859,6 +881,7 @@
     <div class="ck-photo" id="ck-photo"></div>
     <div class="ck-icon" id="ck-icon"></div>
     <div class="ck-text" id="ck-text">…</div>
+    <div class="ck-ing" id="ck-ing"></div>
     <div class="ck-count" id="ck-count">1 / 5</div>
   </div>
   <div class="ck-bar">
@@ -872,6 +895,8 @@
 
 <script src="motion.js?v=20261030-4"></script>
 <script src="data.js?v=20261029-17"></script>
+<script src="cook-art.js?v=20261030-6"></script>
+<script src="cook-steps.js?v=20261030-6"></script>
 <script src="icons.js?v=20261029-17"></script>
 <script src="dish-photos.js?v=20261029-19"></script>
 <script src="sync.js?v=20261029-17"></script>
@@ -957,6 +982,7 @@ function renderHome(){
         <span class="m">
           <b>${I18N.recipeName(r.recipe)}</b>
           <span class="mt">${t("card.min", {n:r.recipe.minutes})}${miss}</span>
+          ${actionStrip(r.recipe)}
         </span>
       </button>`;
     }).join("") : `<p class="empty" style="margin:0">${t("home.none")}</p>`;
@@ -1084,26 +1110,43 @@ const SHELVES = [
   {id:1, key:"fridge.shelf1", fallback:"中层", tags:["veg", "greens"]},
   {id:2, key:"fridge.shelf2", fallback:"下层", tags:["carb", "dairy", "other", ""]}
 ];
-const LS_LAYOUT = "fd.layout.v1";                 /* 只存摆放位置，不进库存、不进云端 */
-const layout = () => FD.read(LS_LAYOUT, {}) || {};
-const saveLayout = m => FD.write(LS_LAYOUT, m);
-function defaultShelf(it){
+/* 层位只用来标一行「上层/中层/下层」，不参与任何交互；没有整理模式了 */
+function shelfOf(it){
   const s = SHELVES.find(x => x.tags.includes(it.tag));
   return s ? s.id : 2;
 }
-function shelfOf(it, lay){
-  const l = (lay || layout())[it.id];
-  return (l && typeof l.shelf === "number") ? l.shelf : defaultShelf(it);
-}
-function posOf(it, lay){
-  const l = (lay || layout())[it.id];
-  return (l && typeof l.pos === "number") ? l.pos : 999;
-}
-let tidying = false;
 const daysClass = d => d <= 1 ? "hot" : (d <= 3 ? "warm" : "ok");
 
+/* 一道菜的步骤：每一步配一个动作插画（和锅页共用 cook-steps.js 的 9 个动作） */
+function cleanSteps(recipe){
+  return (I18N.recipeSteps(recipe) || []).filter(s => s && !/^!\[/.test(String(s).trim()));
+}
+function stepsHtml(recipe){
+  return cleanSteps(recipe).map((s, i) => {
+    const a = COOK_STEPS.of(s, recipe.id + "#" + i);
+    return `<li data-act="${a.id}"><span class="n">${i + 1}</span><span class="act">${COOK_STEPS.svg(a.id)}</span><span class="tx">${s}</span></li>`;
+  }).join("");
+}
+function actionStrip(recipe){
+  const seq = [];
+  cleanSteps(recipe).forEach((s, i) => {
+    const a = COOK_STEPS.of(s, recipe.id + "#" + i);
+    if(!seq.length || seq[seq.length - 1] !== a.id) seq.push(a.id);
+  });
+  if(!seq.length) return "";
+  return `<span class="astrip">` + seq.slice(0, 5).map(id => `<i class="a">${COOK_STEPS.svg(id)}</i>`).join("") + `</span>`;
+}
+/* 这一步用到哪些食材：看步骤文字里有没有提到（提不到就不硬猜） */
+function ingredientsInStep(recipe, text){
+  const s = String(text || ""), low = s.toLowerCase();
+  const hit = recipe.needs.filter(id => {
+    const f = FD.byId[id]; if(!f) return false;
+    return (f.cn && s.includes(f.cn)) || (f.name && low.includes(String(f.name).toLowerCase()));
+  });
+  return {ids: hit.length ? hit : [], all: recipe.needs.slice(0, 4), guessed: !hit.length};
+}
+
 function renderItems(){
-  const lay = layout();
   const sorted = items.slice().sort((a, b) => FD.daysLeftOf(a) - FD.daysLeftOf(b));
   const soon = sorted.filter(i => FD.daysLeftOf(i) <= 3);
 
@@ -1138,127 +1181,36 @@ function renderItems(){
     }
   }
 
-  /* 3 · 清单（浏览=按到期排序；整理=按货架） */
+  /* 3 · 清单：一条一条按到期排序，随时能扫 */
   const box = $("#items");
   box.innerHTML = "";
-  box.classList.toggle("is-tidy", tidying);   /* 别和按钮的 .tidy 撞名，否则整块列表会拿到按钮的胶囊底色 */
-  if(tidying){
-    SHELVES.forEach(sh => {
-      const zone = document.createElement("div");
-      zone.className = "zone";
-      zone.dataset.shelf = sh.id;
-      zone.innerHTML = `<h3>${tt(sh.key, sh.fallback)} · ${items.filter(it => shelfOf(it, lay) === sh.id).length}</h3>`;
-      items.filter(it => shelfOf(it, lay) === sh.id)
-        .sort((a, b) => posOf(a, lay) - posOf(b, lay) || FD.daysLeftOf(a) - FD.daysLeftOf(b))
-        .forEach(it => zone.appendChild(itemRow(it, true, lay)));
-      box.appendChild(zone);
-    });
-  }else{
-    sorted.forEach(it => box.appendChild(itemRow(it, false, lay)));
-  }
+  sorted.forEach(it => box.appendChild(itemRow(it)));
 
   const cnt = $("#cnt"); if(cnt) cnt.textContent = t("fridge.count", {n: items.length});
   const empty = $("#emptyNote"); if(empty) empty.style.display = items.length ? "none" : "block";
-  const tb = $("#tidyBtn");
-  if(tb){
-    tb.textContent = tidying ? tt("fridge.tidyDone", "完成") : tt("fridge.tidy", "整理冰箱");
-    tb.classList.toggle("on", tidying);
-  }
-  const th = $("#tidyHint"); if(th) th.hidden = !tidying;
   paintPantry();
 }
 
-function itemRow(it, inTidy, lay){
+function itemRow(it){
   const d = FD.daysLeftOf(it);
   const q = it.qty == null ? 1 : it.qty;
-  const shelf = SHELVES.find(s => s.id === shelfOf(it, lay));
+  const shelf = SHELVES.find(s => s.id === shelfOf(it));
   const el = document.createElement("div");
-  el.className = "row-i" + (inTidy ? " draggable" : "");
+  el.className = "row-i";
   el.dataset.id = it.id;
   el.innerHTML =
     `<span class="ic">${window.FD_ICON(it.cat, 20)}</span>
      <span class="mid">
        <span class="nm">${cnOf(it.cat)}${q > 1 ? `<span class="q">×${q}</span>` : ""}</span>
-       <span class="meta">${inTidy ? (it.unit || "") : `<span class="shelf-tag">${tt(shelf.key, shelf.fallback)}</span>${it.by ? " · " + it.by : ""}`}</span>
+       <span class="meta"><span class="shelf-tag">${tt(shelf.key, shelf.fallback)}</span>${it.by ? " · " + it.by : ""}</span>
      </span>
      <span class="d ${daysClass(d)}">${expiryText(d)}</span>
      <button class="del" aria-label="${tt("fridge.del", "删除")}" data-del="${it.id}">×</button>`;
   el.addEventListener("click", ev => {
-    if(tidying) return;                       /* 整理模式下点行不弹编辑 */
     if(ev.target.closest("button")) return;   /* × 是删除 */
     openSheet(it, null);                      /* 点行 = 编辑这一条 */
   });
-  if(inTidy) attachShelfDrag(el, it);
   return el;
-}
-
-/* 整理模式：长按拖动（触摸）/ 直接拖（鼠标）把食材换层。只写 fd.layout.v1。 */
-function attachShelfDrag(el, it){
-  const HOLD = 140, MOVE = 8;
-  let pid = null, sx = 0, sy = 0, ghost = null, dragging = false, hold = null, touch = false;
-
-  const zones = () => Array.from(document.querySelectorAll("#items .zone"));
-  const zoneAt = (x, y) => zones().find(z => {
-    const r = z.getBoundingClientRect();
-    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
-  });
-  const moveGhost = (x, y) => { if(ghost) ghost.style.transform = `translate(${x - 135}px,${y - 24}px)`; };
-
-  function start(x, y){
-    dragging = true;
-    el.classList.add("drag-i");
-    document.body.classList.add("dragging-i");
-    ghost = el.cloneNode(true);
-    ghost.classList.add("ghost-i");
-    ghost.querySelector(".del") && ghost.querySelector(".del").remove();
-    document.body.appendChild(ghost);
-    moveGhost(x, y);
-  }
-
-  el.addEventListener("pointerdown", e => {
-    if(e.button > 0) return;
-    pid = e.pointerId; touch = e.pointerType === "touch";
-    sx = e.clientX; sy = e.clientY;
-    try{ el.setPointerCapture(pid); }catch(_){}
-    if(touch) hold = setTimeout(() => start(sx, sy), HOLD);
-  });
-
-  el.addEventListener("pointermove", e => {
-    if(e.pointerId !== pid) return;
-    if(!dragging){
-      if(Math.hypot(e.clientX - sx, e.clientY - sy) < MOVE) return;
-      if(touch){ clearTimeout(hold); pid = null; return; }   /* 没长按就滑 = 让页面滚 */
-      start(sx, sy);
-    }
-    e.preventDefault();
-    moveGhost(e.clientX, e.clientY);
-    const z = zoneAt(e.clientX, e.clientY);
-    zones().forEach(x => x.classList.toggle("over", x === z));
-  }, {passive:false});
-
-  function end(e){
-    if(e.pointerId !== pid) return;
-    clearTimeout(hold);
-    if(dragging){
-      const z = zoneAt(e.clientX, e.clientY);
-      zones().forEach(x => x.classList.remove("over"));
-      if(ghost){ ghost.remove(); ghost = null; }
-      el.classList.remove("drag-i");
-      document.body.classList.remove("dragging-i");
-      if(z && +z.dataset.shelf !== shelfOf(it)) moveToShelf(it.id, +z.dataset.shelf);
-    }
-    dragging = false; pid = null;
-  }
-  el.addEventListener("pointerup", end);
-  el.addEventListener("pointercancel", end);
-}
-
-function moveToShelf(id, shelf){
-  const lay = layout();
-  lay[id] = {shelf, pos: Object.keys(lay).length + 1};    /* 放到这一层最后 */
-  saveLayout(lay);
-  renderItems();                                          /* 只重排视觉，不碰 items / 库存 */
-  toast(tt("fridge.moved", "已挪到这一层"));
 }
 
 /* 我的调味料：和设置页用的是同一份 FD.pantry() / FD.savePantry()，没有第二套数据 */
@@ -1277,19 +1229,9 @@ $("#pantryChips") && $("#pantryChips").addEventListener("click", e => {
   const have = new Set(FD.pantry());
   have.has(el.dataset.p) ? have.delete(el.dataset.p) : have.add(el.dataset.p);
   FD.savePantry([...have]);
-  pantry = [...have];                       /* 页面里那份也同步，别让推荐用旧值 */
+  pantry = [...have];
   paintPantry();
   $("#view-discover").classList.contains("on") && renderDiscover();
-});
-
-$("#tidyBtn") && $("#tidyBtn").addEventListener("click", () => {
-  tidying = !tidying;
-  renderItems();
-  if(tidying){
-    const box = $("#items");
-    box && box.scrollIntoView({block:"nearest", behavior:"smooth"});
-    toast(tt("fridge.tidyOn", "整理模式：按住食材拖到别的层"));
-  }
 });
 
 $("#findDish") && $("#findDish").addEventListener("click", () => show("discover"));
@@ -1401,7 +1343,8 @@ function recipeCard(r, opts){
       ${r.status==="ready"?`<span class="tg g">${t("disc.ready1")}</span>`:""}
     </div>
     ${used?`<p class="uses">${t("disc.uses")}${used}</p>`:""}
-    <details><summary>${t("disc.steps")}</summary><ol>${I18N.recipeSteps(r.recipe).map(s=>`<li>${s}</li>`).join("")}</ol>
+    ${actionStrip(r.recipe)}
+    <details><summary>${t("disc.steps")}</summary><ol>${stepsHtml(r.recipe)}</ol>
       <div class="src">${t("card.src")}<a href="${r.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · ${t("card.srcNote")}</div>
     </details>
     <button class="go" data-take="${r.recipe.id}">${t("disc.cook")}</button>
@@ -1502,9 +1445,22 @@ function openCook(recipeId){
   $("#cook").classList.add("on");
 }
 function renderCook(){
-  const steps = I18N.recipeSteps(cookRecipe);
-  $("#ck-icon").innerHTML = stepIcon(steps[cookStep]);
-  $("#ck-text").textContent = steps[cookStep];
+  const steps = cleanSteps(cookRecipe);
+  const text = steps[cookStep] || "";
+  const act = COOK_STEPS.of(text, cookRecipe.id + "#" + cookStep);
+  $("#ck-icon").innerHTML = `<span style="display:inline-block;animation:ckPulse 2.6s ease-in-out infinite">
+      ${COOK_STEPS.svg(act.id, "ck-act")}</span>`;
+  $("#ck-text").textContent = text;
+  /* 这一步用到的食材：文字里提到了就只显示这几样，没提到就退回整道菜的主料（并标灰） */
+  const ing = ingredientsInStep(cookRecipe, text);
+  const box = $("#ck-ing");
+  if(box){
+    const list = ing.ids.length ? ing.ids : ing.all;
+    box.innerHTML = list.length
+      ? `<span class="lb">${ing.ids.length ? tt("cook.usesHere", "这一步用到") : tt("cook.usesAll", "整道菜用到")}</span>` +
+        list.map(id => `<span class="ii ${ing.ids.length ? "" : "dim"}">${window.COOK_ART ? COOK_ART.svg(id) : ""}${cnOf(id)}</span>`).join("")
+      : "";
+  }
   $("#ck-count").textContent = `${cookStep + 1} / ${steps.length}`;
   $("#ck-prev").disabled = cookStep === 0;
   $("#ck-next").disabled = cookStep >= steps.length - 1;
