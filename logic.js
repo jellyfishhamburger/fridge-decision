@@ -204,7 +204,86 @@
     const v = read(LS_ITEMS, []);
     return Array.isArray(v) ? v : [];
   };
-  const saveItems = list => write(LS_ITEMS, list);
+  /* ---------- optional cloud (Supabase) ----------
+     saveItems() is the only write path in the whole app, so the bridge
+     lives here: no page has to know whether a backend exists. */
+  const daysOf = i => (i && typeof i.life === "number" && i.addedAt)
+    ? Math.max(0, i.life - Math.floor((Date.now() - new Date(i.addedAt + "T00:00:00").getTime()) / 86400000))
+    : (i && typeof i.daysLeft === "number" ? i.daysLeft : 0);
+
+  const snap = list => {
+    const m = {};
+    (list || []).forEach(i => { m[i.id] = [i.cat, i.name, i.tag, i.qty, i.unit, i.life, i.addedAt, daysOf(i)]; });
+    return m;
+  };
+
+  let lastCloud = null;
+  const cloudOn = () => !!(global.SYNC && global.SYNC.enabled && global.SYNC.enabled());
+
+  function pushDiff(list) {
+    if (!cloudOn()) return;
+    const code = household().code; if (!code) return;
+    const now = snap(list);
+    const before = lastCloud || {};
+    Object.keys(now).forEach(id => {
+      const a = before[id], b = now[id];
+      if (!a) {
+        const it = (list || []).filter(x => x.id === id)[0] || {};
+        global.SYNC.add(code, {
+          id: it.id, cat: it.cat, name: it.name, tag: it.tag, qty: it.qty, unit: it.unit,
+          life: it.life, addedAt: it.addedAt, daysLeft: daysOf(it), by: it.by
+        }).catch(() => {});
+      } else if (a.join("|") !== b.join("|")) {
+        global.SYNC.update(code, id, { qty: b[3], days_left: b[7] }).catch(() => {});
+      }
+    });
+    Object.keys(before).forEach(id => { if (!now[id]) global.SYNC.remove(code, id).catch(() => {}); });
+    lastCloud = now;
+  }
+
+  const saveItems = list => {
+    write(LS_ITEMS, list);
+    try { pushDiff(list); } catch (e) {}
+    return true;
+  };
+
+  const sync = {
+    on: cloudOn,
+    code() {
+      const h = household();
+      if (h.code) return h.code;
+      const c = newCode(); saveHousehold({ code: c }); return c;
+    },
+    async pull() {
+      if (!cloudOn()) return false;
+      const rows = await global.SYNC.pull(sync.code());
+      if (!Array.isArray(rows)) return false;
+      lastCloud = snap(rows);
+      write(LS_ITEMS, rows);          /* raw write: never echo back what we just got */
+      return true;
+    },
+    start(onChange, ms) {
+      if (!cloudOn()) return false;
+      const me = this;
+      (async () => {
+        try { await global.SYNC.ensureHousehold(me.code()); } catch (e) {}
+        try { await me.pull(); onChange && onChange(); } catch (e) {}
+      })();
+      setInterval(async () => {
+        if (document.hidden) return;
+        try {
+          const rows = await global.SYNC.pull(me.code());
+          if (!Array.isArray(rows)) return;
+          if (JSON.stringify(snap(rows)) !== JSON.stringify(snap(read(LS_ITEMS, [])))) {
+            lastCloud = snap(rows);
+            write(LS_ITEMS, rows);
+            onChange && onChange();
+          }
+        } catch (e) {}
+      }, ms || 5000);
+      return true;
+    }
+  };
 
   /* ---------- the signal ---------- */
   function log(action, recipeId) {
@@ -229,7 +308,7 @@
     items, saveItems, unitOf, consumptionOf, consume, migrate, mergeItems,
     settings, saveSettings, DEFAULT_SETTINGS,
     pantry, savePantry,
-    household, saveHousehold, newCode,
+    household, saveHousehold, newCode, sync, cloudOn,
     localDate, daysLeftOf,
     evaluate, decide, urgent, shoppingHint,
     log, stats

@@ -223,7 +223,7 @@
         <button class="btn quiet" id="demoBtn" data-i18n="fridge.demo">载入示例</button>
       </div>
     </div>
-    <button class="btn primary" id="decideBtn" data-i18n="fridge.decide">给我一个决定 →</button>
+    <button class="btn primary" id="decideBtn" data-i18n="fridge.decide">今晚吃什么 →</button>
     <div id="result" style="margin-top:14px"></div>
   </section>
 
@@ -269,7 +269,7 @@
   </section>
 
   <div class="foot">
-    <span data-i18n="foot.line">原型 · 无硬件、无图像识别</span> · build 20261029-7<br>
+    <span data-i18n="foot.line">原型 · 无硬件、无图像识别</span> · build 20261029-8<br>
     <a href="disc.html" data-i18n="foot.disc">圆片 →</a> · <a href="display.html" data-i18n="foot.strip">长条屏 →</a> · <a href="settings.html" data-i18n="foot.settings">设置 →</a>
   </div>
 </div>
@@ -354,10 +354,11 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data.js?v=20261029-5"></script>
-<script src="icons.js?v=20261029-5"></script>
-<script src="logic.js?v=20261029-5"></script>
-<script src="i18n.js?v=20261029-6"></script>
+<script src="data.js?v=20261029-8"></script>
+<script src="icons.js?v=20261029-8"></script>
+<script src="sync.js?v=20261029-8"></script>
+<script src="logic.js?v=20261029-8"></script>
+<script src="i18n.js?v=20261029-8"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -864,6 +865,12 @@ $("#langBtn").addEventListener("click", ()=>{
 
 /* ---------- boot ---------- */
 applyLang();
+// 有后端就跟着云端走：别的手机加的东西 5 秒内出现在这里
+if (FD.cloudOn()) {
+  items = FD.items();
+  FD.sync.start(() => { items = FD.items(); renderItems();
+    if ($("#result").innerHTML) renderResult(FD.decide(items, goal)); });
+}
 // 从设置页底部导航跳回来时，直接落到对应标签
 (function(){
   const h = (location.hash || "").replace("#","");

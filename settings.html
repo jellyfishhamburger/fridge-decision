@@ -198,6 +198,29 @@
   <a class="btn ghost" href="display.html" style="text-decoration:none" data-i18n="set.toStrip"></a>
   <a class="btn quiet" href="stack.html" style="text-decoration:none">架构 / Stack</a>
 
+  <details class="card" id="cloudCard" open>
+    <summary style="cursor:pointer;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:#6b7a72;font-weight:700">
+      云端同步 / Cloud sync <span id="cloudPill" class="pill">未连接</span>
+    </summary>
+    <p class="hint" style="margin-top:10px">填上 Supabase 的 Project URL 和 anon public key，这台设备就连上家庭共享。留空则和现在完全一样 —— 只存在本机。</p>
+    <div class="row" style="margin-top:10px">
+      <input class="inp" id="sbUrl" placeholder="https://xxxx.supabase.co" style="flex:1;min-width:0">
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input class="inp" id="sbKey" placeholder="anon public key（eyJ...）" style="flex:1;min-width:0">
+    </div>
+    <div class="row" style="margin-top:10px">
+      <span class="hint" style="flex:0 0 auto">家庭码</span>
+      <b id="hhCode" style="letter-spacing:.14em;font-size:15px">—</b>
+      <button class="btn tiny" id="hhNew">重新生成</button>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn primary" id="sbSave">保存并连接</button>
+      <button class="btn" id="sbTest">测试连接</button>
+    </div>
+    <div class="hint" id="sbMsg" style="margin-top:8px"></div>
+  </details>
+
   <div class="foot" data-i18n="set.foot"></div>
   <div class="version" id="ver"></div>
 </div>
@@ -237,6 +260,7 @@
 
 <script src="data.js?v=20261029-5"></script>
 <script src="icons.js?v=20261029-5"></script>
+<script src="sync.js?v=20261029-8"></script>
 <script src="logic.js?v=20261029-5"></script>
 <script src="i18n.js?v=20261029-6"></script>
 <script>
@@ -334,14 +358,68 @@ function paintHousehold(){
   $("#hhMembers").textContent = h.members.length ? t("set.hhJoined") + h.members.join(", ") : t("set.hhNone");
 }
 
+/* ---------- 云端同步 ---------- */
+function paintCloud(){
+  const c = (window.SYNC && SYNC.cfg) ? SYNC.cfg() : {};
+  if ($("#sbUrl")) $("#sbUrl").value = c.url || "";
+  if ($("#sbKey")) $("#sbKey").value = c.key || "";
+  const on = !!(c.url && c.key);
+  const pill = $("#cloudPill");
+  if (pill) {
+    pill.textContent = on ? "已连接" : "未连接";
+    pill.style.background = on ? "#e6f2ed" : "#f0f2f1";
+    pill.style.color = on ? "#0b5c44" : "#6b7a72";
+  }
+  const hh = $("#hhCode");
+  if (hh) hh.textContent = FD.household().code || "（首次保存时生成）";
+}
+function cloudMsg(t, bad){
+  const el = $("#sbMsg"); if (!el) return;
+  el.textContent = t; el.style.color = bad ? "#b3261e" : "#0b5c44";
+}
+
 function paintAll(){
   I18N.apply();
+  paintCloud();
   document.title = (I18N.getLang() === "en" ? "Settings" : "设置") + " — Fridge Decision";
-  $("#ver").textContent = "build 20261029-7";
+  $("#ver").textContent = "build 20261029-8";
   paint(); paintDB(); paintRecipes(); paintPantry(); paintHousehold();
 }
 
 /* ---------- events ---------- */
+$("#sbSave") && $("#sbSave").addEventListener("click", async () => {
+  const url = $("#sbUrl").value.trim(), key = $("#sbKey").value.trim();
+  if (!url || !key) { cloudMsg("URL 和 anon key 都要填。", true); return; }
+  SYNC.configure(url, key);
+  cloudMsg("正在测试…", false);
+  try {
+    const r = await SYNC.ping();
+    if (!r.ok) { cloudMsg("连不上：" + r.reason, true); return; }
+    const code = FD.sync.code();
+    try { await SYNC.ensureHousehold(code); } catch (e) {}
+    const n = await SYNC.pull(code);
+    $("#hhCode").textContent = code;
+    cloudMsg("已连接。云端这个家庭现有 " + (Array.isArray(n) ? n.length : 0) + " 样东西；刷新 App 生效。", false);
+    paintCloud();
+  } catch (e) { cloudMsg("出错：" + e.message, true); }
+});
+
+$("#sbTest") && $("#sbTest").addEventListener("click", async () => {
+  const url = $("#sbUrl").value.trim(), key = $("#sbKey").value.trim();
+  if (url && key) SYNC.configure(url, key);
+  try {
+    const r = await SYNC.ping();
+    cloudMsg(r.ok ? "连接正常（HTTP " + r.status + "）" : "连不上：" + r.reason, !r.ok);
+  } catch (e) { cloudMsg("出错：" + e.message, true); }
+});
+
+$("#hhNew") && $("#hhNew").addEventListener("click", () => {
+  const c = FD.newCode();
+  FD.saveHousehold({ code: c });
+  $("#hhCode").textContent = c;
+  cloudMsg("新家庭码 " + c + "：另一台手机填这个码就加入同一个冰箱。", false);
+});
+
 $("#langSeg").addEventListener("click", e=>{
   const b = e.target.closest("[data-lang]"); if(!b) return;
   I18N.setLang(b.dataset.lang); paintAll(); toast(b.dataset.lang === "en" ? "English" : "中文");

@@ -18,7 +18,7 @@
       "fridge.stock": "存货", "fridge.count": "{n} 样",
       "fridge.empty": "还没记录任何东西 —— 用下面的按钮加一样。",
       "fridge.add": "＋ 加一样", "fridge.demo": "载入示例",
-      "fridge.decide": "给我一个决定 →",
+      "fridge.decide": "今晚吃什么 →",
       "fridge.left": "还剩 {n} 天", "fridge.today": "今天到期", "fridge.oneDay": "还剩 1 天",
 
       "disc.lede": "按「先用掉快坏的」排序。差一样的菜也算能做饭，会告诉你去买什么。",
@@ -121,7 +121,7 @@
       "fridge.stock": "In stock", "fridge.count": "{n} items",
       "fridge.empty": "Nothing logged yet — add something below.",
       "fridge.add": "+ Add an item", "fridge.demo": "Load demo fridge",
-      "fridge.decide": "Give me a decision →",
+      "fridge.decide": "What should I cook →",
       "fridge.left": "{n} days", "fridge.today": "use today", "fridge.oneDay": "1 day",
 
       "disc.lede": "Sorted by what dies first. A dish one ingredient short still counts — it tells you what to buy.",
