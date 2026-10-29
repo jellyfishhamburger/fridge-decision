@@ -233,12 +233,17 @@
         global.SYNC.add(code, {
           id: it.id, cat: it.cat, name: it.name, tag: it.tag, qty: it.qty, unit: it.unit,
           life: it.life, addedAt: it.addedAt, daysLeft: daysOf(it), by: it.by
-        }).catch(() => {});
+        }).catch(() => { if (lastCloud) delete lastCloud[id]; });
       } else if (a.join("|") !== b.join("|")) {
-        global.SYNC.update(code, id, { qty: b[3], days_left: b[7] }).catch(() => {});
+        global.SYNC.update(code, id, { qty: b[3], days_left: b[7] }).catch(() => {
+          /* keep it dirty: the next poll re-pushes it */
+          if (lastCloud && lastCloud[id]) lastCloud[id] = [null];
+        });
       }
     });
-    Object.keys(before).forEach(id => { if (!now[id]) global.SYNC.remove(code, id).catch(() => {}); });
+    Object.keys(before).forEach(id => {
+      if (!now[id]) global.SYNC.remove(code, id).catch(() => { if (lastCloud) lastCloud[id] = before[id]; });
+    });
     lastCloud = now;
   }
 
@@ -272,6 +277,7 @@
       rows.forEach(r => have[r.id] = 1);
       const extra = local.filter(i => !have[i.id]);
       lastCloud = snap(rows);
+      extra.forEach(i => { delete lastCloud[i.id]; });   /* local-only = not yet on the server */
       write(LS_ITEMS, rows.concat(extra));
       if (extra.length) pushDiff(rows.concat(extra));
       return true;
