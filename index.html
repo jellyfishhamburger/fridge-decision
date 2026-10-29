@@ -356,8 +356,9 @@ const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 let items  = (() => {
   const m = FD.migrate(FD.items());
-  if (m.changed) FD.saveItems(m.items);
-  return m.items;
+  const merged = FD.mergeItems(m.items);
+  if (m.changed || merged.length !== m.items.length) FD.saveItems(merged);
+  return merged;
 })();
 let goal   = FD.settings();
 let pantry = FD.pantry();
@@ -772,10 +773,17 @@ $("#days").addEventListener("input", e=>{ pendingDays = +e.target.value; $("#day
 $("#saveBtn").addEventListener("click", ()=>{
   if(!picked){ toast("先选一样食物"); return; }
   const hh = FD.household();
-  items.push({id:uid(), cat:picked.id, name:picked.name, tag:picked.tag,
-              qty:pendingQty, unit:FD.unitOf(picked.id),
-              daysLeft:pendingDays, life:pendingDays, addedAt:today(),
-              by: hh.members.length ? hh.members[0] : null});
+  const dup = items.find(i => i.cat === picked.id && FD.daysLeftOf(i) === pendingDays
+                              && (i.by || null) === (hh.members.length ? hh.members[0] : null));
+  if (dup) {
+    dup.qty = (dup.qty == null ? 1 : dup.qty) + pendingQty;   // 同一天到期的合成一份
+  } else {
+    items.push({id:uid(), cat:picked.id, name:picked.name, tag:picked.tag,
+                qty:pendingQty, unit:FD.unitOf(picked.id),
+                daysLeft:pendingDays, life:pendingDays, addedAt:today(),
+                by: hh.members.length ? hh.members[0] : null});
+  }
+  items = FD.mergeItems(items);
   FD.saveItems(items); renderItems(); closeSheet();
   toast(`${picked.cn} ×${pendingQty} 已加入 · 放 ${pendingDays} 天`);
 });

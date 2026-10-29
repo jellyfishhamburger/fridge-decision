@@ -46,7 +46,7 @@
     display:flex;flex-direction:column;align-items:center;gap:3px}
   /* iOS Safari: 点落在按钮内的 SVG 上时不会冒泡成 click —— 让图标不接收指针事件 */
   button svg, button svg *, .pick svg, .pick svg *{pointer-events:none}
-  .pick, .btn{touch-action:manipulation}
+  .pick, .btn{touch-action:manipulation;-webkit-user-select:none;user-select:none}
   .pick svg{width:20px;height:20px;color:#7fd3b4}
   .pick:active{background:#1d8f68}
   .log{font-size:12.5px;color:#9fb3a9;line-height:1.7;max-height:180px;overflow:auto}
@@ -94,6 +94,7 @@
         <div class="row" style="margin-top:12px">
           <button class="btn" id="ignore">忽略这次（不是食物）</button>
         </div>
+        <p class="note" id="dbgNote" style="display:none"></p>
         <p class="note" id="capNote">确认或忽略之后，检测才会继续 —— 所以现在这一屏不会再自己跳走。</p>
       </div>
     </div>
@@ -357,39 +358,60 @@ function resume(){
 function buildPicks(){
   const box = $("#picks"); box.innerHTML = "";
   FD.CATALOG.forEach(c=>{
-    const b = document.createElement("button");
-    b.className = "pick"; b.type = "button"; b.dataset.cat = c.id;
-    b.innerHTML = window.FD_ICON(c.id, 20) + `<span>${c.cn}</span>`;
-    b.addEventListener("click", ()=>commit(c));   // 桌面/安卓
-
-    box.appendChild(b);
+    const el = document.createElement("div");        // 用 div + pointerdown，绕开 iOS 的 click 怪癖
+    el.className = "pick"; el.dataset.cat = c.id;
+    el.setAttribute("role", "button"); el.setAttribute("tabindex", "0");
+    el.innerHTML = window.FD_ICON(c.id, 20) + `<span>${c.cn}</span>`;
+    el.addEventListener("pointerdown", e=>{
+      e.preventDefault(); e.stopPropagation();
+      if(window.__tapDebug) window.__tapDebug("pointerdown 命中 " + c.cn);
+      commit(c);
+    });
+    el.addEventListener("click", e=>{                   // 桌面兜底
+      if(window.__tapDebug) window.__tapDebug("click 命中 " + c.cn);
+      commit(c);
+    });
+    box.appendChild(el);
   });
 }
-function commit(c){
-  const list = FD.items();
-  list.push({id:Math.random().toString(36).slice(2,9), cat:c.id, name:c.name, tag:c.tag,
-             qty:1, unit:FD.unitOf(c.id), daysLeft:c.days, life:c.days, addedAt:FD.localDate(),
-             via:"gate"});
-  FD.saveItems(list);
-  addLog(`<b>${c.cn}</b><span class="badge">已入库</span>　来源：门口闸机`);
-  resume();
-}
-$("#ignore").addEventListener("click", ()=>{ addLog("已忽略这次抓拍"); resume(); });
 
-/* 双保险：委托到容器上，避免个别 iOS 版本吞掉按钮自身的 click */
-$("#picks").addEventListener("click", e=>{
-  const btn = e.target.closest(".pick");
-  if(!btn || !btn.dataset.cat) return;
-  const c = FD.CATALOG.find(x => x.id === btn.dataset.cat);
-  if(c) commit(c);
-});
-$("#picks").addEventListener("touchend", e=>{
-  const btn = e.target.closest(".pick");
-  if(!btn || !btn.dataset.cat) return;
-  e.preventDefault();
-  const c = FD.CATALOG.find(x => x.id === btn.dataset.cat);
-  if(c) commit(c);
-}, {passive:false});
+function commit(c){
+  try{
+    const list = FD.items();
+    const same = list.find(i => i.cat === c.id && FD.daysLeftOf(i) === c.days);
+    if(same){ same.qty = (same.qty == null ? 1 : same.qty) + 1; }
+    else{
+      list.push({id:Math.random().toString(36).slice(2,9), cat:c.id, name:c.name, tag:c.tag,
+                 qty:1, unit:FD.unitOf(c.id), daysLeft:c.days, life:c.days,
+                 addedAt:FD.localDate(), via:"gate"});
+    }
+    FD.saveItems(FD.mergeItems(list));
+    addLog(`<b>${c.cn}</b><span class="badge">已入库</span>　来源：门口闸机`);
+    resume();
+  }catch(err){
+    addLog('<span style="color:#ff8a7a">写入失败：' + (err && err.message ? err.message : err) + '</span>');
+    showDebug("出错：" + (err && err.message ? err.message : err));
+  }
+}
+
+/* 页面左下角一行调试信息：真出问题时她截图给我就能定位 */
+function showDebug(msg){
+  let el = document.getElementById("dbg");
+  if(!el){
+    el = document.createElement("div");
+    el.id = "dbg";
+    el.style.cssText = "position:fixed;left:8px;right:8px;bottom:8px;z-index:99;background:#16302a;" +
+      "border:1px solid #2f7d4f;color:#bfe8d6;font-size:11.5px;line-height:1.4;padding:8px 10px;" +
+      "border-radius:10px;font-family:ui-monospace,monospace";
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.display = "block";
+  clearTimeout(el._t); el._t = setTimeout(()=>{ el.style.display = "none"; }, 6000);
+}
+window.__tapDebug = showDebug;
+
+$("#ignore").addEventListener("click", ()=>{ addLog("已忽略这次抓拍"); resume(); });
 
 function addLog(html){
   const el = $("#log");

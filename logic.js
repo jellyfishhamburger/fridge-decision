@@ -182,6 +182,23 @@
     return {items: out, changed};
   }
 
+  /* 三盒同一天到期的酸奶不该是三行 —— 合并成一行「酸奶 ×3」。
+     只有「到期日不同」才算不同的一批，因为决策要用到各自的剩余天数。 */
+  function mergeItems(list) {
+    const out = [], index = {};
+    (list || []).forEach(it => {
+      const key = [it.cat, daysLeftOf(it), it.unit || "", it.by || ""].join("|");
+      if (index[key] != null) {
+        const target = out[index[key]];
+        target.qty = (target.qty == null ? 1 : target.qty) + (it.qty == null ? 1 : it.qty);
+      } else {
+        index[key] = out.length;
+        out.push(Object.assign({}, it, {qty: it.qty == null ? 1 : it.qty}));
+      }
+    });
+    return out;
+  }
+
   /* ---------- items ---------- */
   const items = () => {
     const v = read(LS_ITEMS, []);
@@ -209,7 +226,7 @@
     CATALOG, RECIPES, PANTRY, byId, pantryById, DB,
     LS_ITEMS, LS_SETTINGS, LS_LOG, LS_PANTRY, LS_HOUSEHOLD,
     read, write,
-    items, saveItems, unitOf, consumptionOf, consume, migrate,
+    items, saveItems, unitOf, consumptionOf, consume, migrate, mergeItems,
     settings, saveSettings, DEFAULT_SETTINGS,
     pantry, savePantry,
     household, saveHousehold, newCode,
