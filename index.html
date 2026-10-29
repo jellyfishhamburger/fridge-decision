@@ -477,12 +477,10 @@
   .ck-ing .ii{display:inline-flex;align-items:center;gap:6px;background:#F1F5EE;
     border:1px solid #DCE4D8;border-radius:999px;padding:4px 11px 4px 5px;font-size:12.5px;color:#41514A;font-weight:500}
   .ck-ing .ii .art{width:24px;height:24px}
-  .ck-ing .ii.dim{opacity:.72;font-weight:400}
-  /* 这一步要下的那几样：一圈鼠尾草绿 + 一个点，其余稍淡 */
-  .ck-ing .ii.on{background:#DCEBD0;border:1.5px solid #79A16A;color:#1F3A2B;font-weight:700;
-    box-shadow:0 2px 8px -4px rgba(63,96,52,.45);transition:background .25s,border-color .25s}
-  .ck-ing .ii.on .dot{width:7px;height:7px;border-radius:99px;background:#4F7A42;display:inline-block}
-  .ck-ing .ii.off{opacity:.5}
+  /* 调料：不画插画，用浅木色文字标签和食材区分开 */
+  .ck-ing .ii.pk{background:#F8F3E7;border:1px solid #E2D6BC;color:#6B5A3C;font-weight:500;
+    padding:5px 10px;font-size:12px}
+  .ck-ing:empty{display:none}
   .ck-ing .lb{font-size:11.5px;color:#9AA69C;align-self:center;margin-right:2px}
 
 
@@ -929,6 +927,13 @@ const uid = () => Math.random().toString(36).slice(2, 9);
 const today = () => FD.localDate();
 const food = id => FD.byId[id] || {cn: id, name: id};
 const cnOf = id => I18N.foodName(id);
+/* 调料：不在 foods 表里，名字从 FD.PANTRY 取；中英跟着当前语言 */
+const pantryOf = id => (FD.PANTRY || []).find(p => p.id === id) || null;
+const pantryLabel = id => {
+  const p = pantryOf(id);
+  if(!p) return id;
+  return I18N.getLang() === "en" ? p.name : p.cn;
+};
 
 function toast(msg){
   const t = $("#toast"); t.textContent = msg; t.classList.add("on");
@@ -1458,21 +1463,22 @@ function renderCook(){
   $("#ck-icon").innerHTML = `<span style="display:inline-block;animation:ckPulse 2.6s ease-in-out infinite">
       ${COOK_STEPS.svg(act.id, "ck-act")}</span>`;
   $("#ck-text").textContent = text;
-  /* 这一步用到的食材：文字里提到了就只显示这几样，没提到就退回整道菜的主料（并标灰） */
-  /* 食材那一行永远是「这道菜要用」；这一步真要用到的会亮起来（人工标注，没有标注就不亮） */
+  /* 这一步要用：只显示这一步真会用到的东西 —— 食材带插画，调料是文字小标签 */
   const box = $("#ck-ing");
   if(box){
-    const list = cookRecipe.needs.slice(0, 6);
-    const stepIds = window.stepIngredients ? window.stepIngredients(cookRecipe.id, cookStep) : null;
-    const mark = stepIds && stepIds.length ? stepIds : null;   /* null = 不做高亮 */
-    box.innerHTML = list.length
-      ? `<span class="lb">${tt("cook.usesDish", "这道菜要用")}</span>` +
-        list.map(id => {
-          const on = mark && mark.indexOf(id) >= 0;
-          const off = mark && !on;
-          return `<span class="ii ${on ? "on" : ""} ${off ? "off" : ""}">${window.COOK_ART ? COOK_ART.svg(id) : ""}${cnOf(id)}${on ? '<i class="dot" aria-hidden="true"></i>' : ""}</span>`;
-        }).join("")
-      : "";
+    const ids = window.stepIngredients ? window.stepIngredients(cookRecipe.id, cookStep) : null;
+    if(!ids || !ids.length){
+      box.innerHTML = "";
+      box.style.display = "none";
+    } else {
+      box.style.display = "";
+      const isP = id => !!pantryOf(id);
+      const foods = ids.filter(id => !isP(id));
+      const conds = ids.filter(isP);
+      box.innerHTML = `<span class="lb">${tt("cook.usesStep", "这一步要用")}</span>` +
+        foods.map(id => `<span class="ii">${window.COOK_ART ? COOK_ART.svg(id) : ""}${cnOf(id)}</span>`).join("") +
+        conds.map(id => `<span class="ii pk">${pantryLabel(id)}</span>`).join("");
+    }
   }
 
   $("#ck-count").textContent = `${cookStep + 1} / ${steps.length}`;
