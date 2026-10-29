@@ -194,6 +194,7 @@
       "toast.took": "Logged — acceptance +1",
 
       "foot.line": "Prototype v0.6 · no hardware, no image recognition",
+      "foot.gate": "Door camera →",
       "foot.disc": "Round puck →", "foot.strip": "Strip e-paper →", "foot.settings": "Settings →",
 
       "set.title": "Settings",

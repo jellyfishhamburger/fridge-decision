@@ -286,7 +286,7 @@
 
   <div class="foot">
     <span data-i18n="foot.line">原型 · 无硬件、无图像识别</span> · build 20261029-10<br>
-    <a href="disc.html" data-i18n="foot.disc">圆片 →</a> · <a href="display.html" data-i18n="foot.strip">长条屏 →</a> · <a href="settings.html" data-i18n="foot.settings">设置 →</a>
+    <a href="gate.html" data-i18n="foot.gate">门口摄像头 →</a> · <a href="disc.html" data-i18n="foot.disc">圆片 →</a> · <a href="display.html" data-i18n="foot.strip">长条屏 →</a> · <a href="settings.html" data-i18n="foot.settings">设置 →</a>
   </div>
 </div>
 
@@ -370,11 +370,11 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data.js?v=20261029-10"></script>
-<script src="icons.js?v=20261029-10"></script>
-<script src="sync.js?v=20261029-10"></script>
-<script src="logic.js?v=20261029-10"></script>
-<script src="i18n.js?v=20261029-10"></script>
+<script src="data.js?v=20261029-17"></script>
+<script src="icons.js?v=20261029-17"></script>
+<script src="sync.js?v=20261029-17"></script>
+<script src="logic.js?v=20261029-17"></script>
+<script src="i18n.js?v=20261029-17"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -740,12 +740,14 @@ $("#undoBtn").addEventListener("click", ()=>{
 /* ---------- add sheet ---------- */
 let editTarget = null, sheetFor = null;   // editTarget=正在编辑的条目；sheetFor=要补的待确认
 
+function tt(k, fallback){ const v = t(k); return (v === k || v == null) ? fallback : v; }
+
 function openSheet(item, pendItem){
   editTarget = item || null;
   sheetFor = pendItem || null;
   openSheetLegacy();                       /* 建网格 + 回填状态 */
-  if($("#sheetTitle")) $("#sheetTitle").textContent = item ? t("sheet.editTitle") : t("sheet.title");
-  if($("#saveBtn")) $("#saveBtn").textContent = item ? t("sheet.saveEdit") : t("sheet.save");
+  if($("#sheetTitle")) $("#sheetTitle").textContent = item ? tt("sheet.editTitle", "修改这一条") : tt("sheet.title", "加入一样东西");
+  if($("#saveBtn")) $("#saveBtn").textContent = item ? tt("sheet.saveEdit", "保存修改") : tt("sheet.save", "加进冰箱");
 }
 function openSheetLegacy(){
   $("#scrim").classList.add("on"); $("#sheet").classList.add("on");
