@@ -409,8 +409,22 @@
     if (tg) tg.addEventListener("click", function(e){
       e.preventDefault();
       const body = $("#prefsBody");
-      const open = body.classList.toggle("on");
+      const open = !body.classList.contains("on");
+      body.classList.toggle("on", open);
       tg.setAttribute("aria-expanded", String(open));
+      if (open) {
+        body.style.height = "auto";
+        const h = body.getBoundingClientRect().height || 1;
+        body.style.height = "0px";
+        MOTION.spring({ from: 0, to: h, stiffness: 450, damping: 29,
+          onUpdate: function(v){ body.style.height = v + "px"; },
+          onComplete: function(){ body.style.height = "auto"; } });
+      } else {
+        const h = body.getBoundingClientRect().height || 1;
+        MOTION.spring({ from: h, to: 0, stiffness: 440, damping: 32,
+          onUpdate: function(v){ body.style.height = Math.max(0, v) + "px"; },
+          onComplete: function(){ body.style.height = "0px"; } });
+      }
     });
     paintPrefs();
   }
@@ -507,6 +521,20 @@
       const btn = card.querySelector(".cook");
       btn.addEventListener("click", () => cook(r.recipe, btn));
       box.appendChild(card);
+      MOTION.press(btn, { scale: 0.97 });
+      /* 入场：从下方 18px + 轻微缩小弹上来，逐张错开 70ms */
+      card.style.opacity = "0";
+      card.style.transform = "translateY(18px) scale(.985)";
+      setTimeout(function(){
+        MOTION.spring({
+          from: 0, to: 1, stiffness: 320, damping: 26,
+          onUpdate: function(v){
+            card.style.opacity = String(v);
+            card.style.transform = "translateY(" + (18 * (1 - v)) + "px) scale(" + (0.985 + 0.015 * v) + ")";
+          },
+          onComplete: function(){ card.style.opacity = ""; card.style.transform = ""; }
+        });
+      }, 80 + i * 70);
     });
   }
 
@@ -596,36 +624,87 @@
   });
 
 
-  /* ---------- 滚动：橱柜看不见时把锅收成一条；标题栏下滑隐藏 ---------- */
+  /* ---------- 滚动：橱柜看不见时把锅「弹」上去收好；标题栏下滑收起 ----------
+     全部用弹簧（MOTION）而不是 CSS transition：CSS 无法做过冲，
+     收起来会像"啪一下没了"，弹簧才有物件感。 */
+  let compacted = false, headerTween = null, potTween = null;
+
+  function setCompact(on){
+    if (on === compacted) return;
+    compacted = on;
+    document.body.classList.toggle("past-fridge", on);
+    const sec = $("#potSec");
+    if (sec) sec.classList.toggle("compact", on);
+    const pot = $("#pot");
+    if (!pot) return;
+    if (potTween) potTween.stop();
+
+    if (on) {
+      const h = pot.getBoundingClientRect().height || 1;
+      potTween = MOTION.spring({
+        from: h, to: 0, stiffness: 330, damping: 26,
+        onUpdate: function(v){
+          const hh = Math.max(0, v);
+          pot.style.height = hh + "px";
+          pot.style.opacity = String(Math.max(0, Math.min(1, hh / h)));
+        },
+        onComplete: function(){ pot.style.pointerEvents = "none"; }
+      });
+    } else {
+      pot.style.height = "auto"; pot.style.pointerEvents = "";
+      const h = pot.getBoundingClientRect().height || 1;
+      pot.style.height = "0px"; pot.style.opacity = "0";
+      potTween = MOTION.spring({
+        from: 0, to: h, stiffness: 380, damping: 22,
+        onUpdate: function(v){
+          pot.style.height = v + "px";
+          pot.style.opacity = String(Math.min(1, v / h));
+        },
+        onComplete: function(){ pot.style.height = ""; pot.style.opacity = ""; }
+      });
+    }
+  }
+
+  function tuckHeader(on){
+    const top = document.querySelector(".top");
+    if (!top) return;
+    const h = top.offsetHeight || 60;
+    const target = on ? -h : 0;
+    if (headerTween && headerTween.retarget) headerTween.retarget(target);
+    else headerTween = MOTION.spring({
+      from: 0, to: target, stiffness: 430, damping: 33,
+      onUpdate: function(v){ top.style.transform = "translateY(" + v + "px)"; },
+      onComplete: function(){ if (target === 0) top.style.transform = ""; }
+    });
+  }
+
   function setupScroll(){
     const fridge = document.querySelector(".fridge-sec");
-    const potSec = $("#potSec");
-    if (fridge && potSec && "IntersectionObserver" in window) {
-      new IntersectionObserver(function(entries){
-        const away = !entries[0].isIntersecting;
-        potSec.classList.toggle("compact", away);
-        document.body.classList.toggle("past-fridge", away);
-      }, { threshold: 0 }).observe(fridge);
+    if (fridge && "IntersectionObserver" in window) {
+      new IntersectionObserver(function(es){ setCompact(!es[0].isIntersecting); },
+                               { threshold: 0, rootMargin: "-8px 0px 0px 0px" }).observe(fridge);
     }
     let lastY = window.scrollY, ticking = false;
     window.addEventListener("scroll", function(){
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(function(){
-        const y = window.scrollY, top = document.querySelector(".top");
-        if (top) {
-          if (y < 40) top.classList.remove("tuck");
-          else if (y > lastY + 10) top.classList.add("tuck");
-          else if (y < lastY - 6) top.classList.remove("tuck");
-        }
+        const y = window.scrollY;
+        if (y < 40) tuckHeader(false);
+        else if (y > lastY + 10) tuckHeader(true);
+        else if (y < lastY - 6) tuckHeader(false);
         lastY = y; ticking = false;
       });
     }, { passive: true });
 
     const back = $("#backTop");
     if (back) back.addEventListener("click", function(){
-      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+      window.scrollTo({ top: 0, behavior: MOTION.reduce ? "auto" : "smooth" });
     });
+
+    /* 每一个可点的东西都要有「按下去再弹回来」的手感 */
+    document.querySelectorAll(".tile, .primary, .pf, .nav a, .chip button, #prefToggle, .lang, .backtop")
+      .forEach(function(el){ MOTION.press(el, { scale: el.classList.contains("tile") ? 0.94 : 0.965 }); });
   }
 
   bindPrefs();

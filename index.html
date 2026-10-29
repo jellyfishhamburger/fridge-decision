@@ -413,6 +413,7 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="motion.js?v=20261030-4"></script>
 <script src="data.js?v=20261029-17"></script>
 <script src="icons.js?v=20261029-17"></script>
 <script src="dish-photos.js?v=20261029-19"></script>
@@ -1153,6 +1154,12 @@ if (FD.cloudOn()) {
 })();
 if(!items.length) setTimeout(()=>toast(t("toast.tip")), 900);
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+/* 每个按钮都该有按下去的手感（和锅页同一套弹簧） */
+if(window.MOTION){
+  [".btn", ".go", ".nav button", ".navset", ".filter", ".f", "#langBtn"].forEach(function(sel){
+    document.querySelectorAll(sel).forEach(function(el){ MOTION.press(el); });
+  });
+}
 </script>
 </body>
 </html>
