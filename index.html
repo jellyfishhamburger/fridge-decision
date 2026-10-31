@@ -464,10 +464,11 @@
     padding:8px 5px;border-radius:10px;border:1px solid var(--line);background:#FCFAF2;
     color:#7C877E;font-size:12px;line-height:1.1;font-family:inherit;cursor:pointer;
     transition:background .18s,color .18s,border-color .18s}
-  .pe .tick{width:0;opacity:0;overflow:hidden;font-size:10px;line-height:1;color:var(--green)}
+  .pe .tick{width:11px;flex:none;opacity:0;font-size:10px;line-height:1;color:var(--green)}
   .pe .lb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .pe.on{background:var(--green-soft);border-color:var(--green-line);color:#2B5E44;font-weight:700}
-  .pe.on .tick{width:11px;opacity:1}
+  /* 勾位一直占着宽度：点一下文字不会左右跳 */
+  .pe.on{background:#D5E7CE;border-color:var(--green-line);color:#254F3A;font-weight:700}
+  .pe.on .tick{opacity:1}
   .pe:active{transform:scale(.97)}
 
   /* ---- 步骤动作图标：和锅页同一套 9 个动作，卡片里小、跟着做里大 ---- */
