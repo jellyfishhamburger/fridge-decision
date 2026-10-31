@@ -500,6 +500,19 @@
   /* ---------------- 小票核对 ----------------
      只读小票、只提示差异；点「加入清单」才动草稿行，点确认才动库存。 */
   var rcptParsed = [], rcptImage = null, rcptRawText = "";
+  var NL = String.fromCharCode(10);
+  var ocrEngine = (function () {
+    try { return (JSON.parse(localStorage.getItem("fd.prefs.v1") || "{}").ocr) || "fast"; }
+    catch (e) { return "fast"; }
+  })();
+
+  function engineLabel() {
+    var b = $("#rcptEngine");
+    if (!b) return;
+    b.textContent = ocrEngine === "paddle"
+      ? "当前：高精度模式（点击切回快速）"
+      : "识别不准？换高精度模式（首次约 50MB）";
+  }
 
   function rcptMsg(text, isErr) {
     var el = $("#rcptMsg");
@@ -514,7 +527,8 @@
     try {
       var dataUrl = await fileToDataUrl(file);
       rcptImage = dataUrl;
-      var text = await RECEIPT.readText(dataUrl);
+      var lines = await RECEIPT.readLines(dataUrl, ocrEngine);
+      var text = lines.join(NL);
       rcptRawText = text;
       var raw = $("#rcptRaw"), rawBox = $("#rcptRawBox");
       if (raw && rawBox) { raw.textContent = text || "（空）"; rawBox.hidden = !text; }
@@ -608,6 +622,31 @@
   }
 
   $("#rcptPick").addEventListener("click", function () { $("#rcptFile").click(); });
+
+  /* 引擎切换：切完如果手上还有小票图，直接重跑一遍 */
+  $("#rcptEngine").addEventListener("click", function () {
+    ocrEngine = ocrEngine === "paddle" ? "fast" : "paddle";
+    try {
+      var v = JSON.parse(localStorage.getItem("fd.prefs.v1") || "{}");
+      v.ocr = ocrEngine;
+      localStorage.setItem("fd.prefs.v1", JSON.stringify(v));
+    } catch (e) {}
+    engineLabel();
+    if (!rcptImage) { rcptMsg(ocrEngine === "paddle" ? "已切到高精度模式，下次拍小票会用。" : "已切回快速模式。"); return; }
+    rcptMsg("正在用高精度模式重读…（首次要下载模型，约 50MB，稍等）");
+    RECEIPT.readLines(rcptImage, ocrEngine).then(function (lines) {
+      rcptRawText = lines.join(NL);
+      var raw = $("#rcptRaw"), rawBox = $("#rcptRawBox");
+      if (raw && rawBox) { raw.textContent = rcptRawText || "（空）"; rawBox.hidden = !rcptRawText; }
+      rcptParsed = RECEIPT.parse(rcptRawText);
+      rcptMsg(rcptParsed.length
+        ? "高精度读到 " + rcptParsed.length + " 样： " + rcptParsed.map(function (p) { return catName(p.cat) + " ×" + p.qty; }).join("、")
+        : "高精度也没读出商品 —— 直接贴文字吧。", !rcptParsed.length);
+      renderDiff();
+    }).catch(function (e) { rcptMsg("高精度模式失败：" + e.message, true); });
+  });
+
+  engineLabel();
 
   /* OCR 认不出时的手动兜底：贴文字 → 走同一套解析与对账 */
   $("#rcptParse").addEventListener("click", function () {

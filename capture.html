@@ -7,6 +7,13 @@
 <meta name="description" content="买回来的东西一件件过一遍，机器先猜，你确认了才进冰箱。">
 <meta name="theme-color" content="#FBF6EC">
 <link rel="icon" href="icon.svg">
+<script type="importmap">
+{"imports":{
+  "js-yaml":"./vendor/paddleocr/deps/js-yaml.mjs",
+  "clipper-lib":"./vendor/paddleocr/deps/clipper-lib.mjs",
+  "@techstark/opencv-js":"./vendor/paddleocr/deps/opencv.mjs"
+}}
+</script>
 <link rel="stylesheet" href="ds.css?v=20261101-1">
 <link rel="stylesheet" href="capture.css?v=20261101-1">
 <link rel="stylesheet" href="nav.css?v=20261101-1">
@@ -112,6 +119,7 @@
       <p class="rh">拍一张小票，帮你找出「买了但没拍到」的。只做提示，不会自己改库存。</p>
       <div class="rb">
         <button class="btn ghost" id="rcptPick">拍小票 / 选图片</button>
+        <button class="mini" id="rcptEngine" style="margin-top:6px">识别不准？换高精度模式（首次约 50MB）</button>
         <input type="file" id="rcptFile" accept="image/*" capture="environment" hidden>
       </div>
       <div class="rmsg" id="rcptMsg"></div>

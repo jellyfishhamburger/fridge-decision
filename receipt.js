@@ -117,6 +117,61 @@
     });
   }
 
+  /* ---------------- 高精度引擎：PaddleOCR（PP-OCRv5/v6） ----------------
+     比 tesseract 对中文准得多（番茄不会再认成 ei），代价是首次要下 ~50MB。
+     所以做成「默认用 tesseract，认不准时手动切高精度」，不做静默下载。 */
+  var paddleP = null;
+  function paddle() {
+    if (paddleP) return paddleP;
+    paddleP = (async function () {
+      var mod = await import("./vendor/paddleocr/index.mjs");
+      var abs = function (p) { return new URL(p, location.href).href; };
+      var defaultName = "PP-OCRv6_tiny";
+      return await mod.PaddleOCR.create({
+        textDetectionModelName: defaultName + "_det",
+        textDetectionModelAsset: { url: abs("./vendor/paddleocr/models/PP-OCRv6_tiny_det.tar") },
+        textRecognitionModelName: defaultName + "_rec",
+        textRecognitionModelAsset: { url: abs("./vendor/paddleocr/models/PP-OCRv6_tiny_rec.tar") },
+        ortOptions: { backend: "wasm", wasmPaths: abs("./vendor/paddleocr/ort/"), numThreads: 1, simd: true },
+        worker: true
+      });
+    })();
+    return paddleP;
+  }
+
+  /* 高精度：返回「按行重组」后的文本行（PaddleOCR 是按文字块给的，名字/数量/价格可能分三块） */
+  async function readLinesPaddle(dataUrl) {
+    var ocr = await paddle();
+    var blob = await (await fetch(dataUrl)).blob();
+    var res = await ocr.predict(blob);
+    var items = (res[0] && res[0].items) || [];
+    if (!items.length) return [];
+
+    /* 用 poly 的纵坐标把不同文字块归到同一行 */
+    var boxes = items.map(function (it) {
+      var ys = (it.poly || []).map(function (p) { return p[1] != null ? p[1] : p.y; });
+      var xs = (it.poly || []).map(function (p) { return p[0] != null ? p[0] : p.x; });
+      var top = Math.min.apply(null, ys), bot = Math.max.apply(null, ys);
+      return { text: it.text, top: top, bot: bot, left: Math.min.apply(null, xs),
+               cy: (top + bot) / 2, h: Math.max(6, bot - top) };
+    }).filter(function (b) { return b.text && b.text.trim(); });
+
+    boxes.sort(function (a, b) { return a.cy - b.cy || a.left - b.left; });
+    var rows = [];
+    boxes.forEach(function (b) {
+      var row = rows[rows.length - 1];
+      if (row && Math.abs(b.cy - row.cy) <= Math.max(8, row.h * 0.6)) {
+        row.parts.push(b); row.cy = (row.cy + b.cy) / 2; row.h = Math.max(row.h, b.h);
+      } else {
+        rows.push({ cy: b.cy, h: b.h, parts: [b] });
+      }
+    });
+    return rows.map(function (r) {
+      return r.parts.sort(function (a, b) { return a.left - b.left; })
+                    .map(function (p) { return p.text.trim(); }).join(" ");
+    });
+  }
+
   async function readText(src) {
     var w = await worker();
     try { await w.setParameters({ tessedit_pageseg_mode: "6" }); } catch (e) {}   /* 单块文字，适合小票 */
@@ -199,8 +254,30 @@
     return { missing: missing, mismatch: mismatch, extra: extra };
   }
 
+  /* 按行切分：手写循环，避免正则里的转义被工具链吃掉 */
+  function toLines(t) {
+    var out = [], cur = "";
+    var s = String(t || "");
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charCodeAt(i);
+      if (c === 10 || c === 13) { if (cur) out.push(cur); cur = ""; }
+      else cur += s[i];
+    }
+    if (cur) out.push(cur);
+    return out;
+  }
+
+  /* 统一入口：给图片（dataURL），按引擎返回文本行数组 */
+  async function readLines(src, engine) {
+    if (engine === "paddle") {
+      try { return await readLinesPaddle(src); }
+      catch (e) { return toLines(await readText(src)); }
+    }
+    return toLines(await readText(src));
+  }
+
   g.RECEIPT = {
-    readText: readText, parse: parse, reconcile: reconcile, prep: prep,
+    readText: readText, readLines: readLines, parse: parse, reconcile: reconcile, prep: prep,
     ALIAS: ALIAS, parseText: function (t) { return parse(t); }
   };
 })(window);
