@@ -1169,14 +1169,16 @@
   <video class="cam" id="cam" playsinline muted autoplay></video>
   <img class="shotpreview" id="shot" alt="刚拍的照片">
   <div class="row" style="margin-bottom:10px">
-    <button class="btn quiet" id="snapBtn" data-i18n="sheet.cam">打开相机</button>
+    <a class="btn quiet" id="snapBtn" href="capture.html" data-i18n="sheet.aiAdd"
+       style="text-decoration:none;display:flex;align-items:center;justify-content:center">拍照识别（自动认）</a>
     <button class="btn quiet" id="flipBtn" style="display:none" data-i18n="sheet.flip">换镜头</button>
   </div>
-  <div class="zoomrow" id="zoomRow">
+  <div class="zoomrow" id="zoomRow" hidden>
     <span><span data-i18n="sheet.zoom">焦距</span> <b id="zoomLbl">1×</b></span>
     <input type="range" id="zoom" min="1" max="8" step="0.1" value="1">
   </div>
-  <button class="btn quiet" id="scanBtn" style="display:none;margin-bottom:10px" data-i18n="sheet.scan">扫商品条码</button>
+  <a class="btn quiet" id="scanBtn" href="capture.html?receipt=1" data-i18n="sheet.rcptAdd"
+     style="text-decoration:none;display:flex;align-items:center;justify-content:center;margin-bottom:10px">拍小票（整单）</a>
   <p class="cammsg" id="camMsg" data-i18n="sheet.camMsg"></p>
   <div class="grid" id="picks"></div>
   <div class="keep" id="keepBox">
@@ -2682,8 +2684,7 @@ function openSheetLegacy(){
     if(c){ picked = c; pendingDays = c.days; $("#pickHint") && ($("#pickHint").textContent = t("sheet.forPending"));
       paintKeep(); paintQty(); }
   }
-  shotURL = null; $("#shot").classList.remove("on"); $("#snapBtn").textContent = t("sheet.cam");
-  if("BarcodeDetector" in window) $("#scanBtn").style.display = "none";
+  shotURL = null; $("#shot").classList.remove("on"); $("#snapBtn").textContent = t("sheet.aiAdd");
 }
 const unitWord = () => I18N.getLang()==="en" ? "portion" : "份";
 function paintQty(){
@@ -2834,11 +2835,7 @@ async function scanBarcode(){
 $("#addBtn").addEventListener("click", () => openSheet(null, null));
 $("#cancelBtn").addEventListener("click", closeSheet);
 $("#scrim").addEventListener("click", closeSheet);
-$("#snapBtn").addEventListener("click", ()=>{
-  if(shotURL){ shotURL = null; $("#shot").classList.remove("on"); startCam(); }
-  else if(stream){ snap(); }
-  else { startCam(); }
-});
+/* #snapBtn / #scanBtn 现在是 <a href>，直接进 capture.html，不再走旧相机逻辑 */
 $("#flipBtn").addEventListener("click", ()=>{
   camPos = (camPos + 1) % Math.max(1, cams.length);
   stopCam(); startCam();
@@ -2849,7 +2846,7 @@ $("#zoom").addEventListener("input", async e=>{
   $("#zoomLbl").textContent = z.toFixed(1) + "×";
   try{ await camTrack.applyConstraints({advanced:[{zoom:z}]}); }catch(err){}
 });
-$("#scanBtn").addEventListener("click", scanBarcode);
+
 /* 保质期不再用滑条：见 paintKeep()（#days 只作为隐藏值保留） */
 
 $("#saveBtn").addEventListener("click", ()=>{

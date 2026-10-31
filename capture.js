@@ -85,7 +85,7 @@
       } else {
         msg = "摄像头没打开（" + ((e && e.name) || "未知原因") + "）。可以先用「从相册选照片」。";
       }
-      if (why) { why.textContent = msg; why.hidden = false; }
+      if (why) { why.textContent = msg; }
     }
     go(2);
   }
@@ -312,9 +312,7 @@
           '<div class="l1"><select aria-label="食材">' + opts + "</select>" + badge + "</div>" +
           '<p class="l2">' + (hint || (food(r.cat) ? (food(r.cat).tag === "protein" ? "蛋白质" : food(r.cat).tag === "greens" ? "蔬菜" : food(r.cat).tag === "dairy" ? "乳品" : food(r.cat).tag === "carb" ? "主食" : "其它") + " · 约 " + food(r.cat).days + " 天" : "")) + "</p>" +
           '<div class="acts">' +
-            '<button data-a="add" class="' + (r.action === "add" ? "on" : "") + '">加进去</button>' +
-            '<button data-a="adjust" class="' + (r.action === "adjust" ? "on" : "") + '">改数量</button>' +
-            '<button data-a="ignore" class="' + (r.action === "ignore" ? "on" : "") + '">删掉</button>' +
+            '<button data-a="ignore" class="del">✕ 这次不买</button>' +
           "</div>" +
           '<div class="qty"><button data-q="-1" aria-label="减少">−</button>' +
             '<span class="v">' + r.qty + '</span>' +
@@ -377,15 +375,13 @@
   }
 
   function updateBar() {
-    var add = 0, adj = 0, ign = 0;
+    var add = 0;
     state.rows.forEach(function (r) {
-      if (!r.cat || r.action === "ignore") ign++;
-      else if (r.action === "adjust") adj++;
-      else add++;
+      if (r.cat && r.action !== "ignore") add++;
     });
-    $("#barTxt").innerHTML = "加进去 <b>" + add + "</b> · 改数量 <b>" + adj + "</b> · 删掉 " + ign;
-    $("#confirm").textContent = add + adj ? "确认入库（" + (add + adj) + " 件）" : "没有要入库的";
-    $("#confirm").disabled = !(add + adj);
+    $("#barTxt").innerHTML = "共 <b>" + add + "</b> 件要入库";
+    $("#confirm").textContent = add ? "确认入库（" + add + " 件）" : "没有要入库的";
+    $("#confirm").disabled = !add;
   }
 
   /* ---------------- 确认入库（只写一次） ---------------- */
@@ -589,6 +585,16 @@
         return;
       }
       rcptMsg("读到 " + rcptParsed.length + " 样： " + rcptParsed.map(function (p) { return catName(p.cat) + " ×" + p.qty; }).join("、"));
+      if (!state.rows.length) {
+        /* 小票模式：没有照片，小票就是清单本身 */
+        state.rows = rcptParsed.map(function (p) {
+          return { cat: p.cat, label: p.cat, qty: Math.max(1, p.qty || 1), action: "add",
+                   img: "", conf: 1, margin: 1, err: false, ai: false, src: "receipt" };
+        });
+        go(4); renderRows();
+        rcptMsg("已按小票生成清单，下面可以改数量或删掉。");
+        return;
+      }
       renderDiff();
       /* 差异就在下面，自动滚过去，别让人以为没反应 */
       setTimeout(function () {
@@ -671,6 +677,17 @@
 
   aiProbe();
 
+  /* 从冰箱页「拍小票」进来：跳过拍照，直接开小票识别 */
+  if (/[?&]receipt=1/.test(location.search)) {
+    /* 等页面初始化完再跳，否则会被后面的 reset 拽回第 1 步 */
+    setTimeout(function () {
+      go(4);
+      var box = $("#rcptBox");
+      if (box) { box.open = true; box.scrollIntoView({ block: "center" }); }
+      rcptMsg("拍一张小票，我来读上面的商品。");
+    }, 400);
+  }
+
   $("#rcptPick").addEventListener("click", function () { $("#rcptFile").click(); });
   $("#rcptPick2").addEventListener("click", function () { $("#rcptFile").click(); });
 
@@ -721,6 +738,11 @@
   $("#startCam").addEventListener("click", startCam);
   $("#pickFiles").addEventListener("click", function () { $("#fileIn").click(); });
   $("#pickFiles2").addEventListener("click", function () { $("#fileIn").click(); });
+  /* 一旦从相册选了照片，"没给摄像头"那段提示就没意义了 */
+  $("#fileIn").addEventListener("change", function () {
+    var why = $("#camWhy");
+    if (why) why.textContent = "";
+  });
   $("#fileIn").addEventListener("change", function (e) { takeFiles(e.target.files); });
   $("#shoot").addEventListener("click", shoot);
 
@@ -773,6 +795,7 @@
           miss.push(sh);
         }
       } catch (e) {
+        sh.aiErr = String(e && e.message || e);
         miss.push(sh);
       }
     }
@@ -781,8 +804,12 @@
     var chip = $("#lastChip");
     if (chip) {
       chip.hidden = false;
+      var why = "";
+      if (!done) why = "连不上识别服务（" + AI_URL + "）";
+      else if (miss.length && miss[0].aiErr) why = "报错：" + miss[0].aiErr;
+      else if (miss.length && miss[0].label) why = "认成「" + miss[0].label + "」，不在食材表里";
       chip.innerHTML = "<b>AI 认出 " + hit + "/" + done + " 件</b><span class='pct'>"
-        + (miss.length ? miss.length + " 件要手选" : "全部有标签") + "</span>";
+        + (why || (miss.length ? miss.length + " 件要手选" : "全部有标签")) + "</span>";
     }
     if (typeof renderRows === "function" && state.step === 4) renderRows();
   });
