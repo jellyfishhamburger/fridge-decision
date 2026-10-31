@@ -4,6 +4,8 @@
 (function () {
   "use strict";
   var $ = function (s) { return document.querySelector(s); };
+  var LANG = (function () { try { return JSON.parse(localStorage.getItem("fd.lang")) || "zh"; } catch (e) { return "zh"; } })();
+  function fname(f) { return (LANG === "en" ? (f.name || f.cn) : (f.cn || f.name)) || ""; }
   var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
   var NL = String.fromCharCode(10);
 
@@ -78,7 +80,7 @@
   function paintGrid() {
     var box = $("#pickGrid");
     box.innerHTML = FD.CATALOG.map(function (f) {
-      return '<button data-cat="' + f.id + '" class="' + (state.cat === f.id ? "on" : "") + '">' + f.name + "</button>";
+      return '<button data-cat="' + f.id + '" class="' + (state.cat === f.id ? "on" : "") + '">' + fname(f) + "</button>";
     }).join("");
   }
   $("#pickGrid").addEventListener("click", function (e) {
@@ -379,7 +381,7 @@
       if (ex) { ex.qty = (Number(ex.qty) || 0) + r.qty; adjusted++; return; }
       items.push({
         id: "i" + Date.now() + Math.floor(Math.random() * 1e4),
-        cat: f.id, name: f.name, tag: f.tag, qty: r.qty, unit: FD.unitOf ? FD.unitOf(f.id) : "份",
+        cat: f.id, name: fname(f), tag: f.tag, qty: r.qty, unit: FD.unitOf ? FD.unitOf(f.id) : "份",
         daysLeft: f.days, life: f.days, addedAt: today
       });
       added++;
@@ -392,7 +394,7 @@
     var sid = await AUTH.rpc("start_capture_session", {});
     var payload = state.rows.map(function (r) {
       var f = FD.byId[r.cat];
-      return { action: "add", cat: f.id, name: f.name, tag: f.tag, qty: r.qty, unit: FD.unitOf ? FD.unitOf(f.id) : "份", life: f.days };
+      return { action: "add", cat: f.id, name: fname(f), tag: f.tag, qty: r.qty, unit: FD.unitOf ? FD.unitOf(f.id) : "份", life: f.days };
     });
     var res = await AUTH.rpc("confirm_purchase", { p_session: sid, p_rows: payload, p_key: sid + ":confirm" });
     return { added: (res && res.added) | 0, adjusted: (res && res.adjusted) | 0 };
