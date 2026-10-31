@@ -499,7 +499,7 @@
 
   /* ---------------- 小票核对 ----------------
      只读小票、只提示差异；点「加入清单」才动草稿行，点确认才动库存。 */
-  var rcptParsed = [], rcptImage = null;
+  var rcptParsed = [], rcptImage = null, rcptRawText = "";
 
   function rcptMsg(text, isErr) {
     var el = $("#rcptMsg");
@@ -515,9 +515,14 @@
       var dataUrl = await fileToDataUrl(file);
       rcptImage = dataUrl;
       var text = await RECEIPT.readText(dataUrl);
+      rcptRawText = text;
+      var raw = $("#rcptRaw"), rawBox = $("#rcptRawBox");
+      if (raw && rawBox) { raw.textContent = text || "（空）"; rawBox.hidden = !text; }
+      try { localStorage.setItem("fd.receipt.last", text.slice(0, 4000)); } catch (e) {}
       rcptParsed = RECEIPT.parse(text);
       if (!rcptParsed.length) {
-        rcptMsg("没从小票里读出商品 —— 可能是照片太糊，或者这家店的小票格式认不出来。", true);
+        rcptMsg("没从小票里读出商品 —— 可能是照片太糊，或者这家店的小票格式认不出来。可以直接贴文字。", true);
+        $("#rcptManual").hidden = false;
         renderDiff();
         return;
       }
@@ -603,6 +608,19 @@
   }
 
   $("#rcptPick").addEventListener("click", function () { $("#rcptFile").click(); });
+
+  /* OCR 认不出时的手动兜底：贴文字 → 走同一套解析与对账 */
+  $("#rcptParse").addEventListener("click", function () {
+    var txt = ($("#rcptText").value || "").trim();
+    if (!txt) { rcptMsg("先把小票上的商品行贴进来。", true); return; }
+    rcptParsed = RECEIPT.parse(txt);
+    if (!rcptParsed.length) {
+      rcptMsg("这几行里没认出食材 —— 试试写成「牛奶 2盒 25.60」这样。", true);
+      return;
+    }
+    rcptMsg("认到 " + rcptParsed.length + " 样： " + rcptParsed.map(function (p) { return catName(p.cat) + " ×" + p.qty; }).join("、"));
+    renderDiff();
+  });
   $("#rcptFile").addEventListener("change", function (e) {
     var f = e.target.files && e.target.files[0];
     e.target.value = "";

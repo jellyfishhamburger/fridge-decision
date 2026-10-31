@@ -116,6 +116,15 @@
       </div>
       <div class="rmsg" id="rcptMsg"></div>
       <div class="rdiff" id="rcptDiff"></div>
+      <div id="rcptManual" hidden>
+        <p class="rh" style="margin-top:8px">认不出的话，可以直接把小票上的商品行贴进来（一行一个）：</p>
+        <textarea id="rcptText" rows="4" placeholder="青菜 2把 6.00&#10;牛奶 2盒 25.60" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;font:inherit;font-size:13px;background:var(--bg)"></textarea>
+        <button class="btn ghost" id="rcptParse" style="margin-top:8px">解析这几行</button>
+      </div>
+      <details id="rcptRawBox" hidden style="margin:2px 0 10px">
+        <summary style="cursor:pointer;font-size:11.5px;color:var(--muted)">看看 OCR 读到的原文</summary>
+        <pre id="rcptRaw" style="white-space:pre-wrap;font-size:11px;color:var(--muted);background:var(--card-2);padding:8px;border-radius:10px;margin:6px 0 0;max-height:180px;overflow:auto"></pre>
+      </details>
     </details>
     <p class="tiny" id="reviewNote"></p>
   </section>

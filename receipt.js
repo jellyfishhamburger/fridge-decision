@@ -76,9 +76,52 @@
   }
 
   /* 图片（URL / canvas / img）→ 纯文本 */
+  /* 小票预处理：灰度 + 对比度拉伸。
+     热敏纸发灰、手机拍偏黄是最常见的两种「明明看得清但认不出」，
+     拉伸一次直方图比换模型便宜得多。 */
+  function prep(dataUrl) {
+    return new Promise(function (res) {
+      var img = new Image();
+      img.onload = function () {
+        var c = document.createElement("canvas");
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        var ctx = c.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0);
+        try {
+          var d = ctx.getImageData(0, 0, c.width, c.height);
+          var px = d.data, hist = new Array(256).fill(0), i;
+          for (i = 0; i < px.length; i += 4) {
+            var g = (0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]) | 0;
+            px[i] = px[i + 1] = px[i + 2] = g;
+            hist[g]++;
+          }
+          /* 只取 2%–98% 的区间拉伸，避开反光的纯白和阴影的纯黑 */
+          var total = c.width * c.height, lo = 0, hi = 255, acc = 0;
+          for (i = 0; i < 256; i++) { acc += hist[i]; if (acc > total * 0.02) { lo = i; break; } }
+          acc = 0;
+          for (i = 255; i >= 0; i--) { acc += hist[i]; if (acc > total * 0.02) { hi = i; break; } }
+          if (hi - lo > 30) {
+            var k = 255 / (hi - lo);
+            for (i = 0; i < px.length; i += 4) {
+              var v = (px[i] - lo) * k;
+              v = v < 0 ? 0 : v > 255 ? 255 : v;
+              px[i] = px[i + 1] = px[i + 2] = v;
+            }
+          }
+          ctx.putImageData(d, 0, 0);
+        } catch (e) { /* 跨域图会抛，直接用原图 */ }
+        res(c.toDataURL("image/jpeg", 0.92));
+      };
+      img.onerror = function () { res(dataUrl); };
+      img.src = dataUrl;
+    });
+  }
+
   async function readText(src) {
     var w = await worker();
-    var r = await w.recognize(src);
+    try { await w.setParameters({ tessedit_pageseg_mode: "6" }); } catch (e) {}   /* 单块文字，适合小票 */
+    var input = (typeof src === "string" && src.indexOf("data:") === 0) ? await prep(src) : src;
+    var r = await w.recognize(input);
     return (r && r.data && r.data.text) || "";
   }
 
@@ -157,7 +200,7 @@
   }
 
   g.RECEIPT = {
-    readText: readText, parse: parse, reconcile: reconcile,
+    readText: readText, parse: parse, reconcile: reconcile, prep: prep,
     ALIAS: ALIAS, parseText: function (t) { return parse(t); }
   };
 })(window);
