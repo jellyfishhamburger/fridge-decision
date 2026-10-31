@@ -184,7 +184,7 @@
     } else if (!shot.cat || shot.label === "unknown") {
       chip.innerHTML = "<b>没认出来</b><span class='pct'>下一步手选</span>";
     } else {
-      chip.innerHTML = "<b>" + catName(shot.cat) + "</b><span class='pct'>" + pct(shot.conf) + "%"
+      chip.innerHTML = "<b>" + catName(shot.cat) + "</b><span class='pct'>" + (shot.ai ? "AI" : pct(shot.conf) + "%")
         + (shot.total > 1 ? " · " + shot.votes + "/" + shot.total + " 帧一致" : "") + "</span>";
     }
   }
@@ -240,8 +240,9 @@
   function buildRows() {
     state.rows = state.shots.map(function (s) {
       return {
-        cat: s.cat, qty: 1, action: s.cat ? "add" : "ignore",
-        img: s.img, conf: s.conf, label: s.label, margin: s.margin, err: !!s.err
+        cat: s.cat, qty: (s.ai && s.qty > 0 ? s.qty : 1), action: s.cat ? "add" : "ignore",
+        img: s.img, conf: s.conf, label: s.label, margin: s.margin, err: !!s.err,
+        ai: !!s.ai, qty2: s.qty, unit2: s.unit
       };
     });
   }
@@ -271,8 +272,8 @@
       var badge = "";
       if (!r.cat) badge = '<span class="badge warn">没认出来</span>';
       else if (r.err) badge = '<span class="badge warn">服务未接</span>';
-      else if (needsReview(r)) badge = '<span class="badge warn">待确认 ' + pct(r.conf) + "%</span>";
-      else badge = '<span class="badge ok">' + pct(r.conf) + "%</span>";
+      else if (needsReview(r)) badge = '<span class="badge warn">待确认' + (r.ai ? "" : " " + pct(r.conf) + "%") + "</span>";
+      else badge = '<span class="badge ok">' + (r.ai ? "AI 判断" : pct(r.conf) + "%") + "</span>";
 
       var opts = '<option value=""' + (r.cat ? '' : ' selected') + '>还没选</option>' +
                  FD.CATALOG.map(function (f) {
@@ -459,7 +460,7 @@
         p_session: sid,
         p_rows: state.rows.map(function (r) {
           return { cat: r.cat, label: r.label, conf: r.conf, qty: r.qty,
-                   unit: r.cat ? FD.unitOf(r.cat) : "", action: r.action,
+                   unit: r.cat ? FD.unitOf(r.cat) : "", action: r.action, ai: !!r.ai,
                    needs_review: needsReview(r), reason: r.err ? "service" : (r.cat ? "" : "unknown") };
         })
       });
@@ -501,6 +502,33 @@
      只读小票、只提示差异；点「加入清单」才动草稿行，点确认才动库存。 */
   var rcptParsed = [], rcptImage = null, rcptRawText = "";
   var NL = String.fromCharCode(10);
+  /* 本地 AI（电脑上跑的 Qwen2.5-VL 服务）。没有这个服务时按钮永远不出现，
+     原来的端上 9 类模型完全不受影响。 */
+  var AI_URL = "http://127.0.0.1:8941";
+
+  function catFromName(n) {
+    var A = (window.RECEIPT && window.RECEIPT.ALIAS) || {};
+    n = String(n || "").trim();
+    if (!n) return "";
+    for (var k in A) {
+      for (var i = 0; i < A[k].length; i++) {
+        var a = A[k][i];
+        if (n.indexOf(a) >= 0 || a.indexOf(n) >= 0) return k;
+      }
+    }
+    return "";
+  }
+
+  function aiProbe() {
+    var btn = $("#aiRecog");
+    if (!btn) return;
+    var ctl = window.AbortController ? new AbortController() : null;
+    var t = setTimeout(function () { if (ctl) ctl.abort(); }, 1500);
+    fetch(AI_URL + "/health", ctl ? { signal: ctl.signal } : {})
+      .then(function (r) { return r.json(); })
+      .then(function (d) { clearTimeout(t); btn.hidden = !(d && d.ok); })
+      .catch(function () { clearTimeout(t); btn.hidden = true; });
+  }
   var ocrEngine = (function () {
     try { return (JSON.parse(localStorage.getItem("fd.prefs.v1") || "{}").ocr) || "fast"; }
     catch (e) { return "fast"; }
@@ -621,6 +649,8 @@
     });
   }
 
+  aiProbe();
+
   $("#rcptPick").addEventListener("click", function () { $("#rcptFile").click(); });
 
   /* 引擎切换：切完如果手上还有小票图，直接重跑一遍 */
@@ -686,6 +716,54 @@
     chip.innerHTML = s.cat
       ? "<b>" + catName(s.cat) + "</b><span class='pct'>" + pct(s.conf) + "%</span>"
       : "<b>没认出来</b><span class='pct'>下一步手选</span>";
+  });
+
+  /* 本地 AI 重认：逐张送给电脑上的 Qwen，把识别结果回填到每一张 shot 上。
+     只改 shot 的标签，不改库存；后面的确认流程完全照旧。 */
+  $("#aiRecog").addEventListener("click", async function () {
+    var btn = $("#aiRecog");
+    if (!state.shots.length) return;
+    btn.disabled = true;
+    var done = 0, hit = 0, miss = [];
+    for (var i = 0; i < state.shots.length; i++) {
+      var sh = state.shots[i];
+      btn.textContent = "识别中 " + (i + 1) + "/" + state.shots.length + "…";
+      try {
+        var r = await fetch(AI_URL + "/recognize", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: sh.img })
+        }).then(function (x) { return x.json(); });
+        done++;
+        var items = (r && r.items) || [];
+        var first = items[0];
+        var cat = first ? catFromName(first.name) : "";
+        if (cat) {
+          hit++;
+          sh.cat = cat; sh.label = first.name; sh.ai = true;
+          sh.conf = 0.9; sh.second = ""; sh.margin = 1;
+          /* 只有量纲对得上才采信 AI 的数量：它说「10 个鸡蛋」而我们按「盒」记，
+             就不能照搬，否则会变成「10 盒」。量纲不一致时退回 1。 */
+          var catalogUnit = FD.unitOf ? FD.unitOf(cat) : "";
+          if (first.qty != null && first.unit && catalogUnit && first.unit === catalogUnit) {
+            sh.qty = first.qty; sh.unit = first.unit;
+          }
+        } else {
+          sh.cat = ""; sh.label = first ? first.name : ""; sh.ai = true; sh.conf = 0;
+          miss.push(sh);
+        }
+      } catch (e) {
+        miss.push(sh);
+      }
+    }
+    btn.disabled = false;
+    btn.textContent = "本地 AI 重认一遍（更准，需电脑上跑服务）";
+    var chip = $("#lastChip");
+    if (chip) {
+      chip.hidden = false;
+      chip.innerHTML = "<b>AI 认出 " + hit + "/" + done + " 件</b><span class='pct'>"
+        + (miss.length ? miss.length + " 件要手选" : "全部有标签") + "</span>";
+    }
+    if (typeof renderRows === "function" && state.step === 4) renderRows();
   });
 
   $("#toDraft").addEventListener("click", function () {
