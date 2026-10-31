@@ -687,6 +687,8 @@
   }
 
   aiProbe();
+  if ($("#detToggle")) $("#detToggle").addEventListener("click", detStart);
+  applyMode();
 
   /* 从冰箱页「拍小票」进来：跳过拍照，直接开小票识别 */
   if (/[?&]receipt=1/.test(location.search)) {
@@ -744,6 +746,114 @@
     e.target.value = "";
     pickReceipt(f);
   });
+
+
+  /* ============================================================
+     三种录入方式共用这一页，用 ?mode= 区分：
+       detect  自动检测：手一进画面就拍，放完再按一次结束
+       receipt 小票：拍/选小票 → 逐行读出来 → 清单
+       batch   摊开俯拍：拍一张 → 认出多样 → 清单
+     ============================================================ */
+  var MODE = (function () {
+    var m = (location.search.match(/[?&]mode=([a-z]+)/) || [])[1];
+    return m === "detect" || m === "receipt" || m === "batch" ? m : "";
+  })();
+
+  var det = { running: false, timer: null, landmarker: null, lastShot: 0, armed: true, count: 0 };
+
+  async function loadHandLandmarker() {
+    if (det.landmarker) return det.landmarker;
+    var vision = await import("./vendor/mediapipe/vision_bundle.mjs");
+    var fileset = await vision.FilesetResolver.forVisionTasks("./vendor/mediapipe/wasm");
+    det.landmarker = await vision.HandLandmarker.createFromOptions(fileset, {
+      baseOptions: { modelAssetPath: "./models/hand_landmarker.task", delegate: "GPU" },
+      runningMode: "VIDEO", numHands: 1
+    }).catch(async function () {
+      return await vision.HandLandmarker.createFromOptions(fileset, {
+        baseOptions: { modelAssetPath: "./models/hand_landmarker.task", delegate: "CPU" },
+        runningMode: "VIDEO", numHands: 1
+      });
+    });
+    return det.landmarker;
+  }
+
+  function detTick() {
+    if (!det.running) return;
+    var v = $("#cam");
+    if (!v || !v.videoWidth) return;
+    var now = Date.now();
+    try {
+      var res = det.landmarker.detectForVideo(v, now);
+      var hasHand = res && res.landmarks && res.landmarks.length > 0;
+      if (!hasHand) { det.armed = true; return; }
+      /* 手在画面里：冷却过就拍，拍完进冷却，等手离开再装弹 */
+      if (det.armed && now - det.lastShot > 1200 && det.count < 30) {
+        det.lastShot = now; det.armed = false; det.count++;
+        detSnap();
+      }
+    } catch (e) { /* 丢帧就算了 */ }
+  }
+
+  async function detSnap() {
+    var v = $("#cam");
+    var c = document.createElement("canvas");
+    c.width = 480; c.height = 480;
+    var side = Math.min(v.videoWidth, v.videoHeight);
+    c.getContext("2d").drawImage(v, (v.videoWidth - side) / 2, (v.videoHeight - side) / 2, side, side, 0, 0, 480, 480);
+    var shot = await classifyCanvas(c);
+    shot.fullImg = c.toDataURL("image/jpeg", 0.85);
+    addShot(shot);
+    showStage(shot.fullImg);
+    var h = $("#detHint");
+    if (h) h.textContent = "已自动拍 " + det.count + " 件 —— 继续放，放完点「结束并确认」。";
+  }
+
+  async function detStart() {
+    var btn = $("#detToggle");
+    if (det.running) { detStop(); return; }
+    if (!state.stream) await startCam();
+    if (!state.stream) { $("#detHint").textContent = "相机没打开，先用下面的「从相册选照片」。"; return; }
+    btn.textContent = "正在加载手部模型…";
+    btn.disabled = true;
+    try { await loadHandLandmarker(); } catch (e) { btn.disabled = false; btn.textContent = "开始检测"; $("#detHint").textContent = "手部模型加载失败：" + (e && e.message); return; }
+    btn.disabled = false;
+    det.running = true; det.armed = true; det.count = 0;
+    btn.textContent = "结束并确认";
+    btn.classList.add("on");
+    $("#detHint").textContent = "手伸进来就自动拍，不用再按。";
+    det.timer = setInterval(detTick, 220);
+  }
+
+  function detStop() {
+    det.running = false;
+    if (det.timer) { clearInterval(det.timer); det.timer = null; }
+    var btn = $("#detToggle");
+    if (btn) { btn.textContent = "开始检测"; btn.classList.remove("on"); }
+    if (!state.shots.length) { $("#detHint").textContent = "这一轮没拍到东西。再试一次？"; return; }
+    buildRows();
+    go(4);
+    renderRows();
+  }
+
+  function applyMode() {
+    if (!MODE) return;
+    document.body.classList.add("mode-" + MODE);
+    var T = { detect: "自动检测录入", receipt: "小票识别", batch: "摊开俯拍（整批）" };
+    var h1 = $("#pageTitle"); if (h1) h1.textContent = T[MODE] || "采购整理";
+    if (MODE === "detect") {
+      go(2);
+    } else if (MODE === "receipt") {
+      setTimeout(function () {
+        go(4);
+        var box = $("#rcptBox");
+        if (box) { box.open = true; box.scrollIntoView({ block: "center" }); }
+        rcptMsg("拍一张小票，我来读上面的商品。");
+      }, 350);
+    } else if (MODE === "batch") {
+      $("#shoot").textContent = "拍这一批";
+      go(2);
+    }
+  }
 
   /* ---------------- 绑定 ---------------- */
   $("#startCam").addEventListener("click", startCam);
@@ -869,4 +979,5 @@
   window.addEventListener("pagehide", stopCam);
 
   go(1);
+  applyMode();
 })();

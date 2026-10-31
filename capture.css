@@ -263,3 +263,25 @@ h2{
 
 /* 从相册选的图：直接铺在舞台上，替代那块黑底 */
 #stageShot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+
+/* ---- 三种录入模式：各自只露出该露的控件 ---- */
+body.mode-detect #shoot,
+body.mode-detect #toDraft,
+body.mode-detect #aiRecog,
+body.mode-detect #steps,
+body.mode-detect #stepLabel { display:none !important; }
+
+body.mode-batch #toDraft,
+body.mode-batch #aiRecog,
+body.mode-batch #steps,
+body.mode-batch #stepLabel,
+body.mode-batch #detectBar { display:none !important; }
+
+body.mode-receipt #steps,
+body.mode-receipt #stepLabel,
+body.mode-receipt #detectBar { display:none !important; }
+
+body.mode-detect #detectBar { display:block !important; }
+
+body.mode-detect #manualHint,
+body.mode-batch #manualHint { display:none !important; }

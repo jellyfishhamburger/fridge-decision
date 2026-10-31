@@ -1168,16 +1168,18 @@
   <video class="cam" id="cam" playsinline muted autoplay></video>
   <img class="shotpreview" id="shot" alt="刚拍的照片">
   <div class="row" style="margin-bottom:10px">
-    <a class="btn quiet" id="snapBtn" href="capture.html" data-i18n="sheet.aiAdd"
-       style="text-decoration:none;display:flex;align-items:center;justify-content:center">拍照识别（自动认）</a>
+    <a class="btn quiet" id="snapBtn" href="capture.html?mode=detect" data-i18n="sheet.aiAdd"
+       style="text-decoration:none;display:flex;align-items:center;justify-content:center">自动检测录入</a>
     <button class="btn quiet" id="flipBtn" style="display:none" data-i18n="sheet.flip">换镜头</button>
   </div>
   <div class="zoomrow" id="zoomRow" hidden>
     <span><span data-i18n="sheet.zoom">焦距</span> <b id="zoomLbl">1×</b></span>
     <input type="range" id="zoom" min="1" max="8" step="0.1" value="1">
   </div>
-  <a class="btn quiet" id="scanBtn" href="capture.html?receipt=1" data-i18n="sheet.rcptAdd"
-     style="text-decoration:none;display:flex;align-items:center;justify-content:center;margin-bottom:10px">拍小票（整单）</a>
+  <a class="btn quiet" id="scanBtn" href="capture.html?mode=receipt" data-i18n="sheet.rcptAdd"
+     style="text-decoration:none;display:flex;align-items:center;justify-content:center;margin-bottom:10px">小票识别</a>
+  <a class="btn quiet" id="batchBtn" href="capture.html?mode=batch" data-i18n="sheet.batchAdd"
+     style="text-decoration:none;display:flex;align-items:center;justify-content:center;margin-bottom:10px">摊开俯拍（整批）</a>
   <p class="cammsg" id="camMsg" data-i18n="sheet.camMsg"></p>
   <div class="grid" id="picks"></div>
   <div class="keep" id="keepBox">

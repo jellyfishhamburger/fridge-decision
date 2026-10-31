@@ -22,7 +22,7 @@
 
 <header class="top">
   <div class="tt">
-    <h1>采购整理</h1>
+    <h1 id="pageTitle">采购整理</h1>
     <span class="sub" id="stepLabel">第 1 步 · 准备</span>
   </div>
   <a class="quit" href="index.html#fridge" aria-label="退出">✕</a>
@@ -94,10 +94,14 @@
       <button class="mini" id="undoShot" disabled>删掉上一张</button>
     </div>
 
+    <div id="detectBar" hidden style="margin:2px 0 10px">
+      <button class="btn primary" id="detToggle" style="width:100%">开始检测</button>
+      <p class="tiny" id="detHint" style="margin-top:8px">按一次开始；手伸进来就自动拍，放完东西再按一次结束。</p>
+    </div>
     <button class="btn primary shoot" id="shoot">拍这一件</button>
     <button class="btn ghost" id="aiRecog" hidden>本地 AI 重认一遍（更准，需电脑上跑服务）</button>
     <button class="btn ghost" id="toDraft" disabled>拍完了，去确认</button>
-    <p class="tiny">一次只拍一件；同一件反复拍，会在下一步提示你合并。</p>
+    <p class="tiny" id="manualHint">一次只拍一件；同一件反复拍，会在下一步提示你合并。</p>
   </section>
 
   <!-- ========== 3 · 生成清单 ========== -->
