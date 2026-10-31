@@ -52,7 +52,7 @@
       var unit = FD.unitOf ? FD.unitOf(r.cat) : "份";
       return '<div class="row" data-i="' + i + '">' +
         (r.img ? '<img src="' + r.img + '" alt="">' : '<img alt="">') +
-        '<div class="nm"><b>' + (f ? f.name : r.cat) + "</b><span>" + (f ? f.tag : "") + " · 约 " + (f ? f.days : 3) + " 天</span></div>" +
+        '<div class="nm"><b>' + (f ? fname(f) : r.cat) + "</b><span>" + (f ? f.tag : "") + " · 约 " + (f ? f.days : 3) + " 天</span></div>" +
         '<div class="q"><button data-q="-1">−</button><span>' + r.qty + '</span><button data-q="1">＋</button></div>' +
         '<button class="del" data-del="1" aria-label="删掉">✕</button>' +
         "</div>";
@@ -106,6 +106,44 @@
     toast("加进清单了，可以继续选");
     go("review");
   });
+
+  /* ---------- 识别策略 ---------- */
+  var AI_OK = null;
+  async function aiReady() {
+    if (AI_OK !== null) return AI_OK;
+    if (!AI_URL) { AI_OK = false; return AI_OK; }
+    try {
+      var d = await fetch(AI_URL + "/health").then(function (x) { return x.json(); });
+      AI_OK = !!(d && d.ok);
+    } catch (e) { AI_OK = false; }
+    return AI_OK;
+  }
+
+  /* 给一张 canvas 返回 {cat, name, why}：
+     - 有本地 Qwen：开放式识别，能说出"水饺"这种没训过的
+     - 没有：退回 9 类端侧模型，但置信度不够就不自动填（宁可让你手选，也别硬猜） */
+  async function classifySmart(canvas) {
+    if (await aiReady()) {
+      try {
+        var dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+        var r = await fetch(AI_URL + "/recognize", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: dataUrl })
+        }).then(function (x) { return x.json(); });
+        var it = (r && r.items || [])[0];
+        if (it) return { cat: catFromName(it.name), name: it.name, why: "ai" };
+        return { cat: "", name: "", why: "ai-none" };
+      } catch (e) { /* 掉线就退回端侧 */ }
+    }
+    try {
+      var res = await FDCLS.classify(canvas);
+      var conf = res.conf || 0;
+      var cat = (FDCLS.MAP || {})[res.label] || guessCat(res.label);
+      if (!cat) return { cat: "", name: res.label, why: "unknown", conf: conf };
+      if (conf < 0.72) return { cat: "", name: res.label, why: "lowconf", conf: conf };
+      return { cat: cat, name: res.label, why: "ondevice", conf: conf };
+    } catch (e) { return { cat: "", name: "", why: "err" }; }
+  }
 
   /* ---------- 相机 ---------- */
   var stream = null;
@@ -183,14 +221,13 @@
     var url = c.toDataURL("image/jpeg", 0.85);
     showShot(url);
     state.shots.push({ img: url });
-    var cat = "";
-    try {
-      var res = await FDCLS.classify(c);
-      cat = (FDCLS.MAP || {})[res.label] || "";
-      if (!cat) cat = guessCat(res.label);
-    } catch (e) {}
-    if (cat) addRow(cat, 1, "detect", url);
-    $("#detHint").textContent = "已自动拍 " + state.shots.length + " 件 —— 继续放，放完点「结束并确认」。";
+    var r = await classifySmart(c);
+    if (r.cat) addRow(r.cat, 1, "detect", url);
+    else if (r.why === "lowconf") $("#detHint").textContent = "这张没认准（" + Math.round((r.conf || 0) * 100) + "%）—— 先拍着，等下在清单里手动选。";
+    else if (r.why === "ai-none") $("#detHint").textContent = "这张没认出食材，跳过。";
+    else if (r.name) $("#detHint").textContent = "认成了「" + r.name + "」，不在食材表里 —— 等下手动选。";
+    if (!r.cat) { state.needManual = true; }
+    $("#detHint").textContent = "已拍 " + state.shots.length + " 件" + (state.needManual ? "（有没认准的，等下补）" : "") + " —— 放完点「结束并确认」。";
     renderRows();
   }
 
@@ -234,9 +271,8 @@
         var c = await fileToCanvas(files[i]);
         var url = c.toDataURL("image/jpeg", 0.85);
         showShot(url);
-        var cat = "";
-        try { var r = await FDCLS.classify(c); cat = (FDCLS.MAP || {})[r.label] || guessCat(r.label); } catch (err) {}
-        if (cat) addRow(cat, 1, "album", url);
+        var rr = await classifySmart(c);
+        if (rr.cat) addRow(rr.cat, 1, "album", url);
         state.shots.push({ img: url });
       } catch (err) {}
     }
