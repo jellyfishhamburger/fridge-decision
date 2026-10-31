@@ -140,6 +140,7 @@
       <button id="reload">刷新</button>
     </div>
 
+    <button class="btn ghost" id="migrate">把本机库存搬进这个家</button>
     <a class="btn primary" href="index.html#fridge">去冰箱看看</a>
     <button class="btn ghost" id="signOut">退出登录</button>
     <p class="note">把这个邀请码发给家人，他们在自己的手机上登录后填一次，就共用同一个冰箱。</p>
@@ -284,6 +285,30 @@
       .catch(function(){ msg($("#footNote"), "复制不了，手动记一下：" + c); });
   });
   $("#reload").addEventListener("click", paint);
+
+  /* 本机 → 云端：把手机上已有的库存逐条写进当前家庭（add_item 幂等，重跑不会重复） */
+  $("#migrate").addEventListener("click", async function(){
+    var local = [];
+    try { local = (window.FD && FD.items()) || []; } catch(e) { local = []; }
+    if(!local.length){ msg($("#footNote"), "这台手机上没有可搬的库存。", "err"); return; }
+    this.disabled = true;
+    var ok = 0, fail = 0;
+    for (var i = 0; i < local.length; i++) {
+      var it = local[i];
+      try {
+        await AUTH.rpc("add_item", {
+          p_cat: it.cat, p_name: it.name, p_tag: it.tag, p_qty: it.qty || 1,
+          p_unit: it.unit, p_life: it.life, p_days_left: it.daysLeft,
+          p_date_source: "migrated", p_key: "migrate:" + it.id, p_id: it.id
+        });
+        ok++;
+        msg($("#footNote"), "正在搬 " + ok + "/" + local.length + "…");
+      } catch(e) { fail++; }
+    }
+    msg($("#footNote"), "搬完 " + ok + " 样" + (fail ? "，失败 " + fail + " 样（看控制台）" : "") + "。刷新看结果。", fail ? "err" : "ok");
+    this.disabled = false;
+    setTimeout(paint, 600);
+  });
   $("#signOut").addEventListener("click", function(){ AUTH.signOut(); paint(); });
 
   paint();
