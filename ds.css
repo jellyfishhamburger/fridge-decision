@@ -27,6 +27,8 @@
 
   /* 品牌色 */
   --green:#2F6B4F; --green-2:#377257; --green-soft:#DDE9D6; --green-line:#CFE3D9;
+  /* 动作色：按钮/结论条用这一档，比 --green 浅一级，白字仍然够读（对比 4.6:1） */
+  --action:#47805F; --action-hi:#4E8A6B; --action-lo:#3F7358;
   --sage:#7E9C82; --sage-dk:#5F7C64; --sage-bg:#E7EEE4;
   --tomato:#D4553F; --tomato-soft:#FBE7E3;
   --butter:#F2C14E; --butter-bg:#FBEFD2;

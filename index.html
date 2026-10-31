@@ -57,14 +57,14 @@
   .empty{font-size:13px;color:var(--muted);padding:6px 0}
   .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:14px;
     padding:15px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}
-  .btn.primary{background:var(--green);color:#fff;box-shadow:0 6px 18px rgba(15,122,90,.28)}
+  .btn.primary{background:var(--action);color:#fff;box-shadow:0 8px 20px rgba(71,128,95,.22)}
   .btn.primary:active{transform:translateY(1px)}
   .btn.ghost{background:#fff;color:var(--green);border:1px solid var(--green)}
   .btn.quiet{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
   .row{display:flex;gap:10px} .row > *{flex:1}
 
   /* ---------- verdict ---------- */
-  .verdict{background:var(--green);color:#fff;border-radius:20px;padding:18px;margin:0 0 12px;box-shadow:0 12px 32px rgba(15,122,90,.24)}
+  .verdict{background:var(--action);color:#fff;border-radius:20px;padding:18px;margin:0 0 12px;box-shadow:0 12px 32px rgba(71,128,95,.2)}
   .verdict.amber{background:#a96206;box-shadow:0 12px 32px rgba(169,98,6,.22)}
   .verdict .kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
   .verdict h3{font-size:24px;margin:6px 0 8px;line-height:1.15}
@@ -233,7 +233,8 @@
     letter-spacing:-.01em;line-height:var(--lh-tight)}
   .card{border-radius:var(--r);border-color:var(--line)}
   .btn{border-radius:999px;padding:15px 18px;font-weight:700;letter-spacing:.01em}
-  .btn.primary{background:var(--green);box-shadow:0 10px 24px rgba(47,107,79,.24)}
+  .btn.primary{background:var(--action);box-shadow:0 10px 24px rgba(71,128,95,.22)}
+  .btn.primary:active{background:var(--action-lo)}
   .btn.ghost{border-color:var(--green);color:var(--green);background:transparent}
   .nav{background:rgba(255,253,247,.98);border-top-color:var(--line)}
   .chip{background:#FFFDF7;border-color:var(--line);border-radius:18px}
@@ -259,13 +260,13 @@
 
   .cta{display:flex;align-items:center;gap:13px;width:100%;margin:6px 0 0;padding:17px 18px;
     border:0;border-radius:24px;cursor:pointer;text-align:left;color:#fff;font-family:inherit;
-    background:linear-gradient(180deg,#377257 0%,#2B5F47 100%);
-    box-shadow:0 12px 26px rgba(43,95,71,.26),inset 0 1px 0 rgba(255,255,255,.14)}
-  .cta:active{transform:translateY(1px);box-shadow:0 8px 18px rgba(43,95,71,.24)}
+    background:linear-gradient(180deg,var(--action-hi) 0%,var(--action) 100%);
+    box-shadow:0 12px 26px rgba(71,128,95,.2),inset 0 1px 0 rgba(255,255,255,.16)}
+  .cta:active{transform:translateY(1px);box-shadow:0 8px 18px rgba(71,128,95,.2)}
   .cta .ic{width:32px;height:32px;flex:0 0 auto;opacity:.95}
   .cta .tx{flex:1;min-width:0}
   .cta .t{display:block;font-size:18.5px;font-weight:800;letter-spacing:-.01em;line-height:1.25}
-  .cta .s{display:block;font-size:12.5px;opacity:.8;margin-top:3px;line-height:1.3}
+  .cta .s{display:block;font-size:12.5px;opacity:.92;margin-top:3px;line-height:1.3}
   .cta .ar{width:20px;height:20px;flex:0 0 auto;opacity:.9}
 
   .hb{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:24px 0 10px}
@@ -408,18 +409,22 @@
 
   .soon{margin:0 0 14px}
   .soon .fhd{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 8px}
-  .soonrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-  .wc{display:flex;align-items:center;gap:9px;min-width:0;text-align:left;
-    border:1px solid var(--line);background:var(--card);border-radius:14px;padding:9px 10px;
-    font-family:inherit;cursor:pointer;transition:transform .18s ease,border-color .2s}
+  /* 和锅页的橱柜同一套：插画在上、名字、剩余天数 —— 比一排窄胶囊好认 */
+  .soonrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+  .wc{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;text-align:center;
+    border:1px solid var(--line);background:var(--card);border-radius:16px;padding:10px 8px 11px;
+    font-family:inherit;cursor:pointer;transition:transform .18s var(--ease),border-color .2s;
+    box-shadow:0 1px 2px rgba(47,60,45,.04)}
   .wc:active{transform:scale(.98)}
-  .wc .wi{flex:none;display:grid;place-items:center;color:var(--green)}
-  .wc .wt{min-width:0;display:flex;flex-direction:column;gap:1px}
-  .wc .wd{font-size:17px;line-height:1.1;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
-  .wc .wd b{font-size:17px;font-weight:700}
-  .wc .wn{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .wc.hot b{color:var(--red)} .wc.warm b{color:var(--amber)} .wc.ok b{color:var(--green)}
-  .wc.hot{border-color:#f0cfc9;background:#fdf5f3}
+  .wc .wart{display:grid;place-items:center;height:50px;margin-bottom:1px}
+  .wc .wart .art{width:46px;height:46px;display:block}
+  .wc .wart svg{width:46px;height:46px;display:block}
+  .wc .wn{max-width:100%;font-size:13px;font-weight:700;color:var(--ink);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wc .wd{font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--green)}
+  .wc.warm .wd{color:var(--amber)} .wc.ok .wd{color:var(--muted)}
+  .wc.hot{border-color:#F0CFC9;background:#FDF7F4}
+  .wc.hot .wd{color:var(--red)}
 
   .fblock{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 14px 12px}
   .fbhd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
@@ -441,21 +446,29 @@
   .row-i .del:hover,.row-i .del:active{background:#f7ece9;color:var(--red)}
 
 
-  /* 调味料 */
-  .pantry{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
-  .pantry summary{display:flex;align-items:center;gap:8px;padding:13px 14px;cursor:pointer;list-style:none}
+  /* 调味料：一格一格的小方块，勾上的带对勾；说明只留一句 */
+  .pantry{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .pantry summary{display:flex;align-items:center;gap:8px;padding:14px 16px;cursor:pointer;list-style:none}
   .pantry summary::-webkit-details-marker{display:none}
-  .pantry .pt{font-size:14px;font-weight:600;color:var(--ink)}
-  .pantry .pcount{margin-left:auto;font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted);
-    background:#F1F4EF;border-radius:999px;padding:2px 8px}
-  .pantry summary::after{content:"⌄";color:var(--muted);font-size:12px;transition:transform .22s}
-  .pantry[open] summary::after{transform:rotate(180deg)}
-  .pantry .hint{padding:0 14px;margin:0 0 10px}
-  .pantryChips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 14px}
-  .pe{font-size:12.5px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);
-    background:#F7F9F6;color:var(--muted);cursor:pointer;font-family:inherit;
+  .pantry .pt{font-size:14.5px;font-weight:700;color:var(--ink)}
+  .pantry .pcount{margin-left:auto;font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;
+    color:var(--muted);background:var(--card-3);border-radius:999px;padding:2px 8px}
+  .pantry summary::after{content:"";width:8px;height:8px;margin:0 3px 0 2px;flex:none;
+    border-right:1.7px solid var(--muted-2);border-bottom:1.7px solid var(--muted-2);
+    transform:rotate(45deg) translateY(-2px);transition:transform .2s}
+  .pantry[open] summary::after{transform:rotate(225deg) translateY(-2px)}
+  .pantry .phint{margin:0 16px 10px;font-size:12px;line-height:1.5;color:var(--muted)}
+  .pantryChips{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:7px;
+    padding:0 16px 16px}
+  .pe{display:flex;align-items:center;justify-content:center;gap:3px;min-width:0;
+    padding:8px 5px;border-radius:10px;border:1px solid var(--line);background:#FCFAF2;
+    color:#7C877E;font-size:12px;line-height:1.1;font-family:inherit;cursor:pointer;
     transition:background .18s,color .18s,border-color .18s}
-  .pe.on{background:var(--green-soft);border-color:#cfe3d9;color:var(--green);font-weight:600}
+  .pe .tick{width:0;opacity:0;overflow:hidden;font-size:10px;line-height:1;color:var(--green)}
+  .pe .lb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pe.on{background:var(--green-soft);border-color:var(--green-line);color:#2B5E44;font-weight:700}
+  .pe.on .tick{width:11px;opacity:1}
+  .pe:active{transform:scale(.97)}
 
   /* ---- 步骤动作图标：和锅页同一套 9 个动作，卡片里小、跟着做里大 ---- */
   .rc ol, .card ol, .rcard ol{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
@@ -713,7 +726,7 @@
 
         <!-- 冰箱库存徽标 -->
         <g filter="url(#drop)" pointer-events="none">
-          <rect x="6" y="21" width="106" height="25" rx="12.5" fill="#FFFDF7"/>
+          <rect id="sceneBadgeBox" x="6" y="21" width="106" height="25" rx="12.5" fill="#FFFDF7"/>
         </g>
         <text id="sceneBadge" x="59" y="37.6" text-anchor="middle" font-size="11" font-weight="700"
               fill="#2F6B4F" pointer-events="none">12 样 · 3 样急</text>
@@ -881,7 +894,7 @@
         <span class="pt" data-i18n="fridge.pantryH">我的调味料</span>
         <span class="pcount" id="pantryCount"></span>
       </summary>
-      <p class="hint" data-i18n="fridge.pantryHint">调味料不算冰箱里的菜。勾上的才算「家里有」，影响推荐里「还差什么」。</p>
+      <p class="phint" data-i18n="fridge.pantryHint">勾上是家里有的 —— 没勾的，做菜时会提示要买。</p>
       <div class="pantryChips" id="pantryChips"></div>
     </details>
 
@@ -1145,7 +1158,18 @@ function homeDaysUrgent(){
 function renderHome(){
   const n = items.length, u = homeDaysUrgent();
   const badge = $("#sceneBadge"), subEl = $("#homeSub");
-  if(badge) badge.textContent = n ? t("home.badge", {n:n, u:u}) : t("home.badgeEmpty");
+  if(badge){
+    const txt = n ? t("home.badge", {n:n, u:u}) : t("home.badgeEmpty");
+    badge.textContent = txt;
+    /* 徽标底框跟着文字宽度走：换成「临期」之后写死 106 会溢出 */
+    const box = $("#sceneBadgeBox");
+    if(box){
+      const wide = txt.replace(/[^\x00-\xff]/g, "aa");
+      const w = Math.max(96, Math.round(wide.length * 5.4 + 24));
+      box.setAttribute("width", w);
+      badge.setAttribute("x", 6 + w / 2);
+    }
+  }
   if(subEl) subEl.textContent = n ? t("home.sub", {n:n, u:u}) : t("home.subEmpty");
 
   /* 今晚能做：优先「现在就能做」，没有就退到「差一样」 */
@@ -1383,12 +1407,15 @@ function renderItems(){
       soonBox.innerHTML = `<h3 class="fhd">${tt("fridge.soonH", "先吃这些")}</h3>` +
         `<div class="soonrow">` + top.map(it => {
           const d = FD.daysLeftOf(it);
+          const art = (window.COOK_ART && COOK_ART.has(it.cat))
+            ? COOK_ART.svg(it.cat)
+            : (window.FD_ICON ? FD_ICON(it.cat, 44) : "");
+          const left = d <= 0 ? tt("fridge.today", "今天到期")
+                     : (d === 1 ? tt("fridge.oneDay", "还剩 1 天") : t("fridge.left", {n: d}));
           return `<button class="wc ${daysClass(d)}" data-edit="${it.id}">
-            <span class="wi">${window.FD_ICON(it.cat, 20)}</span>
-            <span class="wt">
-              <span class="wd"><b>${d <= 0 ? "0" : d}</b>${d <= 0 ? "" : tt("fridge.daysLeft", "天")}</span>
-              <span class="wn">${cnOf(it.cat)}</span>
-            </span>
+            <span class="wart">${art}</span>
+            <span class="wn">${cnOf(it.cat)}</span>
+            <span class="wd">${left}</span>
           </button>`;
         }).join("") + `</div>`;
       soonBox.querySelectorAll("[data-edit]").forEach(btn => btn.addEventListener("click", () => {
@@ -1464,9 +1491,12 @@ function itemRow(it){
 function paintPantry(){
   const box = $("#pantryChips"); if(!box) return;
   const have = new Set(FD.pantry());
-  box.innerHTML = FD.PANTRY.map(p =>
-    `<button class="pe ${have.has(p.id) ? "on" : ""}" data-p="${p.id}">${I18N.getLang() === "en" ? p.name : p.cn}</button>`
-  ).join("");
+  box.innerHTML = FD.PANTRY.map(p => {
+    const on = have.has(p.id);
+    const label = I18N.getLang() === "en" ? p.name : p.cn;
+    return `<button class="pe ${on ? "on" : ""}" data-p="${p.id}" aria-pressed="${on}">`
+      + `<span class="tick" aria-hidden="true">✓</span><span class="lb">${label}</span></button>`;
+  }).join("");
   const c = $("#pantryCount");
   if(c) c.textContent = `${have.size}/${FD.PANTRY.length}`;
 }
@@ -2256,7 +2286,7 @@ function applyLang(){
   $("#pageTitle").textContent = t(TITLES[view]);
   $("#qtyLbl") && paintQty();
   renderItems();
-  if(view === "home") renderHome();
+  renderHome();            /* 场景徽标/“先吃这些”不分页面，切语言就得跟着换 */
   if(view === "discover") renderDiscover();
   if(view === "build") renderBuild();
   const rbox = $("#result"); if(rbox && rbox.innerHTML) renderResult(FD.decide(items, goal));
