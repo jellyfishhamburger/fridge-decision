@@ -81,7 +81,7 @@
     <div class="stage" id="stage">
       <video id="cam" playsinline muted autoplay></video>
       <div class="stage-off" id="camOff">
-        <p>这个浏览器没给摄像头，或者现在不方便开。</p>
+        <p id="camWhy">这个浏览器没给摄像头，或者现在不方便开。</p>
         <button class="btn ghost" id="pickFiles2">从相册选照片</button>
       </div>
       <div class="guide" id="guide" aria-hidden="true"></div>
@@ -109,7 +109,7 @@
   <!-- ========== 4 · 草稿清单 ========== -->
   <section class="pane" id="s4">
     <h2 id="draftH">这些要放进冰箱</h2>
-    <p class="lede">猜错的改成对的；冰箱里本来就有的，选「不变」。</p>
+    <p class="lede">认错了点「删掉」；这次买了不止一件，点「改数量」。</p>
 
     <div id="rows" class="rows"></div>
 
@@ -119,9 +119,10 @@
       <summary>用小票核对（可选）</summary>
       <p class="rh">拍一张小票，帮你找出「买了但没拍到」的。只做提示，不会自己改库存。</p>
       <div class="rb">
-        <button class="btn ghost" id="rcptPick">拍小票 / 选图片</button>
+        <button class="btn ghost" id="rcptPick">拍小票</button>
+        <button class="btn ghost" id="rcptPick2">从相册选小票</button>
         <button class="mini" id="rcptEngine" style="margin-top:6px">识别不准？换高精度模式（首次约 50MB）</button>
-        <input type="file" id="rcptFile" accept="image/*" capture="environment" hidden>
+        <input type="file" id="rcptFile" accept="image/*" hidden>
       </div>
       <div class="rmsg" id="rcptMsg"></div>
       <div class="rdiff" id="rcptDiff"></div>

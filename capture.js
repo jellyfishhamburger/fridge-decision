@@ -70,6 +70,22 @@
       $("#stage").classList.remove("off");
     } catch (e) {
       $("#stage").classList.add("off");
+      var why = $("#camWhy");
+      var msg;
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        msg = "这个浏览器不支持直接开摄像头（微信/QQ 等内置浏览器常见）。用 Safari 或 Chrome 打开这个网址就能拍。";
+      } else if (e && e.name === "NotAllowedError") {
+        msg = "相机权限被拒了。点地址栏左边的「大小 / 锁」图标 → 网站设置 → 允许相机，再刷新。";
+      } else if (e && e.name === "NotFoundError") {
+        msg = "没找到摄像头。";
+      } else if (e && e.name === "NotReadableError") {
+        msg = "摄像头被别的 App 占用，先关掉其它用相机的程序。";
+      } else if (location.protocol !== "https:" && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+        msg = "现在不是 https，浏览器不给相机。用 https 网址，或者从相册选照片。";
+      } else {
+        msg = "摄像头没打开（" + ((e && e.name) || "未知原因") + "）。可以先用「从相册选照片」。";
+      }
+      if (why) { why.textContent = msg; why.hidden = false; }
     }
     go(2);
   }
@@ -282,8 +298,8 @@
                  }).join("");
 
       var hint = "";
-      if (r.err) hint = "识别服务没起来 —— 从上面选一个，或者忽略。";
-      else if (!r.cat) hint = "没认出来 —— 从上面选一个，或者忽略。";
+      if (r.err) hint = "识别服务没起来 —— 从上面选一个，或者删掉这行。";
+      else if (!r.cat) hint = "没认出来 —— 从上面选一个，或者删掉这行。";
       else if (r.margin < 0.12) hint = "和第二名（" + (r.second === r.label ? "同类" : (MAP[r.second] ? catName(MAP[r.second]) : "其它")) + "）很接近，看一眼图。";
       else if (r.conf < 0.6) hint = "不太确定，确认一下是不是" + catName(r.cat) + "。";
       else if (r.total > 1) hint = (r.votes + "/" + r.total + " 帧一致，比较可信。") + (r.blur < 45 ? " 图有点糊，下次靠近点。" : "");
@@ -296,10 +312,9 @@
           '<div class="l1"><select aria-label="食材">' + opts + "</select>" + badge + "</div>" +
           '<p class="l2">' + (hint || (food(r.cat) ? (food(r.cat).tag === "protein" ? "蛋白质" : food(r.cat).tag === "greens" ? "蔬菜" : food(r.cat).tag === "dairy" ? "乳品" : food(r.cat).tag === "carb" ? "主食" : "其它") + " · 约 " + food(r.cat).days + " 天" : "")) + "</p>" +
           '<div class="acts">' +
-            '<button data-a="add" class="' + (r.action === "add" ? "on" : "") + '">新增</button>' +
-            '<button data-a="adjust" class="' + (r.action === "adjust" ? "on" : "") + '">调整</button>' +
-            '<button data-a="keep" class="' + (r.action === "keep" ? "on" : "") + '">不变</button>' +
-            '<button data-a="ignore" class="' + (r.action === "ignore" ? "on" : "") + '">忽略</button>' +
+            '<button data-a="add" class="' + (r.action === "add" ? "on" : "") + '">加进去</button>' +
+            '<button data-a="adjust" class="' + (r.action === "adjust" ? "on" : "") + '">改数量</button>' +
+            '<button data-a="ignore" class="' + (r.action === "ignore" ? "on" : "") + '">删掉</button>' +
           "</div>" +
           '<div class="qty"><button data-q="-1" aria-label="减少">−</button>' +
             '<span class="v">' + r.qty + '</span>' +
@@ -362,14 +377,13 @@
   }
 
   function updateBar() {
-    var add = 0, adj = 0, keep = 0, ign = 0;
+    var add = 0, adj = 0, ign = 0;
     state.rows.forEach(function (r) {
       if (!r.cat || r.action === "ignore") ign++;
-      else if (r.action === "add") add++;
       else if (r.action === "adjust") adj++;
-      else keep++;
+      else add++;
     });
-    $("#barTxt").innerHTML = "新增 <b>" + add + "</b> · 调整 <b>" + adj + "</b> · 不变 " + keep + " · 忽略 " + ign;
+    $("#barTxt").innerHTML = "加进去 <b>" + add + "</b> · 改数量 <b>" + adj + "</b> · 删掉 " + ign;
     $("#confirm").textContent = add + adj ? "确认入库（" + (add + adj) + " 件）" : "没有要入库的";
     $("#confirm").disabled = !(add + adj);
   }
@@ -445,7 +459,7 @@
 
     var payload = [];
     state.rows.forEach(function (r) {
-      if (!r.cat || r.action === "ignore" || r.action === "keep") return;
+      if (!r.cat || r.action === "ignore") return;
       var f = food(r.cat);
       if (!f) return;
       payload.push({
@@ -486,14 +500,14 @@
     stopCam();
 
     $("#sumcards").innerHTML =
-      '<div class="a"><b>' + stats.added + "</b><span>新增</span></div>" +
-      '<div class="b"><b>' + stats.adjusted + "</b><span>调整</span></div>" +
+      '<div class="a"><b>' + stats.added + "</b><span>加进冰箱</span></div>" +
+      '<div class="b"><b>' + stats.adjusted + "</b><span>改数量</span></div>" +
       '<div class="c"><b>' + (stats.kept + stats.skipped) + "</b><span>没动</span></div>";
     $("#doneH").textContent = wrote ? "已经记进冰箱了" : "这次没往冰箱加东西";
     $("#doneSub").textContent = wrote
       ? (cloud ? "共 " + wrote + " 件写进云端，家里的手机都能看到。"
                : "共 " + wrote + " 件写进去了。冰箱页和首页的推荐会跟着变。")
-      : "你选的都是「不变」或「忽略」，所以库存没动。";
+      : "这行你都删掉了，所以库存没动。";
     go(5);
   }
 
@@ -504,7 +518,12 @@
   var NL = String.fromCharCode(10);
   /* 本地 AI（电脑上跑的 Qwen2.5-VL 服务）。没有这个服务时按钮永远不出现，
      原来的端上 9 类模型完全不受影响。 */
-  var AI_URL = "http://127.0.0.1:8941";
+  /* 必须用「当前页面所在的主机名」：用 127.0.0.1 只有电脑自己能连，
+     手机访问时那是手机自己。https 页面不允许连 http，直接不启用。 */
+  var AI_PORT = 8941;
+  var AI_URL = (location.protocol === "http:")
+    ? "http://" + (location.hostname || "127.0.0.1") + ":" + AI_PORT
+    : "";
 
   function catFromName(n) {
     var A = (window.RECEIPT && window.RECEIPT.ALIAS) || {};
@@ -522,6 +541,7 @@
   function aiProbe() {
     var btn = $("#aiRecog");
     if (!btn) return;
+    if (!AI_URL) { btn.hidden = true; return; }
     var ctl = window.AbortController ? new AbortController() : null;
     var t = setTimeout(function () { if (ctl) ctl.abort(); }, 1500);
     fetch(AI_URL + "/health", ctl ? { signal: ctl.signal } : {})
@@ -652,6 +672,7 @@
   aiProbe();
 
   $("#rcptPick").addEventListener("click", function () { $("#rcptFile").click(); });
+  $("#rcptPick2").addEventListener("click", function () { $("#rcptFile").click(); });
 
   /* 引擎切换：切完如果手上还有小票图，直接重跑一遍 */
   $("#rcptEngine").addEventListener("click", function () {
