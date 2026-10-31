@@ -1012,7 +1012,6 @@
       <p class="empty" id="emptyNote" data-i18n="fridge.empty">还没记录任何东西 —— 用下面的按钮加一样。</p>
       <div class="row" style="margin-top:12px">
         <button class="btn ghost" id="addBtn" data-i18n="fridge.add">＋ 加一样</button>
-        <button class="btn quiet" id="demoBtn" data-i18n="fridge.demo">载入示例</button>
       </div>
       <a class="findlink" href="capture.html" style="margin-top:4px" data-i18n="cap.fridgeLink">刚买完菜？整理本次采购 →</a>
     </div>
@@ -2888,7 +2887,7 @@ if($("#decideBtn")) $("#decideBtn").addEventListener("click", ()=>{
   const r = $("#result"); if(r) window.scrollTo({top:r.offsetTop - 70, behavior:"smooth"});
 });
 
-$("#demoBtn").addEventListener("click", ()=>{
+const __unusedDemo = (()=>{
   const mk = (cat, days, qty) => { const f = FD.byId[cat];
     return {id:uid(), cat, name:f.name, tag:f.tag, qty:qty||1, unit:FD.unitOf(cat),
             daysLeft:days, life:days, addedAt:today()}; };

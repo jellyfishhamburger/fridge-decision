@@ -90,6 +90,14 @@
     go(2);
   }
 
+  /* 把某张图铺到舞台上；没有图就恢复黑底 */
+  function showStage(src) {
+    var img = $("#stageShot");
+    if (!img) return;
+    if (src) { img.src = src; img.style.display = "block"; }
+    else { img.style.display = "none"; img.removeAttribute("src"); }
+  }
+
   function stopCam() {
     if (state.stream) {
       state.stream.getTracks().forEach(function (t) { t.stop(); });
@@ -246,7 +254,10 @@
     for (var i = 0; i < list.length; i++) {
       try {
         var c = await fromFile(list[i]);
-        addShot(await classifyCanvas(c));
+        var shot = await classifyCanvas(c);
+        shot.fullImg = c.toDataURL("image/jpeg", 0.85);
+        addShot(shot);
+        showStage(shot.fullImg);
       } catch (e) { /* 跳过读不了的 */ }
     }
     $("#fileIn").value = "";
@@ -537,13 +548,13 @@
   function aiProbe() {
     var btn = $("#aiRecog");
     if (!btn) return;
-    if (!AI_URL) { btn.hidden = true; return; }
+    if (!AI_URL) { btn.style.display = "none"; return; }
     var ctl = window.AbortController ? new AbortController() : null;
     var t = setTimeout(function () { if (ctl) ctl.abort(); }, 1500);
     fetch(AI_URL + "/health", ctl ? { signal: ctl.signal } : {})
       .then(function (r) { return r.json(); })
-      .then(function (d) { clearTimeout(t); btn.hidden = !(d && d.ok); })
-      .catch(function () { clearTimeout(t); btn.hidden = true; });
+      .then(function (d) { clearTimeout(t); btn.style.display = (d && d.ok) ? "" : "none"; })
+      .catch(function () { clearTimeout(t); btn.style.display = "none"; });
   }
   var ocrEngine = (function () {
     try { return (JSON.parse(localStorage.getItem("fd.prefs.v1") || "{}").ocr) || "fast"; }
@@ -752,8 +763,9 @@
     $("#cnt").textContent = "已拍 " + n + " 件";
     $("#undoShot").disabled = !n;
     $("#toDraft").disabled = !n;
-    if (!n) { $("#lastChip").hidden = true; return; }
+    if (!n) { $("#lastChip").hidden = true; showStage(""); return; }
     var s = state.shots[n - 1];
+    showStage(s.fullImg || s.img || "");
     var chip = $("#lastChip");
     chip.hidden = false;
     chip.innerHTML = s.cat
