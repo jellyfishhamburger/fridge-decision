@@ -201,30 +201,46 @@
     return catFromName(cn);
   }
 
-  async function classifyClip(canvas) {
-    var pipe = await clipPipeline();
-    var url = canvas.toDataURL("image/jpeg", 0.85);
-    var cand = clipCandidates();
-    var out = await pipe(url, cand.map(function (c) { return c.label; }));
-    if (!out || !out.length) return { cat: "", name: "", why: "clip-none" };
+  function centerCrop(canvas, ratio) {
+    var w = canvas.width, h = canvas.height;
+    var side = Math.floor(Math.min(w, h) * ratio);
+    var c = document.createElement("canvas");
+    c.width = side; c.height = side;
+    c.getContext("2d").drawImage(canvas, (w - side) / 2, (h - side) / 2, side, side, 0, 0, side, side);
+    return c;
+  }
 
-    /* 先按「品类」合并分数：同一品类的多个说法（水饺/云吞/汤圆）不该互相打架，
-       否则第二名永远是自己的同义词，边际判断就永远过不了。 */
-    var byCat = {}, best = {};
-    out.forEach(function (o) {
-      var hit = cand.filter(function (c) { return c.label === o.label; })[0];
-      if (!hit) return;
-      if (!(hit.cat in byCat) || o.score > byCat[hit.cat]) {
-        byCat[hit.cat] = o.score;
-        best[hit.cat] = hit.name;
-      }
+  async function clipScores(canvas) {
+    var pipe = await clipPipeline();
+    var cand = clipCandidates();
+    var labels = cand.map(function (c) { return c.label; });
+    /* 两遍：整图 + 中心裁切。中心的那次加权，因为拍的是手里那件 */
+    var full = await pipe(canvas.toDataURL("image/jpeg", 0.8), labels);
+    var mid = await pipe(centerCrop(canvas, 0.62).toDataURL("image/jpeg", 0.8), labels);
+    var score = {};
+    var name = {};
+    [full, mid].forEach(function (list, idx) {
+      var wgt = idx === 0 ? 1.0 : 1.35;
+      (list || []).forEach(function (o) {
+        var hit = cand.filter(function (c) { return c.label === o.label; })[0];
+        if (!hit) return;
+        var v = o.score * wgt;
+        if (!(hit.cat in score) || v > score[hit.cat]) { score[hit.cat] = v; name[hit.cat] = hit.name; }
+      });
     });
-    var ranked = Object.keys(byCat).map(function (k) { return { cat: k, score: byCat[k], name: best[k] }; })
+    var ranked = Object.keys(score).map(function (k) { return { cat: k, score: score[k], name: name[k] }; })
       .sort(function (a, b) { return b.score - a.score; });
+    return ranked;
+  }
+
+  async function classifyClip(canvas) {
+    var ranked = await clipScores(canvas);
+    if (!ranked.length) return { cat: "", name: "", why: "clip-none" };
     var top = ranked[0], sec = ranked[1] || { score: 0 };
-    if (!top) return { cat: "", name: "", why: "clip-none" };
+    var cat = top.cat;
+
     if (top.score >= 0.12 && (top.score - sec.score) >= 0.03) {
-      return { cat: top.cat, name: top.name, why: "clip", conf: top.score };
+      return { cat: cat, name: top.name, why: "clip", conf: top.score };
     }
     return { cat: "", name: top.name, why: "lowconf", conf: top.score };
   }
