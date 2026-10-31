@@ -91,3 +91,8 @@ body.ad{
 
 /* display:flex 会顶掉 hidden 属性，必须显式关掉 */
 .ad-bar[hidden]{display:none !important}
+
+.row .nm select{
+  width:100%;font:inherit;font-size:14.5px;font-weight:600;color:var(--ink);
+  background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 8px;
+}

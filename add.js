@@ -36,13 +36,22 @@
   }
 
   /* ---------- 清单 ---------- */
-  function addRow(cat, qty, src, img) {
+  function addRow(cat, qty, src, img, guessName) {
     var f = FD.byId[cat];
-    if (!f) return;
+    if (cat && !f) return;
     var same = state.rows.filter(function (r) { return r.cat === cat; })[0];
     if (same && src !== "receipt") { same.qty += (qty || 1); renderRows(); return; }
-    state.rows.push({ cat: cat, qty: Math.max(1, qty || 1), src: src || "", img: img || "" });
+    state.rows.push({ cat: cat || "", qty: Math.max(1, qty || 1), src: src || "", img: img || "", guess: guessName || "" });
     renderRows();
+  }
+
+  /* 每一行都能直接改成正确的食材：认错了不用删掉重来 */
+  function selHtml(r) {
+    var opts = '<option value="">' + (r.guess ? "认成「" + r.guess + "」，选一样" : "选一样…") + "</option>" +
+      FD.CATALOG.map(function (c) {
+        return '<option value="' + c.id + '"' + (c.id === r.cat ? " selected" : "") + ">" + fname(c) + "</option>";
+      }).join("");
+    return '<select data-sel="1">' + opts + "</select>";
   }
 
   function renderRows() {
@@ -52,16 +61,16 @@
       var unit = FD.unitOf ? FD.unitOf(r.cat) : "份";
       return '<div class="row" data-i="' + i + '">' +
         (r.img ? '<img src="' + r.img + '" alt="">' : '<img alt="">') +
-        '<div class="nm"><b>' + (f ? fname(f) : r.cat) + "</b><span>" + (f ? f.tag : "") + " · 约 " + (f ? f.days : 3) + " 天</span></div>" +
+        '<div class="nm">' + selHtml(r) + "<span>" + (f ? f.tag + " · 约 " + f.days + " 天" : "还没选是哪一样") + "</span></div>" +
         '<div class="q"><button data-q="-1">−</button><span>' + r.qty + '</span><button data-q="1">＋</button></div>' +
         '<button class="del" data-del="1" aria-label="删掉">✕</button>' +
         "</div>";
     }).join("") || '<p class="tiny">还没有东西。用上面的方式加，或者点「＋ 补一件」。</p>';
-    var n = state.rows.length;
+    var n = state.rows.filter(function (r) { return !!r.cat; }).length;
     $("#barTxt").textContent = "共 " + n + " 件要入库";
     $("#confirm").textContent = n ? "确认入库（" + n + " 件）" : "确认入库";
     $("#confirm").disabled = !n;
-    $("#bar").hidden = !(state.view === "review" && n);
+    $("#bar").hidden = !(state.view === "review" && state.rows.length);
     $("#cnt") && ($("#cnt").textContent = "已拍 " + state.shots.length + " 件");
   }
 
@@ -69,6 +78,11 @@
     var row = e.target.closest(".row"); if (!row) return;
     var i = +row.dataset.i;
     if (e.target.dataset.del) { state.rows.splice(i, 1); renderRows(); return; }
+    if (e.target.dataset.sel) {
+      state.rows[i].cat = e.target.value;
+      renderRows();
+      return;
+    }
     var q = e.target.dataset.q;
     if (q) {
       state.rows[i].qty = Math.max(1, state.rows[i].qty + (+q));
@@ -223,11 +237,10 @@
     state.shots.push({ img: url });
     var r = await classifySmart(c);
     if (r.cat) addRow(r.cat, 1, "detect", url);
-    else if (r.why === "lowconf") $("#detHint").textContent = "这张没认准（" + Math.round((r.conf || 0) * 100) + "%）—— 先拍着，等下在清单里手动选。";
-    else if (r.why === "ai-none") $("#detHint").textContent = "这张没认出食材，跳过。";
-    else if (r.name) $("#detHint").textContent = "认成了「" + r.name + "」，不在食材表里 —— 等下手动选。";
-    if (!r.cat) { state.needManual = true; }
-    $("#detHint").textContent = "已拍 " + state.shots.length + " 件" + (state.needManual ? "（有没认准的，等下补）" : "") + " —— 放完点「结束并确认」。";
+    else addRow("", 1, "detect", url, r.name || "");
+    if (!r.cat) state.needManual = true;
+    var note = r.cat ? "" : (r.why === "lowconf" ? "（没认准，等下选）" : r.name ? "（认成「" + r.name + "」，等下选）" : "（没认出来，等下选）");
+    $("#detHint").textContent = "已拍 " + state.shots.length + " 件" + note + " —— 放完点「结束并确认」。";
     renderRows();
   }
 
@@ -272,7 +285,7 @@
         var url = c.toDataURL("image/jpeg", 0.85);
         showShot(url);
         var rr = await classifySmart(c);
-        if (rr.cat) addRow(rr.cat, 1, "album", url);
+        addRow(rr.cat, 1, "album", url, rr.name || "");
         state.shots.push({ img: url });
       } catch (err) {}
     }
