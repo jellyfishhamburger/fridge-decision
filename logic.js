@@ -558,9 +558,48 @@
     return picked;
   }
 
+
+  /* ---------- 套餐内的「换一道」 ---------- */
+  /* 同一角色里还有哪些能做（用于给某一格换菜） */
+  function altDishes(recipeId, items, st, limit, roles) {
+    st = st || settings();
+    /* roles：这一格允许的角色（来自意图模板）；不传就按这道菜自己的角色找同类 */
+    const base = RECIPES.filter(r => r.id === recipeId)[0] || {};
+    const allowed = roles && roles.length ? roles : [tagOf(base).role];
+    return RECIPES.filter(r => r.id !== recipeId && allowed.indexOf(tagOf(r).role) >= 0)
+      .map(r => evaluate(r, items, st))
+      .filter(e => e.status !== "blocked")
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit || 6)
+      .map(e => ({ recipe: e.recipe, status: e.status, missing: e.missing, minutes: e.recipe.minutes, kcal: e.recipe.kcal }));
+  }
+
+  /* 用指定的几道菜拼一套（用户换过菜之后走这里） */
+  function composeSet(ids, items, st) {
+    st = st || settings();
+    const dishes = (ids || []).map(id => RECIPES.filter(r => r.id === id)[0]).filter(Boolean)
+      .map(r => evaluate(r, items, st));
+    if (!dishes.length) return null;
+    const onepot = dishes.some(d => tagOf(d.recipe).role === "onepot");
+    const minutes = Math.max.apply(null, dishes.map(d => d.recipe.minutes)) + 8;
+    const kcal = dishes.reduce((a, d) => a + (d.recipe.kcal || 0), 0) + (onepot ? 0 : STAPLE_KCAL);
+    const missing = [];
+    dishes.forEach(d => d.missing.forEach(c => { if (missing.indexOf(c) < 0) missing.push(c); }));
+    const used = [], seen = {};
+    dishes.forEach(d => (d.used || []).forEach(i => { if (i && !seen[i.id]) { seen[i.id] = 1; used.push(i); } }));
+    return {
+      id: ids.slice().sort().join("+"), custom: true,
+      dishes, minutes, kcal, missing, used, onepot,
+      ready: dishes.every(d => d.status === "ready"),
+      urgent: used.some(i => daysLeftOf(i) <= 2),
+      name: dishes.map(d => d.recipe.name).join(" + ") + (onepot ? "" : " + 米饭"),
+      pantryMissing: [...new Set(dishes.flatMap(d => d.pantryMissing))]
+    };
+  }
+
   global.FD = {
     CATALOG, RECIPES, PANTRY, byId, pantryById, DB, SETS,
-    evaluateSet, decideSets, buildSets, INTENTS, tagOf,
+    evaluateSet, decideSets, buildSets, INTENTS, tagOf, altDishes, composeSet,
     LS_ITEMS, LS_SETTINGS, LS_LOG, LS_PANTRY, LS_HOUSEHOLD,
     read, write,
     items, saveItems, unitOf, consumptionOf, consume, migrate, mergeItems,

@@ -556,8 +556,16 @@
   .verdict.setv h3{color:var(--ink);font-size:21px}
   .verdict.setv .badge{background:var(--card-2);color:var(--ink-2)}
   .setv .setlist{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
-  .setv .sdi{background:var(--card-2);border-radius:var(--r-pill);padding:5px 11px;
-    font-size:12.5px;color:var(--ink-2)}
+  .setv .sdi{background:var(--card-2);border:1px dashed var(--line);border-radius:var(--r-pill);
+    padding:5px 11px;font-size:12.5px;color:var(--ink-2);font-family:inherit;cursor:pointer}
+  .setv .sdi:active{transform:translateY(1px)}
+  .altpanel{margin:8px 0 2px;padding:10px;border-radius:var(--r-sm);background:var(--bg);border:1px solid var(--line)}
+  .altpanel .sn2{margin:0 0 6px;font-size:11.5px;color:var(--muted)}
+  .altpanel .altbtn{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;
+    border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:13px;
+    padding:9px 11px;border-radius:10px;margin-top:6px;cursor:pointer;text-align:left}
+  .altpanel .altbtn i{font-style:normal;font-size:11.5px;color:var(--muted);white-space:nowrap}
+  .altpanel .altbtn.dim{opacity:.6}
   .setv .sdi i{font-style:normal;color:var(--muted);font-size:11px;margin-left:2px}
   .setv .snote{margin:8px 0 0;font-size:11.5px;color:var(--muted)}
 
@@ -1223,6 +1231,7 @@ let picked = null, pendingDays = 3, pendingQty = 1, stream = null;
 let cookRecipe = null, cookStep = 0, lastUndo = null, cookSession = null, cookCloud = null;
 let setPlan = null;   /* {name,dishes:[],idx} —— 正在做的套餐 */
 let setIntent = "hearty", setPick = 0;   /* 今晚想要什么 + 换到第几套 */
+let setChoice = null;                    /* 用户手动换过菜之后的组合（dish id 数组） */
 let discFilter = "all", buildPicks = new Set();
 
 const uid = () => Math.random().toString(36).slice(2, 9);
@@ -1682,7 +1691,12 @@ function renderResult(list, sel){
   try{ genSets = (FD.buildSets ? FD.buildSets(items, goal, setIntent) : []); }catch(e){ genSets = []; }
   /* 只有「整套现在就能做」的才推 —— 缺料的不许冒充套餐 */
   const readySets = genSets.filter(x => x.ready);
-  const gen = readySets.length ? readySets[setPick % readySets.length] : null;
+  let gen = readySets.length ? readySets[setPick % readySets.length] : null;
+  /* 用户手动换过菜：按他换的那套来 */
+  if(setChoice && setChoice.length){
+    const c = FD.composeSet(setChoice, items, goal);
+    if(c && c.ready) gen = c;
+  }
 
   /* 生成不出来（库存太少）时，退回手工精选里能做的那套 */
   let legacy = null;
@@ -1707,6 +1721,7 @@ function renderResult(list, sel){
                        .sort((a, b) => FD.daysLeftOf(a) - FD.daysLeftOf(b));
     const li = [];
     if(urgent.length) li.push("用掉 " + urgent.map(i => cnOf(i.cat) + "（" + FD.daysLeftOf(i) + " 天）").join("、"));
+    else if(used.length) li.push("用掉冰箱里 " + used.length + " 样现有食材");
     if((setTop.dishes || []).some(d => d.recipe.greens)) li.push("有绿叶菜");
     li.push(setMeta.minutes + " 分钟，一口锅就够");
     const miss = (setTop.pantryMissing || []);
@@ -1731,7 +1746,8 @@ function renderResult(list, sel){
         <span class="badge">${setMeta.n}${tp("sets.dishes", {}, " 道菜")}${setMeta.rice ? tp("sets.plusRice", {}, " + 米饭") : ""}</span>
       </div>
       <div class="setlist">${setDishes.map((d, i) =>
-        `<span class="sdi">${i + 1}. ${d.name}<i>${d.minutes}′</i></span>`).join("")}</div>
+        `<button class="sdi" data-swapdish="${i}" title="换一道">${i + 1}. ${d.name}<i>${d.minutes}′</i></button>`).join("")}</div>
+      <div class="altpanel" id="altPanel" hidden></div>
       <p class="snote">${tp("sets.hint", {}, "按顺序做：先做耗时的，最后一道起锅就能吃。")}</p>
       <div class="setacts">
         <button class="btn primary" data-set-dishes="${setDishes.map(d => d.id).join("|")}" data-set-name="${(setName || "").replace(/"/g, "&quot;")}">${tp("sets.start", {}, "开始做这一套")}</button>
@@ -1771,11 +1787,41 @@ function renderResult(list, sel){
   /* 注意：重画时必须把同一个容器传回去，否则会画到 #result 去 */
   const boxSel = sel || "#result";
   box.querySelectorAll("[data-intent]").forEach(b=>{
-    b.addEventListener("click", () => { setIntent = b.dataset.intent; setPick = 0; renderResult(list, boxSel); });
+    b.addEventListener("click", () => { setIntent = b.dataset.intent; setPick = 0; setChoice = null; renderResult(list, boxSel); });
   });
   box.querySelectorAll("[data-setswap]").forEach(b=>{
-    b.addEventListener("click", () => { setPick++; renderResult(list, boxSel); });
+    b.addEventListener("click", () => { setPick++; setChoice = null; renderResult(list, boxSel); });
   });
+  box.querySelectorAll("[data-swapdish]").forEach(b=>{
+    b.addEventListener("click", () => {
+      const idx = Number(b.dataset.swapdish);
+      const cur = setDishes.map(d => d.id);
+      const it = (FD.INTENTS || []).filter(i => i.id === setIntent)[0];
+      const roles = it && it.slots && it.slots[idx] ? it.slots[idx] : null;
+      /* 热量预算：换上去的菜不能把这一套顶出区间（单人份别给 1790 kcal 的选项） */
+      const others = cur.filter((_, j) => j !== idx)
+        .reduce((a, id) => { const r = FD.RECIPES.filter(x => x.id === id)[0]; return a + (r && r.kcal ? r.kcal : 0); }, 0);
+      const cap = (it ? it.kcalMax : 1200) - others - (gen && gen.onepot ? 0 : 150);
+      const alts = (FD.altDishes ? FD.altDishes(cur[idx], items, goal, 8, roles) : [])
+        .filter(a => cur.indexOf(a.recipe.id) < 0 && (a.recipe.kcal || 0) <= cap)
+        .slice(0, 6);
+      const panel = box.querySelector("#altPanel");
+      if(!panel) return;
+      if(!alts.length){ panel.hidden = false; panel.innerHTML = `<p class="sn2">这个位置暂时没有别的能做。</p>`; return; }
+      panel.hidden = false;
+      panel.innerHTML = `<p class="sn2">第 ${idx + 1} 道换成：</p>` +
+        alts.map(a => `<button class="altbtn${a.status === "ready" ? "" : " dim"}" data-pickalt="${a.recipe.id}" data-idx="${idx}">${I18N.recipeName(a.recipe)}<i>${a.minutes}′ · ${a.kcal} kcal</i></button>`).join("");
+      panel.querySelectorAll("[data-pickalt]").forEach(x => {
+        x.addEventListener("click", () => {
+          const next = setDishes.map(d => d.id);
+          next[Number(x.dataset.idx)] = x.dataset.pickalt;
+          setChoice = next;
+          renderResult(list, boxSel);
+        });
+      });
+    });
+  });
+
   box.querySelectorAll("[data-set-dishes]").forEach(b=>{
     b.addEventListener("click", () => startSet(b.dataset.setDishes.split("|").filter(Boolean), b.dataset.setName));
   });
