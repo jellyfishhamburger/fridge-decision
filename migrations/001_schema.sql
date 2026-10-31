@@ -19,19 +19,18 @@ alter table households add column if not exists created_by uuid;
 alter table households add column if not exists created_at timestamptz default now();
 alter table households add column if not exists join_code text;
 
--- 只有表里为空时才能加主键；已有数据时跳过，改用唯一索引
+-- households 建表时大概率已经用 code 当主键了 —— 表里已有 PRIMARY KEY 就不能再加 id 主键
+-- （加会静默失败），但外键只要求「被引用列上有唯一约束」。所以给 id 补一个唯一索引：
+-- 这不是主键，却足够让 items.household_id / household_members.household_id 的
+-- 外键引用成立。之前报的 42830 就是这一步缺失导致的。
+create unique index if not exists households_id_ux on households (id);
+
 do $$
 begin
-  if not exists (select 1 from households limit 1) then
-    begin
-      alter table households add primary key (id);
-    exception when others then null;
-    end;
-    begin
-      alter table households alter column code drop not null;
-    exception when others then null;
-    end;
-  end if;
+  begin
+    alter table households alter column id set not null;
+  exception when others then null;
+  end;
 end $$;
 
 create unique index if not exists households_join_code_ux on households (join_code);

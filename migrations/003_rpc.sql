@@ -75,9 +75,10 @@ begin
       v_id := coalesce(nullif(r->>'item_id',''),
                        'i' || substr(replace(gen_random_uuid()::text,'-',''), 1, 12));
       insert into items (id, household, household_id, cat, name, tag, qty, unit, life,
-                         added_at, created_by, date_source, estimated, version)
+                         days_left, added_at, created_by, date_source, estimated, version)
       values (v_id, v_code, v_hh, r->>'cat', r->>'name', r->>'tag', v_qty, r->>'unit',
-              coalesce((r->>'life')::int, 3), current_date, auth.uid(),
+              coalesce((r->>'life')::int, 3), coalesce((r->>'life')::int, 3),
+              current_date, auth.uid(),
               coalesce(r->>'date_source','manual'), coalesce((r->>'estimated')::boolean, true), 1);
       insert into inventory_events (household_id, item_id, delta, reason, idempotency_key, created_by)
       values (v_hh, v_id, v_qty, 'purchase_confirm', p_key || ':' || v_id, auth.uid());
