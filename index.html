@@ -580,8 +580,13 @@
   .verdict.setv .badge{background:var(--card-2);color:var(--ink-2)}
   .setv .setlist{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
   .setv .sdi{background:var(--card-2);border:1px dashed var(--line);border-radius:var(--r-pill);
-    padding:5px 11px;font-size:12.5px;color:var(--ink-2);font-family:inherit;cursor:pointer}
+    padding:8px 13px;font-size:12.5px;color:var(--ink-2);font-family:inherit;cursor:pointer;
+    min-height:34px;display:inline-flex;align-items:center;gap:2px}
   .setv .sdi:active{transform:translateY(1px)}
+  .verdict.setv.near{background:var(--card-2);border-style:dashed}
+  .setv .sdi.static{border-style:solid;cursor:default}
+  .setv .nearmiss{margin:8px 0 0;padding:8px 11px;border-radius:10px;background:var(--amber-soft);
+    color:#7A4A05;font-size:12.5px}
   .altpanel{margin:8px 0 2px;padding:10px;border-radius:var(--r-sm);background:var(--bg);border:1px solid var(--line)}
   .altpanel .sn2{margin:0 0 6px;font-size:11.5px;color:var(--muted)}
   .altpanel .altbtn{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;
@@ -1258,7 +1263,10 @@ let pantry = FD.pantry();
 let picked = null, pendingDays = 3, pendingQty = 1, stream = null;
 let cookRecipe = null, cookStep = 0, lastUndo = null, cookSession = null, cookCloud = null;
 let setPlan = null;   /* {name,dishes:[],idx} —— 正在做的套餐 */
-let setIntent = "hearty", setPick = 0;   /* 今晚想要什么 + 换到第几套 */
+let setIntent = (function(){
+  try{ const v = JSON.parse(localStorage.getItem("fd.prefs.v1") || "{}"); return v.setIntent || "hearty"; }
+  catch(e){ return "hearty"; }
+})(), setPick = 0;   /* 今晚想要什么（记住上次） + 换到第几套 */
 let setChoice = null;                    /* 用户手动换过菜之后的组合（dish id 数组） */
 let discFilter = "all", buildPicks = new Set();
 
@@ -1762,6 +1770,11 @@ function renderResult(list, sel){
     const c = FD.composeSet(setChoice, items, goal);
     if(c && c.ready) gen = c;
   }
+  /* 一套都做不齐时，退一步给「差 1–2 样」的那套 —— 真实冰箱大多是这个状态 */
+  let nearSet = null;
+  if(!gen){
+    nearSet = genSets.filter(x => x.missing.length <= 2 && x.dishes.length)[0] || null;
+  }
 
   /* 生成不出来（库存太少）时，退回手工精选里能做的那套 */
   let legacy = null;
@@ -1800,6 +1813,23 @@ function renderResult(list, sel){
   const intentsHTML = (FD.INTENTS || []).map(i =>
     `<button class="itbtn${i.id === setIntent ? " on" : ""}" data-intent="${i.id}">${i.name}</button>`).join("");
 
+  const nearHTML = (!setTop && nearSet) ? `
+    <div class="intents">${intentsHTML}</div>
+    <div class="verdict setv near">
+      <div class="kicker">${tp("sets.nearKicker", {}, "差一点就能做这一套")}</div>
+      <h3>${nearSet.name}</h3>
+      <div class="meta">
+        <span class="badge">${tp("sets.min", {n: nearSet.minutes}, nearSet.minutes + " 分钟")}</span>
+        <span class="badge">${tp("sets.kcal", {n: nearSet.kcal}, "约 " + nearSet.kcal + " kcal")}</span>
+      </div>
+      <div class="setlist">${nearSet.dishes.map((d, i) =>
+        `<span class="sdi static">${i + 1}. ${I18N.recipeName(d.recipe)}<i>${d.recipe.minutes}′</i></span>`).join("")}</div>
+      <div class="nearmiss">${tp("sets.miss", {}, "还差")}：${nearSet.missing.map(c => cnOf(c)).join("、")}</div>
+      <div class="setacts">
+        <button class="btn ghost" data-setswap="1">${tp("sets.next", {}, "换一套")}</button>
+      </div>
+    </div>` : "";
+
   const setHTML = setTop ? `
     <div class="intents">${intentsHTML}</div>
     <div class="verdict setv">
@@ -1832,7 +1862,7 @@ function renderResult(list, sel){
     </div>
     ${top.status==="shop1"?`<div class="shop">${t("card.missing")}<b>${FD.shoppingHint(top)}</b><br>${t("card.missingHint")}</div>`:""}`;
 
-  box.innerHTML = setHTML + singleHTML + `
+  box.innerHTML = setHTML + nearHTML + singleHTML + `
     ${setTop ? "" : `<div class="why">
       <b>${t("card.why")}</b>
       <ul>${reasons(top).map(r=>`<li>${r}</li>`).join("")}</ul>
@@ -1852,7 +1882,12 @@ function renderResult(list, sel){
   /* 注意：重画时必须把同一个容器传回去，否则会画到 #result 去 */
   const boxSel = sel || "#result";
   box.querySelectorAll("[data-intent]").forEach(b=>{
-    b.addEventListener("click", () => { setIntent = b.dataset.intent; setPick = 0; setChoice = null; renderResult(list, boxSel); });
+    b.addEventListener("click", () => {
+      setIntent = b.dataset.intent; setPick = 0; setChoice = null;
+      try{ const v = JSON.parse(localStorage.getItem("fd.prefs.v1") || "{}"); v.setIntent = setIntent;
+           localStorage.setItem("fd.prefs.v1", JSON.stringify(v)); }catch(e){}
+      renderResult(list, boxSel);
+    });
   });
   box.querySelectorAll("[data-setswap]").forEach(b=>{
     b.addEventListener("click", () => { setPick++; setChoice = null; renderResult(list, boxSel); });
