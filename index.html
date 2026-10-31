@@ -543,6 +543,13 @@
   .capcard .cc-ar{flex:none;width:15px;height:15px;color:var(--sage)}
 
   /* 套餐卡：今晚这一套 */
+  .intents{display:flex;gap:6px;margin:0 0 10px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .intents .itbtn{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink-2);
+    font:inherit;font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:var(--r-pill);cursor:pointer}
+  .intents .itbtn.on{background:var(--green-soft);border-color:var(--green-line);color:var(--green)}
+  .setv .setacts{display:flex;gap:8px;margin-top:10px;align-items:stretch}
+  .setv .setacts .btn{margin:0;width:auto;flex:1 1 auto;min-width:0;min-height:46px;padding:13px 14px;font-size:15px}
+  .setv .setacts .btn.ghost{flex:0 0 auto;padding:13px 16px;white-space:nowrap;font-size:14px}
   .verdict.setv{background:var(--card);color:var(--ink);border:1px solid var(--line);
     box-shadow:var(--shadow)}
   .verdict.setv .kicker{color:var(--sage-dk);opacity:1}
@@ -1184,6 +1191,7 @@
 
 <script src="motion.js?v=20261030-4"></script>
 <script src="data.js?v=20261030-18"></script>
+<script src="tags.js?v=20261101-7"></script>
 <script src="sets.js?v=20261101-6"></script>
 <script src="cook-art.js?v=20261030-6"></script>
 <script src="cook-steps.js?v=20261030-6"></script>
@@ -1213,7 +1221,8 @@ let goal   = FD.settings();
 let pantry = FD.pantry();
 let picked = null, pendingDays = 3, pendingQty = 1, stream = null;
 let cookRecipe = null, cookStep = 0, lastUndo = null, cookSession = null, cookCloud = null;
-let setPlan = null;   /* {id,name,dishes:[],idx} —— 正在做的套餐 */
+let setPlan = null;   /* {name,dishes:[],idx} —— 正在做的套餐 */
+let setIntent = "hearty", setPick = 0;   /* 今晚想要什么 + 换到第几套 */
 let discFilter = "all", buildPicks = new Set();
 
 const uid = () => Math.random().toString(36).slice(2, 9);
@@ -1668,23 +1677,67 @@ function renderResult(list, sel){
   }
   const top = usable[0], alts = usable.slice(1,3);
 
-  /* 有整套餐「现在就能做」时，先给套餐 —— 单人吃饭要的是一顿饭，不是一道菜 */
-  let setTop = null;
-  try{ setTop = (FD.decideSets ? FD.decideSets(items, goal).filter(s => s.ready)[0] : null); }catch(e){}
+  /* 套餐：按「今晚想要什么」现场组合（不是手工写死的清单） */
+  let genSets = [];
+  try{ genSets = (FD.buildSets ? FD.buildSets(items, goal, setIntent) : []); }catch(e){ genSets = []; }
+  /* 只有「整套现在就能做」的才推 —— 缺料的不许冒充套餐 */
+  const readySets = genSets.filter(x => x.ready);
+  const gen = readySets.length ? readySets[setPick % readySets.length] : null;
+
+  /* 生成不出来（库存太少）时，退回手工精选里能做的那套 */
+  let legacy = null;
+  if(!gen){
+    try{ legacy = (FD.decideSets ? FD.decideSets(items, goal).filter(x => x.ready)[0] : null); }catch(e){}
+  }
+  const setTop = gen || legacy;
+  const setDishes = gen
+    ? gen.dishes.map(d => ({ name: I18N.recipeName(d.recipe), id: d.recipe.id, minutes: d.recipe.minutes }))
+    : (legacy ? legacy.dishes.map(d => ({ name: I18N.recipeName(d.recipe), id: d.recipe.id, minutes: d.recipe.minutes })) : []);
+  const setMeta = gen
+    ? { minutes: gen.minutes, kcal: gen.kcal, n: gen.dishes.length, rice: !gen.onepot, intent: gen.intent }
+    : (legacy ? { minutes: legacy.minutes, kcal: legacy.kcal, n: legacy.dishes.length, rice: legacy.set.staple === "rice", intent: null } : null);
+
+  /* 套餐理由：用掉哪些临期、有没有绿叶、多久、还缺什么调料 */
+  const setWhy = setTop ? (function(){
+    const used = [], seen = {};
+    (setTop.dishes || []).forEach(d => (d.used || []).forEach(i => {
+      if(i && !seen[i.id]){ seen[i.id] = 1; used.push(i); }
+    }));
+    const urgent = used.filter(i => FD.daysLeftOf(i) <= 3)
+                       .sort((a, b) => FD.daysLeftOf(a) - FD.daysLeftOf(b));
+    const li = [];
+    if(urgent.length) li.push("用掉 " + urgent.map(i => cnOf(i.cat) + "（" + FD.daysLeftOf(i) + " 天）").join("、"));
+    if((setTop.dishes || []).some(d => d.recipe.greens)) li.push("有绿叶菜");
+    li.push(setMeta.minutes + " 分钟，一口锅就够");
+    const miss = (setTop.pantryMissing || []);
+    if(miss.length) li.push("还要调味：" + miss.slice(0, 4).map(p => pantryLabel(p)).join("、"));
+    return `<div class="why"><b>这一套为什么合适</b><ul>${li.map(x => `<li>${x}</li>`).join("")}</ul></div>`;
+  })() : "";
+
+  const setName = gen ? gen.name
+                : (legacy ? legacy.set.name : setDishes.map(d => d.name).join(" + "));
+
+  const intentsHTML = (FD.INTENTS || []).map(i =>
+    `<button class="itbtn${i.id === setIntent ? " on" : ""}" data-intent="${i.id}">${i.name}</button>`).join("");
+
   const setHTML = setTop ? `
+    <div class="intents">${intentsHTML}</div>
     <div class="verdict setv">
-      <div class="kicker">${tp("sets.kicker", {}, "今晚这一套 · 一人份")}</div>
-      <h3>${setTop.set.name}</h3>
+      <div class="kicker">${tp("sets.kicker", {}, "今晚这一套 · 一人份")}${setMeta.intent ? " · " + (FD.INTENTS.filter(i => i.id === setMeta.intent)[0] || {}).name : ""}</div>
+      <h3>${setName}</h3>
       <div class="meta">
-        <span class="badge">${tp("sets.min", {n: setTop.minutes}, setTop.minutes + " 分钟")}</span>
-        <span class="badge">${tp("sets.kcal", {n: setTop.kcal}, "约 " + setTop.kcal + " kcal")}</span>
-        <span class="badge">${setTop.dishes.length}${tp("sets.dishes", {}, " 道菜")}${setTop.set.staple === "rice" ? tp("sets.plusRice", {}, " + 米饭") : ""}</span>
+        <span class="badge">${tp("sets.min", {n: setMeta.minutes}, setMeta.minutes + " 分钟")}</span>
+        <span class="badge">${tp("sets.kcal", {n: setMeta.kcal}, "约 " + setMeta.kcal + " kcal")}</span>
+        <span class="badge">${setMeta.n}${tp("sets.dishes", {}, " 道菜")}${setMeta.rice ? tp("sets.plusRice", {}, " + 米饭") : ""}</span>
       </div>
-      <div class="setlist">${setTop.dishes.map((d,i) =>
-        `<span class="sdi">${i+1}. ${I18N.recipeName(d.recipe)}<i>${d.recipe.minutes}′</i></span>`).join("")}</div>
+      <div class="setlist">${setDishes.map((d, i) =>
+        `<span class="sdi">${i + 1}. ${d.name}<i>${d.minutes}′</i></span>`).join("")}</div>
       <p class="snote">${tp("sets.hint", {}, "按顺序做：先做耗时的，最后一道起锅就能吃。")}</p>
-      <button class="btn primary" style="margin-top:10px" data-set="${setTop.set.id}">${tp("sets.start", {}, "开始做这一套")}</button>
-    </div>` : "";
+      <div class="setacts">
+        <button class="btn primary" data-set-dishes="${setDishes.map(d => d.id).join("|")}" data-set-name="${(setName || "").replace(/"/g, "&quot;")}">${tp("sets.start", {}, "开始做这一套")}</button>
+        ${(gen && readySets.length > 1) ? `<button class="btn ghost" data-setswap="1">${tp("sets.swap", {}, "换一套")}</button>` : ""}
+      </div>
+    </div>${setWhy}` : "";
 
   const singleHTML = setTop ? "" : `
     <div class="verdict ${top.status==="shop1"?"amber":""}">
@@ -1699,14 +1752,14 @@ function renderResult(list, sel){
     ${top.status==="shop1"?`<div class="shop">${t("card.missing")}<b>${FD.shoppingHint(top)}</b><br>${t("card.missingHint")}</div>`:""}`;
 
   box.innerHTML = setHTML + singleHTML + `
-    <div class="why">
-      <b>${setTop ? "这一套为什么合适" : t("card.why")}</b>
+    ${setTop ? "" : `<div class="why">
+      <b>${t("card.why")}</b>
       <ul>${reasons(top).map(r=>`<li>${r}</li>`).join("")}</ul>
       <ol class="steps">${I18N.recipeSteps(top.recipe).map(s=>`<li>${stepRich(s)}</li>`).join("")}</ol>
       ${top.pantryMissing.length?pantryLine(top.pantryMissing):""}
       <div class="srcline">${t("card.src")}<a href="${top.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · ${t("card.srcNote")}</div>
       <button class="btn primary" style="margin-top:12px" data-cook="${top.recipe.id}">${t("disc.cook")}</button>
-    </div>
+    </div>`}
     ${alts.length?`<div class="card"><h2>${t("disc.other")} <span class="count">${t("disc.otherSub")}</span></h2>
       ${alts.map(a=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)">
         <div><div>${I18N.recipeName(a.recipe)} ${a.status==="shop1"?`<span style="color:#b26a00;font-size:12px">· ${t("disc.gapN",{n:1})}</span>`:""}</div>
@@ -1715,8 +1768,16 @@ function renderResult(list, sel){
       </div>`).join("")}
     </div>`:""}`;
 
-  box.querySelectorAll("[data-set]").forEach(b=>{
-    b.addEventListener("click", () => startSet(b.dataset.set));
+  /* 注意：重画时必须把同一个容器传回去，否则会画到 #result 去 */
+  const boxSel = sel || "#result";
+  box.querySelectorAll("[data-intent]").forEach(b=>{
+    b.addEventListener("click", () => { setIntent = b.dataset.intent; setPick = 0; renderResult(list, boxSel); });
+  });
+  box.querySelectorAll("[data-setswap]").forEach(b=>{
+    b.addEventListener("click", () => { setPick++; renderResult(list, boxSel); });
+  });
+  box.querySelectorAll("[data-set-dishes]").forEach(b=>{
+    b.addEventListener("click", () => startSet(b.dataset.setDishes.split("|").filter(Boolean), b.dataset.setName));
   });
 
   box.querySelectorAll("[data-pick]").forEach(b=>{
@@ -2200,12 +2261,12 @@ function stepIcon(text){
 }
 
 /* ---------- cooking mode ---------- */
-function startSet(sid){
-  const s = (window.FD_SETS || []).filter(x => x.id === sid)[0];
-  if(!s) return;
-  setPlan = { id: s.id, name: s.name, dishes: s.dishes.slice(), idx: 0 };
-  toast(tp("sets.step", { a: 1, b: setPlan.dishes.length }, "套餐第 1/" + setPlan.dishes.length + " 道"));
-  openCook(setPlan.dishes[0]);
+function startSet(dishes, name){
+  const list = (dishes || []).filter(Boolean);
+  if(!list.length) return;
+  setPlan = { name: name || "", dishes: list, idx: 0 };
+  toast(tp("sets.step", { a: 1, b: list.length }, "套餐第 1/" + list.length + " 道"));
+  openCook(list[0]);
 }
 
 function advanceSet(){

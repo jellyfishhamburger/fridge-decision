@@ -428,9 +428,139 @@
     return { taken, skipped, decided, rate: decided ? Math.round(taken / decided * 100) : null, rows };
   }
 
+
+  /* ============================================================
+     生成式套餐：按「角色」分桶 → 按模板组合 → 约束过滤 → 排序
+     不写死任何组合，加菜不用改代码。
+     ============================================================ */
+  const TAGS = global.FD_TAGS || {};
+
+  /* 没登记的菜，按 needs 里的食材猜一个角色 */
+  function inferRole(recipe) {
+    const need = recipe.needs || [];
+    const veg = ["greens","broccoli","tomato","chili","eggplant","mushroom","onion","carrot","potato"];
+    const protein = ["egg","tofu","pork","chicken","beef","fish","shrimp","ham"];
+    const carb = ["rice","noodle","bread","dumpling"];
+    const hasP = need.some(c => protein.indexOf(c) >= 0);
+    const hasV = need.some(c => veg.indexOf(c) >= 0);
+    const hasC = need.some(c => carb.indexOf(c) >= 0);
+    if (hasC && need.length <= 3) return "onepot";
+    if (hasP && hasV) return "halfProtein";
+    if (hasP) return "mainProtein";
+    if (hasV) return "veg";
+    return "veg";
+  }
+  function inferProtein(recipe) {
+    const need = recipe.needs || [];
+    if (need.some(c => ["fish","shrimp","chicken","beef","pork"].indexOf(c) >= 0)) return "high";
+    if (need.some(c => ["egg","tofu","ham"].indexOf(c) >= 0)) return "mid";
+    return "low";
+  }
+  function tagOf(recipe) {
+    const t = TAGS[recipe.id] || {};
+    return {
+      role: t.role || inferRole(recipe),
+      method: t.method || "stirfry",
+      protein: t.protein || inferProtein(recipe),
+      spicy: typeof t.spicy === "number" ? t.spicy : 0,
+      cuisine: t.cuisine || "家常"
+    };
+  }
+
+  /* 三种「今晚想要什么」：模板 + 硬约束 */
+  const INTENTS = [
+    { id: "hearty",  name: "一荤一素", slots: [["mainProtein","halfProtein","soup"], ["veg","vegProtein"]],
+      kcalMin: 420, kcalMax: 1050, maxSpicy: 3, needGreens: true },
+    { id: "protein", name: "健身高蛋白", slots: [["mainProtein","halfProtein","vegProtein"], ["veg","vegProtein"]],
+      kcalMin: 400, kcalMax: 900, maxSpicy: 1, needGreens: true, minHighProtein: 1 },
+    { id: "veg",     name: "清淡素菜", slots: [["veg","vegProtein"], ["veg","vegProtein"]],
+      kcalMin: 260, kcalMax: 850, maxSpicy: 0, needGreens: true, noMeat: true }
+  ];
+
+  const MEAT = ["pork","chicken","beef","fish","shrimp","ham"];
+  const STAPLE_KCAL = 150;
+
+  function combinations(groups) {
+    /* groups: [[a,b],[c,d]] → [[a,c],[a,d],[b,c],[b,d]]；最多两张槽 */
+    if (groups.length === 1) return groups[0].map(x => [x]);
+    const out = [];
+    groups[0].forEach(a => groups[1].forEach(b => { if (a.recipe.id !== b.recipe.id) out.push([a, b]); }));
+    return out;
+  }
+
+  function buildSets(items, st, intentId) {
+    st = st || settings();
+    const all = RECIPES.map(r => evaluate(r, items, st));
+    const pantryHave = new Set(pantry());
+    const out = [];
+
+    INTENTS.filter(it => !intentId || it.id === intentId).forEach(it => {
+      /* 每个槽取前 N 个候选：N 小一点，组合才不至于爆炸 */
+      const groups = it.slots.map(slot =>
+        all.filter(e => slot.indexOf(tagOf(e.recipe).role) >= 0 && e.status !== "blocked")
+           .sort((a, b) => b.score - a.score)
+           .slice(0, 6));
+
+      if (groups.some(g => !g.length)) return;
+
+      combinations(groups).forEach(dishes => {
+        const tags = dishes.map(d => tagOf(d.recipe));
+        if (it.maxSpicy != null && tags.some(t => t.spicy > it.maxSpicy)) return;
+        if (it.noMeat && dishes.some(d => (d.recipe.needs || []).some(c => MEAT.indexOf(c) >= 0))) return;
+        if (it.minHighProtein && tags.filter(t => t.protein === "high").length < it.minHighProtein) return;
+        if (it.needGreens && !dishes.some(d => d.recipe.greens)) return;
+
+        /* 同主料重复（两个都靠番茄）就不要 */
+        const usedSets = dishes.map(d => new Set((d.recipe.needs || []).filter(c => MEAT.indexOf(c) >= 0)));
+        if (usedSets.length === 2 && [...usedSets[0]].some(c => usedSets[1].has(c))) return;
+
+        const onepot = dishes.some(d => tagOf(d.recipe).role === "onepot");
+        const kcal = dishes.reduce((a, d) => a + (d.recipe.kcal || 0), 0) + (onepot ? 0 : STAPLE_KCAL);
+        if (kcal < it.kcalMin || kcal > it.kcalMax) return;
+
+        const minutes = Math.max.apply(null, dishes.map(d => d.recipe.minutes)) + 8;
+        if (minutes > (st.maxMinutes || 60) + 10) return;
+
+        /* 两个都爆炒 → 一个灶排不开，扣分而不是禁用 */
+        const methodPenalty = tags.filter(t => t.method === "stirfry").length > 1 ? 6 : 0;
+        const spicyMix = tags.some(t => t.spicy >= 2) && tags.some(t => t.spicy === 0) ? 2 : 0;
+
+        const score = dishes.reduce((a, d) => a + d.score, 0) - methodPenalty - spicyMix;
+        const missing = [];
+        dishes.forEach(d => d.missing.forEach(c => { if (missing.indexOf(c) < 0) missing.push(c); }));
+
+        out.push({
+          id: dishes.map(d => d.recipe.id).sort().join("+"),
+          intent: it.id, intentName: it.name,
+          dishes, minutes, kcal, missing, score,
+          ready: dishes.every(d => d.status === "ready"),
+          urgent: dishes.some(d => d.used.some(i => daysLeftOf(i) <= 2)),
+          name: dishes.map(d => d.recipe.name).join(" + ") + (onepot ? "" : " + 米饭"),
+          onepot: onepot,
+          pantryMissing: [...new Set(dishes.flatMap(d => d.pantryMissing))]
+        });
+      });
+    });
+
+    const sorted = out.sort((a, b) =>
+      (b.ready - a.ready) || (a.missing.length - b.missing.length) ||
+      (b.urgent - a.urgent) || (b.score - a.score));
+
+    /* 去重（同一组菜换个顺序只留一次）+ 同一道主菜最多带两个配菜，避免整页都是同一道 */
+    const seenIds = {}, mainCount = {}, picked = [];
+    sorted.forEach(s => {
+      if (seenIds[s.id]) return;
+      const main = s.dishes[0].recipe.id;
+      if ((mainCount[main] || 0) >= 2) return;
+      seenIds[s.id] = 1; mainCount[main] = (mainCount[main] || 0) + 1;
+      picked.push(s);
+    });
+    return picked;
+  }
+
   global.FD = {
     CATALOG, RECIPES, PANTRY, byId, pantryById, DB, SETS,
-    evaluateSet, decideSets,
+    evaluateSet, decideSets, buildSets, INTENTS, tagOf,
     LS_ITEMS, LS_SETTINGS, LS_LOG, LS_PANTRY, LS_HOUSEHOLD,
     read, write,
     items, saveItems, unitOf, consumptionOf, consume, migrate, mergeItems,
