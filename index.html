@@ -1182,6 +1182,7 @@
 <script src="store.js?v=20261101-2"></script>
 <script src="auth.js?v=20261101-3"></script>
 <script src="cloud.js?v=20261101-4"></script>
+<script src="realtime.js?v=20261101-5"></script>
 <script src="i18n.js?v=20261029-17"></script>
 <script>
 "use strict";
@@ -2681,6 +2682,18 @@ window.addEventListener("hashchange", () => {
   if(["home", "fridge", "discover", "build"].includes(h)) show(h);
 });
 // 云端状态条：有待同步的改动、或者这个家还是空的，就在冰箱页顶部说一句
+/* 拉一次云端并重画 —— Realtime 收到推送、或轮询兜底时都走这里 */
+async function cloudRefresh(){
+  if(!(window.CLOUD && CLOUD.on())) return;
+  try{
+    const m = await CLOUD.pull();
+    if(Array.isArray(m)){
+      CLOUD.withSuppress(() => { items = m; FD.saveItems(items); });
+      renderItems(); renderHome(); renderPending(); updateCloudNote();
+    }
+  }catch(e){ /* 网络不好就等下一次 */ }
+}
+
 function updateCloudNote(){
   const box = $("#cloudNote");
   if(!box) return;
@@ -2713,6 +2726,13 @@ if (window.CLOUD && CLOUD.on()) {
     }catch(e){ /* 拉不到就先用本机缓存，不打断 */ }
     CLOUD.start();
     setInterval(updateCloudNote, 6000);
+
+    /* 实时推送：别的手机一改，这边重拉一次就更新了 */
+    if(window.RT){
+      RT.start(cloudRefresh);
+      /* 推送没接上（被墙/掉线）就退回 20 秒轮询，别让人以为没同步 */
+      setInterval(() => { if(!RT.state().joined) cloudRefresh(); }, 20000);
+    }
   })();
 }
 // 旧的家庭码轮询：只在「没登录」时用。登录后走 CLOUD（带 JWT + RLS）

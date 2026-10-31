@@ -14,6 +14,10 @@
 | `007_meal_session.sql` | 开做饭会话（RLS 开了也能建） | 第二轮 | 低：只建函数 |
 | `008_item_ops.sql` | 手动加/改/删库存（带流水） | 第二轮 | 低：只建函数 |
 | `ALL_SAFE_2.sql` | 003+007+008+收回权限，一次粘完 | 第二轮（可重复跑） | 低：全部 create or replace |
+| `009_client_ids.sql` | add_item 收客户端 id；complete_meal 返回事件 id | 第三轮 | 低：只建函数 |
+| `002_rls.sql` (v2) | 先清策略再重建 RLS | 登录验证通过后 | 中：跑完未登录读不到 items |
+| `010_realtime.sql` | 打开 items/会话的实时广播 | 随时 | 低：只改 publication |
+| `011_cleanup_demo.sql` | 清理 291 行无主演示数据 | 需要时 | **会删数据**：先跑第 1 段看数字 |
 
 ## 顺序
 
