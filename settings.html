@@ -125,29 +125,64 @@
     <summary style="cursor:pointer;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:#6b7a72;font-weight:700">
       云端同步 / Cloud sync <span id="cloudPill" class="pill">未连接</span>
     </summary>
-    <p class="hint" style="margin-top:10px">填上 Supabase 的 Project URL 和 anon public key，这台设备就连上家庭共享。留空则和现在完全一样 —— 只存在本机。</p>
-    <p class="hint" style="margin-top:6px;color:#8a7a4a">URL 只填到 <b>.supabase.co</b> 为止 —— 后面带 <code>/rest/v1/</code> 会连不上（会自动帮你截掉）。</p>
-    <div class="row" style="margin-top:10px">
-      <input class="inp" id="sbUrl" placeholder="https://xxxx.supabase.co" style="flex:1;min-width:0">
+
+    <!-- 已登录：只显示身份与家庭，不再让人碰 URL/key -->
+    <div id="cloudSigned" style="display:none;margin-top:12px">
+      <div class="row" style="gap:10px">
+        <div style="flex:1;min-width:0">
+          <div class="hint" style="margin:0">已登录</div>
+          <div style="font-size:14px;font-weight:600;margin-top:2px;overflow:hidden;text-overflow:ellipsis" id="accEmail">—</div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div class="hint" style="margin:0">家庭</div>
+          <div style="font-size:14px;font-weight:600;margin-top:2px" id="accHome">—</div>
+        </div>
+        <div style="text-align:right">
+          <div class="hint" style="margin:0">邀请码</div>
+          <div style="font-size:14px;font-weight:700;letter-spacing:.12em;margin-top:2px" id="accCode">—</div>
+        </div>
+      </div>
+      <p class="hint" style="margin-top:10px">家里的手机用同一个邀请码加入，就能看到同一个冰箱。数据存在云端，谁改了都会同步。</p>
     </div>
-    <div class="row" style="margin-top:8px">
-      <input class="inp" id="sbKey" placeholder="anon public key（eyJ...）" style="flex:1;min-width:0">
+
+    <!-- 未登录：需要先填连接信息 -->
+    <div id="cloudSetup" style="margin-top:10px">
+      <p class="hint">填上 Supabase 的 Project URL 和 anon public key，这台设备才能连上云端。留空则只存在本机。</p>
+      <p class="hint" style="margin-top:6px;color:#8a7a4a">URL 只填到 <b>.supabase.co</b> 为止 —— 后面带 <code>/rest/v1/</code> 会连不上（会自动帮你截掉）。</p>
+      <div class="row" style="margin-top:10px">
+        <input class="inp" id="sbUrl" placeholder="https://xxxx.supabase.co" style="flex:1;min-width:0">
+      </div>
+      <div class="row" style="margin-top:8px">
+        <input class="inp" id="sbKey" placeholder="anon public key（eyJ...）" style="flex:1;min-width:0">
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary" id="sbSave">保存并连接</button>
+        <button class="btn" id="sbTest">测试连接</button>
+      </div>
+      <div class="hint" id="sbMsg" style="margin-top:8px"></div>
     </div>
-    <div class="row" style="margin-top:10px">
-      <span class="hint" style="flex:0 0 auto">家庭码</span>
-      <b id="hhCode" style="letter-spacing:.14em;font-size:15px">—</b>
-      <button class="btn tiny" id="hhNew">重新生成</button>
-    </div>
-    <div class="row" style="margin-top:12px">
-      <button class="btn primary" id="sbSave">保存并连接</button>
-      <button class="btn" id="sbTest">测试连接</button>
-    </div>
-    <div class="hint" id="sbMsg" style="margin-top:8px"></div>
-    <div class="row" style="margin-top:10px">
-      <a class="btn" href="account.html" id="accLink"
+
+    <div class="row" style="margin-top:12px" id="accBig">
+      <a class="btn primary" href="account.html" id="accLink"
          style="flex:1;text-decoration:none;text-align:center;padding:11px">登录 / 家庭 →</a>
     </div>
-    <p class="hint" id="accState" style="margin-top:6px"></p>
+    <button id="accSmall" style="display:none;width:100%;margin-top:12px;border:0;background:none;
+      color:var(--sage-dk);font:inherit;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:6px"
+      onclick="location.href='account.html'">管理登录与家庭 →</button>
+    <p class="hint" id="accState" style="margin-top:8px"></p>
+
+    <!-- 旧的家庭码：登录后已由邀请码取代，藏起来备用 -->
+    <details style="margin-top:14px" id="legacyCode">
+      <summary style="cursor:pointer;font-size:11.5px;color:#9aa69c">旧的家庭码（未登录时的多设备方式）</summary>
+      <div class="row" style="margin-top:8px">
+        <span class="hint" style="flex:0 0 auto">家庭码</span>
+        <b id="hhCode" style="letter-spacing:.14em;font-size:15px">—</b>
+        <button class="btn tiny" id="hhNew">重新生成</button>
+      </div>
+      <p class="hint" style="margin-top:6px">开了 RLS 之后这条路只能读写本机，正式使用请走上面的登录。</p>
+    </details>
   </details>
 
 <section class="card">
@@ -399,9 +434,20 @@ function paintHousehold(){
 function paintCloud(){
   const c = (window.SYNC && SYNC.cfg) ? SYNC.cfg() : {};
   if ($("#sbUrl")) $("#sbUrl").value = c.url || "";
+  const a = window.AUTH && AUTH.session && AUTH.session();
+  if ($("#cloudSigned")) $("#cloudSigned").style.display = a ? "" : "none";
+  if ($("#cloudSetup")) $("#cloudSetup").style.display = a ? "none" : "";
+  if ($("#accBig")) $("#accBig").style.display = a ? "none" : "";
+  if ($("#accSmall")) $("#accSmall").style.display = a ? "" : "none";
+  if ($("#accEmail")) $("#accEmail").textContent = a ? (a.email || a.user_id) : "—";
   if ($("#accState")) {
-    const a = window.AUTH && AUTH.session && AUTH.session();
-    $("#accState").textContent = a ? ("已登录 " + (a.email || a.user_id)) : "未登录 —— 登录后才能多设备共享同一个冰箱";
+    $("#accState").textContent = a ? "" : "未登录 —— 只存在本机；登录后才会多设备共享";
+  }
+  if (a && window.AUTH) {
+    AUTH.myHousehold().then(h => {
+      if ($("#accHome")) $("#accHome").textContent = (h && h.name) || "还没有家庭";
+      if ($("#accCode")) $("#accCode").textContent = (h && h.join_code) || "—";
+    }).catch(() => {});
   }
   if ($("#sbKey")) $("#sbKey").value = c.key || "";
   const on = !!(c.url && c.key);

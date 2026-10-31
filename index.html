@@ -542,6 +542,14 @@
   .capcard .cc-tx s{font-size:12px;color:var(--muted);text-decoration:none}
   .capcard .cc-ar{flex:none;width:15px;height:15px;color:var(--sage)}
 
+  /* 云端状态条：只在「有待同步」或「这个家还是空的」时出现 */
+  .cloudnote{display:block;margin:0 0 10px;padding:9px 12px;
+    border-radius:var(--r-sm);font-size:12.5px;line-height:1.5;
+    background:var(--butter-bg);color:#8A6A12;border:1px solid #EFDFBC}
+  .cloudnote[hidden]{display:none}
+  .cloudnote a{color:#7A5E0E;font-weight:600;white-space:nowrap}
+  .cloudnote.quiet{background:var(--card);color:var(--muted);border-color:var(--line)}
+
   /* ================= 工具条：搜索 + 排序（冰箱、菜谱同一个） ================= */
   .ftools{display:flex;align-items:center;gap:8px;margin:0 0 10px}
   .ftools .ds-search{flex:1;min-width:0}
@@ -900,6 +908,9 @@
 
   <!-- ============ view 1: fridge ============ -->
   <section class="view" id="view-fridge">
+
+    <!-- 0 · 云端状态（未同步 / 空家） -->
+    <div class="cloudnote" id="cloudNote" hidden></div>
 
     <!-- 1 · 紧凑摘要 -->
     <div class="fsum" id="fsum"></div>
@@ -2669,6 +2680,25 @@ window.addEventListener("hashchange", () => {
   if(h === "cook"){ location.replace("cook.html"); return; }
   if(["home", "fridge", "discover", "build"].includes(h)) show(h);
 });
+// 云端状态条：有待同步的改动、或者这个家还是空的，就在冰箱页顶部说一句
+function updateCloudNote(){
+  const box = $("#cloudNote");
+  if(!box) return;
+  if(!(window.CLOUD && CLOUD.on())){ box.hidden = true; return; }
+  const pending = (CLOUD.outbox() || []).length;
+  if(pending){
+    box.hidden = false; box.className = "cloudnote";
+    box.innerHTML = "有 " + pending + " 项改动还没同步（联网后会自动补上）。";
+    return;
+  }
+  if(!items.length){
+    box.hidden = false; box.className = "cloudnote quiet";
+    box.innerHTML = "这个家还是空的 —— 先加一样，或者<a href=\"capture.html\">整理本次采购</a>。";
+    return;
+  }
+  box.hidden = true;
+}
+
 // 登录了就以云端为准：先拉一次，再把本机改动排队推上去
 if (window.CLOUD && CLOUD.on()) {
   CLOUD.hook();
@@ -2679,8 +2709,10 @@ if (window.CLOUD && CLOUD.on()) {
         CLOUD.withSuppress(() => { items = merged; FD.saveItems(items); });
         renderItems(); renderHome(); renderPending();
       }
+      updateCloudNote();
     }catch(e){ /* 拉不到就先用本机缓存，不打断 */ }
     CLOUD.start();
+    setInterval(updateCloudNote, 6000);
   })();
 }
 // 旧的家庭码轮询：只在「没登录」时用。登录后走 CLOUD（带 JWT + RLS）
