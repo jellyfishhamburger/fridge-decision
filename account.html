@@ -140,9 +140,18 @@
       <button id="reload">刷新</button>
     </div>
 
-    <button class="btn ghost" id="migrate">把本机库存搬进这个家</button>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--line-soft)">
+      <label for="setPw">设一个密码（以后不用等邮件）</label>
+      <input class="inp" id="setPw" type="password" autocomplete="new-password" placeholder="至少 6 位">
+      <button class="btn ghost" id="savePw">保存密码</button>
+      <p class="note" id="pwNote">用邮件链接登录的账号本来没有密码。设一个之后，换设备可以直接用「用密码」登录。</p>
+    </div>
+
     <a class="btn primary" href="index.html#fridge">去冰箱看看</a>
     <button class="btn ghost" id="signOut">退出登录</button>
+    <button id="migrate" style="width:100%;margin-top:10px;border:0;background:none;color:var(--sage-dk);
+      font:inherit;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:6px">
+      把本机已有的库存搬进这个家</button>
     <p class="note">把这个邀请码发给家人，他们在自己的手机上登录后填一次，就共用同一个冰箱。</p>
   </section>
 
@@ -285,6 +294,19 @@
       .catch(function(){ msg($("#footNote"), "复制不了，手动记一下：" + c); });
   });
   $("#reload").addEventListener("click", paint);
+
+  $("#savePw") && $("#savePw").addEventListener("click", async function(){
+    var pw = ($("#setPw").value || "");
+    if(pw.length < 6){ msg($("#pwNote"), "密码至少 6 位。", "err"); return; }
+    this.disabled = true; msg($("#pwNote"), "正在保存…");
+    try{
+      await AUTH.setPassword(pw);
+      msg($("#pwNote"), "密码已保存 —— 下次可以用「用密码」登录同一个邮箱。", "ok");
+      $("#setPw").value = "";
+    }catch(e){
+      msg($("#pwNote"), "存不了：" + friendly(e), "err");
+    }finally{ this.disabled = false; }
+  });
 
   /* 本机 → 云端：把手机上已有的库存逐条写进当前家庭（add_item 幂等，重跑不会重复） */
   $("#migrate").addEventListener("click", async function(){

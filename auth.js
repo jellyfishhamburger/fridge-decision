@@ -163,6 +163,24 @@
     return s.access_token;
   }
 
+  /* ---------- 3b. 已经在登录状态时补一个密码（magic link 用户常常没有密码） ---------- */
+  async function setPassword(pw) {
+    var t = await token();
+    if (!t) throw new Error("not signed in");
+    var res = await fetch(base() + "/auth/v1/user", {
+      method: "PUT",
+      headers: { "apikey": key(), "Authorization": "Bearer " + t, "Content-Type": "application/json" },
+      body: JSON.stringify({ password: pw })
+    });
+    var txt = await res.text(), body = null;
+    try { body = txt ? JSON.parse(txt) : null; } catch (e) {}
+    if (!res.ok) {
+      var m = (body && (body.msg || body.message || body.error_description)) || txt || ("HTTP " + res.status);
+      throw new Error(m);
+    }
+    return true;
+  }
+
   function signOut() {
     var s = session();
     write(null);
@@ -216,7 +234,7 @@
   g.AUTH = {
     configured: configured, signIn: signIn, handleRedirect: handleRedirect,
     signInPassword: signInPassword, signUpPassword: signUpPassword, signInOrSignUp: signInOrSignUp,
-    session: session, signedIn: signedIn, token: token, refresh: refresh, signOut: signOut,
+    session: session, signedIn: signedIn, token: token, refresh: refresh, signOut: signOut, setPassword: setPassword,
     rpc: rpc, myHousehold: myHousehold, createHousehold: createHousehold,
     joinHousehold: joinHousehold, items: items, LS: LS
   };
