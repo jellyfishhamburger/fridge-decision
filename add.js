@@ -327,6 +327,15 @@
     var img = $("#shot");
     img.src = dataUrl; img.classList.add("on");
     $("#cam").classList.remove("on");
+    var f = document.querySelector(".stage .frame");
+    if (f) f.classList.add("off");
+  }
+  function showLive() {
+    var img = $("#shot");
+    img.classList.remove("on"); img.removeAttribute("src");
+    $("#cam").classList.add("on");
+    var f = document.querySelector(".stage .frame");
+    if (f) f.classList.remove("off");
   }
 
   /* ---------- 自动检测 ---------- */
@@ -605,7 +614,7 @@
       var i = state.rows.map(function (r) { return r.img; }).lastIndexOf(s.img);
       if (i >= 0) state.rows.splice(i, 1);
     }
-    if (state.shots.length) showShot(state.shots[state.shots.length - 1].img); else { $("#shot").classList.remove("on"); $("#cam").classList.add("on"); }
+    if (state.shots.length) showShot(state.shots[state.shots.length - 1].img); else showLive();
     renderRows();
   });
 
