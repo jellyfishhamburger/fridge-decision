@@ -60,7 +60,6 @@
     </div>
     <div class="rowline"><span id="cnt">已拍 0 件</span><button class="mini" id="undo">删掉上一张</button></div>
     <button class="btn primary" id="detToggle">开始检测</button>
-    <button class="btn ghost" id="detPick">相机不给用？从相册选</button>
     <p class="tiny" id="detHint">按一次开始；手伸进来就自动拍，放完东西再按一次结束。</p>
   </section>
 
@@ -96,7 +95,8 @@
 </footer>
 
 <input type="file" id="fileIn" accept="image/*" multiple hidden>
-<input type="file" id="fileOne" accept="image/*" hidden>
+<input type="file" id="batchIn" accept="image/*" hidden>
+<input type="file" id="rcptIn" accept="image/*" hidden>
 
 <script src="data.js?v=20261030-18"></script>
 <script src="tags.js?v=20261101-7"></script>
@@ -107,6 +107,6 @@
 <script src="auth.js"></script>
 <script src="classifier.js"></script>
 <script src="receipt.js"></script>
-<script src="add.js?v=20261102-4"></script>
+<script src="add.js?v=20261102-6"></script>
 </body>
 </html>

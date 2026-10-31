@@ -75,19 +75,22 @@
   }
 
   $("#rows").addEventListener("click", function (e) {
+    if (e.target.tagName === "SELECT") return;
     var row = e.target.closest(".row"); if (!row) return;
     var i = +row.dataset.i;
     if (e.target.dataset.del) { state.rows.splice(i, 1); renderRows(); return; }
-    if (e.target.dataset.sel) {
-      state.rows[i].cat = e.target.value;
-      renderRows();
-      return;
-    }
     var q = e.target.dataset.q;
     if (q) {
       state.rows[i].qty = Math.max(1, state.rows[i].qty + (+q));
       renderRows();
     }
+  });
+
+  $("#rows").addEventListener("change", function (e) {
+    if (e.target.tagName !== "SELECT") return;
+    var row = e.target.closest(".row"); if (!row) return;
+    state.rows[+row.dataset.i].cat = e.target.value;
+    renderRows();
   });
 
   /* ---------- 手动 ---------- */
@@ -121,6 +124,51 @@
     go("review");
   });
 
+  /* ---------- 离线识别：CLIP 零样本（不需要电脑、不需要服务器） ---------- */
+  /* 离线 CLIP 还没跑通（onnxruntime 的 wasm 在纯静态托管下起不来），先关掉，
+     免得每次识别都白试一遍再超时。代码留着，下一步换成能跑的方案。 */
+  var CLIP_ON = false;
+  var clipP = null;
+  async function clipPipeline() {
+    if (clipP) return clipP;
+    clipP = (async function () {
+      var mod = await import("./vendor/transformers/transformers.min.js");
+      mod.env.allowLocalModels = false;
+      mod.env.backends.onnx.wasm.wasmPaths = "./vendor/transformers/";
+      /* 静态托管没有 COOP/COEP，多线程 wasm 起不来，强制单线程 */
+      mod.env.backends.onnx.wasm.numThreads = 1;
+      return await mod.pipeline("zero-shot-image-classification", "Xenova/clip-vit-base-patch32", { quantized: true });
+    })();
+    return clipP;
+  }
+
+  function clipLabels() {
+    return FD.CATALOG.map(function (c) { return fname(c) + " / " + (c.name || ""); });
+  }
+  function catFromClipLabel(lbl) {
+    var cn = String(lbl).split("/")[0].trim();
+    for (var i = 0; i < FD.CATALOG.length; i++) {
+      var c = FD.CATALOG[i];
+      if (fname(c) === cn || c.name === String(lbl).split("/")[1] && false) return c.id;
+    }
+    return catFromName(cn);
+  }
+
+  async function classifyClip(canvas) {
+    var pipe = await clipPipeline();
+    var url = canvas.toDataURL("image/jpeg", 0.85);
+    var out = await pipe(url, clipLabels());
+    if (!out || !out.length) return { cat: "", name: "", why: "clip-none" };
+    out.sort(function (a, b) { return b.score - a.score; });
+    var top = out[0], sec = out[1] || { score: 0 };
+    var cat = catFromClipLabel(top.label);
+    /* 前两名太接近就不硬给结论 */
+    if (cat && top.score >= 0.12 && (top.score - sec.score) >= 0.03) {
+      return { cat: cat, name: top.label.split("/")[0].trim(), why: "clip", conf: top.score };
+    }
+    return { cat: "", name: top.label.split("/")[0].trim(), why: "lowconf", conf: top.score };
+  }
+
   /* ---------- 识别策略 ---------- */
   var AI_OK = null;
   async function aiReady() {
@@ -150,6 +198,9 @@
       } catch (e) { /* 掉线就退回端侧 */ }
     }
     try {
+      var c2 = null;
+      if (CLIP_ON) { try { c2 = await classifyClip(canvas); } catch (e2) { c2 = null; } }
+      if (c2 && c2.cat) return c2;
       var res = await FDCLS.classify(canvas);
       var conf = res.conf || 0;
       var cat = (FDCLS.MAP || {})[res.label] || guessCat(res.label);
@@ -275,7 +326,8 @@
   }
 
   /* ---------- 相册选图（检测页的兜底） ---------- */
-  $("#detPick").addEventListener("click", function () { $("#fileIn").click(); });
+  var detPickBtn = $("#detPick");
+  if (detPickBtn) detPickBtn.addEventListener("click", function () { $("#fileIn").click(); });
   $("#fileIn").addEventListener("change", async function (e) {
     var files = Array.prototype.slice.call(e.target.files || []);
     e.target.value = "";
@@ -313,12 +365,12 @@
   $("#rShot").addEventListener("click", function () { pickReceiptFile(); });
   $("#rPick").addEventListener("click", function () { pickReceiptFile(); });
 
-  function pickReceiptFile() {
-    var inp = document.createElement("input");
-    inp.type = "file"; inp.accept = "image/*";
-    inp.onchange = function () { if (inp.files[0]) readReceipt(inp.files[0]); };
-    inp.click();
-  }
+  function pickReceiptFile() { $("#rcptIn").click(); }
+  $("#rcptIn").addEventListener("change", function (e) {
+    var f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (f) readReceipt(f);
+  });
 
   async function readReceipt(file) {
     var msg = $("#rMsg");
@@ -355,22 +407,29 @@
   $("#bShot").addEventListener("click", function () { pickBatch(); });
   $("#bPick").addEventListener("click", function () { pickBatch(); });
 
-  function pickBatch() {
-    var inp = document.createElement("input");
-    inp.type = "file"; inp.accept = "image/*";
-    inp.onchange = function () { if (inp.files[0]) readBatch(inp.files[0]); };
-    inp.click();
-  }
+  function pickBatch() { $("#batchIn").click(); }
+  $("#batchIn").addEventListener("change", function (e) {
+    var f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (f) readBatch(f);
+  });
 
   async function readBatch(file) {
     var msg = $("#bMsg");
-    if (!AI_URL) {
-      msg.textContent = "整批识别要用电脑上的识别服务（本机 http 打开才有）。先用手动添加吧。";
-      return;
-    }
     msg.textContent = "正在识别…";
     try {
       var dataUrl = await fileToDataUrl(file);
+      var useAI = AI_URL && await aiReady();
+      if (!useAI) {
+        /* 没有本地服务：用浏览器里的 CLIP 认这一张的主体 */
+        var c = await fileToCanvas(file);
+        var r0 = await classifyClip(c).catch(function(){ return {cat:"",name:"",why:"clip-off"}; });
+        if (r0.cat) addRow(r0.cat, 1, "batch", dataUrl);
+        else addRow("", 1, "batch", dataUrl, r0.name || "");
+        msg.textContent = r0.cat ? "认出了 1 样。" : "没认准，清单里手动选。";
+        go("review");
+        return;
+      }
       var r = await fetch(AI_URL + "/recognize", {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: dataUrl })
       }).then(function (x) { return x.json(); });
