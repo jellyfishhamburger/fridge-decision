@@ -118,13 +118,57 @@
       return {
         label: r.label, conf: r.conf, second: r.second, margin: r.margin,
         cat: MAP[r.label] || "",
-        img: canvas.toDataURL("image/jpeg", 0.72)
+        img: canvas.toDataURL("image/jpeg", 0.72),
+        votes: 1, total: 1, ok: (r.conf >= 0.6 && r.margin >= 0.12 && r.label !== "unknown"),
+        reason: r.label === "unknown" ? "没认出来" : (r.conf < 0.6 ? "置信度不够" : "与第二名太接近"),
+        blur: blurScore(canvas)
       };
     } catch (e) {
       return { label: "", conf: 0, second: "", margin: 0, cat: "",
                img: canvas.toDataURL("image/jpeg", 0.72), err: true };
     }
   }
+
+  /* 拉普拉斯方差：越低越糊。手机抖动、镜头没贴上焦都会掉到 40 以下 */
+  function blurScore(canvas) {
+    var c = document.createElement("canvas");
+    c.width = 96; c.height = 96;
+    var ctx = c.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(canvas, 0, 0, 96, 96);
+    var d = ctx.getImageData(0, 0, 96, 96).data;
+    var g = new Float32Array(96 * 96);
+    for (var i = 0, j = 0; i < d.length; i += 4, j++) {
+      g[j] = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+    }
+    var sum = 0, sum2 = 0, n = 0;
+    for (var y = 1; y < 95; y++) {
+      for (var x = 1; x < 95; x++) {
+        var v = 4 * g[y * 96 + x] - g[(y - 1) * 96 + x] - g[(y + 1) * 96 + x]
+                - g[y * 96 + x - 1] - g[y * 96 + x + 1];
+        sum += v; sum2 += v * v; n++;
+      }
+    }
+    var mean = sum / n;
+    return sum2 / n - mean * mean;
+  }
+
+  var BLUR_MIN = 45;   /* 低于这个当作糊帧丢掉，但不至于一张都不剩 */
+
+  /* 连拍 3 帧：扔掉糊的，剩下的投票 */
+  async function grabBurst(video, n) {
+    var frames = [];
+    for (var i = 0; i < (n || 3); i++) {
+      if (!video || !video.videoWidth) break;
+      var c = grab(video);
+      frames.push({ canvas: c, blur: blurScore(c) });
+      if (i < (n || 3) - 1) await sleep(320);
+    }
+    var sorted = frames.slice().sort(function (a, b) { return b.blur - a.blur; });
+    var sharp = sorted.filter(function (f) { return f.blur >= BLUR_MIN; });
+    return (sharp.length ? sharp : sorted).slice(0, 3);
+  }
+
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
   function addShot(shot) {
     state.shots.push(shot);
@@ -140,7 +184,8 @@
     } else if (!shot.cat || shot.label === "unknown") {
       chip.innerHTML = "<b>没认出来</b><span class='pct'>下一步手选</span>";
     } else {
-      chip.innerHTML = "<b>" + catName(shot.cat) + "</b><span class='pct'>" + pct(shot.conf) + "%</span>";
+      chip.innerHTML = "<b>" + catName(shot.cat) + "</b><span class='pct'>" + pct(shot.conf) + "%"
+        + (shot.total > 1 ? " · " + shot.votes + "/" + shot.total + " 帧一致" : "") + "</span>";
     }
   }
 
@@ -148,10 +193,33 @@
     if (!state.stream) { $("#fileIn").click(); return; }
     var v = $("#cam");
     if (!v.videoWidth) { $("#fileIn").click(); return; }
-    $("#shoot").disabled = true;
-    var shot = await classifyCanvas(grab(v));
-    addShot(shot);
-    $("#shoot").disabled = false;
+    var btn = $("#shoot");
+    btn.disabled = true;
+    btn.textContent = "拍 3 帧…";
+    try {
+      var frames = await grabBurst(v, 3);
+      var results = [];
+      for (var i = 0; i < frames.length; i++) {
+        try { results.push(await FDCLS.classify(frames[i].canvas)); }
+        catch (e) { results.push({ label: "unknown", conf: 0, second: "unknown", conf2: 0, margin: 0 }); }
+      }
+      var vote = (window.FDCLS && FDCLS.vote) ? FDCLS.vote(results)
+               : { ok: true, label: results[0].label, conf: results[0].conf, votes: 1, total: 1 };
+      var shot = {
+        label: vote.label,
+        conf: vote.conf,
+        second: vote.second,
+        margin: (vote.conf || 0) - (vote.conf2 || 0),
+        cat: MAP[vote.label] || "",
+        img: frames[0].canvas.toDataURL("image/jpeg", 0.72),
+        votes: vote.votes, total: vote.total, ok: vote.ok, reason: vote.reason,
+        blur: Math.round(frames[0].blur)
+      };
+      addShot(shot);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "拍这一件";
+    }
   }
 
   async function takeFiles(files) {
@@ -181,6 +249,7 @@
   function needsReview(r) {
     if (!r.cat) return true;
     if (r.err) return true;
+    if (typeof r.ok === "boolean") return !r.ok;   /* 连拍投票说了算 */
     if (r.conf < 0.6) return true;
     if (r.margin < 0.12) return true;
     return false;
@@ -216,6 +285,7 @@
       else if (!r.cat) hint = "没认出来 —— 从上面选一个，或者忽略。";
       else if (r.margin < 0.12) hint = "和第二名（" + (r.second === r.label ? "同类" : (MAP[r.second] ? catName(MAP[r.second]) : "其它")) + "）很接近，看一眼图。";
       else if (r.conf < 0.6) hint = "不太确定，确认一下是不是" + catName(r.cat) + "。";
+      else if (r.total > 1) hint = (r.votes + "/" + r.total + " 帧一致，比较可信。") + (r.blur < 45 ? " 图有点糊，下次靠近点。" : "");
 
       var unit = (food(r.cat) && FD.unitOf(r.cat)) || "个";
 
