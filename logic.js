@@ -597,9 +597,59 @@
     };
   }
 
+
+  /* ---------- 做饭记录 ----------
+     每做完一道菜记一条；同一餐内的多道菜按 90 分钟内合并成「一顿」。
+     纯本机记录（不上云）：用来回答「今天做过什么 / 这周做了几顿」。 */
+  const LS_COOK = "fd.cooked.v1";
+  const MEAL_GAP = 90 * 60 * 1000;
+
+  function cookLog() {
+    try { const v = JSON.parse(localStorage.getItem(LS_COOK) || "[]"); return Array.isArray(v) ? v : []; }
+    catch (e) { return []; }
+  }
+  function noteCooked(recipe, setName) {
+    if (!recipe) return;
+    const a = cookLog();
+    a.push({ at: Date.now(), dish: recipe.id, name: recipe.name, set: setName || null });
+    try { localStorage.setItem(LS_COOK, JSON.stringify(a.slice(-300))); } catch (e) {}
+  }
+  function dayKey(ts) {
+    const d = new Date(ts);
+    return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+  }
+  /* 把记录按「一顿」分组：相邻两条间隔 < 90 分钟算同一顿 */
+  function cookMeals(sinceMs) {
+    const list = cookLog().filter(e => e.at >= (sinceMs || 0)).sort((a, b) => a.at - b.at);
+    const meals = [];
+    list.forEach(e => {
+      const last = meals[meals.length - 1];
+      if (last && e.at - last.end <= MEAL_GAP) {
+        last.dishes.push(e); last.end = e.at;
+      } else {
+        meals.push({ start: e.at, end: e.at, dishes: [e] });
+      }
+    });
+    return meals;
+  }
+  function cookSummary() {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const weekStart = todayStart - 6 * 24 * 3600 * 1000;
+    const today = cookLog().filter(e => e.at >= todayStart);
+    const meals = cookMeals(weekStart);
+    return {
+      todayDishes: today,
+      todayMeals: cookMeals(todayStart),
+      weekMeals: meals.length,
+      weekDishes: meals.reduce((a, m) => a + m.dishes.length, 0)
+    };
+  }
+
   global.FD = {
     CATALOG, RECIPES, PANTRY, byId, pantryById, DB, SETS,
     evaluateSet, decideSets, buildSets, INTENTS, tagOf, altDishes, composeSet,
+    cookLog, noteCooked, cookMeals, cookSummary,
     LS_ITEMS, LS_SETTINGS, LS_LOG, LS_PANTRY, LS_HOUSEHOLD,
     read, write,
     items, saveItems, unitOf, consumptionOf, consume, migrate, mergeItems,

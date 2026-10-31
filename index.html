@@ -542,6 +542,17 @@
   .capcard .cc-tx s{font-size:12px;color:var(--muted);text-decoration:none}
   .capcard .cc-ar{flex:none;width:15px;height:15px;color:var(--sage)}
 
+  /* 做饭记录 */
+  .cooklog{margin:14px 0 2px;padding:13px 14px;background:var(--card);
+    border:1px solid var(--line);border-radius:var(--r-md)}
+  .cooklog .ch{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  .cooklog .ch b{font-size:13.5px;font-weight:600}
+  .cooklog .ch s{font-size:11.5px;color:var(--muted);text-decoration:none}
+  .cooklog .cl{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .cooklog .cl span{font-size:12px;color:var(--ink-2);background:var(--card-2);
+    border-radius:var(--r-pill);padding:4px 10px}
+  .cooklog .cw{margin:8px 0 0;font-size:11.5px;color:var(--muted)}
+
   /* 菜谱页的套餐速览 */
   .dsets{margin:0 0 14px}
   .dsets h2{font-size:15px;margin:0 0 8px}
@@ -926,6 +937,8 @@
     </div>
     <div class="hsoon" id="homeSoon"></div>
 
+    <section class="cooklog" id="cookLog" hidden></section>
+
     <a class="capcard" href="capture.html">
       <span class="cc-ic" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -1299,6 +1312,7 @@ function homeDaysUrgent(){
 }
 
 function renderHome(){
+  renderCookLog();
   const n = items.length, u = homeDaysUrgent();
   const badge = $("#sceneBadge"), subEl = $("#homeSub");
   if(badge){
@@ -1692,6 +1706,24 @@ function pantryLine(missingIds){
 }
 
 /* 菜谱页的套餐速览：只列「整套 now-cookable」的前三套 */
+/* 做饭记录：今天做过什么、这周几顿 */
+function renderCookLog(){
+  const box = $("#cookLog");
+  if(!box || !FD.cookSummary) return;
+  const sum = FD.cookSummary();
+  if(!sum.todayDishes.length && !sum.weekMeals){ box.hidden = true; box.innerHTML = ""; return; }
+  box.hidden = false;
+  const t = sum.todayDishes;
+  const names = t.slice(-4).map(e => I18N.foodName ? I18N.recipeName({ id: e.dish, name: e.name }) : e.name);
+  box.innerHTML = `
+    <div class="ch">
+      <b>${t.length ? "今天做过 " + t.length + " 道" : "今天还没下厨"}</b>
+      <s>${sum.weekMeals ? "这周 " + sum.weekMeals + " 顿 · " + sum.weekDishes + " 道菜" : ""}</s>
+    </div>
+    ${names.length ? `<div class="cl">${names.map(n => `<span>${n}</span>`).join("")}</div>` : ""}
+    <p class="cw">${t.length ? "记录在这台设备上，用来算「这周做了几顿」。" : "做完一餐就会记在这里。"}</p>`;
+}
+
 function renderDiscSets(){
   const box = $("#discSets");
   if(!box) return;
@@ -2474,7 +2506,8 @@ $("#ck-done").addEventListener("click", ()=>{
         const merged = await CLOUD.pull();
         if(Array.isArray(merged)) CLOUD.withSuppress(() => { items = merged; FD.saveItems(items); });
       }catch(e){}
-      renderItems();
+      try{ FD.noteCooked(cookRecipe, setPlan ? setPlan.name : null); }catch(e){}
+      renderItems(); renderCookLog();
       cookCloud = null; api.ok = false;
       $("#cook").classList.remove("on");
       $("#undoText").textContent = t("cook.doneShort", { dish: I18N.recipeName(cookRecipe) });
@@ -2509,7 +2542,8 @@ $("#ck-done").addEventListener("click", ()=>{
 
   FD.saveItems(items);
   FD.log("take", cookRecipe.id);
-  renderItems();
+  try{ FD.noteCooked(cookRecipe, setPlan ? setPlan.name : null); }catch(e){}
+  renderItems(); renderCookLog();
   cookSession = null;
   $("#cook").classList.remove("on");
   const usedTxt = (res.used || []).map(u => u.left === 0 ? t("undo.usedUp",{n:cnOf(u.cat),q:u.qty}) : t("undo.left",{n:cnOf(u.cat),q:u.qty,left:u.left})).join(I18N.getLang()==="en" ? ", " : "、");
