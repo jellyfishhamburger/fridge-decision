@@ -496,6 +496,119 @@
     go(5);
   }
 
+
+  /* ---------------- 小票核对 ----------------
+     只读小票、只提示差异；点「加入清单」才动草稿行，点确认才动库存。 */
+  var rcptParsed = [], rcptImage = null;
+
+  function rcptMsg(text, isErr) {
+    var el = $("#rcptMsg");
+    el.textContent = text || "";
+    el.className = "rmsg" + (isErr ? " err" : "");
+  }
+
+  async function pickReceipt(file) {
+    if (!file) return;
+    if (!window.RECEIPT) { rcptMsg("小票识别没加载成功", true); return; }
+    rcptMsg("正在读小票…（第一次要下载识别模型，约 20 秒）");
+    try {
+      var dataUrl = await fileToDataUrl(file);
+      rcptImage = dataUrl;
+      var text = await RECEIPT.readText(dataUrl);
+      rcptParsed = RECEIPT.parse(text);
+      if (!rcptParsed.length) {
+        rcptMsg("没从小票里读出商品 —— 可能是照片太糊，或者这家店的小票格式认不出来。", true);
+        renderDiff();
+        return;
+      }
+      rcptMsg("读到 " + rcptParsed.length + " 样： " + rcptParsed.map(function (p) { return catName(p.cat) + " ×" + p.qty; }).join("、"));
+      renderDiff();
+      /* 差异就在下面，自动滚过去，别让人以为没反应 */
+      setTimeout(function () {
+        var d = $("#rcptDiff");
+        if (d && d.children.length) d.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 120);
+    } catch (e) {
+      rcptMsg("读不出来：" + (e && e.message ? e.message : "未知错误"), true);
+    }
+  }
+
+  /* 读成 dataURL 再交给 OCR：blob URL 在 worker 里会踩到缓存层，dataURL 最稳。
+     顺手把长边压到 1600，手机拍的 4000px 原图既慢又没必要。 */
+  function fileToDataUrl(file) {
+    return new Promise(function (res, rej) {
+      var img = new Image();
+      var url = URL.createObjectURL(file);
+      img.onload = function () {
+        var max = 1600;
+        var k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+        var c = document.createElement("canvas");
+        c.width = Math.round(img.naturalWidth * k);
+        c.height = Math.round(img.naturalHeight * k);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        res(c.toDataURL("image/jpeg", 0.9));
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); rej(new Error("图片读不了")); };
+      img.src = url;
+    });
+  }
+
+  function renderDiff() {
+    var box = $("#rcptDiff");
+    box.innerHTML = "";
+    if (!rcptParsed.length) return;
+
+    var d = RECEIPT.reconcile(state.rows, rcptParsed);
+    if (!d.missing.length && !d.mismatch.length) {
+      var ok = document.createElement("div");
+      ok.className = "d quiet";
+      ok.innerHTML = '<span class="tx">小票上的东西清单里都有，数量也对得上。</span>';
+      box.appendChild(ok);
+      return;
+    }
+
+    d.missing.forEach(function (p) {
+      var el = document.createElement("div");
+      el.className = "d";
+      el.innerHTML = '<span class="tx">小票上有 <b>' + catName(p.cat) + ' ×' + p.qty + '</b>，照片里没看到。要补进去吗？</span>' +
+                     '<button data-addrcpt="' + p.cat + '" data-qty="' + p.qty + '">加入清单</button>';
+      box.appendChild(el);
+    });
+
+    d.mismatch.forEach(function (m) {
+      var el = document.createElement("div");
+      el.className = "d";
+      el.innerHTML = '<span class="tx">' + catName(m.p.cat) + '：小票 <b>' + m.p.qty + '</b>，清单 <b>' + m.have + '</b>。</span>' +
+                     '<button data-setrcpt="' + m.idx + '" data-qty="' + m.p.qty + '">改成 ' + m.p.qty + '</button>';
+      box.appendChild(el);
+    });
+
+    box.querySelectorAll("[data-addrcpt]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        state.rows.push({ cat: b.dataset.addrcpt, qty: Number(b.dataset.qty) || 1, action: "add",
+                          img: "", conf: 0, label: "", margin: 0, fromReceipt: true });
+        renderRows();
+        renderDiff();
+      });
+    });
+    box.querySelectorAll("[data-setrcpt]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var r = state.rows[Number(b.dataset.setrcpt)];
+        if (r) { r.qty = Number(b.dataset.qty) || 1; r.action = "add"; }
+        renderRows();
+        renderDiff();
+      });
+    });
+  }
+
+  $("#rcptPick").addEventListener("click", function () { $("#rcptFile").click(); });
+  $("#rcptFile").addEventListener("change", function (e) {
+    var f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    pickReceipt(f);
+  });
+
   /* ---------------- 绑定 ---------------- */
   $("#startCam").addEventListener("click", startCam);
   $("#pickFiles").addEventListener("click", function () { $("#fileIn").click(); });

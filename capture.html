@@ -106,6 +106,17 @@
     <div id="rows" class="rows"></div>
 
     <button class="btn ghost" id="addManual">＋ 补一件没拍到的</button>
+
+    <details class="rcpt" id="rcptBox">
+      <summary>用小票核对（可选）</summary>
+      <p class="rh">拍一张小票，帮你找出「买了但没拍到」的。只做提示，不会自己改库存。</p>
+      <div class="rb">
+        <button class="btn ghost" id="rcptPick">拍小票 / 选图片</button>
+        <input type="file" id="rcptFile" accept="image/*" capture="environment" hidden>
+      </div>
+      <div class="rmsg" id="rcptMsg"></div>
+      <div class="rdiff" id="rcptDiff"></div>
+    </details>
     <p class="tiny" id="reviewNote"></p>
   </section>
 
@@ -176,6 +187,7 @@
 <script src="logic.js?v=20261101-1"></script>
 <script src="sync.js?v=20261101-1"></script>
 <script src="auth.js?v=20261101-3"></script>
+<script src="receipt.js?v=20261102-1"></script>
 <script src="classifier.js?v=20261101-1"></script>
 <script src="capture.js?v=20261101-1"></script>
 <script src="nav.js?v=20261101-1" defer></script>
