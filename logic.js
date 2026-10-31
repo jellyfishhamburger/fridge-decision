@@ -157,6 +157,41 @@
     return RECIPES.map(r => evaluate(r, items, st)).sort((a, b) => b.score - a.score);
   }
 
+  /* ---------- 一人份套餐 ----------
+     套餐不是新菜，是把现有菜组合起来。评分沿用单菜那套（临期优先、缺料扣分），
+     再加上「整套齐不齐」「总时长」两条。 */
+  const SETS = global.FD_SETS || [];
+
+  function evaluateSet(set, items, st) {
+    const dishes = (set.dishes || [])
+      .map(id => RECIPES.filter(r => r.id === id)[0])
+      .filter(Boolean)
+      .map(r => evaluate(r, items, st));
+
+    const ready = dishes.length > 0 && dishes.every(d => d.status === "ready");
+    const shop1 = dishes.filter(d => d.status === "shop1").length;
+    const missing = [];
+    dishes.forEach(d => d.missing.forEach(c => { if (missing.indexOf(c) < 0) missing.push(c); }));
+
+    const minutes = Math.max.apply(null, dishes.map(d => d.recipe.minutes).concat([0])) + 8;
+    const kcal = dishes.reduce((a, d) => a + (d.recipe.kcal || 0), 0) + (set.staple === "rice" ? 150 : 0);
+    const urgent = dishes.some(d => d.used.some(i => daysLeftOf(i) <= 2));
+    const greens = dishes.some(d => d.recipe.greens);
+    const score = dishes.reduce((a, d) => a + d.score, 0) - (dishes.length - 1) * 3;
+
+    return { set, dishes, ready, shop1, missing, minutes, kcal, urgent, greens, score,
+             status: ready ? "ready" : (missing.length <= 1 && shop1 <= 1 ? "shop1" : "blocked") };
+  }
+
+  function decideSets(items, st) {
+    return SETS.map(s => evaluateSet(s, items, st)).sort((a, b) =>
+      (b.ready - a.ready) ||
+      (a.missing.length - b.missing.length) ||
+      (b.urgent - a.urgent) ||
+      (a.minutes - b.minutes) ||
+      (b.score - a.score));
+  }
+
   function urgent(items, limit) {
     return items.slice().sort((a, b) => daysLeftOf(a) - daysLeftOf(b)).slice(0, limit || 3);
   }
@@ -394,7 +429,8 @@
   }
 
   global.FD = {
-    CATALOG, RECIPES, PANTRY, byId, pantryById, DB,
+    CATALOG, RECIPES, PANTRY, byId, pantryById, DB, SETS,
+    evaluateSet, decideSets,
     LS_ITEMS, LS_SETTINGS, LS_LOG, LS_PANTRY, LS_HOUSEHOLD,
     read, write,
     items, saveItems, unitOf, consumptionOf, consume, migrate, mergeItems,

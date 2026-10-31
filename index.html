@@ -542,6 +542,18 @@
   .capcard .cc-tx s{font-size:12px;color:var(--muted);text-decoration:none}
   .capcard .cc-ar{flex:none;width:15px;height:15px;color:var(--sage)}
 
+  /* 套餐卡：今晚这一套 */
+  .verdict.setv{background:var(--card);color:var(--ink);border:1px solid var(--line);
+    box-shadow:var(--shadow)}
+  .verdict.setv .kicker{color:var(--sage-dk);opacity:1}
+  .verdict.setv h3{color:var(--ink);font-size:21px}
+  .verdict.setv .badge{background:var(--card-2);color:var(--ink-2)}
+  .setv .setlist{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+  .setv .sdi{background:var(--card-2);border-radius:var(--r-pill);padding:5px 11px;
+    font-size:12.5px;color:var(--ink-2)}
+  .setv .sdi i{font-style:normal;color:var(--muted);font-size:11px;margin-left:2px}
+  .setv .snote{margin:8px 0 0;font-size:11.5px;color:var(--muted)}
+
   /* 云端状态条：只在「有待同步」或「这个家还是空的」时出现 */
   .cloudnote{display:block;margin:0 0 10px;padding:9px 12px;
     border-radius:var(--r-sm);font-size:12.5px;line-height:1.5;
@@ -1172,6 +1184,7 @@
 
 <script src="motion.js?v=20261030-4"></script>
 <script src="data.js?v=20261030-18"></script>
+<script src="sets.js?v=20261101-6"></script>
 <script src="cook-art.js?v=20261030-6"></script>
 <script src="cook-steps.js?v=20261030-6"></script>
 <script src="cook-step-ing.js?v=20261030-9"></script>
@@ -1200,6 +1213,7 @@ let goal   = FD.settings();
 let pantry = FD.pantry();
 let picked = null, pendingDays = 3, pendingQty = 1, stream = null;
 let cookRecipe = null, cookStep = 0, lastUndo = null, cookSession = null, cookCloud = null;
+let setPlan = null;   /* {id,name,dishes:[],idx} —— 正在做的套餐 */
 let discFilter = "all", buildPicks = new Set();
 
 const uid = () => Math.random().toString(36).slice(2, 9);
@@ -1653,7 +1667,26 @@ function renderResult(list, sel){
     return;
   }
   const top = usable[0], alts = usable.slice(1,3);
-  box.innerHTML = `
+
+  /* 有整套餐「现在就能做」时，先给套餐 —— 单人吃饭要的是一顿饭，不是一道菜 */
+  let setTop = null;
+  try{ setTop = (FD.decideSets ? FD.decideSets(items, goal).filter(s => s.ready)[0] : null); }catch(e){}
+  const setHTML = setTop ? `
+    <div class="verdict setv">
+      <div class="kicker">${tp("sets.kicker", {}, "今晚这一套 · 一人份")}</div>
+      <h3>${setTop.set.name}</h3>
+      <div class="meta">
+        <span class="badge">${tp("sets.min", {n: setTop.minutes}, setTop.minutes + " 分钟")}</span>
+        <span class="badge">${tp("sets.kcal", {n: setTop.kcal}, "约 " + setTop.kcal + " kcal")}</span>
+        <span class="badge">${setTop.dishes.length}${tp("sets.dishes", {}, " 道菜")}${setTop.set.staple === "rice" ? tp("sets.plusRice", {}, " + 米饭") : ""}</span>
+      </div>
+      <div class="setlist">${setTop.dishes.map((d,i) =>
+        `<span class="sdi">${i+1}. ${I18N.recipeName(d.recipe)}<i>${d.recipe.minutes}′</i></span>`).join("")}</div>
+      <p class="snote">${tp("sets.hint", {}, "按顺序做：先做耗时的，最后一道起锅就能吃。")}</p>
+      <button class="btn primary" style="margin-top:10px" data-set="${setTop.set.id}">${tp("sets.start", {}, "开始做这一套")}</button>
+    </div>` : "";
+
+  const singleHTML = setTop ? "" : `
     <div class="verdict ${top.status==="shop1"?"amber":""}">
       <div class="kicker">${top.status==="shop1" ? t("card.shop1") : t("card.tonight")}</div>
       <h3>${I18N.recipeName(top.recipe)}</h3>
@@ -1663,9 +1696,11 @@ function renderResult(list, sel){
         <span class="badge">${top.recipe.greens?t("card.greens"):t("card.noGreens")}</span>
       </div>
     </div>
-    ${top.status==="shop1"?`<div class="shop">${t("card.missing")}<b>${FD.shoppingHint(top)}</b><br>${t("card.missingHint")}</div>`:""}
+    ${top.status==="shop1"?`<div class="shop">${t("card.missing")}<b>${FD.shoppingHint(top)}</b><br>${t("card.missingHint")}</div>`:""}`;
+
+  box.innerHTML = setHTML + singleHTML + `
     <div class="why">
-      <b>${t("card.why")}</b>
+      <b>${setTop ? "这一套为什么合适" : t("card.why")}</b>
       <ul>${reasons(top).map(r=>`<li>${r}</li>`).join("")}</ul>
       <ol class="steps">${I18N.recipeSteps(top.recipe).map(s=>`<li>${stepRich(s)}</li>`).join("")}</ol>
       ${top.pantryMissing.length?pantryLine(top.pantryMissing):""}
@@ -1679,6 +1714,10 @@ function renderResult(list, sel){
         <button class="go" data-pick="${a.recipe.id}" style="border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;color:var(--green);font-family:inherit">${t("card.seeThis")}</button>
       </div>`).join("")}
     </div>`:""}`;
+
+  box.querySelectorAll("[data-set]").forEach(b=>{
+    b.addEventListener("click", () => startSet(b.dataset.set));
+  });
 
   box.querySelectorAll("[data-pick]").forEach(b=>{
     b.addEventListener("click", ()=>{
@@ -2161,6 +2200,29 @@ function stepIcon(text){
 }
 
 /* ---------- cooking mode ---------- */
+function startSet(sid){
+  const s = (window.FD_SETS || []).filter(x => x.id === sid)[0];
+  if(!s) return;
+  setPlan = { id: s.id, name: s.name, dishes: s.dishes.slice(), idx: 0 };
+  toast(tp("sets.step", { a: 1, b: setPlan.dishes.length }, "套餐第 1/" + setPlan.dishes.length + " 道"));
+  openCook(setPlan.dishes[0]);
+}
+
+function advanceSet(){
+  if(!setPlan) return;
+  setPlan.idx++;
+  if(setPlan.idx < setPlan.dishes.length){
+    const nid = setPlan.dishes[setPlan.idx];
+    const r = FD.RECIPES.filter(x => x.id === nid)[0];
+    toast(tp("sets.step", { a: setPlan.idx + 1, b: setPlan.dishes.length }, "套餐第 " + (setPlan.idx + 1) + "/" + setPlan.dishes.length + " 道") + (r ? " · " + I18N.recipeName(r) : ""));
+    setTimeout(() => openCook(nid), 800);
+  }else{
+    const nm = setPlan.name;
+    setPlan = null;
+    toast(tp("sets.done", { name: nm }, "这一套做完了：" + nm));
+  }
+}
+
 function openCook(recipeId){
   cookRecipe = FD.RECIPES.find(r => r.id === recipeId);
   if(!cookRecipe) return;
@@ -2184,7 +2246,7 @@ function openCook(recipeId){
     FD.saveItems(items);
     renderCookReserved();
   }
-  $("#ck-name").textContent = I18N.recipeName(cookRecipe);
+  $("#ck-name").textContent = (setPlan ? tp("sets.badge", { a: setPlan.idx + 1, b: setPlan.dishes.length }, "套餐 " + (setPlan.idx + 1) + "/" + setPlan.dishes.length) + " · " : "") + I18N.recipeName(cookRecipe);
   const ph = window.DISH_PHOTO && DISH_PHOTO.get(cookRecipe.name);
   const phBox = $("#ck-photo");
   if(phBox) phBox.innerHTML = (ph && ph.src) ? `<img src="${ph.src}" alt="${cookRecipe.name}">` : "";
@@ -2249,6 +2311,7 @@ $("#ck-close").addEventListener("click", ()=>{
     FD.saveItems(items);        /* 预留归零要落盘，否则下次打开还占着 */
   }
   cookSession = null;
+  setPlan = null;                       /* 关掉就不再往下走下一道 */
   $("#cook").classList.remove("on");
 });
 
@@ -2276,6 +2339,7 @@ $("#ck-done").addEventListener("click", ()=>{
       $("#undoText").textContent = t("cook.doneShort", { dish: I18N.recipeName(cookRecipe) });
       $("#undoBar").classList.add("on");
       show("fridge");
+      advanceSet();
     }).catch(err => {
       toast((err && err.message) || "扣减没成功，稍后再试");
       btn.disabled = false;
@@ -2311,6 +2375,7 @@ $("#ck-done").addEventListener("click", ()=>{
   $("#undoText").textContent = t("undo.done", {dish: I18N.recipeName(cookRecipe), items: usedTxt || "-"});
   $("#undoBar").classList.add("on");
   if(cookStep >= 0) show("fridge");
+  advanceSet();
 });
 $("#undoBtn").addEventListener("click", ()=>{
   if(!lastUndo) return;
@@ -2343,6 +2408,11 @@ $("#undoBtn").addEventListener("click", ()=>{
 let editTarget = null, sheetFor = null;   // editTarget=正在编辑的条目；sheetFor=要补的待确认
 
 function tt(k, fallback){ const v = t(k); return (v === k || v == null) ? fallback : v; }
+/* 带参数的版本：t() 支持 {n}/{a} 占位，缺词条时退回 fallback */
+function tp(k, params, fallback){
+  const v = t(k, params);
+  return (v === k || v == null) ? fallback : v;
+}
 
 function openSheet(item, pendItem){
   editTarget = (item && item.id) ? item : null;   /* 只认真正的条目；别把 click 事件当成条目 */
