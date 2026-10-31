@@ -542,6 +542,18 @@
   .capcard .cc-tx s{font-size:12px;color:var(--muted);text-decoration:none}
   .capcard .cc-ar{flex:none;width:15px;height:15px;color:var(--sage)}
 
+  /* 菜谱页的套餐速览 */
+  .dsets{margin:0 0 14px}
+  .dsets h2{font-size:15px;margin:0 0 8px}
+  .dsets .dset{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
+    padding:11px 12px;margin-bottom:8px;font-family:inherit;cursor:pointer}
+  .dsets .dset .tx{flex:1;min-width:0}
+  .dsets .dset b{display:block;font-size:13.5px;font-weight:600;color:var(--ink);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dsets .dset s{display:block;font-size:11.5px;color:var(--muted);text-decoration:none;margin-top:2px}
+  .dsets .dset .go2{flex:none;font-size:12px;font-weight:600;color:var(--action)}
+
   /* 套餐卡：今晚这一套 */
   .intents{display:flex;gap:6px;margin:0 0 10px;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .intents .itbtn{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink-2);
@@ -1004,6 +1016,9 @@
   <!-- ============ view 2: discover ============ -->
   <section class="view" id="view-discover">
     <p class="lede" id="discLede" data-i18n="disc.lede">按「先用掉快坏的」排序。</p>
+
+    <!-- 套餐：三套现成的，点一行就能开始做 -->
+    <section id="discSets" class="dsets" hidden></section>
 
     <!-- 现在就能做：扇形叠，一直在，不跟下面的筛选走 -->
     <section class="fan" id="fanSec" hidden aria-label="现在就能做">
@@ -1676,6 +1691,24 @@ function pantryLine(missingIds){
   return `<div class="pantryline">${t("card.pantry")}${names}<br><span style="font-size:12px">${t("card.pantryHint")}</span></div>`;
 }
 
+/* 菜谱页的套餐速览：只列「整套 now-cookable」的前三套 */
+function renderDiscSets(){
+  const box = $("#discSets");
+  if(!box) return;
+  let sets = [];
+  try{ sets = (FD.buildSets ? FD.buildSets(items, goal, setIntent) : []).filter(x => x.ready).slice(0, 3); }catch(e){}
+  if(!sets.length){ box.hidden = true; box.innerHTML = ""; return; }
+  box.hidden = false;
+  box.innerHTML = `<h2>${tp("sets.quick", {}, "按套餐看")}<span class="count" style="font-size:12px;color:var(--muted);margin-left:6px">${tp("sets.quickSub", {}, "一人份，整份都能做")}</span></h2>` +
+    sets.map(s => `<button class="dset" data-setic="${s.dishes.map(d => d.recipe.id).join("|")}" data-setn="${(s.name || "").replace(/"/g, "&quot;")}">
+        <span class="tx"><b>${s.name}</b><s>${s.minutes} 分钟 · 约 ${s.kcal} kcal · ${s.dishes.length} 道菜</s></span>
+        <span class="go2">开始做 →</span>
+      </button>`).join("");
+  box.querySelectorAll("[data-setic]").forEach(b => {
+    b.addEventListener("click", () => startSet(b.dataset.setic.split("|").filter(Boolean), b.dataset.setn));
+  });
+}
+
 function renderResult(list, sel){
   const box = $(sel || "#result");
   const usable = list.filter(r => r.status !== "blocked");
@@ -2167,6 +2200,7 @@ function closeRecipe(){
 window.__closeOverlays = closeRecipe;
 
 function renderDiscover(){
+  renderDiscSets();
   renderFan();
   const all = discBase();
   const cnt = $("#discCount");
