@@ -21,8 +21,24 @@
   const LS_CFG       = "fd.sb.v1";
 
   function cfg() { try { return JSON.parse(localStorage.getItem(LS_CFG) || "{}") || {}; } catch (e) { return {}; } }
+
+  /* 只认 https://xxxx.supabase.co 这一段。
+     贴成 https://xxxx.supabase.co/rest/v1/ 是最常见的错 —— 拼起来会变成
+     /rest/v1//rest/v1/items，PostgREST 直接回 PGRST125。 */
+  function normalizeUrl(u) {
+    let s = String(u || "").trim();
+    if (!s) return "";
+    if (!/^https?:\/\//i.test(s)) s = "https://" + s;
+    try {
+      const x = new URL(s);
+      return x.origin;
+    } catch (e) {
+      return s.replace(/\/+$/, "").replace(/\/rest\/v1$/i, "");
+    }
+  }
+
   function configure(url, key) {
-    const c = Object.assign(cfg(), { url: (url || "").trim().replace(/\/$/, ""), key: (key || "").trim() });
+    const c = Object.assign(cfg(), { url: normalizeUrl(url), key: (key || "").trim() });
     localStorage.setItem(LS_CFG, JSON.stringify(c));
     return c;
   }

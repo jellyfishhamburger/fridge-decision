@@ -126,6 +126,7 @@
       云端同步 / Cloud sync <span id="cloudPill" class="pill">未连接</span>
     </summary>
     <p class="hint" style="margin-top:10px">填上 Supabase 的 Project URL 和 anon public key，这台设备就连上家庭共享。留空则和现在完全一样 —— 只存在本机。</p>
+    <p class="hint" style="margin-top:6px;color:#8a7a4a">URL 只填到 <b>.supabase.co</b> 为止 —— 后面带 <code>/rest/v1/</code> 会连不上（会自动帮你截掉）。</p>
     <div class="row" style="margin-top:10px">
       <input class="inp" id="sbUrl" placeholder="https://xxxx.supabase.co" style="flex:1;min-width:0">
     </div>
@@ -417,14 +418,23 @@ function paintAll(){
 }
 
 /* ---------- events ---------- */
+function prettyErr(msg){
+  const m = String(msg || "");
+  if (/PGRST125/.test(m)) return "URL 里多了 /rest/v1/ —— 只填 https://xxxx.supabase.co 这一段";
+  if (/401|JWT|invalid api key/i.test(m)) return "anon key 不对，去 Project Settings → API → anon public 复制";
+  if (/ENOTFOUND|Failed to fetch|NetworkError/i.test(m)) return "连不上这个域名，检查 URL 有没有打错";
+  return m;
+}
+
 $("#sbSave") && $("#sbSave").addEventListener("click", async () => {
   const url = $("#sbUrl").value.trim(), key = $("#sbKey").value.trim();
   if (!url || !key) { cloudMsg("URL 和 anon key 都要填。", true); return; }
-  SYNC.configure(url, key);
+  const c0 = SYNC.configure(url, key);
+  if ($("#sbUrl")) $("#sbUrl").value = c0.url;          /* 回填截干净后的地址 */
   cloudMsg("正在测试…", false);
   try {
     const r = await SYNC.ping();
-    if (!r.ok) { cloudMsg("连不上：" + r.reason, true); return; }
+    if (!r.ok) { cloudMsg("连不上：" + prettyErr(r.reason), true); return; }
     const code = FD.sync.code();
     const n = await SYNC.pull(code);
     $("#hhCode").textContent = code;
@@ -435,10 +445,13 @@ $("#sbSave") && $("#sbSave").addEventListener("click", async () => {
 
 $("#sbTest") && $("#sbTest").addEventListener("click", async () => {
   const url = $("#sbUrl").value.trim(), key = $("#sbKey").value.trim();
-  if (url && key) SYNC.configure(url, key);
+  if (url && key) {
+    const c1 = SYNC.configure(url, key);
+    if ($("#sbUrl")) $("#sbUrl").value = c1.url;      /* 先截干净再测 */
+  }
   try {
     const r = await SYNC.ping();
-    cloudMsg(r.ok ? "连接正常（HTTP " + r.status + "）" : "连不上：" + r.reason, !r.ok);
+    cloudMsg(r.ok ? "连接正常（HTTP " + r.status + "）" : "连不上：" + prettyErr(r.reason), !r.ok);
   } catch (e) { cloudMsg("出错：" + e.message, true); }
 });
 
