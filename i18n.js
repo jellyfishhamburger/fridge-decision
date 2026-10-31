@@ -117,6 +117,10 @@
 
       "cook.title": "跟着做", "cook.prev": "上一步", "cook.next": "下一步",
       "cook.last": "最后一步", "cook.done": "做完了 · 扣减库存",
+      "cook.reserved": "这餐已预留",
+      "cook.reservedHint": "做完才扣库存，现在只是先占着",
+      "cook.short": "{n} 不够了，先补一点再做",
+      "cook.cantDone": "库存不够了，先去冰箱加一样",
       "undo.done": "{dish} 做好了 · 扣减 {items}", "undo.btn": "撤销", "undo.ok": "已撤销扣减",
       "undo.usedUp": "{n}×{q}（用完）", "undo.left": "{n}×{q}（剩 {left}）",
 
@@ -272,6 +276,10 @@
 
       "cook.title": "Cook along", "cook.prev": "Back", "cook.next": "Next",
       "cook.last": "Last step", "cook.done": "Done — deduct from stock",
+      "cook.reserved": "Reserved for this meal",
+      "cook.reservedHint": "Stock is only deducted when you finish",
+      "cook.short": "Not enough {n} left — top up first",
+      "cook.cantDone": "Not enough in stock — add some first",
       "undo.done": "{dish} cooked · deducted {items}", "undo.btn": "Undo", "undo.ok": "Deduction undone",
       "undo.usedUp": "{n}×{q} (used up)", "undo.left": "{n}×{q} ({left} left)",
 

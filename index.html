@@ -516,6 +516,12 @@
   .ck-ing .ii.pk{background:#F8F3E7;border:1px solid #E2D6BC;color:#6B5A3C;font-weight:500;
     padding:5px 10px;font-size:12px}
   .ck-ing:empty{display:none}
+  /* 已预留：只是先占着，做完才扣 */
+  .ck-res{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;justify-content:center;
+    margin:14px 0 0;padding:9px 12px;background:#F6F4E6;border:1px dashed #DDD2B8;border-radius:14px}
+  .ck-res .lb{font-size:11.5px;font-weight:700;color:#7A6A3C;letter-spacing:.02em}
+  .ck-res .tx{font-size:12.5px;color:#4A4634}
+  .ck-res .hint{font-size:11px;color:#8A8264;flex-basis:100%;text-align:center}
   .ck-ing .lb{font-size:11.5px;color:#9AA69C;align-self:center;margin-right:2px}
 
 
@@ -1141,6 +1147,7 @@
     <div class="ck-icon" id="ck-icon"></div>
     <div class="ck-text" id="ck-text">…</div>
     <div class="ck-ing" id="ck-ing"></div>
+    <div class="ck-res" id="ck-res" style="display:none"></div>
     <div class="ck-count" id="ck-count">1 / 5</div>
   </div>
   <div class="ck-bar">
@@ -1161,6 +1168,7 @@
 <script src="dish-photos.js?v=20261029-19"></script>
 <script src="sync.js?v=20261029-17"></script>
 <script src="logic.js?v=20261029-17"></script>
+<script src="store.js?v=20261101-2"></script>
 <script src="i18n.js?v=20261029-17"></script>
 <script>
 "use strict";
@@ -1169,13 +1177,15 @@ const $$ = s => [...document.querySelectorAll(s)];
 let items  = (() => {
   const m = FD.migrate(FD.items());
   const merged = FD.mergeItems(m.items);
+  /* 上次没做完的烹饪：2 小时内保留预留，超时自动释放（否则预留会一直占着） */
+  if (window.FDSTORE) FDSTORE.sweep(merged);
   if (m.changed || merged.length !== m.items.length) FD.saveItems(merged);
   return merged;
 })();
 let goal   = FD.settings();
 let pantry = FD.pantry();
 let picked = null, pendingDays = 3, pendingQty = 1, stream = null;
-let cookRecipe = null, cookStep = 0, lastUndo = null;
+let cookRecipe = null, cookStep = 0, lastUndo = null, cookSession = null;
 let discFilter = "all", buildPicks = new Set();
 
 const uid = () => Math.random().toString(36).slice(2, 9);
@@ -2141,6 +2151,17 @@ function openCook(recipeId){
   cookRecipe = FD.RECIPES.find(r => r.id === recipeId);
   if(!cookRecipe) return;
   cookStep = 0;
+  /* 开始做 = 预留；不扣库存。同一个会话重复打开不会重复预留（reserve 幂等） */
+  if(window.FDSTORE){
+    if(cookSession && cookSession.status === "reserved") FDSTORE.cancel(cookSession, items);
+    cookSession = FDSTORE.begin(cookRecipe, items);
+    const r = FDSTORE.reserve(cookSession, items);
+    if(!r.ok && r.cats && r.cats.length){
+      toast(t("cook.short", { n: r.cats.map(c => cnOf(c)).join("、") }));
+    }
+    FD.saveItems(items);
+    renderCookReserved();
+  }
   $("#ck-name").textContent = I18N.recipeName(cookRecipe);
   const ph = window.DISH_PHOTO && DISH_PHOTO.get(cookRecipe.name);
   const phBox = $("#ck-photo");
@@ -2148,6 +2169,21 @@ function openCook(recipeId){
   renderCook();
   $("#cook").classList.add("on");
 }
+
+/* 已预留什么，写在做法下面 —— 让人知道「还没扣，做完才扣」 */
+function renderCookReserved(){
+  const box = $("#ck-res");
+  if(!box) return;
+  if(!cookSession || cookSession.status !== "reserved"){ box.style.display = "none"; return; }
+  const need = {};
+  cookSession.plan.forEach(p => { if(p.item_id) need[p.cat] = (need[p.cat] || 0) + p.qty; });
+  const list = Object.keys(need).map(c => cnOf(c) + " ×" + need[c]).join("、");
+  if(!list){ box.style.display = "none"; return; }
+  box.style.display = "";
+  box.innerHTML = `<span class="lb">${tt("cook.reserved", "这餐已预留")}</span><span class="tx">${list}</span>` +
+                  `<span class="hint">${tt("cook.reservedHint", "做完才扣库存，现在只是先占着")}</span>`;
+}
+
 function renderCook(){
   const steps = cleanSteps(cookRecipe);
   const text = steps[cookStep] || "";
@@ -2180,25 +2216,59 @@ function renderCook(){
 }
 $("#ck-prev").addEventListener("click", ()=>{ if(cookStep > 0){ cookStep--; renderCook(); } });
 $("#ck-next").addEventListener("click", ()=>{ if(cookStep < cookRecipe.steps.length - 1){ cookStep++; renderCook(); } });
-$("#ck-close").addEventListener("click", ()=> $("#cook").classList.remove("on"));
+$("#ck-close").addEventListener("click", ()=>{
+  /* 没做完就退出 = 取消：只释放预留，一件都不扣 */
+  if(window.FDSTORE && cookSession){
+    FDSTORE.cancel(cookSession, items);
+    FD.saveItems(items);        /* 预留归零要落盘，否则下次打开还占着 */
+  }
+  cookSession = null;
+  $("#cook").classList.remove("on");
+});
 
 $("#ck-done").addEventListener("click", ()=>{
-  const before = items.slice();
-  const res = FD.consume(items, cookRecipe);
-  lastUndo = {items: before, dish: cookRecipe.name};
-  items = res.items;
+  const btn = $("#ck-done");
+  if(!cookRecipe) return;
+  /* 这一餐已经结算过（会话已清空）：直接不理，绝不走第二条扣减路径 */
+  if(window.FDSTORE && !cookSession) return;
+  if(btn.dataset.busy === "1") return;          /* 防连点 */
+  btn.dataset.busy = "1"; btn.disabled = true;
+
+  let res;
+  try{
+    if(window.FDSTORE && cookSession){
+      res = FDSTORE.complete(cookSession, items);   /* 幂等：同会话只扣一次 */
+      if(!res.ok){ toast(t("cook.cantDone", "库存不够了，先去冰箱加一样")); return; }
+      lastUndo = {key: cookSession.id + ":complete", dish: cookRecipe.name};
+    }else{
+      const before = items.slice();
+      const r = FD.consume(items, cookRecipe);
+      lastUndo = {items: before, dish: cookRecipe.name};
+      items = r.items;
+      res = {used: r.used};
+    }
+  }finally{
+    btn.dataset.busy = "0"; btn.disabled = false;
+  }
+
   FD.saveItems(items);
   FD.log("take", cookRecipe.id);
   renderItems();
+  cookSession = null;
   $("#cook").classList.remove("on");
-  const usedTxt = res.used.map(u => u.left === 0 ? t("undo.usedUp",{n:cnOf(u.cat),q:u.qty}) : t("undo.left",{n:cnOf(u.cat),q:u.qty,left:u.left})).join(I18N.getLang()==="en" ? ", " : "、");
+  const usedTxt = (res.used || []).map(u => u.left === 0 ? t("undo.usedUp",{n:cnOf(u.cat),q:u.qty}) : t("undo.left",{n:cnOf(u.cat),q:u.qty,left:u.left})).join(I18N.getLang()==="en" ? ", " : "、");
   $("#undoText").textContent = t("undo.done", {dish: I18N.recipeName(cookRecipe), items: usedTxt || "-"});
   $("#undoBar").classList.add("on");
   if(cookStep >= 0) show("fridge");
 });
 $("#undoBtn").addEventListener("click", ()=>{
   if(!lastUndo) return;
-  items = lastUndo.items; FD.saveItems(items); renderItems();
+  if(lastUndo.key && window.FDSTORE){
+    FDSTORE.undo(lastUndo.key, items);          /* 反向事件，不改历史 */
+  }else if(lastUndo.items){
+    items = lastUndo.items;
+  }
+  FD.saveItems(items); renderItems();
   $("#undoBar").classList.remove("on");
   toast(t("undo.ok"));
   lastUndo = null;
