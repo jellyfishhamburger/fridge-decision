@@ -127,7 +127,7 @@
   /* ---------- 离线识别：CLIP 零样本（不需要电脑、不需要服务器） ---------- */
   /* 离线 CLIP 还没跑通（onnxruntime 的 wasm 在纯静态托管下起不来），先关掉，
      免得每次识别都白试一遍再超时。代码留着，下一步换成能跑的方案。 */
-  var CLIP_ON = false;
+  var CLIP_ON = true;
   var clipP = null;
   async function clipPipeline() {
     if (clipP) return clipP;
