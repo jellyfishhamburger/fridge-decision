@@ -144,5 +144,61 @@
     el.addEventListener("pointerleave", up, { passive: true });
   }
 
-  g.MOTION = { spring, height, press, reduce };
+  /* 多通道弹簧（位移 x/y、旋转、缩放一起走一条时间轴）——
+     扇形叠的每一张卡都是四个量同时变化，分开做三个 spring 会散架。 */
+  function springVec(opts) {
+    const from = (opts.from || []).slice();
+    const to = (opts.to || []).slice();
+    const n = Math.max(from.length, to.length);
+    const o = {
+      stiffness: opts.stiffness == null ? 380 : opts.stiffness,
+      damping: opts.damping == null ? 26 : opts.damping,
+      epsilon: opts.epsilon == null ? 0.35 : opts.epsilon,
+      onUpdate: opts.onUpdate || function () {},
+      onComplete: opts.onComplete || function () {}
+    };
+    if (reduce) { o.onUpdate(to.slice()); o.onComplete(); return { stop() {} }; }
+    const vel = opts.velocity || new Array(n).fill(0);
+    const t0 = performance.now();
+    const f = solver(o.stiffness, o.damping, 1);
+    let raf = 0, dead = false;
+    (function frame(now) {
+      if (dead) return;
+      const t = (now - t0) / 1000;
+      const out = new Array(n);
+      let maxd = 0;
+      for (let i = 0; i < n; i++) {
+        const d = f((from[i] || 0) - (to[i] || 0), vel[i] || 0, t);
+        out[i] = (to[i] || 0) + d;
+        if (Math.abs(d) > maxd) maxd = Math.abs(d);
+      }
+      o.onUpdate(out);
+      if (maxd < o.epsilon && t > 0.08) {
+        o.onUpdate(to.slice());
+        dead = true;
+        o.onComplete();
+        return;
+      }
+      raf = requestAnimationFrame(frame);
+    })(t0);
+    return { stop() { dead = true; cancelAnimationFrame(raf); } };
+  }
+
+  /* 松手速度（px/s，最近 ~90ms）：没有它，甩一下和拖一下手感一样 */
+  function tracker(limit) {
+    limit = limit || 8;
+    let pts = [];
+    return {
+      reset() { pts = []; },
+      add(x, y) { pts.push({ x, y, t: performance.now() }); if (pts.length > limit) pts.shift(); },
+      v() {
+        if (pts.length < 2) return { vx: 0, vy: 0 };
+        const a = pts[0], b = pts[pts.length - 1], dt = (b.t - a.t) / 1000;
+        if (dt <= 0.001) return { vx: 0, vy: 0 };
+        return { vx: (b.x - a.x) / dt, vy: (b.y - a.y) / dt };
+      }
+    };
+  }
+
+  g.MOTION = { spring, springVec, tracker, height, press, reduce };
 })(window);

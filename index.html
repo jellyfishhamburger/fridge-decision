@@ -532,26 +532,49 @@
   /* 冰箱：分类分组里的行，左边线往里收一点，视觉上属于这一组 */
   .ds-grp .row-i{padding-left:2px}
 
-  /* ================= 菜谱页：现在就能做（横向三条） ================= */
-  .dready{display:flex;gap:9px;overflow-x:auto;padding:2px 0 12px;
-    scrollbar-width:none;scroll-snap-type:x proximity}
-  .dready::-webkit-scrollbar{display:none}
-  .dready:empty{display:none}
-  .dr{flex:0 0 62%;scroll-snap-align:start;display:flex;align-items:center;gap:9px;min-width:0;
-    border:1px solid var(--line);background:var(--card);border-radius:var(--r-md);padding:9px;
-    text-align:left;font-family:inherit;cursor:pointer;box-shadow:var(--shadow);
-    transition:transform .18s var(--ease)}
-  .dr:active{transform:scale(.985)}
-  .dr .th{width:46px;height:46px;border-radius:12px;overflow:hidden;flex:none;
-    background:var(--card-2);display:grid;place-items:center;color:var(--green)}
-  .dr .th img{width:100%;height:100%;object-fit:cover}
-  .dr .tx{display:block;min-width:0;flex:1}
-  .dr b{display:block;font-size:13.5px;font-weight:700;line-height:1.3;color:var(--ink);
+  /* ================= 菜谱页：现在就能做（扇形叠） ================= */
+  .fan{margin:2px 0 10px}
+  .fan[hidden]{display:none}
+  .fan-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 8px}
+  .fan-t{font-size:var(--fs-h2);font-weight:700;margin:0;letter-spacing:-.01em}
+  .fan-c{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .fan-stage{position:relative;height:270px;margin:0 -16px;touch-action:pan-y;overflow:hidden}
+  .fan-card{position:absolute;left:0;top:0;border-radius:20px;overflow:hidden;background:var(--card);
+    box-shadow:0 12px 26px rgba(47,60,45,.14),0 2px 6px rgba(47,60,45,.06);
+    will-change:transform;cursor:pointer;border:0;padding:0;-webkit-user-select:none;user-select:none}
+  .fan-card .ph{display:block;position:relative;width:100%;height:100%;background:var(--card-2)}
+  .fan-card .ph img{display:block;width:100%;height:100%;object-fit:cover}
+  .fan-card .ph.art{display:flex;align-items:center;justify-content:center;gap:18px;background:#F7F2E4}
+  .fan-card .ph.art .ic{display:flex;flex-direction:column;align-items:center;gap:4px;color:#6f7f74}
+  .fan-card .ph.art .ic svg{width:44px;height:44px;stroke-width:1.5}
+  .fan-card .ph.art .ic i{font-style:normal;font-size:11px;color:#8b8574}
+  .fan-card .ph .cr{position:absolute;right:6px;bottom:6px;display:block;max-width:78%;
+    font-size:8px;line-height:1.3;color:#fff;background:rgba(28,32,30,.42);padding:1px 5px;
+    border-radius:5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .fan-card .ph .cr a{color:#fff;text-decoration:none;white-space:nowrap}
+  /* 只有最前面那张显示署名：后面几张露出的边角上挂着半行小字，像渲染坏了 */
+  .fan-card .cr{opacity:0;transition:opacity .22s}
+  .fan-card.front .cr{opacity:1}
+  .fan-card .tag{position:absolute;left:10px;top:10px;background:rgba(255,253,247,.94);
+    color:var(--green);font-size:11px;font-weight:700;border-radius:8px;padding:3px 7px;
+    box-shadow:0 2px 6px rgba(47,60,45,.12);opacity:0;transition:opacity .22s}
+  .fan-card.front .tag{opacity:1}
+  .fan-info{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
+    border-radius:18px;padding:12px 14px;box-shadow:var(--shadow);margin-top:2px}
+  .fan-tx{flex:1;min-width:0}
+  .fan-tx b{display:block;font-size:15.5px;font-weight:700;color:var(--ink);line-height:1.3;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .dr small{display:block;font-size:11.5px;color:var(--muted);margin-top:3px;
+  .fan-tx span{display:block;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .dr.gap{border-color:#EFD9B4;background:#FEFAF1}
-  .dr.gap small{color:#8A5A16}
+  .fan-go{flex:none;border:0;border-radius:var(--r-pill);background:var(--green-soft);color:var(--green);
+    font-size:12.5px;font-weight:700;padding:9px 15px;font-family:inherit;cursor:pointer}
+  .fan-go:active{transform:scale(.96)}
+  .fan-foot{display:flex;align-items:center;gap:8px;margin:9px 0 2px;min-height:12px}
+  .fan-dots{display:flex;align-items:center;gap:5px}
+  .fan-dots i{display:block;width:6px;height:6px;border-radius:99px;background:#D9D3C3;
+    transition:width .26s var(--ease),background .26s var(--ease)}
+  .fan-dots i.on{width:16px;background:var(--green)}
+  .fan-hint{margin-left:auto;font-size:11.5px;color:var(--muted-2)}
 
   .dhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:4px 0 9px}
   .dhead h2{font-size:var(--fs-h2);font-weight:700;margin:0;letter-spacing:-.01em}
@@ -907,8 +930,25 @@
   <section class="view" id="view-discover">
     <p class="lede" id="discLede" data-i18n="disc.lede">按「先用掉快坏的」排序。</p>
 
-    <!-- 现在就能做：先给答案，再给搜索和全部列表；一搜一筛就收起来，不重复列表 -->
-    <div id="discReady"></div>
+    <!-- 现在就能做：扇形叠，一直在，不跟下面的筛选走 -->
+    <section class="fan" id="fanSec" hidden aria-label="现在就能做">
+      <div class="fan-hd">
+        <h2 class="fan-t" id="fanTitle">现在就能做</h2>
+        <span class="fan-c" id="fanCount"></span>
+      </div>
+      <div class="fan-stage" id="fanStage"></div>
+      <div class="fan-info">
+        <div class="fan-tx">
+          <b id="fanName">—</b>
+          <span id="fanMeta"></span>
+        </div>
+        <button class="fan-go" id="fanOpen" type="button">看做法</button>
+      </div>
+      <div class="fan-foot">
+        <span class="fan-dots" id="fanDots"></span>
+        <span class="fan-hint" data-i18n="disc.fanHint">左右滑动切换</span>
+      </div>
+    </section>
 
     <label class="ds-search" style="margin-bottom:10px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
@@ -1205,12 +1245,23 @@ function renderHome(){
   const soon = FD.urgent(items, 3);
   const soonBox = $("#homeSoon");
   if(soonBox){
-    soonBox.innerHTML = soon.length ? soon.map(i=>{
-      const d = FD.daysLeftOf(i);
-      return `<span class="soonc ${d <= 2 ? "urgent" : ""}">
-        ${window.FD_ICON ? FD_ICON(i.cat, 19) : ""}<b>${cnOf(i.cat)}</b>
-        <i>${t("days.n", {n:d})}</i></span>`;
-    }).join("") : `<p class="empty" style="margin:0">${t("home.soonEmpty")}</p>`;
+    soonBox.innerHTML = soon.length
+      ? `<div class="soonrow">` + soon.map(i => {
+          const d = FD.daysLeftOf(i);
+          const art = (window.COOK_ART && COOK_ART.has(i.cat))
+            ? COOK_ART.svg(i.cat)
+            : (window.FD_ICON ? FD_ICON(i.cat, 44) : "");
+          const left = d <= 0 ? tt("fridge.today", "今天到期")
+                     : (d === 1 ? tt("fridge.oneDay", "还剩 1 天") : t("fridge.left", {n: d}));
+          return `<button class="wc ${daysClass(d)}" data-going="fridge">
+            <span class="wart">${art}</span>
+            <span class="wn">${cnOf(i.cat)}</span>
+            <span class="wd">${left}</span>
+          </button>`;
+        }).join("") + `</div>`
+      : `<p class="empty" style="margin:0">${t("home.soonEmpty")}</p>`;
+    soonBox.querySelectorAll("[data-going]").forEach(b =>
+      b.addEventListener("click", () => show("fridge")));
   }
 }
 
@@ -1680,38 +1731,186 @@ function compactCard(r){
   </button>`;
 }
 
-/* 「现在就能做」：最多 4 条最相关的；一道都做不了时退到「差一样」并说清楚 */
-function readyStrip(){
-  const box = $("#discReady");
-  if(!box) return;
-  /* 一进搜索或点了筛选，这块就收起来：否则同一屏里会有两份一样的推荐 */
-  if(discQuery.trim() || discFilter !== "all"){ box.innerHTML = ""; return; }
+/* ---- 现在就能做：扇形叠 ----
+   和下面「全部菜谱」的分工：这一块永远显示、永远只放「现在/差一样就能做」的少量推荐，
+   不跟搜索和筛选联动；筛选只改下面那张库。卡是叠着摞的，一次只看清一张。 */
+const FAN_MAX = 4;
+let fanCards = [], fanIdx = 0, fanBusy = false, fanSig = "", fanList = [];
+
+function fanPool(){
   const ranked = FD.decide(items, goal);
-  let top = ranked.filter(r => r.status === "ready").slice(0, 4);
-  let gap = false;
-  if(!top.length){ top = ranked.filter(r => r.status === "shop1").slice(0, 4); gap = true; }
-  if(!top.length){ box.innerHTML = ""; return; }
-  const sep = I18N.getLang() === "en" ? ", " : "、";
-  box.innerHTML = `<div class="dhead">
-      <h2>${gap ? t("disc.shop1H") : t("disc.readyH")}</h2>
-      <span class="dmeta">${t("disc.countOf", {n: top.length})}</span>
-    </div>
-    <div class="dready">` + top.map(r => {
-    const p = window.DISH_PHOTO && DISH_PHOTO.get(r.recipe.name);
-    const thumb = (p && p.src)
-      ? `<img src="${p.src}" alt="" loading="lazy" decoding="async">`
-      : (window.FD_ICON ? FD_ICON((r.recipe.needs || [""])[0], 24) : "");
-    const sub = gap
-      ? `${t("card.min", {n:r.recipe.minutes})} · ${t("disc.gapN", {n:1})}：${r.missing.map(cnOf).join(sep)}`
-      : `${t("card.min", {n:r.recipe.minutes})} · ${r.used.slice(0,2).map(i => cnOf(i.cat)).join(sep) || t("disc.usesShort")}`;
-    return `<button class="dr${gap ? " gap" : ""}" type="button" data-open="${r.recipe.id}">
-        <span class="th">${thumb}</span>
-        <span class="tx"><b>${I18N.recipeName(r.recipe)}</b><small>${sub}</small></span>
-      </button>`;
-  }).join("") + `</div>`;
-  box.querySelectorAll("[data-open]").forEach(b =>
-    b.addEventListener("click", () => openRecipe(b.dataset.open)));
+  let list = ranked.filter(r => r.status === "ready").slice(0, FAN_MAX);
+  if(!list.length) list = ranked.filter(r => r.status === "shop1").slice(0, FAN_MAX);
+  return list;
 }
+
+function fanSlotOf(i){
+  const d = i - fanIdx;                       /* 0 = 最前面那张 */
+  if(!d) return [0, 0, 0, 1];
+  const side = d % 2 ? 1 : -1, mag = Math.ceil(Math.abs(d) / 2);
+  return [side * mag * 34, Math.abs(d) * 6, side * mag * 8, 1 - Math.abs(d) * 0.05];
+}
+
+function fanPlace(i, v){
+  const c = fanCards[i];
+  if(!c) return;
+  c.style.transform = `translate3d(${c._cx + v[0]}px,${c._cy + v[1]}px,0) rotate(${v[2]}deg) scale(${v[3]})`;
+  c.style.zIndex = String(30 - Math.abs(i - fanIdx));
+  c.classList.toggle("front", i === fanIdx);
+}
+
+function fanArrange(vel){
+  fanCards.forEach((c, i) => {
+    const to = fanSlotOf(i), from = c._v ? c._v.slice() : to.slice();
+    MOTION.springVec({
+      from, to, stiffness: 260, damping: 24,
+      velocity: (i === fanIdx && vel) ? [vel.vx, 0, vel.vx * 0.02, 0] : null,
+      onUpdate: v => { c._v = v; fanPlace(i, v); },
+      onComplete: () => { c._v = to.slice(); }
+    });
+  });
+}
+
+function fanHead(){
+  const r = fanList[fanIdx];
+  if(!r) return;
+  const sep = I18N.getLang() === "en" ? ", " : "、";
+  $("#fanName").textContent = I18N.recipeName(r.recipe);
+  const used = r.used.slice(0, 2).map(i => cnOf(i.cat)).join(sep);
+  $("#fanMeta").textContent = r.status === "ready"
+    ? t("card.min", {n:r.recipe.minutes}) + (used ? " · " + t("disc.uses") + used : "")
+    : t("card.min", {n:r.recipe.minutes}) + " · " + t("disc.gapN", {n:r.missing.length})
+      + "：" + r.missing.map(cnOf).join(sep);
+  const cnt = $("#fanCount");
+  if(cnt) cnt.textContent = t("disc.countOf", {n: fanList.length});
+  const ttl = $("#fanTitle");
+  if(ttl) ttl.textContent = fanList.some(x => x.status === "ready") ? t("disc.readyH") : t("disc.shop1H");
+  [...document.querySelectorAll("#fanDots i")].forEach((d, i) => d.classList.toggle("on", i === fanIdx));
+}
+
+function fanBuild(){
+  const stage = $("#fanStage"), dots = $("#fanDots");
+  if(!stage) return;
+  stage.innerHTML = "";
+  if(dots) dots.innerHTML = "";
+  fanCards = [];
+  fanList.forEach((r, i) => {
+    const c = document.createElement("div");
+    c.className = "fan-card";
+    c.setAttribute("role", "button");
+    c.tabIndex = i === fanIdx ? 0 : -1;
+    c.setAttribute("aria-label", I18N.recipeName(r.recipe));
+    const ph = dishPhoto(r.recipe);
+    const badge = r.status === "ready"
+      ? `<span class="tag">${t("disc.ready1")}</span>`
+      : `<span class="tag">${t("disc.gapN", {n:r.missing.length})}</span>`;
+    c.innerHTML = `<span class="ph${ph.art ? " art" : ""}">${ph.html}</span>${badge}`;
+    c.addEventListener("keydown", e => {
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openRecipe(r.recipe.id); }
+    });
+    stage.appendChild(c);
+    fanCards.push(c);
+    if(dots){ const d = document.createElement("i"); dots.appendChild(d); }
+  });
+}
+
+function fanLayout(){
+  const stage = $("#fanStage");
+  if(!stage || !fanCards.length) return;
+  const w = stage.clientWidth || 358;
+  /* 菜谱照片是横的：卡就做成横的，别用竖卡去裁它 */
+  const ch = Math.round(Math.min(232, Math.max(196, w * 0.62)));
+  const cw = Math.round(ch * 1.18);
+  stage.style.height = (ch + 22) + "px";
+  const cx = Math.round((w - cw) / 2), cy = 10;
+  fanCards.forEach(c => {
+    c.style.width = cw + "px";
+    c.style.height = ch + "px";
+    c._cx = cx; c._cy = cy;
+  });
+}
+
+function fanDrag(){
+  const stage = $("#fanStage");
+  if(!stage || stage._wired) return;
+  stage._wired = true;
+  let drag = null;
+  stage.addEventListener("pointerdown", e => {
+    if(fanBusy) return;
+    const el = e.target.closest(".fan-card");
+    if(!el || el !== fanCards[fanIdx]) return;
+    drag = {
+      sx: e.clientX, dx: 0, moved: 0, tr: MOTION.tracker(),
+      start: (fanCards[fanIdx]._v || fanSlotOf(fanIdx)).slice()
+    };
+    drag.tr.add(e.clientX, e.clientY);
+    try{ stage.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  stage.addEventListener("pointermove", e => {
+    if(!drag) return;
+    const dx = e.clientX - drag.sx;
+    drag.dx = dx;
+    drag.moved = Math.max(drag.moved, Math.abs(dx));
+    drag.tr.add(e.clientX, e.clientY);
+    fanPlace(fanIdx, [drag.start[0] + dx, drag.start[1] + dx * 0.05,
+                      drag.start[2] + dx * 0.045, drag.start[3]]);
+  });
+  const end = () => {
+    if(!drag) return;
+    const d = drag; drag = null;
+    const v = d.tr.v();
+    const far = Math.abs(d.dx) > (stage.clientWidth || 358) * 0.18 || Math.abs(v.vx) > 420;
+    if(fanCards[fanIdx]){
+      fanCards[fanIdx]._v = [d.start[0] + d.dx, d.start[1], d.start[2] + d.dx * 0.045, d.start[3]];
+    }
+    if(d.moved < 8){                                   /* 没拖动 = 点了一下 */
+      fanArrange(null);
+      const r = fanList[fanIdx];
+      if(r) openRecipe(r.recipe.id);
+      return;
+    }
+    if(far && fanList.length > 1){
+      fanBusy = true;
+      fanIdx = (fanIdx + (d.dx < 0 ? 1 : -1) + fanList.length) % fanList.length;
+      fanHead();
+      fanArrange({ vx: v.vx });
+      setTimeout(() => { fanBusy = false; }, 380);
+    } else {
+      fanArrange(null);
+    }
+  };
+  stage.addEventListener("pointerup", end);
+  stage.addEventListener("pointercancel", end);
+}
+
+function renderFan(){
+  const sec = $("#fanSec");
+  if(!sec) return;
+  const list = fanPool();
+  if(!list.length){ sec.hidden = true; fanSig = ""; return; }
+  sec.hidden = false;
+  const sig = list.map(r => r.recipe.id).join(",") + "|" + I18N.getLang() + "|" +
+              list.map(r => r.status).join(",");
+  if(sig === fanSig){ fanHead(); return; }
+  fanList = list;
+  fanSig = sig;
+  if(fanIdx >= fanList.length) fanIdx = 0;
+  fanBuild();
+  fanLayout();
+  fanCards.forEach((c, i) => { c._v = fanSlotOf(i); fanPlace(i, c._v); });
+  fanHead();
+  fanDrag();
+}
+
+let fanRT = 0;
+addEventListener("resize", () => {
+  clearTimeout(fanRT);
+  fanRT = setTimeout(() => {
+    if(!fanCards.length) return;
+    fanLayout();
+    fanCards.forEach((c, i) => { c._v = fanSlotOf(i); fanPlace(i, c._v); });
+  }, 150);
+});
 
 /* 详情：复用 .sheet 和同一套步骤插画；「跟着做」直接进已有的做饭模式，不另起流程 */
 function openRecipe(id){
@@ -1767,7 +1966,7 @@ function closeRecipe(){
 window.__closeOverlays = closeRecipe;
 
 function renderDiscover(){
-  readyStrip();
+  renderFan();
   const all = discBase();
   const cnt = $("#discCount");
   if(cnt) cnt.textContent = t("disc.countOf", {n: all.length});
@@ -1807,6 +2006,11 @@ function renderDiscover(){
   }
   const more = $("#discMore");
   if(more) more.addEventListener("click", () => { discShown += DISC_PAGE * 2; renderDiscover(); });
+  const fanGo = $("#fanOpen");
+  if(fanGo) fanGo.addEventListener("click", () => {
+    const r = fanList[fanIdx];
+    if(r) openRecipe(r.recipe.id);
+  });
   const scrim = $("#rScrim");
   if(scrim) scrim.addEventListener("click", closeRecipe);
   addEventListener("keydown", e => { if(e.key === "Escape" && recipeOpen) closeRecipe(); });
