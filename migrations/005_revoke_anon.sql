@@ -1,38 +1,50 @@
 -- ============================================================
--- 005_revoke_anon.sql — 收回匿名角色对事务函数的执行权
+-- 005_revoke_anon.sql（v2）— 收回匿名角色对「我们这些函数」的执行权
 --
--- 为什么需要：Supabase 默认会把 public 下新函数的 EXECUTE 授给 anon。
--- 我实测过：用网页里那把公开的 publishable key 能直接调到
--- confirm_purchase（返回 "capture session not found"，说明函数真的跑进去了）。
--- 现在因为 assert_member 用 auth.uid() 兜住了，匿名调用写不进数据，
--- 但这属于「只剩一道锁」——不该让匿名用户碰到函数本身。
---
--- 跑法：SQL Editor → 新建查询 → 粘贴 → Run。幂等，跑几次都行。
+-- v1 直接在语句里写 my_households()，但那函数属于 002（还没跑），于是报
+-- 42883 function does not exist。v2 改成动态：先查函数有没有，再决定要不要收回。
+-- 幂等，跑几次都行，也不依赖 006 / 002 谁先谁后。
 -- ============================================================
 
-revoke all on function confirm_purchase(uuid, jsonb, text) from anon;
-revoke all on function reserve_meal(uuid)                   from anon;
-revoke all on function complete_meal(uuid, jsonb, text)     from anon;
-revoke all on function cancel_meal(uuid)                    from anon;
-revoke all on function undo_event(uuid)                     from anon;
-revoke all on function claim_once(text, text)               from anon;
-revoke all on function idem_payload(text)                   from anon;
-revoke all on function assert_member(uuid)                  from anon;
+do $$
+declare
+  sigs text[] := array[
+    'confirm_purchase(uuid,jsonb,text)',
+    'reserve_meal(uuid)',
+    'complete_meal(uuid,jsonb,text)',
+    'cancel_meal(uuid)',
+    'undo_event(uuid)',
+    'claim_once(text,text)',
+    'idem_payload(text)',
+    'assert_member(uuid)',
+    'start_capture_session(uuid)',
+    'save_capture_candidates(uuid,jsonb)',
+    'create_household(text)',
+    'join_household(text)',
+    'my_household()',
+    'my_households()',
+    'my_session_ids()',
+    'my_receipt_ids()'
+  ];
+  s text;
+  n int := 0;
+begin
+  foreach s in array sigs loop
+    if to_regprocedure(s) is not null then
+      execute format('revoke all on function %s from anon', s);
+      execute format('revoke all on function %s from public', s);
+      execute format('grant execute on function %s to authenticated', s);
+      n := n + 1;
+    end if;
+  end loop;
+  raise notice '处理了 % 个函数', n;
+end $$;
 
-revoke all on function create_household(text)               from anon;
-revoke all on function join_household(text)                 from anon;
-revoke all on function my_household()                       from anon;
-revoke all on function my_households()                      from anon;
-
--- 登录用户仍然可以调用
-grant execute on function confirm_purchase(uuid, jsonb, text) to authenticated;
-grant execute on function reserve_meal(uuid)                   to authenticated;
-grant execute on function complete_meal(uuid, jsonb, text)     to authenticated;
-grant execute on function cancel_meal(uuid)                    to authenticated;
-grant execute on function undo_event(uuid)                     to authenticated;
-grant execute on function create_household(text)               to authenticated;
-grant execute on function join_household(text)                 to authenticated;
-grant execute on function my_household()                       to authenticated;
-
--- 验证：下面这条应该返回 t（anon 没有 EXECUTE）
-select not has_function_privilege('anon', 'confirm_purchase(uuid,jsonb,text)', 'execute') as anon_blocked;
+-- 验证：下面这段应该返回 0 行（我们这批函数里，anon 一个都调不到）
+select p.oid::regprocedure as anon_can_still_call
+  from pg_proc p
+ where p.pronamespace = 'public'::regnamespace
+   and p.proname in ('confirm_purchase','reserve_meal','complete_meal','cancel_meal','undo_event',
+                     'claim_once','idem_payload','assert_member','start_capture_session',
+                     'save_capture_candidates','create_household','join_household','my_household')
+   and has_function_privilege('anon', p.oid, 'execute');
