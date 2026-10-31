@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
+<script>/* 录入流程已统一到 add.html：这里只做跳转，别再维护两套 */
+if (!/[?&](debug|legacy)=1/.test(location.search)) location.replace("add.html" + location.search);</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>采购整理 · Fridge Decision</title>

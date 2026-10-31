@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>添加食材</title>
+<link rel="stylesheet" href="ds.css?v=20261102-1">
+<link rel="stylesheet" href="nav.css?v=20261102-1">
+<link rel="stylesheet" href="add.css?v=20261102-1">
+</head>
+<body class="ad">
+
+<header class="ad-top">
+  <button class="ad-back" id="back" aria-label="返回">‹</button>
+  <h1 id="title">添加食材</h1>
+  <a class="ad-x" href="index.html#fridge" aria-label="关闭">×</a>
+</header>
+
+<main class="ad-main">
+
+  <!-- 1 · 选方式 -->
+  <section class="v on" id="v-pick">
+    <p class="ad-lede">怎么把这批东西录进去？</p>
+    <button class="card" data-go="manual">
+      <b>手动添加</b><span>自己选品类、数量、能放几天</span>
+    </button>
+    <button class="card" data-go="detect">
+      <b>自动检测录入</b><span>点一次开始，手伸进画面就自动拍，放完再按结束</span>
+    </button>
+    <button class="card" data-go="receipt">
+      <b>小票识别</b><span>拍一张小票，按上面的商品生成清单</span>
+    </button>
+    <button class="card" data-go="batch">
+      <b>摊开俯拍</b><span>把所有东西摊开拍一张，一次认出好几样</span>
+    </button>
+  </section>
+
+  <!-- 2 · 手动 -->
+  <section class="v" id="v-manual">
+    <p class="ad-lede">选一样，改数量和能放几天。</p>
+    <div class="grid" id="pickGrid"></div>
+    <div class="editrow" id="manualEdit" hidden>
+      <div class="qty">
+        <button data-q="-1">−</button><span id="mQty">1</span><button data-q="1">＋</button>
+        <span class="u" id="mUnit">份</span>
+      </div>
+      <div class="days">
+        能放 <button data-d="-1">−</button><span id="mDays">3</span> 天 <button data-d="1">＋</button>
+      </div>
+      <button class="btn primary" id="mAdd">加进清单</button>
+    </div>
+  </section>
+
+  <!-- 3 · 自动检测 -->
+  <section class="v" id="v-detect">
+    <div class="stage">
+      <video id="cam" playsinline muted autoplay></video>
+      <img id="shot" alt="">
+      <div class="hint" id="camHint"></div>
+    </div>
+    <div class="rowline"><span id="cnt">已拍 0 件</span><button class="mini" id="undo">删掉上一张</button></div>
+    <button class="btn primary" id="detToggle">开始检测</button>
+    <button class="btn ghost" id="detPick">相机不给用？从相册选</button>
+    <p class="tiny" id="detHint">按一次开始；手伸进来就自动拍，放完东西再按一次结束。</p>
+  </section>
+
+  <!-- 4 · 小票 -->
+  <section class="v" id="v-receipt">
+    <p class="ad-lede">拍一张小票，我按上面的商品生成清单。认不准可以手动补。</p>
+    <button class="btn primary" id="rShot">拍小票</button>
+    <button class="btn ghost" id="rPick">从相册选小票</button>
+    <p class="tiny" id="rMsg"></p>
+    <details id="rRawBox" hidden><summary>看看 OCR 读到的原文</summary><pre id="rRaw"></pre></details>
+  </section>
+
+  <!-- 5 · 摊开俯拍 -->
+  <section class="v" id="v-batch">
+    <p class="ad-lede">把这次买的都摊在台面上，从上往下拍一张。</p>
+    <button class="btn primary" id="bShot">拍这一批</button>
+    <button class="btn ghost" id="bPick">从相册选照片</button>
+    <p class="tiny" id="bMsg"></p>
+  </section>
+
+  <!-- 6 · 确认清单 -->
+  <section class="v" id="v-review">
+    <p class="ad-lede" id="revLede">这些要放进冰箱。认错了点 ✕，数量用加减。</p>
+    <div id="rows"></div>
+    <button class="btn ghost" id="addMore">＋ 补一件</button>
+  </section>
+
+</main>
+
+<footer class="ad-bar" id="bar" hidden>
+  <span id="barTxt">共 0 件</span>
+  <button class="btn primary" id="confirm">确认入库</button>
+</footer>
+
+<input type="file" id="fileIn" accept="image/*" multiple hidden>
+<input type="file" id="fileOne" accept="image/*" hidden>
+
+<script src="data.js?v=20261030-18"></script>
+<script src="tags.js?v=20261101-7"></script>
+<script src="sets.js?v=20261101-6"></script>
+<script src="i18n.js"></script>
+<script src="logic.js?v=20261029-17"></script>
+<script src="sync.js?v=20261029-17"></script>
+<script src="auth.js"></script>
+<script src="classifier.js"></script>
+<script src="receipt.js"></script>
+<script src="add.js?v=20261102-1"></script>
+</body>
+</html>
