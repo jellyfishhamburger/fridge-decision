@@ -207,15 +207,26 @@
     var cand = clipCandidates();
     var out = await pipe(url, cand.map(function (c) { return c.label; }));
     if (!out || !out.length) return { cat: "", name: "", why: "clip-none" };
-    out.sort(function (a, b) { return b.score - a.score; });
-    var top = out[0], sec = out[1] || { score: 0 };
-    var hit = cand.filter(function (c) { return c.label === top.label; })[0] || {};
-    var cat = hit.cat || catFromClipLabel(top.label);
-    /* 前两名太接近就不硬给结论 */
-    if (cat && top.score >= 0.12 && (top.score - sec.score) >= 0.03) {
-      return { cat: cat, name: hit.name || top.label, why: "clip", conf: top.score };
+
+    /* 先按「品类」合并分数：同一品类的多个说法（水饺/云吞/汤圆）不该互相打架，
+       否则第二名永远是自己的同义词，边际判断就永远过不了。 */
+    var byCat = {}, best = {};
+    out.forEach(function (o) {
+      var hit = cand.filter(function (c) { return c.label === o.label; })[0];
+      if (!hit) return;
+      if (!(hit.cat in byCat) || o.score > byCat[hit.cat]) {
+        byCat[hit.cat] = o.score;
+        best[hit.cat] = hit.name;
+      }
+    });
+    var ranked = Object.keys(byCat).map(function (k) { return { cat: k, score: byCat[k], name: best[k] }; })
+      .sort(function (a, b) { return b.score - a.score; });
+    var top = ranked[0], sec = ranked[1] || { score: 0 };
+    if (!top) return { cat: "", name: "", why: "clip-none" };
+    if (top.score >= 0.12 && (top.score - sec.score) >= 0.03) {
+      return { cat: top.cat, name: top.name, why: "clip", conf: top.score };
     }
-    return { cat: "", name: hit.name || top.label, why: "lowconf", conf: top.score };
+    return { cat: "", name: top.name, why: "lowconf", conf: top.score };
   }
 
   /* ---------- 识别策略 ---------- */
