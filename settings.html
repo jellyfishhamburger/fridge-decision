@@ -358,6 +358,8 @@
 <script src="sync.js?v=20261029-10"></script>
 <script src="logic.js?v=20261029-5"></script>
 <script src="auth.js?v=20261101-3"></script>
+<script src="cloud.js?v=20261101-4"></script>
+<script src="realtime.js?v=20261101-5"></script>
 <script src="i18n.js?v=20261029-6"></script>
 <script>
 "use strict";
@@ -454,10 +456,17 @@ function paintSync(){
   const c = window.CLOUD;
   if(!c){ $("#outCount").textContent = "0"; return; }
   $("#outCount").textContent = (c.outbox() || []).length;
-  const rt = window.RT ? RT.state() : null;
-  $("#rtState").textContent = !c.on()
-    ? "未登录"
-    : (rt && rt.joined ? "已连接（秒级同步）" : (rt && rt.open ? "握手中" : "未连接 —— 退回 20 秒轮询"));
+  let rtTxt = "—";
+  if (c.on()) {
+    let st = null;
+    try { st = JSON.parse(localStorage.getItem("fd.rt.state") || "null"); } catch (e) {}
+    if (!st) rtTxt = "还没连过";
+    else if (Date.now() - st.t > 90000) rtTxt = "连接已断（超过 90 秒没消息）";
+    else rtTxt = st.s === "joined" ? "已连接（秒级同步）"
+              : st.s === "open" ? "握手中…"
+              : "断开，正在重连";
+  } else rtTxt = "未登录";
+  $("#rtState").textContent = rtTxt;
   const t = Number(localStorage.getItem("fd.cloud.lastPull") || 0);
   $("#lastSync").textContent = t ? new Date(t).toLocaleTimeString() : "还没有";
 }

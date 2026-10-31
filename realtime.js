@@ -25,6 +25,11 @@
     return base + "/realtime/v1/websocket?apikey=" + encodeURIComponent(c.key || "") + "&vsn=1.0.0";
   }
 
+  /* 把连接状态写到 localStorage，好让设置页也能看到（那个页面不自己连） */
+  function mark(state) {
+    try { localStorage.setItem("fd.rt.state", JSON.stringify({ s: state, t: Date.now() })); } catch (e) {}
+  }
+
   function send(o) {
     if (ws && ws.readyState === 1) { try { ws.send(JSON.stringify(o)); } catch (e) {} }
   }
@@ -59,6 +64,7 @@
 
     ws.onopen = function () {
       retry = 0;
+      mark("open");
       join();
       clearInterval(hbTimer);
       hbTimer = setInterval(function () {
@@ -72,6 +78,7 @@
 
       if (msg.event === "phx_reply" && msg.payload && msg.payload.status === "ok") {
         joined = true;
+        mark("joined");
         return;
       }
       if (msg.event === "postgres_changes") { fire(); return; }
@@ -84,6 +91,7 @@
 
     ws.onclose = function () {
       joined = false;
+      mark("closed");
       clearInterval(hbTimer);
       scheduleRetry();
     };
