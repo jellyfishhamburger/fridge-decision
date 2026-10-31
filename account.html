@@ -52,6 +52,10 @@
   .avat{width:44px;height:44px;border-radius:var(--r-pill);background:var(--sage-bg);
     display:grid;place-items:center;color:var(--sage-dk);font-weight:700;font-size:16px;flex:none}
   .who{display:flex;align-items:center;gap:12px}
+  .tabs{display:flex;gap:6px;background:var(--card-2);border-radius:var(--r-pill);padding:4px;margin:2px 0 6px}
+  .tabs button{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;
+    font-weight:600;padding:9px 10px;border-radius:var(--r-pill);cursor:pointer}
+  .tabs button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(47,60,45,.10)}
 </style>
 </head>
 <body>
@@ -72,14 +76,30 @@
 
   <!-- 登录 -->
   <section class="card" id="cardSignIn">
-    <h2>用邮箱登录</h2>
-    <p class="lede">发一条登录链接到你的邮箱，点开就进来了 —— 不用记密码。</p>
+    <h2>登录</h2>
+    <p class="lede">用邮箱加密码最稳；也可以发一条邮件链接，不用记密码。</p>
+
+    <div class="tabs" id="authTabs">
+      <button type="button" data-m="pw" class="on">用密码</button>
+      <button type="button" data-m="link">发邮件链接</button>
+    </div>
+
     <label for="email">邮箱</label>
     <input class="inp" id="email" type="email" inputmode="email" autocomplete="email"
            placeholder="you@example.com">
-    <button class="btn primary" id="sendLink">发登录链接</button>
+
+    <div id="pwWrap">
+      <label for="pw">密码</label>
+      <input class="inp" id="pw" type="password" autocomplete="current-password" placeholder="至少 6 位">
+      <button class="btn primary" id="pwGo">登录 / 首次自动注册</button>
+    </div>
+
+    <div id="linkWrap" class="hide">
+      <button class="btn primary" id="sendLink">发登录链接</button>
+    </div>
+
     <div class="msg" id="signMsg"></div>
-    <p class="note">家里其他人用同一个邮箱登录不了同一台设备 —— 每人用自己的邮箱，然后用邀请码加入同一个家。</p>
+    <p class="note">家里其他人各用自己的邮箱注册，然后用邀请码加入同一个家。密码登录不依赖邮件额度。</p>
   </section>
 
   <!-- 已登录、还没有家庭 -->
@@ -186,6 +206,45 @@
     msg($("#signMsg"), "登录失败：" + red.error, "err");
   }
 
+  /* 两个模式切换 */
+  $("#authTabs").addEventListener("click", function(e){
+    var b = e.target.closest("[data-m]"); if(!b) return;
+    [].forEach.call(this.querySelectorAll("button"), function(x){ x.classList.toggle("on", x === b); });
+    var pw = b.dataset.m === "pw";
+    $("#pwWrap").classList.toggle("hide", !pw);
+    $("#linkWrap").classList.toggle("hide", pw);
+    msg($("#signMsg"), "");
+  });
+
+  function friendly(err){
+    var m = String(err && err.message || err || "");
+    if (/rate limit|429/i.test(m)) return "邮件额度用完了（Supabase 自带邮件每小时只发 2 封）。先用密码登录，或者等一小时。";
+    if (/Invalid login credentials/i.test(m)) return "邮箱或密码不对。";
+    if (/already registered|already exists/i.test(m)) return "这个邮箱注册过了 —— 密码可能记错了。";
+    if (/Email not confirmed/i.test(m)) return "项目还开着「确认邮箱」，得先去邮箱点确认（或者让我把它关掉）。";
+    if (/Password should be/i.test(m)) return "密码至少 6 位。";
+    return m;
+  }
+
+  $("#pwGo").addEventListener("click", async function(){
+    var email = ($("#email").value || "").trim();
+    var pw = ($("#pw").value || "");
+    if(!/.+@.+\..+/.test(email)){ msg($("#signMsg"), "邮箱看起来不对。", "err"); return; }
+    if(pw.length < 6){ msg($("#signMsg"), "密码至少 6 位。", "err"); return; }
+    this.disabled = true; msg($("#signMsg"), "正在登录…");
+    try{
+      var r = await AUTH.signInOrSignUp(email, pw);
+      if(r.needsConfirm){
+        msg($("#signMsg"), "账号建好了，但项目要求先确认邮箱 —— 去收件箱点确认，或者把「Confirm email」关掉。", "err");
+        return;
+      }
+      msg($("#signMsg"), r.created ? "账号已创建，正在进入…" : "登录成功，正在进入…", "ok");
+      setTimeout(paint, 300);
+    }catch(e){
+      msg($("#signMsg"), "登录不了：" + friendly(e), "err");
+    }finally{ this.disabled = false; }
+  });
+
   $("#sendLink").addEventListener("click", async function(){
     var email = ($("#email").value || "").trim();
     if(!/.+@.+\..+/.test(email)){ msg($("#signMsg"), "邮箱看起来不对。", "err"); return; }
@@ -194,7 +253,7 @@
       await AUTH.signIn(email);
       msg($("#signMsg"), "链接已经发出，去邮箱点一下（可能在垃圾邮件里）。", "ok");
     }catch(e){
-      msg($("#signMsg"), "发不出去：" + e.message, "err");
+      msg($("#signMsg"), "发不出去：" + friendly(e), "err");
     }finally{ this.disabled = false; }
   });
 

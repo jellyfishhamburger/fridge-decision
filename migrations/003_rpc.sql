@@ -54,7 +54,8 @@ declare
   r jsonb; v_id text; v_qty numeric;
 begin
   if not claim_once(p_key, 'confirm_purchase') then
-    return coalesce(idem_payload(p_key), '{"duplicate":true}'::jsonb);
+    -- 重复调用：把上次结果原样返回，并显式标注 duplicate，免得看起来像又写了一次
+    return coalesce(idem_payload(p_key), '{}'::jsonb) || jsonb_build_object('duplicate', true);
   end if;
 
   select cs.household_id, cs.status,
@@ -164,7 +165,7 @@ declare
   v_total numeric := 0; v_done int := 0;
 begin
   if not claim_once(p_key, 'complete_meal') then
-    return coalesce(idem_payload(p_key), '{"duplicate":true}'::jsonb);
+    return coalesce(idem_payload(p_key), '{}'::jsonb) || jsonb_build_object('duplicate', true);
   end if;
 
   select household_id, status, plan into v_hh, v_status, v_plan

@@ -60,6 +60,57 @@
     return true;
   }
 
+  /* ---------- 1b. 密码登录 / 首次自动注册 ----------
+     Supabase 自带的邮件服务每小时只发 2 封（rate limit），
+     演示时靠它很危险 —— 所以密码这条路作为主力，magic link 作为备选。 */
+  async function signInPassword(email, password) {
+    if (!configured()) throw new Error("先在设置里填 Supabase URL 和 anon key");
+    var res = await fetch(base() + "/auth/v1/token?grant_type=password", {
+      method: "POST",
+      headers: { "apikey": key(), "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email, password: password })
+    });
+    var body = null, txt = await res.text();
+    try { body = txt ? JSON.parse(txt) : null; } catch (e) { body = null; }
+
+    if (res.ok) return storeSession(body);
+
+    var msg = (body && (body.error_description || body.msg || body.message)) || txt || ("HTTP " + res.status);
+    var err = new Error(msg); err.status = res.status; err.code = body && (body.error_code || body.code);
+    throw err;
+  }
+
+  /* 注册：如果项目开了「确认邮箱」，这里只会建号、不会给 session */
+  async function signUpPassword(email, password) {
+    var res = await fetch(base() + "/auth/v1/signup", {
+      method: "POST",
+      headers: { "apikey": key(), "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email, password: password })
+    });
+    var body = null, txt = await res.text();
+    try { body = txt ? JSON.parse(txt) : null; } catch (e) { body = null; }
+    if (!res.ok) {
+      var msg = (body && (body.msg || body.error_description || body.message)) || txt || ("HTTP " + res.status);
+      var err = new Error(msg); err.status = res.status; err.code = body && (body.error_code || body.code);
+      throw err;
+    }
+    if (body && body.access_token) return storeSession(body);
+    return { needsConfirm: true, email: email };
+  }
+
+  /* 先登录，账号不存在就注册 */
+  async function signInOrSignUp(email, password) {
+    try {
+      var s = await signInPassword(email, password);
+      return { session: s, created: false };
+    } catch (e) {
+      /* invalid_grant / 400 → 很可能还没注册 */
+      var s2 = await signUpPassword(email, password);
+      if (s2 && s2.needsConfirm) return { needsConfirm: true };
+      return { session: s2, created: true };
+    }
+  }
+
   /* ---------- 2. 从跳转回来的 URL 里取 token ---------- */
   function handleRedirect() {
     if (!location.hash) return null;
@@ -164,6 +215,7 @@
 
   g.AUTH = {
     configured: configured, signIn: signIn, handleRedirect: handleRedirect,
+    signInPassword: signInPassword, signUpPassword: signUpPassword, signInOrSignUp: signInOrSignUp,
     session: session, signedIn: signedIn, token: token, refresh: refresh, signOut: signOut,
     rpc: rpc, myHousehold: myHousehold, createHousehold: createHousehold,
     joinHousehold: joinHousehold, items: items, LS: LS
