@@ -173,6 +173,24 @@
       onclick="location.href='account.html'">管理登录与家庭 →</button>
     <p class="hint" id="accState" style="margin-top:8px"></p>
 
+    <!-- 同步状态：出问题时先看这里 -->
+    <div id="syncDiag" style="display:none;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line-soft)">
+      <div class="row" style="justify-content:space-between">
+        <span class="hint" style="margin:0">待同步改动</span>
+        <span style="font-size:13px"><b id="outCount">0</b> 项
+          <button class="btn tiny" id="outClear" style="margin-left:6px">清空</button></span>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-top:6px">
+        <span class="hint" style="margin:0">实时连接</span>
+        <span style="font-size:13px" id="rtState">—</span>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-top:6px">
+        <span class="hint" style="margin:0">上次从云端拉取</span>
+        <span style="font-size:13px" id="lastSync">—</span>
+      </div>
+      <p class="hint" style="margin-top:6px">「待同步」长期不归零，说明有调用一直失败；点清空会把这批改动丢掉（不影响云端已有的）。</p>
+    </div>
+
     <!-- 旧的家庭码：登录后已由邀请码取代，藏起来备用 -->
     <details style="margin-top:14px" id="legacyCode">
       <summary style="cursor:pointer;font-size:11.5px;color:#9aa69c">旧的家庭码（未登录时的多设备方式）</summary>
@@ -431,11 +449,26 @@ function paintHousehold(){
 }
 
 /* ---------- 云端同步 ---------- */
+function paintSync(){
+  if(!$("#outCount")) return;
+  const c = window.CLOUD;
+  if(!c){ $("#outCount").textContent = "0"; return; }
+  $("#outCount").textContent = (c.outbox() || []).length;
+  const rt = window.RT ? RT.state() : null;
+  $("#rtState").textContent = !c.on()
+    ? "未登录"
+    : (rt && rt.joined ? "已连接（秒级同步）" : (rt && rt.open ? "握手中" : "未连接 —— 退回 20 秒轮询"));
+  const t = Number(localStorage.getItem("fd.cloud.lastPull") || 0);
+  $("#lastSync").textContent = t ? new Date(t).toLocaleTimeString() : "还没有";
+}
+
 function paintCloud(){
   const c = (window.SYNC && SYNC.cfg) ? SYNC.cfg() : {};
   if ($("#sbUrl")) $("#sbUrl").value = c.url || "";
   const a = window.AUTH && AUTH.session && AUTH.session();
   if ($("#cloudSigned")) $("#cloudSigned").style.display = a ? "" : "none";
+  if ($("#syncDiag")) $("#syncDiag").style.display = a ? "" : "none";
+  if (a) paintSync();
   if ($("#cloudSetup")) $("#cloudSetup").style.display = a ? "none" : "";
   if ($("#accBig")) $("#accBig").style.display = a ? "none" : "";
   if ($("#accSmall")) $("#accSmall").style.display = a ? "" : "none";
@@ -510,6 +543,15 @@ $("#sbTest") && $("#sbTest").addEventListener("click", async () => {
     cloudMsg(r.ok ? "连接正常（HTTP " + r.status + "）" : "连不上：" + prettyErr(r.reason), !r.ok);
   } catch (e) { cloudMsg("出错：" + e.message, true); }
 });
+
+$("#outClear") && $("#outClear").addEventListener("click", () => {
+  if(!window.CLOUD) return;
+  const list = (window.FD && FD.items()) || [];
+  CLOUD.resetQueue(list);
+  paintSync();
+  cloudMsg("已清空待同步队列（云端已有的不受影响）。", false);
+});
+setInterval(() => { if(!document.hidden) paintSync(); }, 3000);
 
 $("#hhNew") && $("#hhNew").addEventListener("click", () => {
   const c = FD.newCode();

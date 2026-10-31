@@ -55,6 +55,7 @@
                           .filter(function (i) { return i && !server.some(function (s) { return s.id === i.id; }); });
 
     var merged = server.concat(keep);
+    try { localStorage.setItem("fd.cloud.lastPull", String(Date.now())); } catch (e) {}
     var s = {};
     server.forEach(function (i) { s[i.id] = [i.cat, Number(i.qty) || 0]; });
     saveSnap(s);
@@ -81,9 +82,25 @@
       if (!now[id]) q.push({ type: "remove", id: id, at: Date.now() });
     });
 
+    /* 一次改动超过 30 条，几乎一定是「整批换了一次数据」（比如刚登录换了数据源），
+       不是用户手点出来的。这种情况重建快照就好，别把几百条塞进 outbox 去推。 */
+    if (q.length > 30) {
+      resetQueue(list);
+      return 0;
+    }
+
     saveOut(q);
     schedule();
     return q.length;
+  }
+
+  /* 清空待同步队列，并把快照对齐成当前列表（用于「出问题了，先归零」） */
+  function resetQueue(list) {
+    var s = {};
+    (list || []).forEach(function (i) { s[i.id] = [i.cat, Number(i.qty) || 0]; });
+    saveSnap(s);
+    saveOut([]);
+    return true;
   }
 
   async function flush() {
@@ -200,6 +217,7 @@
   g.CLOUD = {
     on: on, pull: pull, flush: flush, queue: queue, snap: snap,
     cookBegin: cookBegin, cookFinish: cookFinish, cookCancel: cookCancel, undoEvent: undoEvent,
+    resetQueue: resetQueue,
     start: start, hook: hook, refresh: refresh, withSuppress: withSuppress,
     outbox: outbox, LS_SNAP: LS_SNAP, LS_OUT: LS_OUT
   };
