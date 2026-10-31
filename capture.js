@@ -311,6 +311,20 @@
     btn.disabled = true;
     btn.textContent = "正在入库…";
 
+    /* 登录了就写云端（唯一真相），没登录就写本机 —— 两条路都只写一次 */
+    if (window.AUTH && AUTH.configured && AUTH.configured() && AUTH.signedIn()) {
+      cloudConfirm().then(function (st) {
+        finish(st, true);
+      }).catch(function (err) {
+        state.locked = false;
+        btn.disabled = false;
+        btn.textContent = "再试一次";
+        $("#reviewNote").textContent =
+          "云端没写成功（" + (err && err.message ? err.message : "网络") + "）。库存一件都没动，检查网络再点一次。";
+      });
+      return;
+    }
+
     var stats = { added: 0, adjusted: 0, kept: 0, skipped: 0 };
     var items = [];
     try { items = FD.items() || []; } catch (e) { items = []; }
@@ -340,8 +354,7 @@
       stats.added++;
     });
 
-    var wrote = stats.added + stats.adjusted;
-    if (wrote) {
+    if (stats.added + stats.adjusted) {
       try { FD.saveItems(items); }
       catch (e) {
         state.locked = false;
@@ -352,6 +365,52 @@
       }
     }
 
+    finish(stats, false);
+  }
+
+  /* 云端确认：开会话 → 留一份候选 → confirm_purchase（事务里一次改完） */
+  async function cloudConfirm() {
+    var sid = await AUTH.rpc("start_capture_session", {});
+
+    var payload = [];
+    state.rows.forEach(function (r) {
+      if (!r.cat || r.action === "ignore" || r.action === "keep") return;
+      var f = food(r.cat);
+      if (!f) return;
+      payload.push({
+        action: r.action, cat: f.id, name: f.name, tag: f.tag,
+        qty: r.qty, unit: FD.unitOf(f.id), life: f.days
+      });
+    });
+
+    /* 候选留档是附加动作，失败不影响入库 */
+    try {
+      await AUTH.rpc("save_capture_candidates", {
+        p_session: sid,
+        p_rows: state.rows.map(function (r) {
+          return { cat: r.cat, label: r.label, conf: r.conf, qty: r.qty,
+                   unit: r.cat ? FD.unitOf(r.cat) : "", action: r.action,
+                   needs_review: needsReview(r), reason: r.err ? "service" : (r.cat ? "" : "unknown") };
+        })
+      });
+    } catch (e) { /* 留档失败就算了 */ }
+
+    var res = await AUTH.rpc("confirm_purchase", {
+      p_session: sid,
+      p_rows: payload,
+      p_key: sid + ":confirm"
+    });
+
+    return {
+      added: (res && res.added) | 0,
+      adjusted: (res && res.adjusted) | 0,
+      skipped: (res && res.skipped) | 0,
+      kept: 0
+    };
+  }
+
+  function finish(stats, cloud) {
+    var wrote = stats.added + stats.adjusted;
     state.done = true;
     stopCam();
 
@@ -361,7 +420,8 @@
       '<div class="c"><b>' + (stats.kept + stats.skipped) + "</b><span>没动</span></div>";
     $("#doneH").textContent = wrote ? "已经记进冰箱了" : "这次没往冰箱加东西";
     $("#doneSub").textContent = wrote
-      ? "共 " + wrote + " 件写进去了。冰箱页和首页的推荐会跟着变。"
+      ? (cloud ? "共 " + wrote + " 件写进云端，家里的手机都能看到。"
+               : "共 " + wrote + " 件写进去了。冰箱页和首页的推荐会跟着变。")
       : "你选的都是「不变」或「忽略」，所以库存没动。";
     go(5);
   }
