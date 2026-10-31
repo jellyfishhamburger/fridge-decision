@@ -24,6 +24,9 @@
       "home.cook": "今晚能做",
       "home.seeAll": "查看全部 →",
       "home.soon": "先吃这些",
+      "cap.entry": "刚买菜回来？",
+      "cap.entrySub": "把这次买的东西一次记进去，不用一样一样加",
+      "cap.fridgeLink": "刚买完菜？整理本次采购 →",
       "home.need": "差 {x}",
       "home.none": "现在还没有能做的菜 —— 再加一两样。",
       "home.soonEmpty": "还没有快到期的食材。",
@@ -122,7 +125,7 @@
       "toast.tip": "提示：第一页有「载入示例」",
       "toast.took": "记下了 —— 采纳率 +1",
 
-      "foot.line": "原型 v0.6 · 无硬件、无图像识别",
+      "foot.line": "原型 v0.7 · 端侧识别、确认后入库",
       "foot.gate": "门口摄像头 →",
       "foot.disc": "圆片（黑色圆盘）→", "foot.strip": "长条墨水屏 →", "foot.settings": "设置 →",
 
@@ -176,6 +179,9 @@
       "home.cook": "Cookable tonight",
       "home.seeAll": "See all →",
       "home.soon": "Eat these first",
+      "cap.entry": "Just back from shopping?",
+      "cap.entrySub": "Log the whole trip at once instead of one by one",
+      "cap.fridgeLink": "Just shopped? Review this trip →",
       "home.need": "missing {x}",
       "home.none": "Nothing cookable yet — add one or two more items.",
       "home.soonEmpty": "Nothing close to expiring.",
@@ -274,7 +280,7 @@
       "toast.tip": "Tip: tap “Load demo fridge” on the first tab",
       "toast.took": "Logged — acceptance +1",
 
-      "foot.line": "Prototype v0.6 · no hardware, no image recognition",
+      "foot.line": "Prototype v0.7 · on-device recognition, confirmed before saving",
       "foot.gate": "Door camera →",
       "foot.disc": "Round puck →", "foot.strip": "Strip e-paper →", "foot.settings": "Settings →",
 

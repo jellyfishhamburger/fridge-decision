@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>采购整理 · Fridge Decision</title>
+<meta name="description" content="买回来的东西一件件过一遍，机器先猜，你确认了才进冰箱。">
+<meta name="theme-color" content="#FBF6EC">
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="ds.css?v=20261101-1">
+<link rel="stylesheet" href="capture.css?v=20261101-1">
+<link rel="stylesheet" href="nav.css?v=20261101-1">
+</head>
+<body>
+
+<header class="top">
+  <div class="tt">
+    <h1>采购整理</h1>
+    <span class="sub" id="stepLabel">第 1 步 · 准备</span>
+  </div>
+  <a class="quit" href="index.html#fridge" aria-label="退出">✕</a>
+</header>
+
+<div class="steps" id="steps" aria-hidden="true">
+  <span class="sd on"></span><span class="sd"></span><span class="sd"></span><span class="sd"></span>
+</div>
+
+<main class="wrap">
+
+  <!-- ========== 1 · 准备 ========== -->
+  <section class="pane on" id="s1">
+    <div class="hero" aria-hidden="true">
+      <svg viewBox="0 0 260 190" fill="none">
+        <ellipse cx="132" cy="176" rx="86" ry="9" fill="#2F3C2D" opacity=".07"/>
+        <!-- 冰箱 -->
+        <rect x="34" y="30" width="96" height="136" rx="9" fill="#EEF3EC"/>
+        <rect x="34" y="30" width="96" height="48" rx="9" fill="#E3ECDD"/>
+        <rect x="34" y="74" width="96" height="3" fill="#D6E3D3"/>
+        <rect x="120" y="46" width="5" height="20" rx="2.5" fill="#B9CBB6"/>
+        <rect x="120" y="86" width="5" height="26" rx="2.5" fill="#B9CBB6"/>
+        <circle cx="86" cy="22" r="7" fill="#DDE9D6"/>
+        <!-- 纸袋 -->
+        <path d="M150 96h74l-7 66h-60z" fill="#E9D8B8"/>
+        <path d="M150 96h74l-3 12h-68z" fill="#DEC9A2"/>
+        <path d="M166 96v-8a10 10 0 0 1 20 0v8" stroke="#C9A877" stroke-width="3" fill="none"/>
+        <!-- 袋子里的东西 -->
+        <ellipse cx="172" cy="102" rx="13" ry="9" fill="#D4553F"/>
+        <ellipse cx="172" cy="100" rx="7" ry="4.5" fill="#E4765F"/>
+        <path d="M196 104c0-9 4-14 9-14s9 5 9 14z" fill="#7E9C82"/>
+        <path d="M205 90v-8" stroke="#5F7C64" stroke-width="2.4"/>
+        <circle cx="196" cy="112" r="7" fill="#F2C14E"/>
+        <rect x="188" y="120" width="26" height="14" rx="3" fill="#FFFDF7"/>
+        <path d="M188 126h26" stroke="#E9E1CF" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <h2>把这次买的东西，一件一件给镜头看一眼</h2>
+    <p class="lede">机器先猜是什么，猜完由你逐项确认 —— <b>你没点确认，冰箱里的东西不会变</b>。</p>
+
+    <ul class="tips">
+      <li><b>一次一件</b><span>放进冰箱前，在镜头前停一秒。</span></li>
+      <li><b>手别挡住</b><span>手掌平放托着，别捏住正面。</span></li>
+      <li><b>漏了也能补</b><span>后面可以手动加。</span></li>
+    </ul>
+
+    <button class="btn primary" id="startCam">开始拍摄</button>
+    <button class="btn ghost" id="pickFiles">从相册选照片</button>
+    <input type="file" id="fileIn" accept="image/*" multiple hidden>
+    <p class="tiny">照片只在这台设备上识别，不上传云端。</p>
+  </section>
+
+  <!-- ========== 2 · 拍摄 ========== -->
+  <section class="pane" id="s2">
+    <div class="stage" id="stage">
+      <video id="cam" playsinline muted autoplay></video>
+      <div class="stage-off" id="camOff">
+        <p>这个浏览器没给摄像头，或者现在不方便开。</p>
+        <button class="btn ghost" id="pickFiles2">从相册选照片</button>
+      </div>
+      <div class="guide" id="guide" aria-hidden="true"></div>
+      <div class="chip" id="lastChip" hidden></div>
+    </div>
+
+    <div class="shotrow">
+      <span class="cnt" id="cnt">已拍 0 件</span>
+      <button class="mini" id="undoShot" disabled>删掉上一张</button>
+    </div>
+
+    <button class="btn primary shoot" id="shoot">拍这一件</button>
+    <button class="btn ghost" id="toDraft" disabled>拍完了，去确认</button>
+    <p class="tiny">一次只拍一件；同一件反复拍，会在下一步提示你合并。</p>
+  </section>
+
+  <!-- ========== 3 · 生成清单 ========== -->
+  <section class="pane" id="s3">
+    <h2>正在把拍到的整理成清单</h2>
+    <p class="lede">同一件拍了多张的，会合并成一条。</p>
+    <ul class="prog" id="prog"></ul>
+  </section>
+
+  <!-- ========== 4 · 草稿清单 ========== -->
+  <section class="pane" id="s4">
+    <h2 id="draftH">这些要放进冰箱</h2>
+    <p class="lede">猜错的改成对的；冰箱里本来就有的，选「不变」。</p>
+
+    <div id="rows" class="rows"></div>
+
+    <button class="btn ghost" id="addManual">＋ 补一件没拍到的</button>
+    <p class="tiny" id="reviewNote"></p>
+  </section>
+
+  <!-- ========== 5 · 完成 ========== -->
+  <section class="pane" id="s5">
+    <div class="done-ic" aria-hidden="true">
+      <svg viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="32" r="26" fill="#DDE9D6"/>
+        <path d="M20 33.5l9 9 16-18" stroke="#2F6B4F" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2 id="doneH">已经记进冰箱了</h2>
+    <p class="lede" id="doneSub"></p>
+    <div class="sumcards" id="sumcards"></div>
+    <a class="btn primary" href="index.html#fridge">去冰箱看看</a>
+    <button class="btn ghost" id="again">再整理一次</button>
+  </section>
+
+</main>
+
+<!-- 底部确认条 -->
+<div class="bar" id="bar" hidden>
+  <div class="barin">
+    <span class="bt" id="barTxt">0 件</span>
+    <button class="btn primary" id="confirm">确认入库</button>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="navin">
+    <a href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.8 11.4 12 4.4l8.2 7"/><path d="M6.3 10.2v9.2h11.4v-9.2"/><path d="M10 19.4v-4.6h4v4.6"/>
+      </svg>
+      <span>首页</span>
+    </a>
+    <a class="on" href="index.html#fridge" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <rect x="6" y="3.2" width="12" height="17.6" rx="2.6"/><path d="M6 9.6h12M9 5.6v2M9 11.8v2.4"/>
+      </svg>
+      <span>冰箱</span>
+    </a>
+    <a href="index.html#discover">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 6.6C10.2 5.3 7.7 4.8 5 5.1v12.4c2.7-.3 5.2.2 7 1.5 1.8-1.3 4.3-1.8 7-1.5V5.1c-2.7-.3-5.2.2-7 1.5z"/>
+        <path d="M12 6.6v12.4"/>
+      </svg>
+      <span>菜谱</span>
+    </a>
+    <a href="cook.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.6 10.4h16.8c0 4.6-3 7.2-6.6 7.2H10.2c-3.6 0-6.6-2.6-6.6-7.2z"/>
+        <path d="M2 9.8h20"/><path d="M6 9.8V8.2M18 9.8V8.2"/>
+        <path d="M9.4 5.4c-.8-1 .6-1.6 0-2.6M14.6 5.4c-.8-1 .6-1.6 0-2.6"/>
+      </svg>
+      <span>自己选</span>
+    </a>
+    <a href="settings.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.1"/><circle cx="15.5" cy="17" r="2.1"/>
+      </svg>
+      <span>设置</span>
+    </a>
+  </div>
+</nav>
+
+<script src="data.js?v=20261101-1"></script>
+<script src="logic.js?v=20261101-1"></script>
+<script src="sync.js?v=20261101-1"></script>
+<script src="classifier.js?v=20261101-1"></script>
+<script src="capture.js?v=20261101-1"></script>
+<script src="nav.js?v=20261101-1" defer></script>
+</body>
+</html>
