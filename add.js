@@ -13,7 +13,19 @@
   var det = { running: false, timer: null, lm: null, armed: true, last: 0, n: 0 };
 
   var AI_PORT = 8941;
-  var AI_URL = (location.protocol === "http:") ? "http://" + (location.hostname || "127.0.0.1") + ":" + AI_PORT : "";
+  var AI_URL = (function () {
+    var q = (location.search.match(/[?&]ai=([^&]+)/) || [])[1];
+    if (q) {
+      var u = decodeURIComponent(q);
+      try { localStorage.setItem("fd.ai.url", u); } catch (e) {}
+      return u.replace(/\/$/, "");
+    }
+    try {
+      var saved = localStorage.getItem("fd.ai.url");
+      if (saved) return saved.replace(/\/$/, "");
+    } catch (e) {}
+    return location.protocol === "http:" ? "http://" + (location.hostname || "127.0.0.1") + ":" + AI_PORT : "";
+  })();
 
   /* ---------- 视图 ---------- */
   var TITLES = { pick: "添加食材", manual: "手动添加", detect: "自动检测录入", receipt: "小票识别", batch: "摊开俯拍", review: "确认清单" };
@@ -142,8 +154,43 @@
     return clipP;
   }
 
-  function clipLabels() {
-    return FD.CATALOG.map(function (c) { return fname(c) + " / " + (c.name || ""); });
+  /* 同一品类给多个说法：CLIP 对措辞很敏感，多写几种能明显提命中 */
+  var CLIP_EXTRA = {
+    greens: ["青菜", "小白菜", "生菜", "菠菜", "菜心", "油麦菜", "娃娃菜"],
+    tomato: ["番茄", "西红柿"],
+    chili: ["辣椒", "青椒", "尖椒"],
+    mushroom: ["蘑菇", "香菇", "金针菇", "平菇"],
+    egg: ["鸡蛋", "一盒鸡蛋", "蛋"],
+    milk: ["牛奶", "一盒牛奶", "鲜奶"],
+    tofu: ["豆腐", "一盒豆腐", "豆干"],
+    pork: ["猪肉", "一块猪肉", "五花肉", "肉片"],
+    beef: ["牛肉", "牛肉片"],
+    chicken: ["鸡肉", "鸡胸肉", "鸡腿"],
+    fish: ["鱼", "一条鱼", "鱼片"],
+    shrimp: ["虾", "一盒虾", "虾仁"],
+    dumpling: ["速冻饺子", "水饺", "冷冻水饺", "云吞", "汤圆"],
+    bread: ["面包", "一袋面包", "吐司"],
+    rice: ["米饭", "大米", "剩饭"],
+    noodles: ["面条", "挂面", "一包面"],
+    yogurt: ["酸奶", "一杯酸奶"],
+    cheese: ["芝士", "奶酪", "黄油"],
+    onion: ["洋葱", "一个洋葱"],
+    potato: ["土豆", "马铃薯"],
+    carrot: ["胡萝卜", "红萝卜"],
+    broccoli: ["西兰花", "青花菜"],
+    eggplant: ["茄子"],
+    cucumber: ["黄瓜", "青瓜"],
+    cabbage: ["包菜", "卷心菜", "圆白菜"]
+  };
+
+  /* 展开成 CLIP 的候选标签：每个说法对应回品类 */
+  function clipCandidates() {
+    var out = [];
+    FD.CATALOG.forEach(function (c) {
+      var names = [fname(c)].concat(CLIP_EXTRA[c.id] || []);
+      names.forEach(function (n) { out.push({ label: n + " / " + (c.name || ""), cat: c.id, name: n }); });
+    });
+    return out;
   }
   function catFromClipLabel(lbl) {
     var cn = String(lbl).split("/")[0].trim();
@@ -157,16 +204,18 @@
   async function classifyClip(canvas) {
     var pipe = await clipPipeline();
     var url = canvas.toDataURL("image/jpeg", 0.85);
-    var out = await pipe(url, clipLabels());
+    var cand = clipCandidates();
+    var out = await pipe(url, cand.map(function (c) { return c.label; }));
     if (!out || !out.length) return { cat: "", name: "", why: "clip-none" };
     out.sort(function (a, b) { return b.score - a.score; });
     var top = out[0], sec = out[1] || { score: 0 };
-    var cat = catFromClipLabel(top.label);
+    var hit = cand.filter(function (c) { return c.label === top.label; })[0] || {};
+    var cat = hit.cat || catFromClipLabel(top.label);
     /* 前两名太接近就不硬给结论 */
     if (cat && top.score >= 0.12 && (top.score - sec.score) >= 0.03) {
-      return { cat: cat, name: top.label.split("/")[0].trim(), why: "clip", conf: top.score };
+      return { cat: cat, name: hit.name || top.label, why: "clip", conf: top.score };
     }
-    return { cat: "", name: top.label.split("/")[0].trim(), why: "lowconf", conf: top.score };
+    return { cat: "", name: hit.name || top.label, why: "lowconf", conf: top.score };
   }
 
   /* ---------- 识别策略 ---------- */
