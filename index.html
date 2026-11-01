@@ -786,6 +786,34 @@
     text-decoration:none;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .rcc.set .cr{font-size:8px;opacity:.72}
   .rcc.set .setflag{font-size:9.5px;padding:2px 6px;border-radius:6px;left:7px;top:7px}
+
+  /* 套餐卡名字：两道菜都在第一行，最多两行，不截断成一个名字 */
+  .rcc.set .nm{display:block;line-height:1.32}
+  .rcc.set .nm b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden;font-size:13.5px;font-weight:700;white-space:normal;word-break:break-word}
+  .rcc.set .nm s{display:block;font-size:11px;font-weight:500;color:var(--muted);
+    text-decoration:none;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* 套餐详情里两道菜：整行按钮与 ⇄ 用 grid 保证同高、同基线，不再一高一低 */
+  .ssrow{display:grid;grid-template-columns:1fr 44px;gap:8px;align-items:stretch;
+    background:none;border:0;border-radius:0;overflow:visible}
+  .ssrow .sshead,.ssrow .sw{height:100%;min-height:64px;box-sizing:border-box}
+  .ssrow .sshead{background:var(--card-2);border:1px solid var(--line);border-radius:14px;
+    display:flex;align-items:center;gap:10px;padding:10px 12px;font:inherit;text-align:left;cursor:pointer}
+  .ssrow .sw{width:44px;background:var(--card-2);border:1px solid var(--line);border-radius:14px;
+    color:var(--muted);font:inherit;font-size:15px;cursor:pointer}
+  .ssrow .tx{min-width:0}
+  .ssrow .tx b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* 套餐拼图里「一半有照片、一半没有」时的空白格：改成插画底，不再是白块 */
+  .rcc .ph.set2 .h,.rcc .ph.set2 .hh{display:flex;align-items:center;justify-content:center;
+    gap:8px;overflow:hidden;background:#F7F2E4;min-height:100%}
+  .rcc .ph.set2 .h img,.rcc .ph.set2 .hh img{width:100%;height:100%;object-fit:cover;display:block}
+  .rcc .ph.set2 .ic{display:flex;flex-direction:column;align-items:center;gap:3px;color:#6f7f74}
+  .rcc .ph.set2 .ic svg{width:22px;height:22px;stroke-width:1.6}
+  .rcc .ph.set2 .ic i{font-style:normal;font-size:10px;color:#8b8574}
+  /* 卡片上再挂一个「套餐」小标是多余的，区块标题已经说了 */
+  .rcc.set .setflag{display:none}
 </style>
 </head>
 <body>
@@ -1003,7 +1031,7 @@
     <div id="homeResult"></div>
 
     <div class="hb">
-      <h2 data-i18n="home.cook">今晚这一套</h2>
+      <h2 data-i18n="home.cook">今晚能做</h2>
       <button data-goto="discover" data-focus="sets" data-i18n="home.seeAll">查看全部 →</button>
     </div>
     <div class="hcards" id="homeCook"></div>
@@ -1420,17 +1448,32 @@ function renderHome(){
   }
   if(subEl) subEl.textContent = n ? t("home.sub", {n:n, u:u}) : t("home.subEmpty");
 
-  /* 今晚这一套：首页推荐的是「一顿饭」，不是一道菜 */
-  let allSets = [];
-  try{ allSets = (FD.buildSets ? FD.buildSets(items, goal, "") : []); }catch(e){ allSets = []; }
-  let cand = allSets.filter(x => x.ready).slice(0, 2);
-  if(!cand.length) cand = allSets.filter(x => (x.missing || []).length === 1).slice(0, 2);
+  /* 今晚能做：单菜（套餐在下面按 CTA 展开，首页不重复推荐） */
+  const ranked = FD.decide(items, goal);
+  let list = ranked.filter(r => r.status === "ready").slice(0,2);
+  if(!list.length) list = ranked.filter(r => r.status === "shop1").slice(0,2);
 
   const box = $("#homeCook");
   if(box){
-    box.innerHTML = cand.length ? cand.map(setCardEl).join("")
-      : `<p class="empty" style="margin:0">${t("home.none")}</p>`;
-    bindSetCards(box);
+    box.innerHTML = list.length ? list.map(r=>{
+      const p = window.DISH_PHOTO && DISH_PHOTO.get(r.recipe.name);
+      const art = (p && p.src)
+        ? `<img src="${p.src}" alt="" loading="lazy" decoding="async">`
+        : `<span class="hart">${(r.recipe.needs||[]).slice(0,3).map(id => window.FD_ICON ? FD_ICON(id,26) : "").join("")}</span>`;
+      const sep = I18N.getLang() === "en" ? " / " : "、";
+      const miss = r.status === "shop1"
+        ? `<span class="miss">${t("home.need", {x:r.missing.map(cnOf).join(sep)})}</span>` : "";
+      return `<button class="hcard" data-take="${r.recipe.id}">
+        ${art}
+        <span class="m">
+          <b>${I18N.recipeName(r.recipe)}</b>
+          <span class="mt">${t("card.min", {n:r.recipe.minutes})}${miss}</span>
+          ${actionStrip(r.recipe)}
+        </span>
+      </button>`;
+    }).join("") : `<p class="empty" style="margin:0">${t("home.none")}</p>`;
+    box.querySelectorAll("[data-take]").forEach(b =>
+      b.addEventListener("click", () => openCook(b.dataset.take)));
   }
 
   /* 先吃这些 */
@@ -1828,8 +1871,8 @@ function setCardEl(st){
       data-setn="${(st.name || "").replace(/"/g, "&quot;")}" aria-label="${name}">
     ${setPhotoHtml(st.dishes)}<i class="setflag">${tp("sets.tag", {}, "套餐")}</i>
     <span class="bd">
-      <span class="nm"><b>${I18N.recipeName(st.dishes[0].recipe)}</b>
-        <s>${st.dishes.slice(1).map(d => I18N.recipeName(d.recipe)).join(" + ") + (st.onepot ? "" : " + " + tp("sets.riceSuffix", {}, "米饭").replace(" + ", ""))}</s></span>
+      <span class="nm"><b>${st.dishes.map(d => I18N.recipeName(d.recipe)).join(" + ")}</b>
+        <s>${st.onepot ? tp("sets.onePot", {}, "一锅出") : tp("sets.withRice", {}, "+ 米饭")}</s></span>
       <span class="mt">
         <span class="ds-pill">${t("card.min", { n: st.minutes })}</span>
         <span class="ds-pill">${st.kcal} kcal</span>
