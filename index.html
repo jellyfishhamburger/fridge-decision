@@ -757,6 +757,35 @@
   .rsheet .rbclose{position:absolute;right:12px;top:12px;z-index:3;width:34px;height:34px;
     border-radius:50%;border:0;background:rgba(28,32,30,.44);color:#fff;font-size:15px;
     cursor:pointer;font-family:inherit;display:grid;place-items:center}
+
+  /* ================= 套餐展示 ================= */
+  .setchips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .setchips::-webkit-scrollbar{display:none}
+  .setchips .sc{flex:0 0 auto;font-family:inherit;font-size:13px;font-weight:600;
+    color:var(--ink-2);background:var(--card);border:1px solid var(--line);
+    border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+  .setchips .sc.on{background:var(--green);border-color:var(--green);color:#fff}
+  #setMore{margin:10px 0 0}
+  .ds-pill.ok{background:var(--green-soft)!important;color:var(--green)!important;font-weight:700}
+  .ds-pill.miss{background:var(--amber-soft)!important;color:var(--amber)!important;font-weight:700}
+
+  /* 套餐里两道菜：整行按钮与 ⇄ 各自独立，不再共享一个边框（之前挤在一起） */
+  .setsteps{gap:9px}
+  .ssrow{background:none;border:0;border-radius:0;overflow:visible;gap:8px}
+  .ssrow .sshead{background:var(--card-2);border:1px solid var(--line);border-radius:14px}
+  .ssrow .sw{width:42px;border:1px solid var(--line);border-radius:14px;background:var(--card-2)}
+  .ssrow .go{padding:6px 10px;font-size:12px;white-space:nowrap;line-height:1.1}
+  @media (max-width:362px){ .ssrow .go{display:none} }
+
+  /* 套餐卡的名字：主菜一行、其余一行，两行都不换行（小卡宽度放不下三行） */
+  .rcc.set .nm{display:block;line-height:1.3}
+  .rcc.set .nm b{display:block;font-size:14px;font-weight:700;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis}
+  .rcc.set .nm s{display:block;font-size:11.5px;font-weight:500;color:var(--muted);
+    text-decoration:none;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rcc.set .cr{font-size:8px;opacity:.72}
+  .rcc.set .setflag{font-size:9.5px;padding:2px 6px;border-radius:6px;left:7px;top:7px}
 </style>
 </head>
 <body>
@@ -974,8 +1003,8 @@
     <div id="homeResult"></div>
 
     <div class="hb">
-      <h2 data-i18n="home.cook">今晚能做</h2>
-      <button data-goto="discover" data-i18n="home.seeAll">查看全部 →</button>
+      <h2 data-i18n="home.cook">今晚这一套</h2>
+      <button data-goto="discover" data-focus="sets" data-i18n="home.seeAll">查看全部 →</button>
     </div>
     <div class="hcards" id="homeCook"></div>
 
@@ -1103,7 +1132,9 @@
         <h2 data-i18n="sets.quick">按套餐看</h2>
         <span class="dmeta" id="setCount"></span>
       </div>
+      <div class="setchips" id="setChips"></div>
       <div class="dgrid" id="discSetGrid"></div>
+      <button class="btn quiet" id="setMore" style="display:none" data-i18n="sets.more">展开全部</button>
     </section>
 
     <label class="ds-search" style="margin-bottom:10px">
@@ -1389,32 +1420,17 @@ function renderHome(){
   }
   if(subEl) subEl.textContent = n ? t("home.sub", {n:n, u:u}) : t("home.subEmpty");
 
-  /* 今晚能做：优先「现在就能做」，没有就退到「差一样」 */
-  const ranked = FD.decide(items, goal);
-  let list = ranked.filter(r => r.status === "ready").slice(0,2);
-  if(!list.length) list = ranked.filter(r => r.status === "shop1").slice(0,2);
+  /* 今晚这一套：首页推荐的是「一顿饭」，不是一道菜 */
+  let allSets = [];
+  try{ allSets = (FD.buildSets ? FD.buildSets(items, goal, "") : []); }catch(e){ allSets = []; }
+  let cand = allSets.filter(x => x.ready).slice(0, 2);
+  if(!cand.length) cand = allSets.filter(x => (x.missing || []).length === 1).slice(0, 2);
 
   const box = $("#homeCook");
   if(box){
-    box.innerHTML = list.length ? list.map(r=>{
-      const p = window.DISH_PHOTO && DISH_PHOTO.get(r.recipe.name);
-      const art = (p && p.src)
-        ? `<img src="${p.src}" alt="" loading="lazy" decoding="async">`
-        : `<span class="hart">${(r.recipe.needs||[]).slice(0,3).map(id => window.FD_ICON ? FD_ICON(id,26) : "").join("")}</span>`;
-      const sep = I18N.getLang() === "en" ? " / " : "、";
-      const miss = r.status === "shop1"
-        ? `<span class="miss">${t("home.need", {x:r.missing.map(cnOf).join(sep)})}</span>` : "";
-      return `<button class="hcard" data-take="${r.recipe.id}">
-        ${art}
-        <span class="m">
-          <b>${I18N.recipeName(r.recipe)}</b>
-          <span class="mt">${t("card.min", {n:r.recipe.minutes})}${miss}</span>
-          ${actionStrip(r.recipe)}
-        </span>
-      </button>`;
-    }).join("") : `<p class="empty" style="margin:0">${t("home.none")}</p>`;
-    box.querySelectorAll("[data-take]").forEach(b =>
-      b.addEventListener("click", () => openCook(b.dataset.take)));
+    box.innerHTML = cand.length ? cand.map(setCardEl).join("")
+      : `<p class="empty" style="margin:0">${t("home.none")}</p>`;
+    bindSetCards(box);
   }
 
   /* 先吃这些 */
@@ -1466,10 +1482,21 @@ $$("[data-go]").forEach(el=>{
 $("#homeDecide").addEventListener("click", ()=>{
   renderResult(FD.decide(items, goal), "#homeResult");
   const r = $("#homeResult");
-  window.scrollTo({top: r.offsetTop - 12, behavior:"smooth"});
+  /* offsetTop 是相对 offsetParent 的，在首页会算错 —— 用视口坐标换算 */
+  const y = r.getBoundingClientRect().top + window.scrollY - 12;
+  window.scrollTo({top: y, behavior: "smooth"});
 });
 
-$$("[data-goto]").forEach(b => b.addEventListener("click", () => show(b.dataset.goto)));
+$$("[data-goto]").forEach(b => b.addEventListener("click", () => {
+  show(b.dataset.goto);
+  /* 「查看全部」直接落在套餐区，不用再往下找 */
+  if(b.dataset.focus === "sets"){
+    setTimeout(() => {
+      const el = $("#discSets");
+      if(el) window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 64, behavior:"smooth"});
+    }, 60);
+  }
+}));
 
 /* ============ view 1: fridge ============ */
 function expiryClass(d){ return d <= 2 ? "urgent" : d <= 5 ? "warn" : ""; }
@@ -1784,34 +1811,86 @@ function renderCookLog(){
     <p class="cw">${t.length ? tp("cooklog.note", {}, "记录在这台设备上，用来算「这周做了几顿」。") : tp("cooklog.noteEmpty", {}, "做完一餐就会记在这里。")}</p>`;
 }
 
+let discSetIntent = "", discSetShown = 6;
+
+/* 一套三种状态：现在就能做 / 差 N 样 / 其余 */
+function setStatusPill(st){
+  if(st.ready) return `<span class="ds-pill ok">${tp("sets.readyNow", {}, "现在就能做")}</span>`;
+  const n = (st.missing || []).length;
+  return n ? `<span class="ds-pill miss">${tp("sets.needN", {n:n}, "差 " + n + " 样")}</span>` : "";
+}
+
+function setCardEl(st){
+  const name = st.dishes.map(d => I18N.recipeName(d.recipe)).join(" + ")
+             + (st.onepot ? "" : tp("sets.riceSuffix", {}, " + 米饭"));
+  const ids = st.dishes.map(d => d.recipe.id).join("|");
+  return `<button class="rcc set" type="button" data-setic="${ids}"
+      data-setn="${(st.name || "").replace(/"/g, "&quot;")}" aria-label="${name}">
+    ${setPhotoHtml(st.dishes)}<i class="setflag">${tp("sets.tag", {}, "套餐")}</i>
+    <span class="bd">
+      <span class="nm"><b>${I18N.recipeName(st.dishes[0].recipe)}</b>
+        <s>${st.dishes.slice(1).map(d => I18N.recipeName(d.recipe)).join(" + ") + (st.onepot ? "" : " + " + tp("sets.riceSuffix", {}, "米饭").replace(" + ", ""))}</s></span>
+      <span class="mt">
+        <span class="ds-pill">${t("card.min", { n: st.minutes })}</span>
+        <span class="ds-pill">${st.kcal} kcal</span>
+        ${setStatusPill(st)}
+      </span>
+    </span>
+  </button>`;
+}
+
+function bindSetCards(scope){
+  scope.querySelectorAll("[data-setic]").forEach(b =>
+    b.addEventListener("click", () =>
+      openSetSheet(b.dataset.setic.split("|").filter(Boolean), b.dataset.setn)));
+}
+
 function renderDiscSets(){
   const box = $("#discSets");
   if(!box) return;
-  let sets = [];
-  try{ sets = (FD.buildSets ? FD.buildSets(items, goal, setIntent) : []).filter(x => x.ready).slice(0, 3); }catch(e){}
-  if(!sets.length){ box.hidden = true; box.innerHTML = ""; return; }
+
+  let all = [];
+  try{ all = (FD.buildSets ? FD.buildSets(items, goal, "") : []); }catch(e){ all = []; }
+
+  /* 分类 = 全部 + 三个意图（和首页那排是同一份定义） */
+  const chips = [{ id: "", name: tp("sets.allKind", {}, "全部") }]
+    .concat((FD.INTENTS || []).map(i => ({
+      id: i.id,
+      name: (I18N.getLang() === "en" && i.nameEn) ? i.nameEn : i.name
+    })));
+  const cb = $("#setChips");
+  if(cb){
+    cb.innerHTML = chips.map(c =>
+      `<button class="sc${c.id === discSetIntent ? " on" : ""}" data-sintent="${c.id}">${c.name}</button>`).join("");
+    cb.querySelectorAll("[data-sintent]").forEach(b => b.addEventListener("click", () => {
+      discSetIntent = b.dataset.sintent;
+      discSetShown = 6;
+      renderDiscSets();
+    }));
+  }
+
+  let pool = all.filter(x => !discSetIntent || x.intent === discSetIntent);
+  pool = pool.slice().sort((a, b) =>
+    (b.ready ? 1 : 0) - (a.ready ? 1 : 0) || a.minutes - b.minutes);
+
+  if(!pool.length){ box.hidden = true; return; }
   box.hidden = false;
+
+  const readyN = pool.filter(x => x.ready).length;
+  const slice = pool.slice(0, discSetShown);
   const grid = $("#discSetGrid");
-  if(grid) grid.innerHTML = sets.map(s => {
-    const name = s.dishes.map(d => I18N.recipeName(d.recipe)).join(" + ") + (s.onepot ? "" : tp("sets.riceSuffix", {}, " + 米饭"));
-    return `<button class="rcc set" type="button" data-setic="${s.dishes.map(d => d.recipe.id).join("|")}" data-setn="${(s.name || "").replace(/"/g, "&quot;")}" aria-label="${name}">
-      ${setPhotoHtml(s.dishes)}<i class="setflag">${tp("sets.tag", {}, "套餐")}</i>
-      <span class="bd">
-        <span class="nm">${name}</span>
-        <span class="mt">
-          <span class="ds-pill">${t("card.min", { n: s.minutes })}</span>
-          <span class="ds-pill">${s.kcal} kcal</span>
-        </span>
-      </span>
-    </button>`;
-  }).join("");
+  if(grid){ grid.innerHTML = slice.map(setCardEl).join(""); bindSetCards(grid); }
+
   const sc = $("#setCount");
-  if(sc) sc.textContent = tp("sets.quickSubN", { n: sets.length }, sets.length + " 套 · 一人份");
-  const scope = $("#discSetGrid") || box;
-  /* 点一套 → 就地展开这套的做法和「从哪道开始」，不再把人踢回首页 */
-  scope.querySelectorAll("[data-setic]").forEach(b => {
-    b.addEventListener("click", () => openSetSheet(b.dataset.setic.split("|").filter(Boolean), b.dataset.setn));
-  });
+  if(sc) sc.textContent = tp("sets.countN", { n: pool.length, r: readyN },
+    "共 " + pool.length + " 套 · 现在能做 " + readyN + " 套");
+
+  const more = $("#setMore");
+  if(more){
+    const rest = pool.length - slice.length;
+    more.style.display = rest > 0 ? "flex" : "none";
+    more.textContent = tp("sets.moreN", { n: rest }, "展开另外 " + rest + " 套");
+  }
 }
 
 function renderResult(list, sel){
@@ -2448,6 +2527,11 @@ function closeRecipe(){
 }
 /* 换页时由 show() 调用：详情面板不跨页留着 */
 window.__closeOverlays = closeRecipe;
+
+$("#setMore") && $("#setMore").addEventListener("click", () => {
+  discSetShown += 12;
+  renderDiscSets();
+});
 
 function renderDiscover(){
   renderDiscSets();
