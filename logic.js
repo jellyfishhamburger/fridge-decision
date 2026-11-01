@@ -139,7 +139,13 @@
     }
 
     const status = missing.length === 0 ? "ready" : (missing.length === 1 ? "shop1" : "blocked");
-    const urgency = used.reduce((s, i) => s + Math.max(0, 8 - daysLeftOf(i)) * 0.9, 0);
+    /* 排序的主轴是「最先坏的那一样」，不是把几样临期加起来：
+       一条 1 天的鱼必须压过「2 天的猪肉 + 3 天的豆腐」，否则今天该吃的鱼永远排不上。
+       次要项只给很小权重，避免多料菜靠数量堆分。 */
+    const lefts = used.map(daysLeftOf);
+    const soonest = lefts.length ? Math.min.apply(null, lefts) : 99;
+    const urgency = used.reduce((s, i) => s + Math.max(0, 8 - daysLeftOf(i)) * 0.35, 0)
+                  + (soonest <= 3 ? (4 - soonest) * 2.2 : 0);
     const greensBonus = (recipe.greens && st.greensPerDay > 0) ? 4 : 0;
     const timePenalty = Math.max(0, recipe.minutes - st.maxMinutes) * 1.2;
     const gapPenalty = missing.length ? 10 * missing.length : 0;
@@ -147,7 +153,7 @@
     const pantryMissing = (recipe.pantry || []).filter(p => !pantryHave.has(p));
 
     return {
-      recipe, status, used, missing, pantryMissing,
+      recipe, status, used, missing, pantryMissing, soonest,
       score: urgency + greensBonus - timePenalty - gapPenalty,
       urgency, greensBonus, timePenalty
     };
@@ -176,20 +182,26 @@
     const minutes = Math.max.apply(null, dishes.map(d => d.recipe.minutes).concat([0])) + 8;
     const kcal = dishes.reduce((a, d) => a + (d.recipe.kcal || 0), 0) + (set.staple === "rice" ? 150 : 0);
     const urgent = dishes.some(d => d.used.some(i => daysLeftOf(i) <= 2));
+    const soonest = Math.min.apply(null, dishes.map(d => d.soonest == null ? 99 : d.soonest).concat([99]));
     const greens = dishes.some(d => d.recipe.greens);
     const score = dishes.reduce((a, d) => a + d.score, 0) - (dishes.length - 1) * 3;
 
-    return { set, dishes, ready, shop1, missing, minutes, kcal, urgent, greens, score,
+    return { set, dishes, ready, shop1, missing, minutes, kcal, urgent, soonest, greens, score,
              status: ready ? "ready" : (missing.length <= 1 && shop1 <= 1 ? "shop1" : "blocked") };
   }
 
-  function decideSets(items, st) {
-    return SETS.map(s => evaluateSet(s, items, st)).sort((a, b) =>
-      (b.ready - a.ready) ||
+  /* 一套套餐怎么排：同一把尺子（先能吃、再缺得少、再最先坏的先做、再分高、再快）
+     —— 生成式套餐和手写套餐都走这里，不再各写一份 */
+  function compareSet(a, b) {
+    return (b.ready - a.ready) ||
       (a.missing.length - b.missing.length) ||
-      (b.urgent - a.urgent) ||
-      (a.minutes - b.minutes) ||
-      (b.score - a.score));
+      ((a.soonest == null ? 99 : a.soonest) - (b.soonest == null ? 99 : b.soonest)) ||
+      (b.score - a.score) ||
+      (a.minutes - b.minutes);
+  }
+
+  function decideSets(items, st) {
+    return SETS.map(s => evaluateSet(s, items, st)).sort(compareSet);
   }
 
   function urgent(items, limit) {
@@ -469,11 +481,11 @@
 
   /* 三种「今晚想要什么」：模板 + 硬约束 */
   const INTENTS = [
-    { id: "hearty",  name: "一荤一素", slots: [["mainProtein","halfProtein","soup"], ["veg","vegProtein"]],
+    { id: "hearty",  name: "一荤一素", nameEn: "Meat + veg", slots: [["mainProtein","halfProtein","soup"], ["veg","vegProtein"]],
       kcalMin: 420, kcalMax: 1050, maxSpicy: 3, needGreens: true },
-    { id: "protein", name: "健身高蛋白", slots: [["mainProtein","halfProtein","vegProtein"], ["veg","vegProtein"]],
+    { id: "protein", name: "健身高蛋白", nameEn: "High protein", slots: [["mainProtein","halfProtein","vegProtein"], ["veg","vegProtein"]],
       kcalMin: 400, kcalMax: 900, maxSpicy: 1, needGreens: true, minHighProtein: 1 },
-    { id: "veg",     name: "清淡素菜", slots: [["veg","vegProtein"], ["veg","vegProtein"]],
+    { id: "veg",     name: "清淡素菜", nameEn: "Light veggie", slots: [["veg","vegProtein"], ["veg","vegProtein"]],
       kcalMin: 260, kcalMax: 850, maxSpicy: 0, needGreens: true, noMeat: true }
   ];
 
@@ -533,6 +545,7 @@
           id: dishes.map(d => d.recipe.id).sort().join("+"),
           intent: it.id, intentName: it.name,
           dishes, minutes, kcal, missing, score,
+          soonest: Math.min.apply(null, dishes.map(d => d.soonest == null ? 99 : d.soonest).concat([99])),
           ready: dishes.every(d => d.status === "ready"),
           urgent: dishes.some(d => d.used.some(i => daysLeftOf(i) <= 2)),
           name: dishes.map(d => d.recipe.name).join(" + ") + (onepot ? "" : " + 米饭"),
@@ -542,9 +555,7 @@
       });
     });
 
-    const sorted = out.sort((a, b) =>
-      (b.ready - a.ready) || (a.missing.length - b.missing.length) ||
-      (b.urgent - a.urgent) || (b.score - a.score));
+    const sorted = out.sort(compareSet);
 
     /* 去重（同一组菜换个顺序只留一次）+ 同一道主菜最多带两个配菜，避免整页都是同一道 */
     const seenIds = {}, mainCount = {}, picked = [];
@@ -648,7 +659,7 @@
 
   global.FD = {
     CATALOG, RECIPES, PANTRY, byId, pantryById, DB, SETS,
-    evaluateSet, decideSets, buildSets, INTENTS, tagOf, altDishes, composeSet,
+    evaluateSet, decideSets, buildSets, INTENTS, tagOf, altDishes, composeSet, compareSet,
     cookLog, noteCooked, cookMeals, cookSummary,
     LS_ITEMS, LS_SETTINGS, LS_LOG, LS_PANTRY, LS_HOUSEHOLD,
     read, write,

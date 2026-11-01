@@ -596,6 +596,21 @@
   .altpanel .altbtn.dim{opacity:.6}
   .setv .sdi i{font-style:normal;color:var(--muted);font-size:11px;margin-left:2px}
   .setv .snote{margin:8px 0 0;font-size:11.5px;color:var(--muted)}
+  /* 套餐里每一道：左边点一下=从这道开始，右边 ⇄=换一道 */
+  .sdiwrap{display:inline-flex;align-items:stretch;background:var(--card-2);
+    border:1px dashed var(--line);border-radius:var(--r-pill);overflow:hidden}
+  .sdiwrap .sdi{background:transparent;border:0;border-radius:0;padding:8px 10px 8px 13px}
+  .sdiwrap .sw{background:transparent;border:0;border-left:1px solid var(--line);
+    color:var(--muted);font:inherit;font-size:12px;padding:0 11px;cursor:pointer;min-height:34px}
+  .sdiwrap .sw:active{background:var(--card)}
+  /* 其他套餐 */
+  .osrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
+  .osrow:first-of-type{border-top:0;padding-top:2px}
+  .osrow .otx{flex:1;min-width:0}
+  .osrow .on{font-size:14px;font-weight:600;color:var(--ink);line-height:1.35}
+  .osrow .om{font-size:12px;color:var(--muted);margin-top:3px}
+  .osrow .go{flex:none;border:1px solid var(--line);background:var(--card);color:var(--green);
+    border-radius:10px;padding:9px 13px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
 
   /* 云端状态条：只在「有待同步」或「这个家还是空的」时出现 */
   .cloudnote{display:block;margin:0 0 10px;padding:9px 12px;
@@ -1244,12 +1259,12 @@
 <script src="icons.js?v=20261029-17"></script>
 <script src="dish-photos.js?v=20261029-19"></script>
 <script src="sync.js?v=20261029-17"></script>
-<script src="logic.js?v=20261029-17"></script>
+<script src="logic.js?v=20261101-1"></script>
 <script src="store.js?v=20261101-2"></script>
 <script src="auth.js?v=20261101-3"></script>
 <script src="cloud.js?v=20261101-4"></script>
 <script src="realtime.js?v=20261101-5"></script>
-<script src="i18n.js?v=20261029-17"></script>
+<script src="i18n.js?v=20261101-1"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -1729,11 +1744,11 @@ function renderCookLog(){
   const names = t.slice(-4).map(e => I18N.foodName ? I18N.recipeName({ id: e.dish, name: e.name }) : e.name);
   box.innerHTML = `
     <div class="ch">
-      <b>${t.length ? "今天做过 " + t.length + " 道" : "今天还没下厨"}</b>
-      <s>${sum.weekMeals ? "这周 " + sum.weekMeals + " 顿 · " + sum.weekDishes + " 道菜" : ""}</s>
+      <b>${t.length ? tp("cooklog.today", { n: t.length }, "今天做过 " + t.length + " 道") : tp("cooklog.none", {}, "今天还没下厨")}</b>
+      <s>${sum.weekMeals ? tp("cooklog.week", { n: sum.weekMeals, m: sum.weekDishes }, "这周 " + sum.weekMeals + " 顿 · " + sum.weekDishes + " 道菜") : ""}</s>
     </div>
     ${names.length ? `<div class="cl">${names.map(n => `<span>${n}</span>`).join("")}</div>` : ""}
-    <p class="cw">${t.length ? "记录在这台设备上，用来算「这周做了几顿」。" : "做完一餐就会记在这里。"}</p>`;
+    <p class="cw">${t.length ? tp("cooklog.note", {}, "记录在这台设备上，用来算「这周做了几顿」。") : tp("cooklog.noteEmpty", {}, "做完一餐就会记在这里。")}</p>`;
 }
 
 function renderDiscSets(){
@@ -1745,7 +1760,7 @@ function renderDiscSets(){
   box.hidden = false;
   box.innerHTML = `<h2>${tp("sets.quick", {}, "按套餐看")}<span class="count" style="font-size:12px;color:var(--muted);margin-left:6px">${tp("sets.quickSub", {}, "一人份，整份都能做")}</span></h2>` +
     sets.map(s => `<button class="dset" data-setic="${s.dishes.map(d => d.recipe.id).join("|")}" data-setn="${(s.name || "").replace(/"/g, "&quot;")}">
-        <span class="tx"><b>${s.name}</b><s>${s.minutes} 分钟 · 约 ${s.kcal} kcal · ${s.dishes.length} 道菜</s></span>
+        <span class="tx"><b>${s.dishes.map(d => I18N.recipeName(d.recipe)).join(" + ") + (s.onepot ? "" : tp("sets.riceSuffix", {}, " + 米饭"))}</b><s>${tp("sets.min", {n: s.minutes}, s.minutes + " 分钟")} · ${tp("sets.kcal", {n: s.kcal}, "约 " + s.kcal + " kcal")} · ${s.dishes.length}${tp("sets.dishes", {}, " 道菜")}</s></span>
         <span class="go2">开始做 →</span>
       </button>`).join("");
   box.querySelectorAll("[data-setic]").forEach(b => {
@@ -1786,12 +1801,25 @@ function renderResult(list, sel){
     try{ legacy = (FD.decideSets ? FD.decideSets(items, goal).filter(x => x.ready)[0] : null); }catch(e){}
   }
   const setTop = gen || legacy;
-  const setDishes = gen
+  /* 默认顺序 = 耗时的先做（起锅时间对得上）；但用户可以点任意一道从那道开始 */
+  const setDishes = (gen
     ? gen.dishes.map(d => ({ name: I18N.recipeName(d.recipe), id: d.recipe.id, minutes: d.recipe.minutes }))
-    : (legacy ? legacy.dishes.map(d => ({ name: I18N.recipeName(d.recipe), id: d.recipe.id, minutes: d.recipe.minutes })) : []);
+    : (legacy ? legacy.dishes.map(d => ({ name: I18N.recipeName(d.recipe), id: d.recipe.id, minutes: d.recipe.minutes })) : []))
+    .slice().sort((a, b) => (b.minutes || 0) - (a.minutes || 0));
   const setMeta = gen
     ? { minutes: gen.minutes, kcal: gen.kcal, n: gen.dishes.length, rice: !gen.onepot, intent: gen.intent }
     : (legacy ? { minutes: legacy.minutes, kcal: legacy.kcal, n: legacy.dishes.length, rice: legacy.set.staple === "rice", intent: null } : null);
+
+  /* 其他套餐：同一把尺子排出来的另外几套（整套都能做的才有资格），最多 3 个 */
+  const otherSets = (function(){
+    const pool = readySets.filter(s => !gen || s.id !== gen.id);
+    const seen = {};
+    return pool.filter(s => (seen[s.id] ? false : (seen[s.id] = 1))).slice(0, 3)
+      .map(s => ({
+        name: s.dishes.map(d => I18N.recipeName(d.recipe)).join(" + ") + (s.onepot ? "" : tp("sets.riceSuffix", {}, " + 米饭")),
+        minutes: s.minutes, kcal: s.kcal, dishes: s.dishes
+      }));
+  })();
 
   /* 套餐理由：用掉哪些临期、有没有绿叶、多久、还缺什么调料 */
   const setWhy = setTop ? (function(){
@@ -1802,20 +1830,24 @@ function renderResult(list, sel){
     const urgent = used.filter(i => FD.daysLeftOf(i) <= 3)
                        .sort((a, b) => FD.daysLeftOf(a) - FD.daysLeftOf(b));
     const li = [];
-    if(urgent.length) li.push("用掉 " + urgent.map(i => cnOf(i.cat) + "（" + FD.daysLeftOf(i) + " 天）").join("、"));
-    else if(used.length) li.push("用掉冰箱里 " + used.length + " 样现有食材");
-    if((setTop.dishes || []).some(d => d.recipe.greens)) li.push("有绿叶菜");
-    li.push(setMeta.minutes + " 分钟，一口锅就够");
+    const sep = I18N.getLang() === "en" ? ", " : "、";
+    if(urgent.length) li.push(tp("sets.whyUsed", { list: urgent.map(i => cnOf(i.cat) + (I18N.getLang() === "en" ? " (" : "（") + FD.daysLeftOf(i) + (I18N.getLang() === "en" ? " d)" : " 天）")).join(sep) }, "用掉 " + urgent.map(i => cnOf(i.cat) + "（" + FD.daysLeftOf(i) + " 天）").join("、")));
+    else if(used.length) li.push(tp("sets.whyUsedN", { n: used.length }, "用掉冰箱里 " + used.length + " 样现有食材"));
+    if((setTop.dishes || []).some(d => d.recipe.greens)) li.push(tp("sets.whyGreens", {}, "有绿叶菜"));
+    li.push(tp("sets.whyTime", { n: setMeta.minutes }, setMeta.minutes + " 分钟，一口锅就够"));
     const miss = (setTop.pantryMissing || []);
-    if(miss.length) li.push("还要调味：" + miss.slice(0, 4).map(p => pantryLabel(p)).join("、"));
-    return `<div class="why"><b>这一套为什么合适</b><ul>${li.map(x => `<li>${x}</li>`).join("")}</ul></div>`;
+    if(miss.length) li.push(tp("sets.whyPantry", {}, "还要调味：") + miss.slice(0, 4).map(p => pantryLabel(p)).join(sep));
+    return `<div class="why"><b>${tp("sets.why", {}, "这一套为什么合适")}</b><ul>${li.map(x => `<li>${x}</li>`).join("")}</ul></div>`;
   })() : "";
 
-  const setName = gen ? gen.name
-                : (legacy ? legacy.set.name : setDishes.map(d => d.name).join(" + "));
+  const riceSuffix = tp("sets.riceSuffix", {}, " + 米饭");
+  const setName = setDishes.length
+    ? setDishes.map(d => d.name).join(" + ") + (setMeta && setMeta.rice ? riceSuffix : "")
+    : (gen ? gen.name : (legacy ? legacy.set.name : ""));
 
+  const intentName = i => (I18N.getLang() === "en" && i && i.nameEn) ? i.nameEn : (i ? i.name : "");
   const intentsHTML = (FD.INTENTS || []).map(i =>
-    `<button class="itbtn${i.id === setIntent ? " on" : ""}" data-intent="${i.id}">${i.name}</button>`).join("");
+    `<button class="itbtn${i.id === setIntent ? " on" : ""}" data-intent="${i.id}">${intentName(i)}</button>`).join("");
 
   const nearHTML = (!setTop && nearSet) ? `
     <div class="intents">${intentsHTML}</div>
@@ -1837,7 +1869,7 @@ function renderResult(list, sel){
   const setHTML = setTop ? `
     <div class="intents">${intentsHTML}</div>
     <div class="verdict setv">
-      <div class="kicker">${tp("sets.kicker", {}, "今晚这一套 · 一人份")}${setMeta.intent ? " · " + (FD.INTENTS.filter(i => i.id === setMeta.intent)[0] || {}).name : ""}</div>
+      <div class="kicker">${tp("sets.kicker", {}, "今晚这一套 · 一人份")}${setMeta.intent ? " · " + intentName(FD.INTENTS.filter(i => i.id === setMeta.intent)[0]) : ""}</div>
       <h3>${setName}</h3>
       <div class="meta">
         <span class="badge">${tp("sets.min", {n: setMeta.minutes}, setMeta.minutes + " 分钟")}</span>
@@ -1845,9 +1877,12 @@ function renderResult(list, sel){
         <span class="badge">${setMeta.n}${tp("sets.dishes", {}, " 道菜")}${setMeta.rice ? tp("sets.plusRice", {}, " + 米饭") : ""}</span>
       </div>
       <div class="setlist">${setDishes.map((d, i) =>
-        `<button class="sdi" data-swapdish="${i}" title="换一道">${i + 1}. ${d.name}<i>${d.minutes}′</i></button>`).join("")}</div>
+        `<span class="sdiwrap">
+           <button class="sdi" data-set-start="${i}" title="${tp("sets.startFrom", {}, "从这道开始")}">${i + 1}. ${d.name}<i>${d.minutes}′</i></button>
+           <button class="sw" data-swapdish="${i}" title="${tp("sets.swapOne", {}, "换一道")}" aria-label="${tp("sets.swapOne", {}, "换一道")}">⇄</button>
+         </span>`).join("")}</div>
       <div class="altpanel" id="altPanel" hidden></div>
-      <p class="snote">${tp("sets.hint", {}, "按顺序做：先做耗时的，最后一道起锅就能吃。")}</p>
+      <p class="snote">${tp("sets.hint", {}, "默认先做耗时的，最后一道起锅就能吃。点哪一道，就从哪一道开始。")}</p>
       <div class="setacts">
         <button class="btn primary" data-set-dishes="${setDishes.map(d => d.id).join("|")}" data-set-name="${(setName || "").replace(/"/g, "&quot;")}">${tp("sets.start", {}, "开始做这一套")}</button>
         ${(gen && readySets.length > 1) ? `<button class="btn ghost" data-setswap="1">${tp("sets.swap", {}, "换一套")}</button>` : ""}
@@ -1875,7 +1910,14 @@ function renderResult(list, sel){
       <div class="srcline">${t("card.src")}<a href="${top.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · ${t("card.srcNote")}</div>
       <button class="btn primary" style="margin-top:12px" data-cook="${top.recipe.id}">${t("disc.cook")}</button>
     </div>`}
-    ${alts.length?`<div class="card"><h2>${t("disc.other")} <span class="count">${t("disc.otherSub")}</span></h2>
+    ${(setTop && otherSets.length) ? `<div class="card"><h2>${tp("sets.other", {}, "其他套餐")} <span class="count">${tp("sets.otherSub", {}, "同样是整套都能做")}</span></h2>
+      ${otherSets.map(s => `<div class="osrow">
+        <div class="otx"><div class="on">${s.name}</div>
+          <div class="om">${tp("sets.min", {n: s.minutes}, s.minutes + " 分钟")} · ${tp("sets.kcal", {n: s.kcal}, "约 " + s.kcal + " kcal")} · ${s.dishes.length}${tp("sets.dishes", {}, " 道菜")}</div></div>
+        <button class="go" data-setset="${s.dishes.map(d => d.recipe.id).join("|")}">${tp("sets.choose", {}, "看这套")}</button>
+      </div>`).join("")}
+    </div>` : ""}
+    ${(!setTop && alts.length)?`<div class="card"><h2>${t("disc.other")} <span class="count">${t("disc.otherSub")}</span></h2>
       ${alts.map(a=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)">
         <div><div>${I18N.recipeName(a.recipe)} ${a.status==="shop1"?`<span style="color:#b26a00;font-size:12px">· ${t("disc.gapN",{n:1})}</span>`:""}</div>
         <div style="font-size:12px;color:var(--muted);margin-top:2px">${t("card.min",{n:a.recipe.minutes})}${a.recipe.kcal?` · ${a.recipe.kcal} kcal`:""}${a.recipe.greens?" · "+t("card.greens"):""}</div></div>
@@ -1911,9 +1953,9 @@ function renderResult(list, sel){
         .slice(0, 6);
       const panel = box.querySelector("#altPanel");
       if(!panel) return;
-      if(!alts.length){ panel.hidden = false; panel.innerHTML = `<p class="sn2">这个位置暂时没有别的能做。</p>`; return; }
+      if(!alts.length){ panel.hidden = false; panel.innerHTML = `<p class="sn2">${tp("sets.noAlt", {}, "这个位置暂时没有别的能做。")}</p>`; return; }
       panel.hidden = false;
-      panel.innerHTML = `<p class="sn2">第 ${idx + 1} 道换成：</p>` +
+      panel.innerHTML = `<p class="sn2">${tp("sets.swapTitle", { n: idx + 1 }, "第 " + (idx + 1) + " 道换成：")}</p>` +
         alts.map(a => `<button class="altbtn${a.status === "ready" ? "" : " dim"}" data-pickalt="${a.recipe.id}" data-idx="${idx}">${I18N.recipeName(a.recipe)}<i>${a.minutes}′ · ${a.kcal} kcal</i></button>`).join("");
       panel.querySelectorAll("[data-pickalt]").forEach(x => {
         x.addEventListener("click", () => {
@@ -1928,6 +1970,23 @@ function renderResult(list, sel){
 
   box.querySelectorAll("[data-set-dishes]").forEach(b=>{
     b.addEventListener("click", () => startSet(b.dataset.setDishes.split("|").filter(Boolean), b.dataset.setName));
+  });
+  /* 点某一道 = 从那道开始做，做完自动接后面的 */
+  box.querySelectorAll("[data-set-start]").forEach(b=>{
+    b.addEventListener("click", () => {
+      const ids = setDishes.map(d => d.id);
+      const at = Number(b.dataset.setStart) || 0;
+      startSet(ids, setName, at);   /* 轮转交给 startSet 做，函数里只转一次 */
+    });
+  });
+  /* 换到另一套：把这套的菜写进 setChoice，重画 */
+  box.querySelectorAll("[data-setset]").forEach(b=>{
+    b.addEventListener("click", () => {
+      setChoice = b.dataset.setset.split("|").filter(Boolean);
+      setPick = 0;
+      renderResult(list, boxSel);
+      window.scrollTo({top: 0, behavior: "smooth"});
+    });
   });
 
   box.querySelectorAll("[data-pick]").forEach(b=>{
@@ -2412,12 +2471,15 @@ function stepIcon(text){
 }
 
 /* ---------- cooking mode ---------- */
-function startSet(dishes, name){
+function startSet(dishes, name, startAt){
   const list = (dishes || []).filter(Boolean);
   if(!list.length) return;
-  setPlan = { name: name || "", dishes: list, idx: 0 };
-  toast(tp("sets.step", { a: 1, b: list.length }, "套餐第 1/" + list.length + " 道"));
-  openCook(list[0]);
+  const at = Math.max(0, Math.min(Number(startAt) || 0, list.length - 1));
+  /* 从选中的那道开始，后面的按顺序接上（做过的不会再回头） */
+  const order = list.slice(at).concat(list.slice(0, at));
+  setPlan = { name: name || "", dishes: order, idx: 0 };
+  toast(tp("sets.step", { a: 1, b: order.length }, "套餐第 1/" + order.length + " 道"));
+  openCook(order[0]);
 }
 
 function advanceSet(){

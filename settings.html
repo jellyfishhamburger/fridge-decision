@@ -113,30 +113,30 @@
   <p class="sub" data-i18n="set.sub"></p>
 
     <section class="card">
-      <h2 style="margin:0 0 6px">门口摄像头（闸机）</h2>
-      <p class="hint">抓拍和识别都在这一页，它跑在冰箱那块屏上；手机这边只负责确认和改。</p>
+      <h2 style="margin:0 0 6px" data-i18n="set.gateH"></h2>
+      <p class="hint" data-i18n="set.gateHint"></p>
       <div class="row" style="margin-top:10px">
-        <a class="btn primary" href="gate.html" style="text-decoration:none;flex:1;text-align:center;padding:11px">打开闸机页</a>
-        <a class="btn" href="collect.html" style="text-decoration:none;text-align:center;padding:11px">拍样本</a>
+        <a class="btn primary" href="gate.html" style="text-decoration:none;flex:1;text-align:center;padding:11px" data-i18n="set.gateOpen"></a>
+        <a class="btn" href="collect.html" style="text-decoration:none;text-align:center;padding:11px" data-i18n="set.gateSample"></a>
       </div>
     </section>
 
     <details class="card" id="cloudCard" open>
     <summary style="cursor:pointer;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:#6b7a72;font-weight:700">
-      云端同步 / Cloud sync <span id="cloudPill" class="pill">未连接</span>
+      <span data-i18n="set.cloudH">云端同步 / Cloud sync</span> <span id="cloudPill" class="pill" data-i18n="set.cloudOff">未连接</span>
     </summary>
 
     <!-- 已登录：只显示身份与家庭，不再让人碰 URL/key -->
     <div id="cloudSigned" style="display:none;margin-top:12px">
       <div class="row" style="gap:10px">
         <div style="flex:1;min-width:0">
-          <div class="hint" style="margin:0">已登录</div>
+          <div class="hint" style="margin:0" data-i18n="set.signedIn">已登录</div>
           <div style="font-size:14px;font-weight:600;margin-top:2px;overflow:hidden;text-overflow:ellipsis" id="accEmail">—</div>
         </div>
       </div>
       <div class="row" style="margin-top:12px;gap:10px">
         <div style="flex:1;min-width:0">
-          <div class="hint" style="margin:0">家庭</div>
+          <div class="hint" style="margin:0" data-i18n="set.household">家庭</div>
           <div style="font-size:14px;font-weight:600;margin-top:2px" id="accHome">—</div>
         </div>
         <div style="text-align:right">
@@ -191,16 +191,6 @@
       <p class="hint" style="margin-top:6px">「待同步」长期不归零，说明有调用一直失败；点清空会把这批改动丢掉（不影响云端已有的）。</p>
     </div>
 
-    <!-- 旧的家庭码：登录后已由邀请码取代，藏起来备用 -->
-    <details style="margin-top:14px" id="legacyCode">
-      <summary style="cursor:pointer;font-size:11.5px;color:#9aa69c">旧的家庭码（未登录时的多设备方式）</summary>
-      <div class="row" style="margin-top:8px">
-        <span class="hint" style="flex:0 0 auto">家庭码</span>
-        <b id="hhCode" style="letter-spacing:.14em;font-size:15px">—</b>
-        <button class="btn tiny" id="hhNew">重新生成</button>
-      </div>
-      <p class="hint" style="margin-top:6px">开了 RLS 之后这条路只能读写本机，正式使用请走上面的登录。</p>
-    </details>
   </details>
 
 <section class="card">
@@ -263,19 +253,6 @@
       <div><b id="s-rate">—</b><span data-i18n="set.rate"></span></div>
     </div>
     <button class="btn quiet" id="clearLog" data-i18n="set.clearLog"></button>
-  </section>
-
-  <section class="card">
-    <h2 data-i18n="set.hhH"></h2>
-    <p class="hint" data-i18n="set.hhHint"></p>
-    <div class="stat" style="grid-template-columns:1fr 1fr">
-      <div><b id="hhCode" style="font-size:20px;letter-spacing:.16em">—</b><span data-i18n="set.hhCode"></span></div>
-      <div><b id="hhPanel" style="font-size:20px">—</b><span data-i18n="set.hhPanel"></span></div>
-    </div>
-    <button class="btn ghost" id="hhNew" data-i18n="set.hhNew"></button>
-    <button class="btn quiet" id="hhPanelBtn" data-i18n="set.hhBind"></button>
-    <div id="hhMembers" class="hint" style="margin-top:10px"></div>
-    <p class="hint" style="margin-top:8px;color:#b26a00" data-i18n="set.hhLimit"></p>
   </section>
 
   <section class="card">
@@ -356,11 +333,11 @@
 <script src="data.js?v=20261029-5"></script>
 <script src="icons.js?v=20261029-5"></script>
 <script src="sync.js?v=20261029-10"></script>
-<script src="logic.js?v=20261029-5"></script>
+<script src="logic.js?v=20261101-1"></script>
 <script src="auth.js?v=20261101-3"></script>
 <script src="cloud.js?v=20261101-4"></script>
 <script src="realtime.js?v=20261101-5"></script>
-<script src="i18n.js?v=20261029-6"></script>
+<script src="i18n.js?v=20261101-1"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -444,10 +421,8 @@ function paintRecipes(){
 }
 
 function paintHousehold(){
-  const h = FD.household();
-  $("#hhCode").textContent = h.code || "—";
-  $("#hhPanel").textContent = h.panel ? (I18N.getLang()==="en"?"yes":"是") : (I18N.getLang()==="en"?"no":"否");
-  $("#hhMembers").textContent = h.members.length ? t("set.hhJoined") + h.members.join(", ") : t("set.hhNone");
+  /* 家庭码已从设置页移除（登录后走 account.html 的邀请码），保留空实现给旧调用点 */
+  return;
 }
 
 /* ---------- 云端同步 ---------- */
@@ -495,7 +470,7 @@ function paintCloud(){
   const on = !!(c.url && c.key);
   const pill = $("#cloudPill");
   if (pill) {
-    pill.textContent = on ? "已连接" : "未连接";
+    pill.textContent = on ? t("set.cloudOn") : t("set.cloudOff");
     pill.style.background = on ? "#e6f2ed" : "#f0f2f1";
     pill.style.color = on ? "#0b5c44" : "#6b7a72";
   }
@@ -535,7 +510,7 @@ $("#sbSave") && $("#sbSave").addEventListener("click", async () => {
     if (!r.ok) { cloudMsg("连不上：" + prettyErr(r.reason), true); return; }
     const code = FD.sync.code();
     const n = await SYNC.pull(code);
-    $("#hhCode").textContent = code;
+    const hhEl = $("#hhCode"); if (hhEl) hhEl.textContent = code;
     cloudMsg("已连接。云端这个家庭现有 " + (Array.isArray(n) ? n.length : 0) + " 样东西；刷新 App 生效。", false);
     paintCloud();
   } catch (e) { cloudMsg("出错：" + e.message, true); }
@@ -562,12 +537,7 @@ $("#outClear") && $("#outClear").addEventListener("click", () => {
 });
 setInterval(() => { if(!document.hidden) paintSync(); }, 3000);
 
-$("#hhNew") && $("#hhNew").addEventListener("click", () => {
-  const c = FD.newCode();
-  FD.saveHousehold({ code: c });
-  $("#hhCode").textContent = c;
-  cloudMsg("新家庭码 " + c + "：另一台手机填这个码就加入同一个冰箱。", false);
-});
+/* 旧家庭码按钮已随整块 UI 删除 */
 
 $("#langSeg").addEventListener("click", e=>{
   const b = e.target.closest("[data-lang]"); if(!b) return;
@@ -601,17 +571,7 @@ document.querySelectorAll("#mins button").forEach(b=>b.addEventListener("click",
 $("#clearLog").addEventListener("click", ()=>{ FD.write(FD.LS_LOG, []); paint(); toast(I18N.getLang()==="en"?"Log cleared":"已清空"); });
 $("#showAll").addEventListener("click", ()=>{ showAllFoods = !showAllFoods; paintDB(); });
 $("#showAllRecipes").addEventListener("click", ()=>{ allRecipes = !allRecipes; paintRecipes(); });
-$("#hhNew").addEventListener("click", ()=>{
-  const h = FD.household();
-  const code = h.code || FD.newCode();
-  FD.saveHousehold({code, members: h.members.length ? h.members : ["this phone"]});
-  paintHousehold(); toast((I18N.getLang()==="en"?"Household code: ":"家庭码：") + code);
-});
-$("#hhPanelBtn").addEventListener("click", ()=>{
-  const h = FD.household();
-  if(!h.code){ toast(I18N.getLang()==="en"?"Create a code first":"先创建家庭码"); return; }
-  FD.saveHousehold({panel: !h.panel}); paintHousehold();
-});
+/* 「生成家庭码 / 设为面板」按钮已经移除：这两件事现在在 account.html 里做 */
 
 paintAll();
 </script>
