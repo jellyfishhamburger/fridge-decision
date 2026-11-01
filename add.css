@@ -117,3 +117,17 @@ body.ad{
 .ad-steps{display:flex;gap:6px;padding:8px 14px 0;max-width:560px;margin:0 auto}
 .ad-steps i{flex:1;height:3px;border-radius:2px;background:#E6DFCE}
 .ad-steps i.on{background:var(--green)}
+/* ---------- 手动添加：分类 ---------- */
+.pickwrap{display:block}
+.pickwrap .grp{margin:16px 0 0;scroll-margin-top:64px}
+.pickwrap .grp:first-child{margin-top:6px}
+.pickwrap .grp h3{display:flex;align-items:baseline;justify-content:space-between;
+  margin:0 0 8px;font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.01em}
+.pickwrap .grp h3 span{font-size:11.5px;font-weight:500;color:var(--muted);
+  font-variant-numeric:tabular-nums}
+.catjump{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;margin:0 0 2px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none}
+.catjump::-webkit-scrollbar{display:none}
+.catjump a{flex:0 0 auto;font-size:12.5px;font-weight:600;color:var(--ink);text-decoration:none;
+  background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;white-space:nowrap}
+.catjump a:active{background:#EFF5EE;border-color:var(--green)}

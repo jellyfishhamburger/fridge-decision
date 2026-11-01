@@ -123,13 +123,51 @@
   });
 
   /* ---------- 手动 ---------- */
+  /* 77 项平铺看不清，按类别分组；顶部给一排跳转 */
+  var GROUPS = [
+    { id: "veg",   tags: ["greens", "veg"], label: ["蔬菜", "Vegetables"] },
+    { id: "meat",  tags: ["protein"],       label: ["肉蛋", "Meat & eggs"] },
+    { id: "carb",  tags: ["carb"],          label: ["主食", "Staples"] },
+    { id: "dairy", tags: ["dairy"],         label: ["奶制品", "Dairy"] },
+    { id: "fruit", tags: ["fruit"],         label: ["水果", "Fruit"] },
+    { id: "other", tags: ["other"],         label: ["其他", "Other"] }
+  ];
+
   function paintGrid() {
     var box = $("#pickGrid");
-    box.innerHTML = FD.CATALOG.map(function (f) {
-      var ic = (window.FD_ICON && FD_ICON(f.id, 26)) || "";
-      return '<button data-cat="' + f.id + '" class="' + (state.cat === f.id ? "on" : "") + '">'
-        + ic + "<i>" + fname(f) + "</i></button>";
-    }).join("");
+    if (!box) return;
+    var en = (window.I18N && I18N.getLang && I18N.getLang() === "en") ? 1 : 0;
+    var html = "";
+    GROUPS.forEach(function (g) {
+      var items = FD.CATALOG.filter(function (f) { return g.tags.indexOf(f.tag) >= 0; });
+      if (!items.length) return;
+      html += '<section class="grp" id="grp-' + g.id + '">'
+        + '<h3><b>' + g.label[en] + '</b><span>' + items.length + '</span></h3>'
+        + '<div class="grid">'
+        + items.map(function (f) {
+            var ic = (window.FD_ICON && FD_ICON(f.id, 26)) || "";
+            return '<button data-cat="' + f.id + '" class="' + (state.cat === f.id ? "on" : "") + '">'
+              + ic + "<i>" + fname(f) + "</i></button>";
+          }).join("")
+        + '</div></section>';
+    });
+    box.innerHTML = html;
+
+    var jump = $("#catJump");
+    if (jump) {
+      jump.innerHTML = GROUPS.map(function (g) {
+        var n = FD.CATALOG.filter(function (f) { return g.tags.indexOf(f.tag) >= 0; }).length;
+        if (!n) return "";
+        return '<a href="#grp-' + g.id + '" data-jump="grp-' + g.id + '">' + g.label[en] + " " + n + "</a>";
+      }).join("");
+      jump.querySelectorAll("[data-jump]").forEach(function (a) {
+        a.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          var el = document.getElementById(a.dataset.jump);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    }
   }
   $("#pickGrid").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-cat]"); if (!b) return;

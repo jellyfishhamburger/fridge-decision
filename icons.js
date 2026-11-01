@@ -62,8 +62,20 @@
     cheese: `<path d="M3.4 16.6l8.8-8.8h8.4v8.8z"/><circle cx="9" cy="14" r="1.1"/><circle cx="15.4" cy="12.4" r="1.1"/>`,
     yogurt: `<path d="M7.2 8.2h9.6l-1.4 12.2H8.6z"/><path d="M7.2 8.2h9.6M9 11.8h6"/>`,
     /* ---- 本轮扩容：蔬菜 ---- */
-    cabbage: `<circle cx="12" cy="13" r="7"/><path d="M12 6c-2.4 2.2-2.4 11.8 0 14"/>
-              <path d="M12 6c2.4 2.2 2.4 11.8 0 14"/><path d="M5.3 10.6c2.6 1.4 10.8 1.4 13.4 0"/>`,
+    lettuce: `<path d="M12 20c-5 0-8.4-3-8.4-6.6 0-2.2 1.6-4 4-4.6-.4-2.6 1.6-4.8 4.4-4.8s4.8 2.2 4.4 4.8c2.4.6 4 2.4 4 4.6C20.4 17 17 20 12 20z"/>
+              <path d="M12 20c-1.6-4-1.6-8 0-12M8 16c-.8-2.6-.4-6 1.4-8M16 16c.8-2.6.4-6-1.4-8"/>`,
+    chives: `<path d="M8 20.4c-.6-5 .4-9.6 2.4-13M12 20.4c0-5.4 0-10.6 0-16M16 20.4c.6-5-.4-9.6-2.4-13"/>
+             <path d="M6.6 20.4h10.8"/>`,
+    celery: `<path d="M9 20.4c-1.6-4-1.6-8.6 0-12.6M12 20.4c-.8-4.4-.8-9.4 0-14M15 20.4c1.6-4 1.6-8.6 0-12.6"/>
+             <path d="M7.4 20.4h9.2M9 7.8C7.4 7 6.6 5.6 6.6 4c1.8 0 3.2.8 4 2"/>`,
+    sprout: `<path d="M12 20.4v-7.6"/>
+             <path d="M12 12.8C12 9 9.6 6.6 6.2 6.6c0 3.4 2.4 5.8 5.8 6.2z"/>
+             <path d="M12 12.8c0-3.2 2-5.4 4.8-5.8 0 3-2 5.4-4.8 5.8z"/>`,
+    ear: `<path d="M12 3.4c4.4 0 7 3.4 7 8.4 0 5-2.6 8.8-7 8.8s-7-3.8-7-8.8c0-5 2.6-8.4 7-8.4z"/>
+          <path d="M12 6.4c-2.2 0-3.6 2.2-3.6 5.2s1.4 5.4 3.6 5.4"/>`,
+
+    cabbage: `<path d="M8.4 20.4c-1.6-2.6-2.4-6-2.4-9.4C6 6.6 8.8 3.4 12 3.4s6 3.2 6 7.6c0 3.4-.8 6.8-2.4 9.4z"/>
+              <path d="M12 3.8v16.2M9 6.6c-.8 3-.8 7.6 0 10.6M15 6.6c.8 3 .8 7.6 0 10.6"/>`,
     leaf2: `<path d="M12 20.4c0-6.8 3.2-12 8.8-13 0 8.8-4.2 13.2-8.8 13z"/>
             <path d="M12 20.4c-3.4-2.4-5-5.4-5-8.4 2.6.6 4.4 2 5 4.4z"/>`,
     cucumber: `<path d="M8 4.8c2.6-1.4 6.8 1 8.6 4.4 1.9 3.4 1.3 7.9-1.3 9.3-2.6 1.4-6.8-1-8.6-4.4C4.8 10.7 5.4 6.2 8 4.8z"/>
@@ -80,6 +92,27 @@
     bun: `<path d="M4.8 14.6c0-3.4 3.2-6 7.2-6s7.2 2.6 7.2 6-3.2 5.4-7.2 5.4-7.2-2-7.2-5.4z"/>
           <path d="M8.6 9.8c1-1.6 5.8-1.6 6.8 0"/>`,
     bag: `<path d="M6.6 8.8h10.8l1.2 10.6H5.4z"/><path d="M9.2 8.8V6.6a2.8 2.8 0 015.6 0v2.2"/>`,
+
+    gourd: `<path d="M12 3.6c1.8 0 2.8 2 2.8 4.4 0 2.2 3 3.8 3 7.4 0 3-2.6 5-5.8 5s-5.8-2-5.8-5c0-3.6 3-5.2 3-7.4 0-2.4 1-4.4 2.8-4.4z"/>`,
+    luffa: `<path d="M12 4.2c2.8 0 4.8 3.6 4.8 8s-2 8.2-4.8 8.2-4.8-3.8-4.8-8.2 2-8 4.8-8z"/>
+             <path d="M12 6.2v12.2M9.4 8.4c-.6 2.6-.6 5.8 0 8.2M14.6 8.4c.6 2.6.6 5.8 0 8.2"/>`,
+    lotus: `<path d="M4.6 12.8h14.8a7.4 7.4 0 01-14.8 0z"/>
+             <ellipse cx="12" cy="12.8" rx="7.4" ry="1.9"/>
+             <circle cx="9.8" cy="15" r="1"/><circle cx="14.2" cy="15" r="1"/>`,
+    yam: `<path d="M9.8 20.4c-2.6 0-4.4-2.2-4.4-5 0-4.2 3.2-8 7.2-9.8 1.6-.6 3 .4 3 2 0 3.6-2.6 12.8-5.8 12.8z"/>
+           <path d="M7.2 16c1.8-.6 3.2-1.6 4.4-3"/>`,
+
+    avocado: `<path d="M12 3.6c2.8 0 4.6 3.4 4.6 7 0 4.6-2 9.8-4.6 9.8s-4.6-5.2-4.6-9.8c0-3.6 1.8-7 4.6-7z"/>
+              <ellipse cx="12" cy="13.6" rx="2.6" ry="3"/>`,
+    lemon: `<path d="M15.2 4.8c2.2 0 4 1.8 4 4 0 5.2-4.4 10.4-9.2 10.4-2.2 0-4-1.8-4-4 0-5.2 4.4-10.4 9.2-10.4z"/>
+            <path d="M6.4 17.4l-1.4 1.4M17.6 6.6l1.4-1.4"/>`,
+    mango: `<path d="M12.8 5.8c3 .8 4.6 3.8 4.2 7.4-.4 4-3 7.2-6.2 7.2-3.4 0-5.6-3-5.2-6.8.4-4 3.4-8.6 7.2-7.8z"/>
+            <path d="M13 5.8c0-1.6.8-2.6 2.2-3"/>`,
+    blueberry: `<circle cx="9.2" cy="11.8" r="3"/><circle cx="14.8" cy="11.8" r="3"/><circle cx="12" cy="16.6" r="3"/>
+                <path d="M12 8.8V5.2"/>`,
+    cherry2: `<circle cx="9" cy="16" r="3.4"/><circle cx="15.4" cy="17.2" r="3.4"/>
+              <path d="M9 12.6c0-3 1.6-5.4 4.4-6.6M15.4 13.8c.2-2.6-.4-4.8-2-6.8"/>
+              <path d="M13.4 6.4c1.4-.6 2.4-.2 3 .8"/>`,
 
     /* ---- 本轮扩容：水果 ---- */
     apple: `<path d="M12 7.6c-2.6-1.6-6.4-.4-7 3-.6 3.6 2 8.4 4.8 8.4 1 0 1.4-.5 2.2-.5s1.2.5 2.2.5c2.8 0 5.4-4.8 4.8-8.4-.6-3.4-4.4-4.6-7-3z"/>
@@ -117,18 +150,18 @@
     rice:"rice", noodle:"noodle", dumpling:"dumpling", bread:"bread",
     chili:"chili", potato:"potato", eggplant:"eggplant", cola:"cola",
     milk:"milk", cheese:"cheese", yogurt:"yogurt",
-    cabbage:"cabbage", baby_cabbage:"cabbage", lettuce:"cabbage", spinach:"cabbage", chives:"cabbage",
-    celery:"leaf2", bean_sprout:"leaf2", kelp:"leaf2", wood_ear:"leaf2",
-    cucumber:"cucumber", luffa:"cucumber", wax_gourd:"cucumber",
+    cabbage:"cabbage", baby_cabbage:"cabbage", lettuce:"lettuce", spinach:"leaf2", chives:"chives",
+    celery:"celery", bean_sprout:"sprout", kelp:"leaf2", wood_ear:"ear",
+    cucumber:"cucumber", luffa:"luffa", wax_gourd:"gourd",
     pumpkin:"pumpkin", corn:"corn", green_beans:"pod", snow_peas:"pod",
     cauliflower:"broccoli", enoki:"mushroom", cherry_tomato:"tomato", red_chili:"chili",
-    yam:"root", lotus_root:"root", sweet_potato:"root",
+    yam:"yam", lotus_root:"lotus", sweet_potato:"root",
     mantou:"bun", flour:"bag", rice_cake:"rice", butter:"cheese", cream:"milk",
     chicken_wing:"chicken", ribs:"meat", duck:"meat", lamb:"meat", bacon:"ham", sausage:"ham",
     peeled_shrimp:"shrimp", dried_tofu:"tofu",
-    apple:"apple", banana:"banana", mandarin:"citrus", orange:"citrus", lemon:"citrus",
-    grape:"grape", strawberry:"berry", blueberry:"berry", cherry:"berry",
-    pear:"pear", watermelon:"melon", kiwi:"kiwi", peach:"drupe", mango:"drupe", avocado:"drupe",
+    apple:"apple", banana:"banana", mandarin:"citrus", orange:"citrus", lemon:"lemon",
+    grape:"grape", strawberry:"berry", blueberry:"blueberry", cherry:"cherry2",
+    pear:"pear", watermelon:"melon", kiwi:"kiwi", peach:"drupe", mango:"mango", avocado:"avocado",
     dragon_fruit:"dragon"
   };
 
