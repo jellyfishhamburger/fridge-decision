@@ -555,10 +555,15 @@
 
   async function readReceipt(file) {
     var msg = $("#rMsg");
-    msg.textContent = "正在读小票…（第一次要下模型，约 20 秒）";
+    msg.textContent = "正在读小票…（约 5 秒）";
     try {
       var dataUrl = await fileToDataUrl(file);
-      var lines = await RECEIPT.readLines(dataUrl, "fast");
+      /* 小票是热敏纸 + 手机拍的，tesseract 对中文几乎全是乱码（实测把「品名」读成 he）。
+         paddle 在同一张图上能读对 90% 以上，所以默认用它；真跑不起来才退回 fast。 */
+      var lines = [];
+      try { lines = await RECEIPT.readLines(dataUrl, "paddle"); }
+      catch (e) { lines = await RECEIPT.readLines(dataUrl, "fast"); }
+      if (!lines.length) lines = await RECEIPT.readLines(dataUrl, "fast");
       var text = lines.join(NL);
       $("#rRaw").textContent = text || "（空）";
       $("#rRawBox").hidden = !text;
