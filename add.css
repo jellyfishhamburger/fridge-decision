@@ -131,3 +131,9 @@ body.ad{
 .catjump a{flex:0 0 auto;font-size:12.5px;font-weight:600;color:var(--ink);text-decoration:none;
   background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;white-space:nowrap}
 .catjump a:active{background:#EFF5EE;border-color:var(--green)}
+
+/* 「先拆包装」提示：拍照前给一次，别等认错了才说 */
+.tipwrap{display:flex;gap:8px;align-items:flex-start;margin:8px 0 4px;padding:10px 12px;
+  background:#F4F8F0;border:1px solid #DDE9D6;border-radius:12px;
+  font-size:12.5px;line-height:1.5;color:#3F5B49}
+.tipico{flex:0 0 auto;font-size:13px;line-height:1.4;color:#2F6B4F}

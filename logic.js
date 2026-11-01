@@ -450,12 +450,11 @@
   /* 没登记的菜，按 needs 里的食材猜一个角色 */
   function inferRole(recipe) {
     const need = recipe.needs || [];
-    const veg = ["greens","broccoli","tomato","chili","eggplant","mushroom","onion","carrot","potato"];
-    const protein = ["egg","tofu","pork","chicken","beef","fish","shrimp","ham"];
-    const carb = ["rice","noodle","bread","dumpling"];
-    const hasP = need.some(c => protein.indexOf(c) >= 0);
-    const hasV = need.some(c => veg.indexOf(c) >= 0);
-    const hasC = need.some(c => carb.indexOf(c) >= 0);
+    /* 按目录里的 tag 判断，别写死名单 —— 扩了库（排骨/白菜/鸭肉…）之后名单会漏 */
+    const tag = c => (byId[c] && byId[c].tag) || "";
+    const hasP = need.some(c => tag(c) === "protein");
+    const hasV = need.some(c => tag(c) === "greens" || tag(c) === "veg");
+    const hasC = need.some(c => tag(c) === "carb");
     if (hasC && need.length <= 3) return "onepot";
     if (hasP && hasV) return "halfProtein";
     if (hasP) return "mainProtein";
@@ -464,7 +463,8 @@
   }
   function inferProtein(recipe) {
     const need = recipe.needs || [];
-    if (need.some(c => ["fish","shrimp","chicken","beef","pork"].indexOf(c) >= 0)) return "high";
+    const MEATY = ["fish","shrimp","peeled_shrimp","chicken","chicken_wing","beef","pork","ribs","lamb","duck"];
+    if (need.some(c => MEATY.indexOf(c) >= 0)) return "high";
     if (need.some(c => ["egg","tofu","ham"].indexOf(c) >= 0)) return "mid";
     return "low";
   }
