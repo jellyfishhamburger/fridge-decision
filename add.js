@@ -463,7 +463,7 @@
       var r = det.lm.detectForVideo(v, Date.now());
       var has = r && r.landmarks && r.landmarks.length;
       if (!has) { det.armed = true; return; }
-      if (det.armed && det.n < 30) {
+      if (det.armed && det.n < 30 && !det.busy && Date.now() - (det.last || 0) > 1200) {
         det.armed = false; det.n++;
         snapOne();
       }
@@ -471,17 +471,74 @@
   }
 
   async function snapOne() {
+    if (det.busy) return;
+    det.busy = true;
+    det.last = Date.now();
     var c = grab();
     var url = c.toDataURL("image/jpeg", 0.85);
-    showShot(url);
+    /* 相机保持常亮：抓拍只在画面上闪一下 + 边框变绿 + 提示音，
+       否则用户会以为「卡住了 / 相机没了」。 */
     state.shots.push({ img: url });
-    var r = await classifySmart(c);
+    flashCapture(url);
+    var r = { cat: "", name: "" };
+    try { r = await classifySmart(c); } catch (e) { r = { cat: "", name: "" }; }
     if (r.cat) addRow(r.cat, 1, "detect", url);
     else addRow("", 1, "detect", url, r.name || "");
     if (!r.cat) state.needManual = true;
     var note = r.cat ? "" : (r.why === "lowconf" ? "（没认准，等下选）" : r.name ? "（认成「" + r.name + "」，等下选）" : "（没认出来，等下选）");
-    $("#detHint").textContent = "已拍 " + state.shots.length + " 件" + note + " —— 放完点「结束并确认」。";
+    $("#detHint").textContent = "✓ 拍到第 " + state.shots.length + " 件" + note +
+      " · 继续放下一件，全部放完点「结束并确认」。";
     renderRows();
+    det.busy = false;
+  }
+
+  /* 抓拍的三重反馈：白闪 + 取景框变绿打勾 + 提示音/震动 */
+  function flashCapture(url) {
+    var st = document.querySelector(".stage");
+    var fr = document.querySelector(".stage .frame");
+    var sp = fr && fr.querySelector("span");
+    if (st) {
+      st.classList.remove("flash");
+      void st.offsetWidth;
+      st.classList.add("flash");
+      setTimeout(function () { st.classList.remove("flash"); }, 460);
+    }
+    if (fr) {
+      fr.classList.add("ok");
+      if (sp) sp.textContent = "✓ 拍到了";
+      setTimeout(function () {
+        fr.classList.remove("ok");
+        if (sp) sp.textContent = tt("add.frame", "把手里的东西放进框里");
+      }, 950);
+    }
+    beep();
+    try { if (navigator.vibrate) navigator.vibrate(28); } catch (e) {}
+    addThumb(url);
+  }
+
+  function addThumb(url) {
+    var box = $("#detStrip");
+    if (!box) return;
+    var n = state.shots.length;
+    var d = document.createElement("div");
+    d.className = "detitem";
+    d.innerHTML = '<b>' + n + '</b><img src="' + url + '" alt="">';
+    box.insertBefore(d, box.firstChild);
+    while (box.children.length > 12) box.removeChild(box.lastChild);
+  }
+
+  var AC = null;
+  function beep() {
+    try {
+      AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+      var o = AC.createOscillator(), g = AC.createGain();
+      o.type = "sine"; o.frequency.value = 880;
+      g.gain.setValueAtTime(0.001, AC.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.12, AC.currentTime + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + 0.16);
+      o.connect(g); g.connect(AC.destination);
+      o.start(); o.stop(AC.currentTime + 0.17);
+    } catch (e) {}
   }
 
   function guessCat(label) {
@@ -502,7 +559,7 @@
     }
     btn.disabled = false; btn.textContent = "结束并确认"; btn.classList.add("on");
     det.running = true; det.armed = true; det.n = 0;
-    $("#detHint").textContent = "手伸进来就自动拍，不用再按。";
+    $("#detHint").textContent = "把东西拿在手里，伸进虚线框内 —— 会自动抓拍（画面会闪一下、框变绿）。拍完继续放下一件。";
     det.timer = setInterval(tick, 220);
   });
 

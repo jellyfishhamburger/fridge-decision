@@ -175,7 +175,7 @@
       "add.tipUnwrapBatch": "记得先拆掉包装袋 —— 连着袋子拍，我认不出里面是什么。",
       "add.keepPre": "能放",
       "add.keepPost": "天",
-      "add.frame": "把东西放在框里",
+      "add.frame": "把手里的东西放进框里",
       "add.undo": "删掉上一张",
       "add.detHint": "按一次开始；手伸进来就自动拍，放完东西再按一次结束。",
       "add.recLede": "拍一张小票，我按上面的商品生成清单。认不准可以手动补。",

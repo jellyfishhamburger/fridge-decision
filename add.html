@@ -62,9 +62,11 @@
     <div class="stage">
       <video id="cam" playsinline muted autoplay></video>
       <img id="shot" alt="">
-      <div class="frame" aria-hidden="true"><span data-i18n="add.frame">把东西放在框里</span></div>
+      <div class="frame" aria-hidden="true"><span data-i18n="add.frame">把手里的东西放进框里</span></div>
+      <div class="shotflash" aria-hidden="true"></div>
       <div class="hint" id="camHint"></div>
     </div>
+    <div id="detStrip" aria-live="polite"></div>
     <p class="tipwrap"><span class="tipico">✂</span><span data-i18n="add.tipUnwrap">拍照前，先把塑料袋 / 保鲜膜拆开 —— 隔着袋子几乎认不出来。</span></p>
     <div class="rowline"><span id="cnt">已拍 0 件</span><button class="mini" id="undo" data-i18n="add.undo">删掉上一张</button></div>
     <button class="btn primary" id="detToggle">开始检测</button>

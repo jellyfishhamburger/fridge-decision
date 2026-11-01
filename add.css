@@ -152,3 +152,23 @@ body.ad{
   background:#F4F8F0;border:1px solid #DDE9D6;border-radius:12px;
   font-size:12.5px;line-height:1.5;color:#3F5B49}
 .tipico{flex:0 0 auto;font-size:13px;line-height:1.4;color:#2F6B4F}
+
+/* ---------- 抓拍反馈 ---------- */
+.frame{transition:border-color .18s ease, box-shadow .18s ease}
+.frame.ok{border-color:#3DDC84;border-width:3px;
+  box-shadow:0 0 0 2px rgba(255,255,255,.9), inset 0 0 0 4px rgba(61,220,132,.35)}
+.frame.ok span{background:rgba(47,107,79,.92)}
+.shotflash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:3}
+.stage.flash .shotflash{animation:shotflash .42s ease-out}
+@keyframes shotflash{0%{opacity:.9}55%{opacity:.25}100%{opacity:0}}
+#detStrip{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 2px;scrollbar-width:none}
+#detStrip::-webkit-scrollbar{display:none}
+#detStrip:empty{display:none}
+#detStrip img{width:66px;height:66px;border-radius:12px;object-fit:cover;flex:0 0 auto;
+  border:2px solid #fff;box-shadow:0 2px 10px rgba(51,48,42,.18);animation:pop .3s cubic-bezier(.22,1,.36,1)}
+#detStrip img:first-child{outline:2px solid var(--green);outline-offset:-2px}
+@keyframes pop{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:1}}
+.detitem{position:relative;flex:0 0 auto}
+.detitem b{position:absolute;left:-4px;top:-4px;width:18px;height:18px;border-radius:50%;
+  background:var(--green);color:#fff;font-size:11px;line-height:18px;text-align:center;
+  box-shadow:0 1px 4px rgba(0,0,0,.25)}
