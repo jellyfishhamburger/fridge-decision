@@ -138,7 +138,11 @@
       else missing.push(need);
     }
 
-    const status = missing.length === 0 ? "ready" : (missing.length === 1 ? "shop1" : "blocked");
+    /* 一道菜如果连一个库存食材都对不上（多半是「萝卜」这类还没进目录），
+       不能算 ready —— 否则「现在就能做」里会出现根本做不了的菜 */
+    const status = !recipe.needs || !recipe.needs.length
+      ? "blocked"
+      : (missing.length === 0 ? "ready" : (missing.length === 1 ? "shop1" : "blocked"));
     /* 排序的主轴是「最先坏的那一样」，不是把几样临期加起来：
        一条 1 天的鱼必须压过「2 天的猪肉 + 3 天的豆腐」，否则今天该吃的鱼永远排不上。
        次要项只给很小权重，避免多料菜靠数量堆分。 */
@@ -159,8 +163,13 @@
     };
   }
 
-  function decide(items, st) {
-    return RECIPES.map(r => evaluate(r, items, st)).sort((a, b) => b.score - a.score);
+  /* 小吃/饮品/甜点/调料都不算「一道菜」：不进套餐，也不上今晚吃什么的推荐 */
+  const DISH_KINDS = { meat: 1, veg: 1, soup: 1, staple: 1 };
+  function isDish(recipe) { return !!DISH_KINDS[(recipe && recipe.kind) || "meat"]; }
+
+  function decide(items, st, opts) {
+    const pool = (opts && opts.all) ? RECIPES : RECIPES.filter(isDish);
+    return pool.map(r => evaluate(r, items, st)).sort((a, b) => b.score - a.score);
   }
 
   /* ---------- 一人份套餐 ----------
@@ -502,7 +511,7 @@
 
   function buildSets(items, st, intentId) {
     st = st || settings();
-    const all = RECIPES.map(r => evaluate(r, items, st));
+    const all = RECIPES.filter(isDish).map(r => evaluate(r, items, st));
     const pantryHave = new Set(pantry());
     const out = [];
 
@@ -670,7 +679,7 @@
     LS_PENDING, pending, savePending, addPending, removePending, takePending,
     pullPendingCloud, shrinkThumb,
     localDate, daysLeftOf,
-    evaluate, decide, urgent, shoppingHint,
+    evaluate, decide, urgent, shoppingHint, isDish, DISH_KINDS,
     log, stats
   };
 })(window);

@@ -819,6 +819,12 @@
 
   /* 套餐拼图太小，压角版权字会糊成一片：小图不叠字，版权统一在详情页和「图片来源」里给 */
   .rcc.set .ph .cr{display:none}
+
+  /* 类别行：横向滑动，单独一行，和下面的条件行分开 */
+  .kindfilters{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;margin:0 0 10px;padding-bottom:2px}
+  .kindfilters::-webkit-scrollbar{display:none}
+  .kindfilters .f{flex:0 0 auto;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -1139,6 +1145,9 @@
   <section class="view" id="view-discover">
     <p class="lede" id="discLede" data-i18n="disc.lede">按「先用掉快坏的」排序。</p>
 
+    <!-- 菜谱类别：373 道先分类，再谈别的 -->
+    <div class="filters kindfilters" id="discKinds"></div>
+
     <!-- 现在就能做：扇形叠，一直在，不跟下面的筛选走 -->
     <section class="fan" id="fanSec" hidden aria-label="现在就能做">
       <div class="fan-hd">
@@ -1384,7 +1393,7 @@ let setIntent = (function(){
   catch(e){ return "hearty"; }
 })(), setPick = 0;   /* 今晚想要什么（记住上次） + 换到第几套 */
 let setChoice = null;                    /* 用户手动换过菜之后的组合（dish id 数组） */
-let discFilter = "all", buildPicks = new Set();
+let discFilter = "all", discKind = "all", buildPicks = new Set();
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 const today = () => FD.localDate();
@@ -2216,6 +2225,9 @@ function dishPhoto(recipe){
       + `<span class="cr"><a href="${p.page}" target="_blank" rel="noopener">${p.credit} · ${p.license}</a></span>`};
   }
   const ids = (recipe.needs || []).slice(0,3);
+  if(!ids.length){
+    return {art:true, html:`<span class="ic">${window.FD_ICON ? FD_ICON("rice", 34) : ""}<i>${recipe.name}</i></span>`};
+  }
   return {art:true, html: ids.map(id =>
     `<span class="ic">${window.FD_ICON ? FD_ICON(id, 26) : ""}<i>${cnOf(id)}</i></span>`).join("")};
 }
@@ -2262,8 +2274,38 @@ function recipeHits(recipe, q){
 
 /* 全部菜谱都在库里：能吃 / 差一样 / 还差几样，用状态胶囊区分。
    以前把「差两样」的整条藏掉，空冰箱时这一页就是白板。 */
+const KINDS = [
+  {id:"all",     zh:"全部",   en:"All"},
+  {id:"meat",    zh:"家常菜", en:"Mains"},
+  {id:"veg",     zh:"素菜",   en:"Veg"},
+  {id:"soup",    zh:"汤",     en:"Soup"},
+  {id:"staple",  zh:"主食",   en:"Staples"},
+  {id:"snack",   zh:"小吃",   en:"Snacks"},
+  {id:"drink",   zh:"饮品",   en:"Drinks"},
+  {id:"dessert", zh:"甜点",   en:"Desserts"},
+  {id:"condiment",zh:"调料",  en:"Condiments"}
+];
+
+function renderKinds(){
+  const box = $("#discKinds");
+  if(!box) return;
+  const en = I18N.getLang() === "en";
+  const cnt = {};
+  FD.RECIPES.forEach(r => { cnt[r.kind || "meat"] = (cnt[r.kind || "meat"] || 0) + 1; });
+  box.innerHTML = KINDS.filter(k => k.id === "all" || cnt[k.id]).map(k => {
+    const n = k.id === "all" ? FD.RECIPES.length : cnt[k.id];
+    return `<button class="f${discKind === k.id ? " on" : ""}" data-kind="${k.id}">${en ? k.en : k.zh} ${n}</button>`;
+  }).join("");
+  box.querySelectorAll("[data-kind]").forEach(b => b.addEventListener("click", () => {
+    discKind = b.dataset.kind;
+    discShown = DISC_PAGE;
+    renderDiscover();
+  }));
+}
+
 function discBase(){
-  let list = FD.decide(items, goal);
+  let list = FD.decide(items, goal, {all:true});
+  if(discKind !== "all") list = list.filter(r => (r.recipe.kind || "meat") === discKind);
   if(discFilter === "ready")  list = list.filter(r => r.status === "ready");
   if(discFilter === "shop1")  list = list.filter(r => r.status === "shop1");
   if(discFilter === "greens") list = list.filter(r => r.recipe.greens);
@@ -2274,6 +2316,7 @@ function discBase(){
 }
 
 function statusPill(r){
+  if(!r.recipe.needs || !r.recipe.needs.length) return `<span class="ds-pill">自备食材</span>`;
   if(r.status === "ready") return `<span class="ds-pill ok">${t("disc.ready1")}</span>`;
   if(r.status === "shop1") return `<span class="ds-pill warn">${t("disc.gapN", {n:1})}</span>`;
   return `<span class="ds-pill">${t("disc.gapN", {n:r.missing.length})}</span>`;
@@ -2589,6 +2632,7 @@ $("#setMore") && $("#setMore").addEventListener("click", () => {
 });
 
 function renderDiscover(){
+  renderKinds();
   renderDiscSets();
   renderFan();
   const all = discBase();

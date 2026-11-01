@@ -877,7 +877,8 @@ window.FD_DATA = {
    "水烧热感觉到水温后放进入鱼",
    "大火清蒸 10 分钟。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/aquatic/清蒸鲈鱼/清蒸鲈鱼.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/aquatic/清蒸鲈鱼/清蒸鲈鱼.md",
+  "kind": "meat"
  },
  {
   "id": "白灼虾",
@@ -910,7 +911,8 @@ window.FD_DATA = {
    "和上一步并行操作，制作蘸料：",
    "虾出锅，用干净的盘子装好。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/aquatic/白灼虾/白灼虾.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/aquatic/白灼虾/白灼虾.md",
+  "kind": "meat"
  },
  {
   "id": "蒜蓉虾",
@@ -933,7 +935,8 @@ window.FD_DATA = {
    "锅中倒入热水，将盘子放入锅中，大火蒸 3 分钟",
    "烧热油，倒入虾盘中，倒入生抽"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/aquatic/蒜蓉虾/蒜蓉虾.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/aquatic/蒜蓉虾/蒜蓉虾.md",
+  "kind": "meat"
  },
  {
   "id": "微波炉蒸蛋",
@@ -958,7 +961,8 @@ window.FD_DATA = {
    "加热完成后取出静置 1 分钟，让余温使中心完全熟化。",
    "淋上香油，撒葱花即可食用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/breakfast/微波炉蒸蛋.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/breakfast/微波炉蒸蛋.md",
+  "kind": "veg"
  },
  {
   "id": "可乐鸡翅",
@@ -989,7 +993,8 @@ window.FD_DATA = {
    "等到葱结变黄，和姜片一起捞出，转中火继续慢煮可乐鸡翅。",
    "等到可乐呈现挂丝状态，关小火让汁牢牢挂在鸡翅上。出锅，装盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/可乐鸡翅.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/可乐鸡翅.md",
+  "kind": "meat"
  },
  {
   "id": "宫保鸡丁",
@@ -1027,7 +1032,8 @@ window.FD_DATA = {
    "转大火，下入熟花生，干辣椒和花椒；加入鸡精 2g，香醋 5g，白糖 2g，翻炒均匀；",
    "淀粉 10g 加 50g 清水调成水淀粉，加入锅中，翻炒均匀，收汁到自己想要的浓度"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/宫保鸡丁/宫保鸡丁.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/宫保鸡丁/宫保鸡丁.md",
+  "kind": "meat"
  },
  {
   "id": "洋葱炒猪肉",
@@ -1051,7 +1057,8 @@ window.FD_DATA = {
    "下刚盛起备用的猪肉翻炒至猪肉熟后",
    "待猪肉熟后再翻炒 1、2 分钟即可起锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/洋葱炒猪肉.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/洋葱炒猪肉.md",
+  "kind": "meat"
  },
  {
   "id": "辣椒炒肉",
@@ -1092,7 +1099,8 @@ window.FD_DATA = {
    "加入腌制好的猪肉倒入锅内翻炒 2 分钟，再加入干煸过的青椒翻炒 1 分钟。",
    "根据个人口味喜好加入豆豉，最后加入酱油，继续翻炒 30s。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/辣椒炒肉.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/辣椒炒肉.md",
+  "kind": "meat"
  },
  {
   "id": "青椒土豆炒肉",
@@ -1120,7 +1128,8 @@ window.FD_DATA = {
    "转 8 成油温加入青椒，大火煸炒出锅气（有白烟冒出），反复均匀翻炒 1 分钟上色，最后在锅周围倒入水淀粉转 4 成火勾芡。",
    "在外观*呈粘稠状态*后关火，盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/青椒土豆炒肉/青椒土豆炒肉.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/青椒土豆炒肉/青椒土豆炒肉.md",
+  "kind": "meat"
  },
  {
   "id": "香菇滑鸡",
@@ -1149,7 +1158,8 @@ window.FD_DATA = {
    "油温 3 成，下入鸡腿肉煸炒，等鸡腿肉金黄后盛出备用",
    "锅留底油，下入葱、姜、蒜炒香，香菇入锅，大火翻匀"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/香菇滑鸡/香菇滑鸡.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/香菇滑鸡/香菇滑鸡.md",
+  "kind": "meat"
  },
  {
   "id": "麻婆豆腐",
@@ -1181,7 +1191,8 @@ window.FD_DATA = {
    "热锅，锅内放入 10ml - 15ml 食用油。等待 10 秒让油温升高",
    "调成小火，放入大蒜、生姜、辣椒圈、花椒、咸鸭蛋、蒜蓉辣酱翻炒 20 秒，炒出香味"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/麻婆豆腐/麻婆豆腐.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/meat_dish/麻婆豆腐/麻婆豆腐.md",
+  "kind": "veg"
  },
  {
   "id": "西红柿鸡蛋汤",
@@ -1211,7 +1222,8 @@ window.FD_DATA = {
    "待开锅后，将鸡蛋液放入，并用筷子将鸡蛋打散，放入味素和香油。",
    "等待 30 秒，关火出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/soup/西红柿鸡蛋汤.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/soup/西红柿鸡蛋汤.md",
+  "kind": "soup"
  },
  {
   "id": "蛋炒饭",
@@ -1242,7 +1254,8 @@ window.FD_DATA = {
    "待主体凝固后，将火调至中小火，倒入火腿肠、熟肉，胡萝卜、黄瓜等备料、翻炒 10 秒钟（到爆香）",
    "重新倒入蛋白，翻炒 5s 钟，迅速倒入米饭大火翻炒，为的就是每一粒饭都裹上鸡蛋。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/staple/蛋炒饭.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/staple/蛋炒饭.md",
+  "kind": "staple"
  },
  {
   "id": "西红柿鸡蛋挂面",
@@ -1275,7 +1288,8 @@ window.FD_DATA = {
    "鸡蛋滑到凝固后，一点不会有蛋液了后倒入小碗备用，此处留一些底油",
    "锅中留底油后先加入葱白、蒜末炒香"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/staple/西红柿鸡蛋挂面/西红柿鸡蛋挂面.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/staple/西红柿鸡蛋挂面/西红柿鸡蛋挂面.md",
+  "kind": "staple"
  },
  {
   "id": "凉拌豆腐",
@@ -1304,7 +1318,8 @@ window.FD_DATA = {
    "在一个干净的小碗中，加入 15 ml 生抽，5 ml 香油，5 ml 醋（可选），2 g 白糖（可选）。",
    "加入切好的 大蒜末。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/vegetable_dish/凉拌豆腐.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/vegetable_dish/凉拌豆腐.md",
+  "kind": "veg"
  },
  {
   "id": "洋葱炒鸡蛋",
@@ -1328,7 +1343,8 @@ window.FD_DATA = {
    "起锅烧油，倒入鸡蛋，一面煎炸 30-45 S ，翻面继续翻炒，反复 2-3 分钟 后散上料酒出锅",
    "鸡蛋装盘，散上葱花"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/vegetable_dish/洋葱炒鸡蛋/洋葱炒鸡蛋.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/vegetable_dish/洋葱炒鸡蛋/洋葱炒鸡蛋.md",
+  "kind": "veg"
  },
  {
   "id": "炒茄子",
@@ -1363,7 +1379,8 @@ window.FD_DATA = {
    "热油约 6 成熟，放入八角、虾皮、香葱这三种可选性材料。",
    "如果没有八角等可选材料，热油至 9 成熟。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/vegetable_dish/炒茄子.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/vegetable_dish/炒茄子.md",
+  "kind": "veg"
  },
  {
   "id": "炒青菜",
@@ -1396,7 +1413,8 @@ window.FD_DATA = {
    "最后加入白糖小火加热 2 分钟，加热时盖上锅盖。",
    "盛盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/vegetable_dish/炒青菜.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/vegetable_dish/炒青菜.md",
+  "kind": "veg"
  },
  {
   "id": "蒜蓉空心菜",
@@ -1422,7 +1440,8 @@ window.FD_DATA = {
    "接着不需使用筷子，而是使用铲子快速翻炒已软化的空心菜 15 - 20 秒，使之受热更均匀，撒入盐 2 g ，白糖 3 g，生抽 8 ml。",
    "继续大火翻炒 10 秒，即可出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/vegetable_dish/蒜蓉空心菜/蒜蓉空心菜.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/vegetable_dish/蒜蓉空心菜/蒜蓉空心菜.md",
+  "kind": "veg"
  },
  {
   "id": "蒜蓉西兰花",
@@ -1450,7 +1469,8 @@ window.FD_DATA = {
    "加入 10 ml 生抽，5 ml 蚝油，2 g 白糖，加入 30 ml 饮用水。",
    "将锅中汤汁烧开。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/vegetable_dish/蒜蓉西兰花.md"
+  "src": "https://github.com/Anduin2017/HowToCook/blob/master/dishes/vegetable_dish/蒜蓉西兰花.md",
+  "kind": "veg"
  },
  {
   "id": "咖喱炒蟹",
@@ -1483,7 +1503,8 @@ window.FD_DATA = {
    "焖煮完后，倒入椰浆和蛋清，关火，关火后不断翻炒，一直到酱汁变浓稠。",
    "出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "微波葱姜黑鳕鱼",
@@ -1514,7 +1535,8 @@ window.FD_DATA = {
    "取花生油 50mL，在小锅中加热至 190℃。",
    "将热油淋到放油葱绿的鱼片上，立刻上桌。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "水煮鱼",
@@ -1547,7 +1569,8 @@ window.FD_DATA = {
    "汆鱼片：加入 150ml 热水，水很快开后加入腌制好的鱼片，轻轻翻动让鱼片在水中散开，加入 2g 盐和 2g 糖调味（此时可根据个人口味调整盐的用量）。水再次沸腾后即可盛盘。",
    "盛盘：先将熟的蔬菜盛至大碗中，然后将热的鱼片盛在蔬菜上面，浇上锅中剩余热汤即可！"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "红烧鱼",
@@ -1585,7 +1608,8 @@ window.FD_DATA = {
    "当锅内汤汁收汁到鱼的脊背线上的鱼鳍下面一点点的时候（或者汤汁不多的时候），转小火，加入香菜，葱花，然后盖上锅盖 20 秒，关火",
    "起锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "红烧鱼头",
@@ -1641,7 +1665,8 @@ window.FD_DATA = {
    "将香菜放至已经盛出的鱼头上，把切好的美人椒圈放在香菜之上。",
    "色香味俱全的红烧鱼头出炉！"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "红烧鲤鱼",
@@ -1692,7 +1717,8 @@ window.FD_DATA = {
    "调至大火收汁，汤汁剩余 1/4 时，撒点蒜末，关火盛出。",
    "红烧鲤鱼出锅！"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "肉蟹煲",
@@ -1724,7 +1750,8 @@ window.FD_DATA = {
    "加螃蟹、土豆、啤酒和清水，烧开转小火炖 12 分钟",
    "放年糕和青红椒，开大火收汁到汤汁可以附着在物品表面，最后撒白胡椒粉"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "酱炖蟹",
@@ -1753,7 +1780,8 @@ window.FD_DATA = {
    "放点葱段和姜片，建议敲个鸡蛋或在盘底铺肉末",
    "上锅蒸 10-12 分钟"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "小龙虾",
@@ -1783,7 +1811,8 @@ window.FD_DATA = {
    "加入啤酒，等啤酒烧开后加入生抽，盐。",
    "将小龙虾完全煮熟后出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "干煎阿根廷红虾",
@@ -1819,7 +1848,8 @@ window.FD_DATA = {
    "撒上香菜叶，装盘",
    "切好柠檬片，摆放到盘边即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "油焖大虾",
@@ -1857,7 +1887,8 @@ window.FD_DATA = {
    "![油焖大虾-预览图-1](./油焖大虾.jpg)",
    "开吃✅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "烤鱼",
@@ -1902,7 +1933,8 @@ window.FD_DATA = {
    "最后撒上熟花生米，葱花，白芝麻，香菜",
    "煮 5-6 分钟，美味即成。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "糖醋鲤鱼",
@@ -1948,7 +1980,8 @@ window.FD_DATA = {
    "![糖醋鲤鱼-预览图-2](./成品.jpg)",
    "这里的糖醋汁熬的有点稠了......"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "芥末黄油罗氏虾",
@@ -1977,7 +2010,8 @@ window.FD_DATA = {
    "下入调好的酱汁，继续大火煮沸，翻炒虾，至酱汁收汁，加入酒（料酒、啤酒可以放 30g，朗姆酒味道浓郁放 15g 即可。）",
    "在等酱汁稍微收汁，加入香菜翻炒两下，即可出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "葱油桂鱼",
@@ -2019,7 +2053,8 @@ window.FD_DATA = {
    "在铁锅中倒入 15g 植物油，用中小火慢熬 5 分钟，不要用大火，否则油会挥发很快",
    "将出锅后的热油均匀地慢慢地淋在鱼身上，鲜掉眉毛的葱油桂鱼就出炉啦！"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "蒜香黄油虾",
@@ -2051,7 +2086,8 @@ window.FD_DATA = {
    "挤入柠檬汁，翻炒均匀后立即关火",
    "装盘，淋上锅中剩余酱汁"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "蛏抱蛋",
@@ -2077,7 +2113,8 @@ window.FD_DATA = {
    "往大碗中打入 2 个 鸡蛋，继续搅拌",
    "起锅烧油，倒入碗中蛏子，煎炸至单面金黄后，翻面继续煎炸"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "阳朔啤酒鱼",
@@ -2112,7 +2149,8 @@ window.FD_DATA = {
    "开盖，放入青椒红椒块，继续煮 3-5 分钟",
    "大火收汁至汤汁浓稠，撒上葱叶段，出锅装盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "香煎翘嘴鱼",
@@ -2146,7 +2184,8 @@ window.FD_DATA = {
    "此时改中大火，煮 5-10 分钟，后放入青椒断，白糖，鸡精，十三香，陈醋",
    "改小火 2-5 分钟，放入葱，香菜，即可出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "鲤鱼炖白菜",
@@ -2176,7 +2215,8 @@ window.FD_DATA = {
    "加入“水”（水量尽量和鱼平齐，可以少一点点） 放入 “生抽” “老抽” “娃娃菜”",
    "大火炖 15-20 分钟，汤汁快干时添加 “盐” 即可出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "鳊鱼炖豆腐",
@@ -2207,7 +2247,8 @@ window.FD_DATA = {
    "大火烧开后，放入老豆腐，豆腐贴在锅边，加入食盐，转小火",
    "小火烧 10-15 分钟，然后大火收点汁，即可出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "黄油煎虾",
@@ -2235,7 +2276,8 @@ window.FD_DATA = {
    "虾变色后加入黄油，黄油完全融化后倒入调制酱汁，继续翻炒",
    "大火翻炒 15 秒收汁即可装盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "吐司果酱",
@@ -2256,7 +2298,8 @@ window.FD_DATA = {
    "用餐巾纸包一下可以边走边吃也可以吃完再出门",
    "两分钟快速搞定，操作很简单，味道十分美味，十分适合程序员。耗时短，不会产生额外垃圾，也不需要清洗工具什么的。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "太阳蛋",
@@ -2287,7 +2330,8 @@ window.FD_DATA = {
    "放入微波炉，1 分钟。",
    "while（太阳蛋 否 大面积成固体状） 用微波炉打(30s);"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "完美水煮蛋",
@@ -2309,7 +2353,8 @@ window.FD_DATA = {
    "立即放入冰水（ 0 摄氏度）终止加热（维持 30 秒）",
    "剥壳时从钝端气室处开始，沿纵轴剥离蛋膜"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "微波炉荷包蛋",
@@ -2335,7 +2380,8 @@ window.FD_DATA = {
    "将放好材料的碗放入微波炉中，高火加热 80 秒",
    "到达设定时间后，使用抹布垫着手取出成品"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "微波炉蛋糕",
@@ -2371,7 +2417,8 @@ window.FD_DATA = {
    "微波炉（高火）加热 **1分钟** （至蓬松蛋糕形态）",
    "取出杯子（烫手啊啊啊啊↑）并拍朋友圈就可以吃了"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "意式香肠北非蛋",
@@ -2406,7 +2453,8 @@ window.FD_DATA = {
    "关火。根据个人喜好撒上磨碎的帕马森干酪、新鲜欧芹或干辣椒碎。",
    "将平底锅直接端上桌，配以硬壳面包蘸取蛋黄与酱汁食用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "手抓饼",
@@ -2437,7 +2485,8 @@ window.FD_DATA = {
    "煎好的饼依次铺入煎蛋、生菜、火腿、芝士片等配料，卷起即可。",
    "---"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "水煮玉米",
@@ -2461,7 +2510,8 @@ window.FD_DATA = {
    "水煮开之后转至小火，加盖继续煮 15-20 分钟，玉米煮久点没事。",
    "煮熟后沥干水分，冷却后食用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "溏心蛋",
@@ -2483,7 +2533,8 @@ window.FD_DATA = {
    "- 若想要完全煮熟的易碎蛋黄，需静置 10 分钟",
    "沥干水分，用冷水冲洗鸡蛋约 1 分钟，即可去壳食用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "煎饺",
@@ -2510,7 +2561,8 @@ window.FD_DATA = {
    "放入黑芝麻和葱花再焖 10s",
    "1 - 2 分钟夹出一个饺子观察底部，若出现金黄色脆皮立即取出"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "燕麦鸡蛋饼",
@@ -2535,7 +2587,8 @@ window.FD_DATA = {
    "翻面继续加热两分钟。",
    "出锅，搭配剩下的牛奶作为早餐。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "牛奶燕麦",
@@ -2566,7 +2619,8 @@ window.FD_DATA = {
    "烹饪基本 3 分钟 搞定，做完菜品都是常温，极易入口，一般每次 2 分钟吃完。",
    "> 🥑 水果蔬菜，苏打饼干搭配食用更佳"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "空气炸锅面包片",
@@ -2585,7 +2639,8 @@ window.FD_DATA = {
    "200°C 烘烤 5 分钟",
    "取出即可使用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "美式炒蛋",
@@ -2611,7 +2666,8 @@ window.FD_DATA = {
    "黄油一融化，就快速翻动蛋液，将其打碎成细密状，在蛋液大体凝固前关火",
    "加入牛奶搅拌 15 秒，至炒蛋湿润绵密，装盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "茶叶蛋",
@@ -2640,7 +2696,8 @@ window.FD_DATA = {
    "大火煮开之后，转中小火煮 15 分钟",
    "> 中火煮15 分钟之后，捞出料渣，鸡蛋再浸泡一会口感更佳"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "蒸水蛋",
@@ -2662,7 +2719,8 @@ window.FD_DATA = {
    "使用锡纸包裹盛蛋液的碗（或用盘子盖住），置入提前带盖并加入大约 3cm 深度水的锅中",
    "中火烧至水开，转最小的火继续蒸 4 分钟"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "蛋煎糍粑",
@@ -2688,7 +2746,8 @@ window.FD_DATA = {
    "将剩下的鸡蛋液慢慢倒在糍粑表面",
    "用筷子或者勺子为糍粑翻面，来回煎至金黄色后开吃"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "金枪鱼酱三明治",
@@ -2715,7 +2774,8 @@ window.FD_DATA = {
    "将另一片方形吐司片覆盖在上面，并按压轻食机，开机",
    "待轻食机自动停止加热，即可装盘使用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "韩国麻药鸡蛋",
@@ -2745,7 +2805,8 @@ window.FD_DATA = {
    "将剥好的鸡蛋放入调好的酱汁中，表面淋上 5ml 芝麻油并撒上葱花。",
    "放入冰箱**冷藏等待 1 - 2 小时**，让鸡蛋充分入味。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "鸡蛋三明治",
@@ -2775,7 +2836,8 @@ window.FD_DATA = {
    "组装吐司，在两片吐司间加入制作好的鸡蛋酱及培根",
    "四边形吐司切成三角形装盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "温泉蛋",
@@ -2801,7 +2863,8 @@ window.FD_DATA = {
    "捞出鸡蛋，并立刻放入冰水中，**等待 3 分钟**",
    "将鸡蛋打入小碗，完成制作"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "苏格兰蛋",
@@ -2828,7 +2891,8 @@ window.FD_DATA = {
    "空气炸锅 160 度 15 分钟",
    "切开即可食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "油酥",
@@ -2851,7 +2915,8 @@ window.FD_DATA = {
    "加入 200 度的热油",
    "用筷子将其搅拌成无固状物体的糊状。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "condiment"
  },
  {
   "id": "草莓酱",
@@ -2876,7 +2941,8 @@ window.FD_DATA = {
    "烧开后转小火不断搅拌直至果酱呈粘稠状关火",
    "待草莓酱冷却后装入准备好的密封罐中"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "condiment"
  },
  {
   "id": "胡萝卜甜糕",
@@ -2910,7 +2976,8 @@ window.FD_DATA = {
    "将炸好的坚果和葡萄干的一半拌入胡萝卜甜糕中",
    "盛盘，将剩余坚果和葡萄干撒在表面作为装饰"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "奥利奥冰淇淋",
@@ -2936,7 +3003,8 @@ window.FD_DATA = {
    "可选：将混合物倒入冰淇淋模具中",
    "放置冰箱冷冻室（ -18 度） 4 小时以上可取出"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "戚风蛋糕",
@@ -3021,7 +3089,8 @@ window.FD_DATA = {
    "- 此操作可能会**烫手**，注意用毛巾辅助",
    "脱模，食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "提拉米苏",
@@ -3050,7 +3119,8 @@ window.FD_DATA = {
    "放入冰箱冷藏四个小时（心急的小伙伴可以提早拿出来）",
    "取出后在表面筛上可可粉，即可享用啦"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "无厨师机蜂蜜面包",
@@ -3089,7 +3159,8 @@ window.FD_DATA = {
    "烤箱 180°(355°F), 18 - 20 分钟。",
    "出炉后, 刷上蜂蜜水, 撒上芝麻。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "炸鲜奶",
@@ -3125,7 +3196,8 @@ window.FD_DATA = {
    "将奶条分 2 - 3 批放入油中，每批炸约 60 - 90 秒；期间翻动 1 - 2 次，使各面受热均匀",
    "奶条表面呈均匀金黄色时捞出，放在厨房纸上沥油约 2 分钟后食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "烤箱版巴斯克芝士蛋糕",
@@ -3153,7 +3225,8 @@ window.FD_DATA = {
    "烤箱 220°(425°F)，20 - 25 分钟（本人一般 20 或者 22 分钟）。",
    "放凉之后放入冰箱，最好过夜。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "烤蛋挞",
@@ -3186,7 +3259,8 @@ window.FD_DATA = {
    "将半成品蛋挞放入烤箱中进行烤制 温度为 200 摄氏度 时间为 25 分钟",
    "烤制结束后即可食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "玛格丽特饼干",
@@ -3216,7 +3290,8 @@ window.FD_DATA = {
    "预热烤箱至 150℃，将小面团放入烤箱中，烘烤 20 分钟。",
    "微微放凉即可食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "红柚蛋糕",
@@ -3247,7 +3322,8 @@ window.FD_DATA = {
    "继续 180 摄氏度烤 8 分钟",
    "取出即可食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "芋泥雪媚娘",
@@ -3279,7 +3355,8 @@ window.FD_DATA = {
    "包好后再均匀撒 2g 手粉防粘",
    "重复以上两步直至原材料用光"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "英式司康",
@@ -3309,7 +3386,8 @@ window.FD_DATA = {
    "用刷子蘸取剩余的 20g 鸡蛋液，刷在司康表面",
    "烤箱预热 180 度，烤制 27 分钟"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "草莓冰淇淋",
@@ -3338,7 +3416,8 @@ window.FD_DATA = {
    "将保留的切碎的新鲜草莓折叠到冰淇淋底座中。将生过的冰淇淋底座转移到冷冻安全容器中。将冷却的草莓糖浆淋在冰淇淋上，然后轻轻地将其旋入混合物中。",
    "盖上冰淇淋并冷冻 **八小时** ，然后舀取和食用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "酸奶意式奶冻",
@@ -3364,7 +3443,8 @@ window.FD_DATA = {
    "将上述步骤得到的混合物过两遍筛网",
    "分装入合适的容器，放入冰箱冷藏 4 小时以上"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "雪花酥",
@@ -3393,7 +3473,8 @@ window.FD_DATA = {
    "将上述步骤混合物压入模具中，边角压实，擀面杖擀平，未满的一边用手尽量压成直边",
    "室温放凉，完全冷却后脱模，按照模具纹路切块，或切成自己喜欢的大小，撒上剩余奶粉，尽量使雪花酥每面都沾上奶粉"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "魔芋蛋糕",
@@ -3447,7 +3528,8 @@ window.FD_DATA = {
    "* 此操作可能会**烫手**，注意戴好隔热手套",
    "脱模，餐刀切块食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "dessert"
  },
  {
   "id": "冬瓜茶",
@@ -3471,7 +3553,8 @@ window.FD_DATA = {
    "**冷却**：将冬瓜茶液放凉后，倒入干净的容器中，放入冰箱冷藏即可。",
    "**享用**: 熬好的冬瓜茶液是浓缩汁，根据个人喜好添加水或其他饮品，冷热皆宜。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "印度奶茶",
@@ -3507,7 +3590,8 @@ window.FD_DATA = {
    "用滤网过滤到茶盏中，去除茶叶和香料残渣",
    "趁热饮用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "可乐桶",
@@ -3533,7 +3617,8 @@ window.FD_DATA = {
    "沿杯壁缓慢倒入可口可乐至距离杯口 3/4 处（控制可乐和威士忌的比例约在 5:1 ）",
    "倒入威士忌直至满杯"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "奶茶",
@@ -3554,7 +3639,8 @@ window.FD_DATA = {
    "称取 11-12g 奶粉和 5-7g 砂糖，分别加入前一步骤得到的液体中。",
    "搅拌均匀即可饮用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "杨枝甘露",
@@ -3577,7 +3663,8 @@ window.FD_DATA = {
    "倒入杯中，放上点缀材料（如有）。",
    "一边享用一边写代码！！"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "牛油果拉西",
@@ -3602,7 +3689,8 @@ window.FD_DATA = {
    "将打好的饮品倒入杯中。",
    "（可选）在表面放上几片薄荷叶或撒上 5g 切碎的坚果作为装饰。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "长岛冰茶",
@@ -3634,7 +3722,8 @@ window.FD_DATA = {
    "轻轻搅拌 20 秒；",
    "开始享用."
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "奇异果菠菜特调",
@@ -3662,7 +3751,8 @@ window.FD_DATA = {
    "加入白砂糖",
    "启动搅拌机，搅拌约 4 个 15 秒（每 15 秒停下看状态）"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "柠檬水",
@@ -3683,7 +3773,8 @@ window.FD_DATA = {
    "摇晃均匀",
    "最后根据喜好加冰"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "泰国手标红茶",
@@ -3707,7 +3798,8 @@ window.FD_DATA = {
    "将水壶放到冰箱 4 小时以上",
    "喝前可以加 6-8 颗冰块"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "海边落日",
@@ -3738,7 +3830,8 @@ window.FD_DATA = {
    "轻轻倒入酒杯中",
    "插上柠檬和吸管"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "百香果橙子特调",
@@ -3779,7 +3872,8 @@ window.FD_DATA = {
    "- 在液面放置好装饰用的绿叶（可选）",
    "搅拌均匀后享用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "菠萝咖啡特调",
@@ -3805,7 +3899,8 @@ window.FD_DATA = {
    "在第一部混合液上方倒入奶油",
    "奶油顶面撒上海盐"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "金汤力",
@@ -3834,7 +3929,8 @@ window.FD_DATA = {
    "用勺子轻轻上下提拉将液体搅拌均匀（不要旋转搅拌，避免起泡流失）",
    "在液面放置好装饰用的绿叶（可选）"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "金菲士",
@@ -3870,7 +3966,8 @@ window.FD_DATA = {
    "将冰块、金酒、柠檬汁、蔗糖糖浆倒入雪克瓶，雪克均匀",
    "将充分雪克的产物倒到杯子中（如果里面的冰太碎了，可以选择过滤其中的冰，重新往杯中补充冰块）"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "drink"
  },
  {
   "id": "乡村啤酒鸭",
@@ -3916,7 +4013,8 @@ window.FD_DATA = {
    "- 翻炒 1 分钟",
    "出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "冬瓜桑拿鸡",
@@ -3944,7 +4042,8 @@ window.FD_DATA = {
    "把腌好的鸡肉铺在虫草花上面",
    "水烧开后放入蒸锅，上汽后蒸 15 分钟，出锅即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "冷吃兔",
@@ -3976,7 +4075,8 @@ window.FD_DATA = {
    "关火，加入蒜、姜、白芝麻，翻炒均匀。",
    "放置一夜更加入味。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "咕噜肉",
@@ -4011,7 +4111,8 @@ window.FD_DATA = {
    "加入青椒和菠萝，大火加热 2 分钟。",
    "将已炸好的梅头猪肉粒与酱汁拌匀即可。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "商芝肉",
@@ -4039,7 +4140,8 @@ window.FD_DATA = {
    "商芝入沸水锅中煮软捞出，去除老茎、杂质，淘洗干净，切成 3 cm 长的段，放入碗中,加酱油（5 克）、精盐（1 克）、熟猪油（10 克）拌匀，盖在肉片上，另将鸡汤（100 克）放入一小碗中，加酱油（5 克）、精盐（0.5 克）、料酒（15 克）搅匀，浇入蒸碗，再放入姜片、葱段、八角上笼用旺火蒸约半小时后，转用小火继续蒸约一小时三十分钟，熟烂后取出，拣去姜、葱、八角，倒、过滤原汁，将肉扣入汤盘。",
    "炒锅内，放入鸡汤（100 克），加入原汁，用旺火烧沸，下入姜末、葱片、味精后搅匀，投入摊鸡蛋皮，淋芝麻油，浇入汤盘即成。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "孜然牛肉",
@@ -4070,7 +4172,8 @@ window.FD_DATA = {
    "然后下入青椒丝，断生后放盐",
    "大🔥炒 1 分钟后关火再翻炒 30 秒保证受热均匀即可出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "小炒肉",
@@ -4103,7 +4206,8 @@ window.FD_DATA = {
    "加入小米椒、朝天椒、葱段翻炒 40 秒",
    "出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "小米辣炒肉",
@@ -4130,7 +4234,8 @@ window.FD_DATA = {
    "热锅倒油，先把肉炒好盛起",
    "姜蒜爆香，倒入豆瓣酱翻炒，到入切好的小米辣，再倒入瘦肉，翻炒一下，放点生抽、鸡精、盐、糖翻炒"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "小酥肉",
@@ -4176,7 +4281,8 @@ window.FD_DATA = {
    "### 复炸出成品",
    "将油温升至 180° 放入初炸好的肉条，炸至金黄色即可捞出。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "尖椒炒牛肉",
@@ -4215,7 +4321,8 @@ window.FD_DATA = {
    "翻炒变熟之前加入葱，继续翻炒",
    "翻炒至牛肉变熟，关火出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "山西过油肉",
@@ -4246,7 +4353,8 @@ window.FD_DATA = {
    "下入葱姜蒜爆香，先下蒜苔炒至断生，再下入木耳葱头，加入生抽，花椒粉，翻炒几下将之前炸好的肉片下入翻炒",
    "加 10g 的盐，起锅前加 10ml 的醋和鸡精，起锅装盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "带把肘子",
@@ -4274,7 +4382,8 @@ window.FD_DATA = {
    "撒入精盐，用消过毒的干净纱布盖在肉上，再将甜面酱（50 克）、葱（75 克）、红豆腐乳、红酱油、白酱油、姜、蒜等在纱布上抹开，用旺火蒸大约三小时（以蒸烂为准）。",
    "蒸完取出，揭去纱布，扣入盘中，拣去八角，上桌时另带葱段和甜面酱小碟（或将甜面酱抹到肘面上，另带葱段小碟亦可）。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "意式烤鸡",
@@ -4306,7 +4415,8 @@ window.FD_DATA = {
    "烤好的鸡肉取出，淋上柠檬汁",
    "撒上欧芹碎即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "杀猪菜",
@@ -4340,7 +4450,8 @@ window.FD_DATA = {
    "到时间后放气开盖。加入血肠和枸杞，盖上锅盖焖二分钟即可，血肠是熟的，不需再加热。",
    "倒入盆中，按照上表调制蘸料，即可开吃。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "椒盐排条",
@@ -4371,7 +4482,8 @@ window.FD_DATA = {
    "待油温再次升高到 150 ℃ - 160 ℃ 时，下入排条复炸至金黄色后捞出。",
    "撒上椒盐粉，搅拌均匀后出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "水煮肉片",
@@ -4412,7 +4524,8 @@ window.FD_DATA = {
    "碗中均匀撒上刀口辣椒、蒜蓉和葱花。",
    "锅洗干净，加入 200g 菜籽油，烧至 7 成热，然后一次性均匀泼在碗中肉片上（注意安全），美味完成。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "烤鸡翅",
@@ -4442,7 +4555,8 @@ window.FD_DATA = {
    "将烤盘放入烤箱中层，烤 15-20 分钟",
    "取出烤盘，将鸡翅翻面，再烤 15-20 分钟，直到熟透"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "猪肉烩酸菜",
@@ -4477,7 +4591,8 @@ window.FD_DATA = {
    "调味：加入食用盐 10 克，搅拌均匀。",
    "关火，出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "甜辣烤全翅",
@@ -4508,7 +4623,8 @@ window.FD_DATA = {
    "继续 200 摄氏度烤 25 分钟",
    "取出即可食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "番茄红酱",
@@ -4539,7 +4655,8 @@ window.FD_DATA = {
    "加入炒好的蔬菜们和番茄酱继续翻炒，搅拌均匀。",
    "分多次缓缓倒入牛奶，中小火煮 30 分钟，完成。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "白菜猪肉炖粉条",
@@ -4574,7 +4691,8 @@ window.FD_DATA = {
    "加入白菜嫩叶，炒匀后将粉条放在菜上方，加盖再煮 **5 分钟**",
    "尝味、关火，收汁"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "粉蒸肉",
@@ -4611,7 +4729,8 @@ window.FD_DATA = {
    "若未达到此状态，则继续加热 10 - 15 分钟，直至肉质软烂，油脂渗出",
    "取出盛盘，即可食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "糖醋里脊",
@@ -4642,7 +4761,8 @@ window.FD_DATA = {
    "裹酱：另外拿一个锅，锅里放底油，把调好的酱汁倒进去，煮到冒泡，把炸好的里脊放进去，翻炒，让每一根都裹上酱汁。",
    "下炸好的里脊肉翻炒，关火盛出。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "红烧鸡翅",
@@ -4681,7 +4801,8 @@ window.FD_DATA = {
    "关火，将鸡翅盛入盘中，淋上锅中剩余的粘稠汤汁。",
    "最后撒上 3g 白芝麻和 5g 小葱花，完成制作。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "肉饼炖蛋",
@@ -4707,7 +4828,8 @@ window.FD_DATA = {
    "将调好味的猪肉末铺在盘子里，肉末中间用勺子挖一个洞，往洞中打入 1 个鸡蛋。",
    "锅中加水至 1/4 高度，水烧开后，将盘子放入锅中，盖上锅盖，蒸 15 分钟。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "腐乳肉",
@@ -4736,7 +4858,8 @@ window.FD_DATA = {
    "小火慢炖 40 分钟",
    "大火收汁，看到汤汁冒浓稠鱼眼泡时关火"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "葱烧鸡腿",
@@ -4772,7 +4895,8 @@ window.FD_DATA = {
    "等待 2 分钟让料汁和葱香完全融合到鸡肉里。",
    "开盖，下入小葱段和 2g 熟白芝麻（可选），翻炒 5-10 秒即可关火出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "蒜苔炒肉末",
@@ -4803,7 +4927,8 @@ window.FD_DATA = {
    "锅内加入 20g 水，中火翻炒 **5 分钟** 将蒜苔炒至稍稍变软",
    "最后加入 2g 食盐，中火翻炒 **30 秒**，即可出锅装盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "蚂蚁上树",
@@ -4836,7 +4961,8 @@ window.FD_DATA = {
    "中小火煮约 5 分钟，直至粉丝**完全吸收汤汁**、呈现微微收干状态",
    "依据口味可撒入小葱末，关火装盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "豉汁排骨",
@@ -4865,7 +4991,8 @@ window.FD_DATA = {
    "锅中倒入 10 ml 热油，加热到 180-200 ℃",
    "均匀撒上葱花和白芝麻，热油浇在撒料上"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "香干肉丝",
@@ -4902,7 +5029,8 @@ window.FD_DATA = {
    "成品。",
    "注意，不同的锅具或者灶台，会影响翻炒的时间，建议，不确定是否熟了，可以试吃下。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "鱼香肉丝",
@@ -4958,7 +5086,8 @@ window.FD_DATA = {
    "倒入`香汁`。快速翻炒均匀。注意不要炒超过 15 秒。",
    "关火，盛盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "麻辣香锅",
@@ -4990,7 +5119,8 @@ window.FD_DATA = {
    "放入煮过的北京麻辣方便面，用筷子翻动 1 分钟。",
    "关火，出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "黄油鸡",
@@ -5043,7 +5173,8 @@ window.FD_DATA = {
    "搅拌均匀，关火",
    "盛盘，可额外淋上少量淡奶油作为装饰"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "黄焖鸡",
@@ -5084,7 +5215,8 @@ window.FD_DATA = {
    "待鸡肉软烂，汤汁浓稠后（汤汁不要收的太干），最后放入青椒",
    "放入味精，兜炒均匀后，关火！青椒基本断生即可，不要炒时间久了"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "黄瓜炒肉",
@@ -5117,7 +5249,8 @@ window.FD_DATA = {
    "放入黄瓜，加入盐 2 克，大火翻炒均匀半分钟，出锅",
    "* 如果无法保证大火，可能会有点生。可以考虑增加到 50 秒。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "农家一碗香",
@@ -5147,7 +5280,8 @@ window.FD_DATA = {
    "放入青红椒、炒至断生的鸡蛋后加入酱油和白糖，继续将它们翻炒到青椒微微断生，保持青椒清脆口感。",
    "出锅上菜！"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "冬瓜酿肉",
@@ -5183,7 +5317,8 @@ window.FD_DATA = {
    "将冬瓜酿肉碟子的水倒入锅中，放入水淀粉，加入 50ml 清水倒入锅中烧开",
    "淋到冬瓜酿肉上"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "凉拌鸡丝",
@@ -5219,7 +5354,8 @@ window.FD_DATA = {
    "搅拌料汁，使糖和盐尽量溶化",
    "将料汁倒入鸡丝中，搅拌均匀"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "卤菜",
@@ -5266,7 +5402,8 @@ window.FD_DATA = {
    "将蒜末、葱花、白芝麻、辣椒粉按 1:1:1:1 的比例混合，依个人口味加小米辣，热植物油中加入少量芝麻油或藤椒油，分次泼在调料上，再加入生抽、醋、蚝油各 10ml，5ml 糖，味精/鸡精，最后 15ml 卤汤混合均匀。",
    "凉拌时可搭配拍黄瓜、木耳、油炸花生米、香菜等配菜。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "口水鸡",
@@ -5300,7 +5437,8 @@ window.FD_DATA = {
    "红油中放入剩余蒜末、生抽、醋、盐、味精、糖、香油、花椒粉。拌匀放凉",
    "在鸡肉上撒上花生碎，把红油淋到切好的鸡肉上，撒上香菜。成盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "台式卤肉饭",
@@ -5340,7 +5478,8 @@ window.FD_DATA = {
    "1 小时后，开大火收汁直到酱汁浓稠，呈现有光泽的琥珀色，即完成。",
    "炖煮结束后，乘一碗米饭，将软烂的卤肉浇在米饭上，并加上卤蛋，开始享用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "咖喱肥牛",
@@ -5371,7 +5510,8 @@ window.FD_DATA = {
    "将香叶、咖喱块投入锅中，盖上锅盖，**待水沸腾后将火调小然后等待直至土豆块以及胡萝卜块炖至软烂（可用筷子确认）**",
    "加入肥牛卷以及牛奶，盖上锅盖再小火煮 2-3 分钟即可出锅（用勺子搅拌食材，注意力度，避免肥牛卷破碎）"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "啤酒鸭",
@@ -5400,7 +5540,8 @@ window.FD_DATA = {
    "倒入啤酒，没过鸭肉，加入盐、鸡精，然后中火将鸭子烧 30 分钟（牙口不好的话可以再多烧 5 分钟）。",
    "出锅盛盘，上桌食用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "回锅肉",
@@ -5453,7 +5594,8 @@ window.FD_DATA = {
    "倒入切成段的蒜苗翻炒 10 秒",
    "出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "土豆炖排骨",
@@ -5498,7 +5640,8 @@ window.FD_DATA = {
    "**调味收汁：** 打开锅盖，加入 3g 盐（此时可尝一下汤汁，根据个人口味酌情微调）。转大火开始翻炒收汁，大约需要 3-5 分钟。直到汤汁变得浓稠，均匀地挂在排骨和土豆上即可关火。",
    "**点缀出锅：** 盛盘出锅，在表面均匀撒上预处理好的 10g 葱花作为 UI 点缀即可。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "奥尔良风味烤鸡腿",
@@ -5534,7 +5677,8 @@ window.FD_DATA = {
    "抓住手枪腿鸡腿根部，蘸取小碗中的液体，可使用餐巾纸或手套隔油。现在可以直接从烤盘铝箔纸上享用奥尔良风味烤鸡腿了。",
    "若小碗中的液体中途用尽，重复上一步。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "奶酪培根通心粉",
@@ -5578,7 +5722,8 @@ window.FD_DATA = {
    "等待烤箱预热至 180°C 后，将通心粉放入",
    "烤至表面金黄,约 24 分钟"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "姜葱捞鸡",
@@ -5611,7 +5756,8 @@ window.FD_DATA = {
    "鸡腿蒸好后将其撕碎成鸡丝，不需要特别细，大概 1cm 粗就可以",
    "姜葱姜油淋在鸡丝上，搅拌均匀即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "小炒黄牛肉",
@@ -5641,7 +5787,8 @@ window.FD_DATA = {
    "放入牛里脊和芹菜，然后**大火翻炒 1 分钟**",
    "关火，撒上香菜，盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "尖叫牛蛙",
@@ -5673,7 +5820,8 @@ window.FD_DATA = {
    "加大火力，大火收汁半分钟，加入青红辣椒圈，再煮 10 秒准备起锅",
    "盛到盆里，撒上葱花，可以开动了！"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "巴基斯坦牛肉咖喱",
@@ -5705,7 +5853,8 @@ window.FD_DATA = {
    "将整锅材料转移到电饭煲/电炖锅，并加入 250 ml 的水，开启炖肉/慢炖档，设定时间 2-3 个小时",
    "等待完成，开锅检查牛肉软糯，就可以吃了"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "干煸仔鸡",
@@ -5739,7 +5888,8 @@ window.FD_DATA = {
    "锅中加入 5ml 食用油，小火煸炒蒜瓣至发黄，下入红油豆瓣酱煸炒出香，下入白糖炒融化，下入花椒碎，加 40ml 清水，不停搅拌至酱汁粘稠。",
    "下入炸好的鸡块、土豆块、青椒片，搅拌均匀后出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "广式萝卜牛腩",
@@ -5772,7 +5922,8 @@ window.FD_DATA = {
    "牛腩焖到半软之后加入白萝卜继续焖 30 分钟",
    "等到萝卜焖软之后就完成，一锅浓香的萝卜牛腩就完成了"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "徽派红烧肉",
@@ -5801,7 +5952,8 @@ window.FD_DATA = {
    "加入生抽、老抽、蚝油，中火煮 20 分钟",
    "开锅，大火烧汁，端盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "新疆大盘鸡",
@@ -5835,7 +5987,8 @@ window.FD_DATA = {
    "炖到汁收的差不多时可以进行翻面，将土豆与汤汁相吸，最后关火盛出。",
    "**另：此做法可以吃面，买粗面剂子，将粗面剂子压扁，然后用手拉成宽面，一定要是宽面，下好后可以放入到大盘鸡中，与汤汁搅拌味道极佳！**"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "无骨鸡爪",
@@ -5885,7 +6038,8 @@ window.FD_DATA = {
    "放入冰箱一个晚上（6 个小时）",
    "调配好后全部放入准备好的鸡爪"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "枝竹羊腩煲",
@@ -5926,7 +6080,8 @@ window.FD_DATA = {
    "开盖加入酱汁 2 搅拌均匀",
    "关火，出锅前加入葱绿段或香菜"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "柱候牛腩",
@@ -5977,7 +6132,8 @@ window.FD_DATA = {
    "煮好后捞出萝卜土豆和牛腩放一起",
    "把汤汁过滤淋入碗中"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "桂林十八酿",
@@ -6034,7 +6190,8 @@ window.FD_DATA = {
    "└── 混合馅 implements MeatFilling  // 猪肉 + 虾滑，猪肉 + 螺肉...",
    "换一个 wrapper 就是一道新菜，换一种 filling 又是一个变体。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "梅菜扣肉",
@@ -6065,7 +6222,8 @@ window.FD_DATA = {
    "中火蒸 45 分钟",
    "拿个盘子倒盖在五花肉大碗中，将五花肉倒在盘子中"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "水煮牛肉",
@@ -6102,7 +6260,8 @@ window.FD_DATA = {
    "撒上香菜叶，辣椒粉，辣椒圈。",
    "另起锅烧热油，将热油淋在菜上面，就完成了。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "淄博烧烤",
@@ -6131,7 +6290,8 @@ window.FD_DATA = {
    "取一张小薄面饼平铺，抹上 3 - 4g 混合酱料",
    "放上烤好的肉片和 1 - 2 段大葱，卷起即可食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "清蒸鳜鱼",
@@ -6166,7 +6326,8 @@ window.FD_DATA = {
    "- 蒸制结束后，倒掉蒸鱼的水，去除姜片，放上葱丝，浇上热油",
    "- 在倒入生抽或蒸鱼豉油即可上桌"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "湖南家常红烧肉",
@@ -6194,7 +6355,8 @@ window.FD_DATA = {
    "加盖中火煮沸，转小火慢顿 30 分钟，慢炖期间，间隔 10 分钟搅拌一次防止粘锅",
    "小火慢炖汤汁剩三分之一的时，调成中火收汁出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "湘祁米夫鸭",
@@ -6225,7 +6387,8 @@ window.FD_DATA = {
    "翻炒鸭肉和米粉有湿感，铲出入碗中，高压锅放水蒸 20-25 分钟",
    "出锅前撒点葱花即可享用了"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "澳门湿版免治牛肉饭",
@@ -6259,7 +6422,8 @@ window.FD_DATA = {
    "将炒好的免治牛肉浇在热米饭上，放上提前准备好的水波蛋或半熟煎蛋。",
    "（可选）表面撒上 5g 切好的小葱花作装饰。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "煎烤羊排",
@@ -6290,7 +6454,8 @@ window.FD_DATA = {
    "加入糖和盐（如果在炖煮步骤中未添加），翻炒均匀。",
    "翻炒均匀后即可关火，盛盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "牛排",
@@ -6342,7 +6507,8 @@ window.FD_DATA = {
    "取出牛排，用刀切成宽度 1.5cm 宽度的肉条，此时您可以观察到牛肉的熟度。",
    "取出配菜，装盘，淋上锅中剩余的油或者牛排酱汁（可选）"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "田螺酿",
@@ -6393,7 +6559,8 @@ window.FD_DATA = {
    "开盖，放入剩余的新鲜薄荷叶和紫苏叶，再焖 2-3 分钟",
    "大火收汁至汤汁浓稠，即可出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "瘦肉土豆片",
@@ -6423,7 +6590,8 @@ window.FD_DATA = {
    "放入土豆，保持翻炒，加入 2g 食用盐、5g 生抽，",
    "炒约 3 分钟，盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "空气炸锅脆皮现腌炸鸡",
@@ -6468,7 +6636,8 @@ window.FD_DATA = {
    "观察鸡皮颜色，并用牙签扎一下最厚的部分，看是否有血水流出。",
    "如需要再以 200°C 炸 1-2 分钟补脆上色（可迭代进行，先炸 1 分钟观察再决定是否继续）。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "糖醋排骨",
@@ -6498,7 +6667,8 @@ window.FD_DATA = {
    "用大火将锅中液体煮沸后，加入老抽 5 ml 进行上色，并快速收汁；若排骨块较大，可转小火焖煮 5–10 分钟以便更好地入味，切勿采用中火长时间炖煮 20 分钟，以免损伤口感。",
    "起锅装盘，撒上芝麻 2 g，即可享用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "南派红烧肉",
@@ -6538,7 +6708,8 @@ window.FD_DATA = {
    "当水的高度减至肉最高的高度与锅底高度的 3/5 时，转中火，并捞出除肉和水以外的所有辅料，开始收汁；",
    "打开锅盖，待汤汁快没有的时粘稠状出锅（切记不可收干）；"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "简易红烧肉",
@@ -6585,7 +6756,8 @@ window.FD_DATA = {
    "打开锅盖，待汤汁快没有的时候开大火收汁（切记不可收干）；",
    "加入 2-3g `盐`，翻炒一下，就可以出锅了。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "羊排焖面",
@@ -6616,7 +6788,8 @@ window.FD_DATA = {
    "翻炒均匀之后，即可出锅。",
    "*注 1：可以用超市的面条代替，但是尽量选择宽面。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "老式锅包肉",
@@ -6677,7 +6850,8 @@ window.FD_DATA = {
    "**出锅装盘**：",
    "- 将锅包肉盛入盘中，撒上白熟芝麻（可无），即可上桌。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "芥末罗氏虾",
@@ -6713,7 +6887,8 @@ window.FD_DATA = {
    "- 黄油融化后翻拌均匀，加入准备好的碗汁",
    "- 盖锅盖焖煮 2 分钟汤汁浓稠后出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "荔枝肉",
@@ -6748,7 +6923,8 @@ window.FD_DATA = {
    "起锅，倒入汤汁，30 S 后倒入瘦肉块、凤梨块，充分翻炒后 出锅",
    "摆上芝麻"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "荷兰豆炒腊肠",
@@ -6775,7 +6951,8 @@ window.FD_DATA = {
    "放入腊肠，保持翻炒至腊肠*微微卷边*，注意这里一定要**保持小火**，小到不能小的那种，不然容易糊",
    "放入荷兰豆，转为中大火，翻炒 30s 放入生抽，接着再翻炒 20-30s 即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "血浆鸭",
@@ -6805,7 +6982,8 @@ window.FD_DATA = {
    "翻炒至肉眼可见鸭血均为黑色，加入盐，鸡精，香葱，（喜欢食用山胡椒油的朋友也可以在此时放入 3-6 滴山胡椒油）再次翻炒一到二次即可。",
    "出锅盛盘，上桌食用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "西红柿土豆炖牛肉",
@@ -6849,7 +7027,8 @@ window.FD_DATA = {
    "- 依据个人口味边尝边加糖盐，合适为止",
    "- 筷子戳牛肉软烂后出锅！"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "西红柿牛腩",
@@ -6877,7 +7056,8 @@ window.FD_DATA = {
    "开锅后大火继续炒制 3-5 分钟",
    "待番茄汁呈中等粘稠程度后关火，散入葱花，盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "豆豉鲮鱼油麦菜",
@@ -6909,7 +7089,8 @@ window.FD_DATA = {
    "- 翻拌均匀后加入油麦菜，加入生抽和糖调味",
    "- 调味加入后简单翻拌即可出锅装盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "豉汁蒸白鱔",
@@ -6950,7 +7131,8 @@ window.FD_DATA = {
    "- 可再淋热麻油提升香气。",
    "- 趁热上桌，搭配白饭享用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "贵州辣子鸡",
@@ -6981,7 +7163,8 @@ window.FD_DATA = {
    "然后加入土豆条，大蒜（不用切，一颗一颗的最好），然后再闷 20 分钟",
    "最后加入酒糟翻炒均匀再加入切好的蒜苗，就可以出锅了"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "酱排骨",
@@ -7009,7 +7192,8 @@ window.FD_DATA = {
    "大火煮 30 分钟，加入老抽上色，再煮 10 分钟",
    "起锅摆盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "醉排骨",
@@ -7042,7 +7226,8 @@ window.FD_DATA = {
    "准备一个小碗，加入蒜末、香醋、白砂糖、鱼露、番茄酱、葱花、芝麻搅拌均匀，倒入 5 ml 热油",
    "将汤汁浇灌入排骨，在充分搅拌后倒入盘中"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "青椒酿",
@@ -7095,7 +7280,8 @@ window.FD_DATA = {
    "后续酿入、煎制、焖煮步骤与猪肉版本一致",
    "虾滑易熟，焖煮时间可缩短至 4-5 分钟"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "香干芹菜炒肉",
@@ -7131,7 +7317,8 @@ window.FD_DATA = {
    "加入芹菜，放入 5g 盐翻炒 1 分钟",
    "加入 3g 鸡精、5ml 蚝油翻炒均匀，即可出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "香煎五花肉",
@@ -7156,7 +7343,8 @@ window.FD_DATA = {
    "五花肉出锅后，装盘。",
    "将豆瓣酱抹到菜叶上，卷着五花肉即可食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "鱼香茄子",
@@ -7186,7 +7374,8 @@ window.FD_DATA = {
    "锅中倒入 15-30ml 油，放入豆瓣酱、葱白、姜、蒜炒香，然后倒入肉沫翻炒均匀。",
    "加入 80-150ml 清水（水面预计茄子八成高度为准），倒入茄子、倒入料汁，爆炒入味收汁。最后放入葱翻炒均匀，就可以起锅了。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "黑椒牛柳",
@@ -7217,7 +7406,8 @@ window.FD_DATA = {
    "加入盐，再次撒一份黑胡椒粉，翻炒 30 秒，搅拌均匀。",
    "观察洋葱已经变软即可关火，出锅，盛盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "黔式腊肠娃娃菜",
@@ -7238,7 +7428,8 @@ window.FD_DATA = {
    "关火，夹出腊肠及娃娃菜",
    "娃娃菜切段、腊肠切片，装盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "meat"
  },
  {
   "id": "凉皮",
@@ -7283,7 +7474,8 @@ window.FD_DATA = {
    "如有喜爱可以加入辣椒油。",
    "色香味俱全的家常凉皮出炉！"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "半成品意面",
@@ -7310,7 +7502,8 @@ window.FD_DATA = {
    "700W 加热 2 分钟",
    "取出拌匀即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "牛油火锅底料",
@@ -7348,7 +7541,8 @@ window.FD_DATA = {
    "等待容器中 **油水分离** 后，将表面的 **油** 撇净（将油打出来） 装入另外的容器。",
    "将上一步所 **撇** 出来的 **油** 重新倒入 **净锅** 中，直至 **炼干** 油中水分起锅装入容器即为 **火锅老油**。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "速冻水饺",
@@ -7371,7 +7565,8 @@ window.FD_DATA = {
    "所有饺子浮起后（下饺子后约 8 分钟）用铲子或漏勺把饺子铲入盘或碗中，装盘后即可食用。",
    "吃完饺子后，等锅内水温降低，将水倒掉并用洗洁精及时刷锅，不然过段时间锅内煮过的面粉会在锅壁形成黏糊糊的物质。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "懒人蛋挞",
@@ -7390,7 +7585,8 @@ window.FD_DATA = {
    "将烤盘放入烤箱内，上下火 190 度，烤 10 - 20 分。如果想快速烤出蛋挞液上的焦褐斑点，需要上火更高一些，通常是 200 - 210 度",
    "蛋挞液烤出焦褐斑点，蛋挞皮完全蓬松冒油即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "空气炸锅鸡翅中",
@@ -7408,7 +7604,8 @@ window.FD_DATA = {
    "撒上罗勒碎，空气炸锅 200°C，10 分钟",
    "翻面，撒上罗勒碎，空气炸锅 200°C，7 分钟"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "奶油蘑菇汤",
@@ -7440,7 +7637,8 @@ window.FD_DATA = {
    "熄火后可用料理机打成细腻浓汤（可选）。",
    "---"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "山药南瓜炖鸡汤",
@@ -7470,7 +7668,8 @@ window.FD_DATA = {
    "加入南瓜泥搅开，放入红枣，再煮 10 分钟",
    "加盐调味，盛出即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "生汆丸子汤",
@@ -7514,7 +7713,8 @@ window.FD_DATA = {
    "淋 3-5 滴香油",
    "加一小颗香菜"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "番茄牛肉蛋花汤",
@@ -7553,7 +7753,8 @@ window.FD_DATA = {
    "加入盐和胡椒粉调味",
    "最后加入葱花，即可出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "皮蛋瘦肉粥",
@@ -7592,7 +7793,8 @@ window.FD_DATA = {
    "配料 - 待主料煮熟后，生菜单独过一次热水，并与其余配料一同开盖加入主料中搅拌均匀",
    "酱料 - 待主料煮熟后，与其余配料一同开盖加入主料中搅拌均匀"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "米粥",
@@ -7616,7 +7818,8 @@ window.FD_DATA = {
    "在 T1 之前将火关小。**如果忘记此步骤，水可能会漫出而熄灭火焰。非常危险！**",
    "加热到 Tr。在 Tr 时关闭火源。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "紫菜蛋花汤",
@@ -7642,7 +7845,8 @@ window.FD_DATA = {
    "撒上葱花，转小火 20 秒。",
    "关火，出锅前放入几滴香油，也有的会放入一点虾皮，味道也不错。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "罗宋汤",
@@ -7684,7 +7888,8 @@ window.FD_DATA = {
    "中火烹制半小时",
    "开盖加入剩余 15 g 盐，混合均匀后盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "腊八粥",
@@ -7710,7 +7915,8 @@ window.FD_DATA = {
    "洗净好红枣、桂圆、栗子、核桃、葡萄干（其中红枣切成小片）、冰糖，倒入锅中，合上锅盖，小火煮 60 分钟。",
    "确认煮出的粥粘稠后即可关火、盛盘、食用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "金针菇汤",
@@ -7734,7 +7940,8 @@ window.FD_DATA = {
    "加入味精和食盐并搅拌。",
    "继续加热约 30 秒，关火装盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "黄瓜皮蛋汤",
@@ -7763,7 +7970,8 @@ window.FD_DATA = {
    "放入黄瓜片。水再次沸腾以后立马关火，放入盐、鸡精调味即可出锅",
    "装入碗中，再撒上葱花即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "勾芡香菇汤",
@@ -7791,7 +7999,8 @@ window.FD_DATA = {
    "倒入开水 300ml ，调中火再煮 3-5 分钟",
    "倒入水淀粉，适当搅拌锅中汤汁后，加入 3g 盐、3 g ，最后撒上葱花出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "排骨山药玉米汤",
@@ -7837,7 +8046,8 @@ window.FD_DATA = {
    "- 保持小火继续**炖煮 2 分钟**使盐分入味。",
    "- 关火，根据个人喜好撒入小葱末，盛盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "排骨苦瓜汤",
@@ -7866,7 +8076,8 @@ window.FD_DATA = {
    "- 选择炖汤功能，进行烹饪（一般为加压烹饪 45 分钟）",
    "- 出锅，和汤锅一样进行加盐和胡椒"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "昂刺鱼豆腐汤",
@@ -7894,7 +8105,8 @@ window.FD_DATA = {
    "待鱼全部煎好之后，倒入开水、5ml 料酒、姜片，小火转至大火，盖上锅盖、大火煮 10 分钟（水要稍微多一些，后面会蒸发掉一些）",
    "见汤变白后倒入准备好的豆腐，调中火再煮 5 分钟，加入 10g 盐、3g 胡椒粉调味，最后撒上葱花出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "朱雀汤",
@@ -7917,7 +8129,8 @@ window.FD_DATA = {
    "水烧开后，在沸腾状态下快速倒入盛有鸡蛋的碗中。",
    "放入白糖。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "玉米排骨汤",
@@ -7953,7 +8166,8 @@ window.FD_DATA = {
    "先下入玉米，放入胡椒粉，盖盖小火炖二十分钟，然后放入胡萝卜，盖盖继续小火炖四十分钟",
    "调味很简单，出锅前三分钟，除了盐什么都不用放，最后撒上一把小葱花即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "羊肉汤",
@@ -7983,7 +8197,8 @@ window.FD_DATA = {
    "5 分钟后，加入白胡椒粉、盐，继续煮沸 5 分钟",
    "出锅之后，加入香菜、孜然粉，搅拌均匀"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "菌菇炖乳鸽",
@@ -8011,7 +8226,8 @@ window.FD_DATA = {
    "注意：高压锅 30 分钟，瓦罐需在水烧开后转小火慢炖 40-60 分钟",
    "时间到了，盛到碗中，加入 3~5g 盐 即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "陈皮排骨汤",
@@ -8038,7 +8254,8 @@ window.FD_DATA = {
    "煲汤容器加入水，炖煮 1.5 小时即可",
    "加入食盐，趁热饮用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "soup"
  },
  {
   "id": "利提巧卡",
@@ -8094,7 +8311,8 @@ window.FD_DATA = {
    "将利提摆盘，旁边放上巧卡蔬菜泥",
    "趁热食用，用手掰开利提蘸巧卡"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "印度烤饼",
@@ -8151,7 +8369,8 @@ window.FD_DATA = {
    "趁热食用",
    "适合搭配任何印度咖喱，如黄油鸡、红芸豆咖喱等"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "印度焖饭",
@@ -8210,7 +8429,8 @@ window.FD_DATA = {
    "开盖，用大铲子从底部轻轻翻拌，使各层混合均匀",
    "盛盘，搭配酸奶(Raita)食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "可乐炒饭",
@@ -8242,7 +8462,8 @@ window.FD_DATA = {
    "翻炒均匀后，改小火，锅内食物中心挖一个洞，打入 1 个鸡蛋，盖上锅盖，焖 2 分钟",
    "开盖翻炒至第三颗鸡蛋熟透，撒上葱花和胡椒粉，出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "咸肉菜饭",
@@ -8274,7 +8495,8 @@ window.FD_DATA = {
    "正常煮饭模式启动，最后 10 分钟开盖快速铺入菜叶",
    "煮好后焖 5 分钟，再淋 5 g 猪油、白胡椒粉疯狂翻拌均匀"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "手工水饺",
@@ -8327,7 +8549,8 @@ window.FD_DATA = {
    "第一次放入饺子，且水冒泡后，锅边加入 50ml 冷水（重复此步骤两次）",
    "第三次水开后加入冷水 50ml，水开后调至小火等 60s 即可出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "汤面",
@@ -8356,7 +8579,8 @@ window.FD_DATA = {
    "将易于煮熟的食材如青菜类放入锅中，适当搅拌以充分浸没，煮 2-5 分钟",
    "关火，随后加入盐、胡椒粉、香油等自己喜欢的调味料，适当搅拌即可出锅食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "滕州菜煎饼",
@@ -8394,7 +8618,8 @@ window.FD_DATA = {
    "转最小火继续加热 1 分钟，至两面均呈金黄色、蔬菜熟透（可用筷子插入中心，确认无生蔬菜的阻力）",
    "关火，将菜煎饼两边向中间折叠成约 10 cm 宽的长方形，用锅铲或刀从中间一分为二，盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "炒年糕",
@@ -8427,7 +8652,8 @@ window.FD_DATA = {
    "加入酱油和盐，翻炒均匀。",
    "关火，加入葱油，翻炒均匀，乘盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "炒河粉",
@@ -8471,7 +8697,8 @@ window.FD_DATA = {
    "撒入葱叶点缀，把锅端起。",
    "倒入盘中，开始干饭。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "炒馍",
@@ -8504,7 +8731,8 @@ window.FD_DATA = {
    "最后将葱花放入一起翻炒几下。",
    "关火出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "炸酱面",
@@ -8533,7 +8761,8 @@ window.FD_DATA = {
    "立即控水捞出，盛入干净的碗中。",
    "取第 3 步炸酱，倒入碗中，拌匀。然后取第 1 步菜码，倒入碗中，拌匀。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "热干面",
@@ -8562,7 +8791,8 @@ window.FD_DATA = {
    "加入萝卜干，肉末，酸豆角，葱花",
    "拌均匀后开吃"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "照烧鸡腿饭",
@@ -8599,7 +8829,8 @@ window.FD_DATA = {
    "加入调好的酱汁，盖好盖子中小火（在燃气灶上使用小火）焖 5-10 分钟熟透，酱汁浓稠起泡即可",
    "切件，和蔬菜一起摆在饭面，淋入煎鸡腿的酱汁就可以慢慢享用啦"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "煮泡面加蛋",
@@ -8621,7 +8852,8 @@ window.FD_DATA = {
    "去壳鸡蛋，加入锅中",
    "等待约 3 至 4 分钟，即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "猪油拌饭",
@@ -8648,7 +8880,8 @@ window.FD_DATA = {
    "撒上葱花和猪油渣",
    "搅拌均匀"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "红芸豆拌饭",
@@ -8702,7 +8935,8 @@ window.FD_DATA = {
    "将红芸豆咖喱浇在米饭上或旁边",
    "可搭配洋葱沙拉和柠檬角"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "肉蛋盖饭",
@@ -8734,7 +8968,8 @@ window.FD_DATA = {
    "关火，将肉蛋盖到米饭上",
    "安全检查，开始食用盖饭"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "葱油拌面",
@@ -8772,7 +9007,8 @@ window.FD_DATA = {
    "可以加入之前炸好的葱段（可选）。",
    "用 筷子 快速搅拌均匀，即可食用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "蒸卤面",
@@ -8813,7 +9049,8 @@ window.FD_DATA = {
    "将面条放入菜锅中搅拌，搅拌方式为一手持筷，一手持锅铲将菜翻至面条上面，以面条以全部均匀上色为搅拌完成标准",
    "将搅拌后的面条再次放在整屉上，再次蒸 10 分钟 关火"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "蛋包饭",
@@ -8849,7 +9086,8 @@ window.FD_DATA = {
    "用铲子将蛋皮折叠包住米饭，形成椭圆形状",
    "用锅铲轻轻推至盘中，整理外形，可在表面挤上少量番茄酱装饰"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "螺蛳粉",
@@ -8874,7 +9112,8 @@ window.FD_DATA = {
    "下剩下的配料包，如酸笋，豆皮（这部分配料不适合被汤泡太久）",
    "享用美食"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "酸辣蕨根粉",
@@ -8913,7 +9152,8 @@ window.FD_DATA = {
    "将准备的葱、蒜、小米辣切碎后撒在粉上",
    "完成啦(｡･∀･)ﾉﾞ"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "韭菜盒子",
@@ -8941,7 +9181,8 @@ window.FD_DATA = {
    "热锅，加入食用油，放入包好的韭菜盒子，煎至两面金黄，约 3-4 分钟。",
    "盛盘，稍凉后即可享用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "鲜肉烧卖",
@@ -8979,7 +9220,8 @@ window.FD_DATA = {
    "放在蒸笼里，间隔开，避免粘连",
    "大火蒸 8-10 分钟即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "鹰嘴豆炸饼",
@@ -9041,7 +9283,8 @@ window.FD_DATA = {
    "炸饼趁热上桌，搭配鹰嘴豆咖喱食用",
    "可搭配切片洋葱、青辣椒和柠檬角"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "麻辣减脂荞麦面",
@@ -9070,7 +9313,8 @@ window.FD_DATA = {
    "加入生菜，再煮 2 分钟",
    "加入醋、花椒油，关火，直接端着小锅开吃。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "中式馅饼",
@@ -9114,7 +9358,8 @@ window.FD_DATA = {
    "之后，每一面再额外煎 20 秒。",
    "关火出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "凉粉",
@@ -9147,7 +9392,8 @@ window.FD_DATA = {
    "再加入 10ml 酱油，10ml 醋，5g 白糖，3g 鸡精，3g 盐搅拌均匀。",
    "将调味料倒在凉粉上，然后撒上香菜即可。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "基础牛奶面包",
@@ -9222,7 +9468,8 @@ window.FD_DATA = {
    "放凉后装入食品袋内，可保存一个星期。冷冻可保存一个月。",
    ">当装在食品袋内密闭一晚上后，面包会内部和表面会进一步回软。所以最好的品尝时机是第二天早上。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "微波炉腊肠煲仔饭",
@@ -9260,7 +9507,8 @@ window.FD_DATA = {
    "在腊肠饭上淋上叮热的生抽，撒上葱花即可",
    "多余的青菜可以沾着酱油吃"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "扬州炒饭",
@@ -9304,7 +9552,8 @@ window.FD_DATA = {
    "撒入葱绿，翻炒 1 分钟",
    "关火，装盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "披萨饼皮",
@@ -9340,7 +9589,8 @@ window.FD_DATA = {
    "肉蔬菜烤箱上 200 度，下 230 度，18 分钟即可",
    "挤上沙拉酱或者其他自己喜欢的酱即可享用~"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "日式咖喱饭",
@@ -9383,7 +9633,8 @@ window.FD_DATA = {
    "微波炉：单人份高火 2-3 分钟",
    "锅：需额外加 50ml 水，加热时保持搅拌"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "日式肥牛丼饭",
@@ -9425,7 +9676,8 @@ window.FD_DATA = {
    "微波炉：单人份高火 2-3 分钟",
    "锅：需额外加 50ml 水，加热时需**不断翻动**"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "河南蒸面条",
@@ -9472,7 +9724,8 @@ window.FD_DATA = {
    "水开后，大火烧 15 分钟，出锅",
    "淋上 10g 的麻油，即可食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "火腿饭团",
@@ -9497,7 +9750,8 @@ window.FD_DATA = {
    "将米饭，火腿，海苔碎，青豆，玉米粒，沙拉酱放入碗中，混合均匀即可",
    "装盘（如果有的话）"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "炒意大利面",
@@ -9522,7 +9776,8 @@ window.FD_DATA = {
    "放入 10 克番茄酱、肥牛、加入 2g 食盐，继续翻炒一分钟",
    "起锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "炒方便面",
@@ -9567,7 +9822,8 @@ window.FD_DATA = {
    "加入第四步的煎鸡蛋。翻炒 30 秒。",
    "关火盛盘即可。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "烙饼",
@@ -9593,7 +9849,8 @@ window.FD_DATA = {
    "大火烙一分钟，打开盖子，将饼翻个面再烙一分钟",
    "重复以上动作，完成饼的烙制"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "芝麻烧饼",
@@ -9615,7 +9872,8 @@ window.FD_DATA = {
    "做饼：面擀成长方形，抹上调好的油酥，从一头卷起，切成 7 个面剂子，对折，用虎口收拢即可，先沾水再沾白芝麻，擀成小圆饼",
    "烙饼：将电饼铛预热，倒入凉油（锅底铺满油），将擀好的饼放入电饼铛中，将饼的上方也刷点油，涂抹均匀盖上盖子，选大饼档,听到叮的一声出锅即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "电饭煲三文鱼炊饭",
@@ -9641,7 +9899,8 @@ window.FD_DATA = {
    "根据电饭煲的刻度放水",
    "把电饭煲調較至煲飯模式，等待大約 30 - 45 分鐘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "空气炸锅照烧鸡饭",
@@ -9668,7 +9927,8 @@ window.FD_DATA = {
    "**350°F(177°C)** 炸**40 分钟**。最好在米饭上食用",
    "在外观*呈金黄酥脆*后出锅，切块盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "煮锅蒸米饭",
@@ -9690,7 +9950,8 @@ window.FD_DATA = {
    "关火，静置 5 分钟",
    "Enjoy :)"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "电饭煲蒸米饭",
@@ -9711,7 +9972,8 @@ window.FD_DATA = {
    "将米在电饭煲中闷 10-15 分钟。",
    "盛出米。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "老友猪肉粉",
@@ -9739,7 +10001,8 @@ window.FD_DATA = {
    "放入 5ml 米醋、 10ml 生抽、450ml 清水一起煮开",
    "水煮开后，放入温水泡好的米粉，继续煮 3 分钟就可以盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "茄子肉煎饼",
@@ -9767,7 +10030,8 @@ window.FD_DATA = {
    "用筷子或勺子把裹了面糊的茄片、肉片放入锅中，先煎至两面金黄，再煎**3-6分钟**（**煎的过程中，食用油会变少，可再添加食用油**）",
    "撒盐，翻炒均匀，起锅装盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "豆角焖面",
@@ -9813,7 +10077,8 @@ window.FD_DATA = {
    "使用筷子不断翻炒，将菜与肉均匀搅拌。",
    "关火"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "酱拌荞麦面",
@@ -9835,7 +10100,8 @@ window.FD_DATA = {
    "黄瓜、萝卜 切成小条",
    "将荞麦面、黄瓜、萝卜放入盘子，放上老干妈，搅拌"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "陕西油泼面",
@@ -9873,7 +10139,8 @@ window.FD_DATA = {
    "待油温升至七成热（微微冒烟）时，迅速均匀地泼在碗中的干辣椒面上，听到“滋啦”声即可",
    "用筷子将所有调料和面条充分拌匀即可食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "韩式拌饭",
@@ -9908,7 +10175,8 @@ window.FD_DATA = {
    "- 搅拌上述酱汁，可以再加生抽和盐",
    "将备好的酱汁倒在摆好盘的碗中"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "鲣鱼海苔玉米饭",
@@ -9926,7 +10194,8 @@ window.FD_DATA = {
    "盛好米饭，放入玉米粒拌好",
    "放入鲣鱼海苔碎"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "staple"
  },
  {
   "id": "凉拌金针菇",
@@ -9961,7 +10230,8 @@ window.FD_DATA = {
    "根据个人喜好，淋上 5 ml 辣椒油（可选）。",
    "用 筷子 轻轻拌匀，即可食用。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "凉拌黄瓜",
@@ -9989,7 +10259,8 @@ window.FD_DATA = {
    "将醋，酱油，盐，蚝油和蒜依次倒入碗中搅拌均匀",
    "将香油倒入碗中并均匀搅拌"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "印度土豆花菜",
@@ -10030,7 +10301,8 @@ window.FD_DATA = {
    "翻炒 1 分钟",
    "关火，撒上香菜叶，盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "印度葫芦丸子",
@@ -10074,7 +10346,8 @@ window.FD_DATA = {
    "撒上印度综合香料粉 3g 和切碎的青辣椒",
    "关火，撒上香菜叶装饰，盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "家常日本豆腐",
@@ -10110,7 +10383,8 @@ window.FD_DATA = {
    "加入蚝油、生抽、盐、鸡精、白砂糖、番茄酱",
    "轻轻翻炒至颜色均匀"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "松仁玉米",
@@ -10139,7 +10413,8 @@ window.FD_DATA = {
    "加入熟松仁翻炒均匀",
    "出锅装盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "油醋爆蛋",
@@ -10168,7 +10443,8 @@ window.FD_DATA = {
    "油热倒入鸡蛋，等鸡蛋凝固之后铲成大块，倒入蒜沫、小米辣沫、倒入糖醋料汁",
    "大火收汁、快出锅时加入葱段即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "清炒花菜",
@@ -10200,7 +10476,8 @@ window.FD_DATA = {
    "沿锅边淋入 50 ml 饮用水，盖上锅盖，焖 **1 分钟**，帮助花菜完全熟透入味。",
    "开盖，快速翻炒均匀，即可出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "清蒸南瓜",
@@ -10222,7 +10499,8 @@ window.FD_DATA = {
    "盖上锅盖，保持大火蒸 **15-20 分钟**，直至南瓜变软，可以用筷子轻松穿透。",
    "关火，小心取出盘子。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "炒土豆和胡萝卜蒸菜",
@@ -10252,7 +10530,8 @@ window.FD_DATA = {
    "开大火后 15 秒先道友加葱翻炒，把葱炒香/炒 40 秒,加入混合的土豆和胡萝卜丝翻炒",
    "20 秒后加入李大厨牌子的炒菜料，随后加入李大厨牌子的肉香味儿，然后加入食盐，然后加入味精，一会儿后出锅，关火"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "皮蛋豆腐",
@@ -10279,7 +10558,8 @@ window.FD_DATA = {
    "将生抽、白砂糖、醋、香油、辣椒油调成酱汁，淋上去。",
    "最后可选撒上花生碎、葱花、香菜。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "素炒豆角",
@@ -10311,7 +10591,8 @@ window.FD_DATA = {
    "转中小火，盖上锅盖焖制 8-10 分钟",
    "加入蒜切沫，出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "红烧茄子",
@@ -10349,7 +10630,8 @@ window.FD_DATA = {
    "放入酱油和（份数 * 3）g 的盐。",
    "等待，直到汤汁呈粘稠状（水位大概为剩余食材高度的 0.2-0.3 倍），开盖，盛出菜，关火。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "脆皮豆腐",
@@ -10380,7 +10662,8 @@ window.FD_DATA = {
    "待两面煎至金黄后，倒入酱料，让每块豆腐都沐浴在酱料中，大火 3 分钟至酱汁浓稠",
    "关火"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "茄子炖土豆",
@@ -10414,7 +10697,8 @@ window.FD_DATA = {
    "加入水，水面高度为锅内食材高度的 0.9 倍，并盖上锅盖。",
    "等待，直到锅内水的高度剩余食材高度的 0.1 倍时，开盖，放入蒜，搅拌均匀，关火。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "葱煎豆腐",
@@ -10446,7 +10730,8 @@ window.FD_DATA = {
    "倒入豆腐，翻炒，加入盐与鸡精，中火翻炒 1 分钟后倒入 10 ML 水，大火收汁。",
    "出锅前撒上之前计算好的葱花，起锅盛盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "蒲烧茄子",
@@ -10477,7 +10762,8 @@ window.FD_DATA = {
    "把剩下的蒲烧汁浇在茄子上",
    "出锅，一份茄子烧蒲烧汁就烧好了"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "蚝油生菜",
@@ -10507,7 +10793,8 @@ window.FD_DATA = {
    "等待有蒜香飘出，倒入调好的汁，煮沸即可，立马关火。",
    "将锅中的汤汁均匀地**浇**在生菜上。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "西红柿炒鸡蛋",
@@ -10546,7 +10833,8 @@ window.FD_DATA = {
    "加入剩余的盐、糖（可选，如果倾向于甜味版本）、葱花（可选），翻炒均匀",
    "关火，盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "酸辣土豆丝",
@@ -10577,7 +10865,8 @@ window.FD_DATA = {
    "加 5ml 生抽，10ml 陈醋，倒入剩下的一半蒜末和 2g 盐快速翻炒均匀。",
    "出锅前撒上剩余的葱花，翻匀即可装盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "金针菇日本豆腐煲",
@@ -10603,7 +10892,8 @@ window.FD_DATA = {
    "切蒜成蒜末；将生抽，蚝油，老抽，糖，100ml 水调汁备用。",
    "热锅放油，油热放小米椒、蒜末爆香，先放金针菇，炒软，把煎好的豆腐平铺在金针菇上，倒入#2 配好的料汁，焖 5 分钟，大火收汁。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "金钱蛋",
@@ -10636,7 +10926,8 @@ window.FD_DATA = {
    "接着加豆瓣酱煎制约几十秒，翻面",
    "生抽、耗油、糖调成汁，轻轻颠锅后即可出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "陕北熬豆角",
@@ -10671,7 +10962,8 @@ window.FD_DATA = {
    "加入西红柿块，加入盐，生抽，蚝油，五香粉，辣椒，熬至西红柿成汁（注意搅拌，防止糊锅）；",
    "加入香菜碎，出锅。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "雷椒皮蛋",
@@ -10708,7 +11000,8 @@ window.FD_DATA = {
    "倒入生抽，陈醋，白糖，香油，以及其他未使用的备用食材",
    "均匀搅拌"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "snack"
  },
  {
   "id": "鸡蛋火腿炒黄瓜",
@@ -10741,7 +11034,8 @@ window.FD_DATA = {
    "把 `半熟鸡蛋` 倒入锅中，调入 2g 盐、3ml 生抽，立刻倒入火腿片和辣椒碎（可选）翻炒均匀",
    "关火，盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "上汤娃娃菜",
@@ -10778,7 +11072,8 @@ window.FD_DATA = {
    "![上汤娃娃菜](./上汤娃娃菜.png)",
    "拍照技术有限, 味道还是很不错的"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "乾隆白菜",
@@ -10806,7 +11101,8 @@ window.FD_DATA = {
    "将调好的麻酱汁均匀淋在白菜叶上，用手轻轻抓拌，使每片菜叶都裹上酱汁",
    "撒上熟白芝麻，装盘即可食用；若时间充裕，可**静置 5 分钟**待其入味后再食用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "凉拌木耳",
@@ -10835,7 +11131,8 @@ window.FD_DATA = {
    "木耳盛出后沥水, 放入上一步碗中。",
    "搅拌充分，端盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "凉拌莴笋",
@@ -10862,7 +11159,8 @@ window.FD_DATA = {
    "起锅烧油，放入姜片、蒜粒、小米椒煸炒 30-45 S ，倒入莴笋中",
    "搅拌充分，端盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "包菜炒鸡蛋粉丝",
@@ -10896,7 +11194,8 @@ window.FD_DATA = {
    "放入之前炒好的鸡蛋，翻炒约 15 秒",
    "出锅摆盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "地三鲜",
@@ -10944,7 +11243,8 @@ window.FD_DATA = {
    "翻炒 20 秒，让浓稠的酱汁均匀挂在食材上。",
    "关火，撒入 7.5g 蒜。翻拌均匀，盛盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "小炒藕丁",
@@ -10976,7 +11276,8 @@ window.FD_DATA = {
    "加入生抽、老抽、耗油",
    "翻炒 2 分钟即可出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "干锅花菜",
@@ -11009,7 +11310,8 @@ window.FD_DATA = {
    "再加入 5 g 白糖，转大火不断翻炒 1 分钟",
    "把大蒜叶部分切成段，放入锅中，翻炒几下后，关火盖上盖子焖 1 分钟即可"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "手撕包菜",
@@ -11040,7 +11342,8 @@ window.FD_DATA = {
    "倒入姜片等材料，翻炒 1 分钟",
    "倒入包菜翻炒后，加入 香醋、料酒、鸡精、料酒，大火继续翻炒，2 分钟 后出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "拔丝土豆",
@@ -11068,7 +11371,8 @@ window.FD_DATA = {
    "重新倒入土豆，翻炒 30 S 后 出锅",
    "土豆盛盘，散上芝麻"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "椒盐玉米",
@@ -11104,7 +11408,8 @@ window.FD_DATA = {
    "最重要的一步：撒上 3g 椒盐，撒上芝麻粒！",
    "香喷喷的”椒盐玉米“就做好了"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "榄菜肉末四季豆",
@@ -11135,7 +11440,8 @@ window.FD_DATA = {
    "将调料翻炒均匀。",
    "出锅，装盘。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "炒滑蛋",
@@ -11158,7 +11464,8 @@ window.FD_DATA = {
    "在锅中静置 5 秒后，用锅铲将蛋液从边缘缓慢推向中间",
    "翻炒至鸡蛋大致凝固后关火，装盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "炸洋葱花",
@@ -11208,7 +11515,8 @@ window.FD_DATA = {
    "把洋葱根盘朝下放在盘子上，花瓣自然摊开",
    "中心放 30ml 蘸酱（番茄酱、蛋黄酱或蜂蜜芥末酱均可）"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "烤茄子",
@@ -11242,7 +11550,8 @@ window.FD_DATA = {
    "再次将茄子放入烤箱，将烤箱温度设置为 200℃ ，烤制 4-7 分钟",
    "取出，关闭烤箱电源"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "白灼菜心",
@@ -11273,7 +11582,8 @@ window.FD_DATA = {
    "开另一小锅将兑好的料汁倒入，小火烧开，放入一半的蒜末，一点点姜丝和小米椒碎。在制作时加了一点点洋葱碎和大蒜，先在锅底倒油，五成热后倒入蒜末、洋葱，稍稍爆香后再加入料汁，加入小米辣煮开",
    "料汁稍微收汁，煮沸后稍等十来秒吧，后直接浇在菜心上，不要特别多，但蒜末还是很给力的不要少蒜"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "糖拌西红柿",
@@ -11299,7 +11609,8 @@ window.FD_DATA = {
    "放入冰箱冷藏 10 分钟",
    "一盘糖拌西红柿就好了，营养美味，酸甜爽口，夏日解暑又解腻"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "红烧冬瓜",
@@ -11329,7 +11640,8 @@ window.FD_DATA = {
    "加入鸡精、料酒、香葱翻炒后 30 S， 取出冬瓜到大碗中",
    "锅中剩余汤汁保留，倒入水淀粉，煮开后汤汁浇灌在冬瓜表面"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "芹菜拌茶树菇",
@@ -11361,7 +11673,8 @@ window.FD_DATA = {
    "装盘",
    "开吃"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "莴笋叶煎饼",
@@ -11386,7 +11699,8 @@ window.FD_DATA = {
    "起锅烧油，倒入莴笋叶浆汁，均匀平铺在锅面上",
    "第一面炸 120 S 后，翻面再炸 60 S 后出锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "菠菜炒鸡蛋",
@@ -11415,7 +11729,8 @@ window.FD_DATA = {
    "加入 5g 盐、100ml 饮用水，大火 翻炒 10 秒",
    "关火，盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "蒜蓉炒芹菜",
@@ -11444,7 +11759,8 @@ window.FD_DATA = {
    "**转大火**，倒入芹菜段，快速翻炒 **30 秒**，立即出锅",
    "出锅标准：芹菜看起来**半生不熟**、颜色翠绿、没有炒软塌，这时的口感最脆"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "虎皮青椒",
@@ -11475,7 +11791,8 @@ window.FD_DATA = {
    "翻炒约 2 分钟，待青椒表皮出现褶皱时，倒入 `调料 2`。",
    "加大火候继续翻炒 30s 后即可出锅盛入盘中。"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "蚝油三鲜菇",
@@ -11509,7 +11826,8 @@ window.FD_DATA = {
    "中火烧干汁，加入料酒、葱花 出锅",
    "摆上西蓝花"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "西红柿豆腐汤羹",
@@ -11538,7 +11856,8 @@ window.FD_DATA = {
    "汤水重新烧开后，加入水淀粉，沿一个方向搅拌 2 圈",
    "加入鸡精、盐、香葱，30 S 后起锅"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "西葫芦炒鸡蛋",
@@ -11568,7 +11887,8 @@ window.FD_DATA = {
    "倒入备用的鸡蛋，中火翻炒 15 秒",
    "关火，盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "韭菜炒蛋",
@@ -11598,7 +11918,8 @@ window.FD_DATA = {
    "加入盐，翻炒均匀",
    "关火，盛盘"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "微波炉鸡蛋羹",
@@ -11630,7 +11951,8 @@ window.FD_DATA = {
    "如果选择放入酱油，则确保酱油在鸡蛋羹表面流动后能以最薄的形式沾满鸡蛋羹表面即可。",
    "开心的享受鸡蛋羹"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "蒸箱鸡蛋羹",
@@ -11666,7 +11988,8 @@ window.FD_DATA = {
    "出锅（可加入生抽调味）",
    "享用"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "鸡蛋羹",
@@ -11707,7 +12030,8 @@ window.FD_DATA = {
    "加入香油和生抽即可享用",
    "- 也可用藤椒油代替香油，增加麻爽口感"
   ],
-  "src": "https://github.com/Anduin2017/HowToCook"
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
  },
  {
   "id": "鸡蛋花",
@@ -11733,6 +12057,1302 @@ window.FD_DATA = {
    "**一边用筷子快速搅拌碗中的蛋液，一边将沸水以细流状冲入蛋液中**。确保沸水与蛋液充分混合。",
    "持续搅拌片刻，直至蛋液被完全烫熟，形成均匀的淡黄色蛋花。"
   ],
+  "src": "https://github.com/Anduin2017/HowToCook",
+  "kind": "veg"
+ },
+ {
+  "id": "响油鳝丝",
+  "name": "响油鳝丝",
+  "needs": [],
+  "pantry": [
+   "大蒜",
+   "姜末",
+   "料酒",
+   "生抽",
+   "蚝油",
+   "老抽"
+  ],
+  "minutes": 40,
+  "kcal": 556,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "将鳝鱼切成三段后切成细丝",
+   "加入 0.5 g 胡椒粉、3 g 料酒搅拌均匀，再加入 5 g 香油腌制",
+   "热油滑锅",
+   "加入植物油，烧到 6 成热",
+   "加入一半蒜末和全部姜末，翻炒几下",
+   "加入鳝丝，中火爆炒 30 秒",
+   "边缘淋入 10 g 料酒，翻炒几下",
+   "加入生抽，炒匀",
+   "加入蚝油、老抽，翻炒几下",
+   "加入食用盐、白糖、3 g 胡椒粉，炒匀",
+   "淀粉和水混合为水淀粉，倒入锅中，收汁至浓稠",
+   "装盘，撒上蒜蓉、葱花",
+   "另起锅烧热，加入猪油，烧至七成热，浇在鳝丝上"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "清蒸生蚝",
+  "name": "清蒸生蚝",
+  "needs": [],
+  "pantry": [
+   "葱",
+   "蒜",
+   "姜",
+   "酱油",
+   "葱 3 颗",
+   "蒜 6 瓣"
+  ],
+  "minutes": 32,
+  "kcal": 184,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "将生蚝用刷子刷干净（没有刷子用牙刷）。",
+   "蒸锅中放水，将蒸屉放上之后，将 6 个生蚝平铺在蒸屉，使用 50%功率，蒸 3 分钟。",
+   "用右手拿着湿抹布掀开烫锅盖，将每个生蚝的外壳掀开一半去掉，生蚝的凸面向下，平面向上，每个放 1 根姜丝,10g 蒜末放到生蚝上。",
+   "关上烫锅盖，100%功率蒸 3.5 分钟。",
+   "停火，用右手拿着抹布掀开烫锅盖，每个放 5ml 酱油。",
+   "盛盘。"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "葱烧海参",
+  "name": "葱烧海参",
+  "needs": [],
+  "pantry": [
+   "大葱葱白",
+   "大葱葱白 1 根大葱的葱白即可",
+   "食用油 20-25ml",
+   "蚝油 20g",
+   "生抽 5g",
+   "白糖 2g"
+  ],
+  "minutes": 56,
+  "kcal": 299,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "葱白切成 1cm 的段，备用。",
+   "海参切成 1cm 的段，备用。",
+   "准备一个空碗，倒入 20g 蚝油， 10g 生抽， 2g 白糖，搅拌均匀。![料汁](./酱汁.jpeg)",
+   "另一个空碗倒入淀粉，水，制备水淀粉，勾芡用。",
+   "热锅，锅内放入 20ml - 25ml 食用油。等待 10 秒让油温升高。",
+   "放入葱白，调*小火*，注意不要让葱白变焦。大概煎 3-5 分钟即可。![葱白](./葱白.jpeg)",
+   "用筷子夹出葱白，放入盘中备用。",
+   "倒入调好的料汁，炒香，**等待 1 - 2 分钟** 。",
+   "放入切好的海参，翻炒 1 分钟",
+   "加入 100 ml 的水， 中小火， **等待 5 分钟**",
+   "等待锅中汤汁快干的时候，加入水淀粉，加入前面取出的葱白",
+   "在外观*呈粘稠状态*后关火，盛盘 ![葱烧海参-预览图-5](./葱烧海参.jpeg)"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "桂圆红枣粥",
+  "name": "桂圆红枣粥",
+  "needs": [],
+  "pantry": [],
+  "minutes": 28,
+  "kcal": 617,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "将桂圆肉扒出，用清水洗两次，放入碗中浸泡 10 分钟",
+   "红枣用清水洗两次，放入碗中浸泡 10 分钟",
+   "糯米放入电饭锅中，清水淘米两次后，加入 2000ml 水",
+   "将桂圆和红枣加入电饭锅",
+   "打开电饭锅煮饭模式，1 小时后粥成"
+  ],
+  "kind": "snack",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "蒸花卷",
+  "name": "蒸花卷",
+  "needs": [],
+  "pantry": [],
+  "minutes": 36,
+  "kcal": 400,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "从花卷的包装袋中取出 5 个花卷",
+   "把花卷平铺在碟子上，尽量不用重叠",
+   "往锅里倒入 400ml 水，把蒸架放里面，把装花卷的碟子放在蒸架上，盖上锅盖。",
+   "开大火加热，直至水沸腾。",
+   "转中火加热 15 分钟",
+   "开盖用手感受花卷的表面温度，如果不够热，就继续盖上盖子加热，否则就可以关火出锅。",
+   "碟子取出放凉至 50 度即可食用"
+  ],
+  "kind": "snack",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "炸串酱料",
+  "name": "炸串酱料",
+  "needs": [],
+  "pantry": [
+   "干辣椒面（粗细都准备）",
+   "孜然粉",
+   "胡椒粉",
+   "五香粉",
+   "花椒粉",
+   "白芝麻"
+  ],
+  "minutes": 10,
+  "kcal": 1826,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "所有原料在容器内混合，搅拌均匀。",
+   "锅里烧热油，油的用量以在容器内没过所有原材料为佳。",
+   "分三次淋入热油，每次 1/3，同时搅拌。",
+   "最后放入香油 10ml，生抽 10ml，花椒油 10ml，蚝油 10ml。"
+  ],
+  "kind": "condiment",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "简易版炒糖色",
+  "name": "简易版炒糖色",
+  "needs": [],
+  "pantry": [
+   "糖（任选其一）：",
+   "冰糖：炒出来的`糖色`色泽最为鲜艳，红亮，必须水油炒，不加水融化会很慢",
+   "白砂糖：必须水油炒，不加水融化会很慢",
+   "绵白糖：可以不加水",
+   "炒糖色过程火不要太大！！！电磁炉温度不够，火候过了发苦，不够发甜",
+   "`油`：100ml"
+  ],
+  "minutes": 64,
+  "kcal": 1028,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "⚠️ **高能预警与预处理**：",
+   "炒糖色的最后一步（加水/加料）为连续且必须快速响应的操作。一旦糖色到达临界点，几秒钟的迟疑就会导致发苦。",
+   "**要求**：在开火前，必须将 400ml 开水和所有准备好的葱姜蒜辅料放置在灶台手边，确保 1 秒内可以拿取。",
+   "开火，并向锅中倒入 100ml 开水",
+   "再向锅中倒入 100ml 油，与第一步间隔越短越好，此时锅为大火中火都可以，着急的话可以大火",
+   "放入冰糖（如果冰糖过于耦合，可以提前敲碎，做到耦合度越低越好）",
+   "调整火力为中火",
+   "开始搅拌",
+   "- 要一直一直一直搅拌，变成棕褐色，此时**转为小火**",
+   "- 再变稀，变红茶色，再变成酱红色后起小泡泡，准备好执行下面的`操作1`or`操作2`",
+   "- 小泡泡会逐渐消失，之后会出现大泡泡，大泡泡出现时糖色完成",
+   "- 需要在此时快速进行下一步操作（无论哪种操作都一定要提前准备好并快速！否则火候过大糖色发苦），根据菜品派别以及个人口味作出选择",
+   "- 操作 1：可以直接加 400ml 开水降温",
+   "- 操作 2（进阶调味版）：在糖液变成枣红色并起密集小泡时，迅速加入提前备好的葱姜蒜、花椒等辅料进行翻炒。**爆出香味后（约 5-10 秒内），必须立刻倒入 400ml 开水降温中止反应**。（*注：若后续菜谱需要翻炒肉类上色，请在此步先下入肉类翻炒，最后再加水。*）"
+  ],
+  "kind": "condiment",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "糖醋汁",
+  "name": "糖醋汁",
+  "needs": [],
+  "pantry": [
+   "白糖",
+   "白醋/米醋",
+   "料酒",
+   "生抽",
+   "生抽(40ml)",
+   "白糖(30g)"
+  ],
+  "minutes": 24,
+  "kcal": 146,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "按照比例将各调料在小碗中搅拌均匀",
+   "按不同菜肴的方式处理完毕后，将配制好的糖醋汁倒入锅中",
+   "根据各菜肴的不同，烹制 5-10 分钟",
+   "大火收汁，可增加菜的浓度、香味和光泽"
+  ],
+  "kind": "condiment",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "葱油",
+  "name": "葱油",
+  "needs": [],
+  "pantry": [
+   "油",
+   "葱（大葱小葱都可以）",
+   "姜",
+   "洋葱",
+   "料酒",
+   "香菜（可选）"
+  ],
+  "minutes": 30,
+  "kcal": 2069,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "开洋泡入 50 度温水中，加入 10ml 料酒去腥，泡 10 分钟后取出沥干水分",
+   "葱，香菜洗净，切成 5cm 长的段，擦干表面水份",
+   "洋葱切成丝，在锅里用热水煮 5 分钟，取出沥干水份",
+   "姜去皮，切成片",
+   "锅里倒入全部油，放入上述预处理好的材料，开中小火炸 20 分钟"
+  ],
+  "kind": "condiment",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "蒜香酱油",
+  "name": "蒜香酱油",
+  "needs": [],
+  "pantry": [
+   "蒜头",
+   "白芝麻",
+   "花生油",
+   "酱油",
+   "蒜头 2 瓣",
+   "白芝麻 5 克"
+  ],
+  "minutes": 5,
+  "kcal": 177,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "拍碎蒜头",
+   "往蘸料碟中加入酱油",
+   "起锅，加入花生油，等到油温滚烫后加入拍好的蒜头，炸半分钟",
+   "半分钟后，关火，把热油倒入蘸料碟，用筷子搅拌即可"
+  ],
+  "kind": "condiment",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "油泼辣子",
+  "name": "油泼辣子",
+  "needs": [],
+  "pantry": [
+   "蒜头",
+   "干辣椒面",
+   "盐",
+   "熟白芝麻",
+   "花生油（可用菜籽油替换）",
+   "五香粉 （可选）"
+  ],
+  "minutes": 52,
+  "kcal": 1854,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "拿出蒜头掰 2 个`小蒜头`去皮",
+   "拿出砧板剁碎`小蒜头`、`小米椒`",
+   "拿出碗倒入`花生油`",
+   "油热放入`其他配料`和`小葱`,等到香料变焦，捞出扔掉",
+   "拿出铁锅将碗内的油放入加热 2 分钟（菜籽油烧至冒烟）",
+   "此时是空碗",
+   "往空碗加入`干辣椒面`、`白芝麻`、`蒜末`、`小米椒`、`盐`、`五香粉`、`草寇`作为\"调料\"",
+   "关火将油温冷却至 `210` 摄氏度",
+   "将锅内热油倒入碗内并用勺子搅拌即可（可以在 `165` 摄氏度时加入同样\"调料\"的碗最后进行混合进行增辣）",
+   "倒入热油稍微搅拌后放入白醋，此时会重新沸腾。继续进行搅拌，白醋增香。",
+   "油泼辣子冷却到温热放白糖和味精，白糖可以使辣味柔和，不会那么地呛口"
+  ],
+  "kind": "condiment",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "蔗糖糖浆",
+  "name": "蔗糖糖浆",
+  "needs": [],
+  "pantry": [
+   "白砂糖",
+   "建议比例=>糖 : 水 = 1 : 1，这样方便进行糖量控制，比如想要 15 克糖，就量取 30 克的糖浆",
+   "白砂糖 100 克"
+  ],
+  "minutes": 16,
+  "kcal": 400,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "将称好的白砂糖的饮用水于容器混匀",
+   "容器封盖放冰箱冷藏"
+  ],
+  "kind": "condiment",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "反沙芋头",
+  "name": "反沙芋头",
+  "needs": [],
+  "pantry": [
+   "白砂糖或冰糖",
+   "葱",
+   "白砂糖 30g"
+  ],
+  "minutes": 20,
+  "kcal": 397,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "芋头切长条（稍微大条一点，翻炒过程不容易烂）",
+   "加入可以没过芋头的油，等油温起来（插入筷子冒小泡即可）",
+   "放进芋头到油里，去炸到芋头浮起来，一般是微微泛黄并且可以用筷子很轻松戳洞",
+   "炸芋头的油放起来别浪费，后面炒菜啥的都能用",
+   "接下来关键的一步，把糖(30g)和水(15g)按照 2：1 比例，加热至不变色且冒小泡",
+   "倒入葱花和芋头，关火翻炒，此时等温度下来，糖就会有反沙的效果",
+   "装盘上桌！"
+  ],
+  "kind": "dessert",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "咖啡椰奶冻",
+  "name": "咖啡椰奶冻",
+  "needs": [],
+  "pantry": [
+   "125ml 淡奶油",
+   "125ml 淡奶油(whipping cream, 35% M.E)",
+   "糖（可选）"
+  ],
+  "minutes": 40,
+  "kcal": 162,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "将定量淡奶油，椰树牌椰汁，espresso，椰子水混合备用。",
+   "将以上液体加热 1 分钟，温度达到 50-60 度即可。",
+   "（可选）如果格外嗜甜可以加额外的糖。",
+   "倒入吉利丁，搅拌至融化，煮 1 分钟。",
+   "（可选）过筛 （这一步可以让椰奶冻口感更佳顺畅）。",
+   "放入模具。",
+   "（可选）过滤掉表层的泡泡。这一步可以让椰奶冻口感更好，并且看着也会更棒。",
+   "放入冰箱冷藏区，等待 3 小时。"
+  ],
+  "kind": "dessert",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "龟苓膏",
+  "name": "龟苓膏",
+  "needs": [],
+  "pantry": [
+   "白砂糖 100 克"
+  ],
+  "minutes": 36,
+  "kcal": 129,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "在锅中倒入龟苓膏粉 25 克与冷水 120 毫升，充分搅拌至无颗粒感。",
+   "在另一个容器中加入白砂糖 100 克，倒入沸水 500 毫升，搅拌至糖完全溶解。",
+   "将糖水缓慢倒入龟苓膏粉液中，立即搅拌均匀，避免结块。",
+   "将混合液体放入锅中，加热时保持中小火，并持续搅拌以防粘锅。",
+   "加热至液体变粘稠并开始冒小泡，即可关火。",
+   "快速将液体倒入模具中，自然冷却凝固。建议冷藏 1~2 小时后食用，口感更佳。",
+   "---"
+  ],
+  "kind": "dessert",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "B52轰炸机",
+  "name": "B52轰炸机",
+  "needs": [],
+  "pantry": [],
+  "minutes": 28,
+  "kcal": 80,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "在利口酒杯的最底层倒入甘露咖啡酒到 1/3 处。(10ml)",
+   "顺着吧勺缓缓倒入爱尔兰百利甜酒，也是 1/3 处 (10ml)。注意要慢，保证层次分明。（太快甜酒会和咖啡混合）",
+   "最后在上层倒入蓝天原味伏特加 （10ml)",
+   "用打火机热一下杯口",
+   "最后一步点火： 看到淡蓝色的小火苗了吗？"
+  ],
+  "kind": "drink",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "Mojito莫吉托",
+  "name": "Mojito莫吉托",
+  "needs": [],
+  "pantry": [
+   "糖浆 20ml"
+  ],
+  "minutes": 52,
+  "kcal": 187,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "将切成半块的青柠之一切成小块，放入海波杯，随后用研杵将其捣出汁；",
+   "用 3-4 珠薄荷叶沿着杯口涂抹，随后将其放入杯中；",
+   "加入 糖浆 20ml；",
+   "加入 金色朗姆酒 45ml；",
+   "将剩下的半块青柠压出汁水放入杯中；",
+   "轻轻搅拌，使砂糖/糖浆处于半融合状态；",
+   "将打碎的冰块放入杯中，直到占杯中 3/4；",
+   "加入冰镇苏打水直到刚好淹没碎冰；",
+   "旋转搅拌半分钟；",
+   "使用碎冰将海波杯补满；",
+   "将剩下的一株薄荷叶拍醒，插入碎冰，作装饰。"
+  ],
+  "kind": "drink",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "酸梅汤（半成品加工）",
+  "name": "酸梅汤（半成品加工）",
+  "needs": [],
+  "pantry": [
+   "方糖（可选）",
+   "方糖 9 克"
+  ],
+  "minutes": 28,
+  "kcal": 603,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "取饮用水 1177 克。",
+   "放入酸梅晶固体饮料 60 克，使用汤匙顺时针搅拌 50 圈。",
+   "再放入剩下 60 克酸梅晶固体饮料，再次使用汤匙顺时针搅拌 50 圈。",
+   "放入 9 克的方糖，使用汤匙顺时针搅拌 100 圈。",
+   "放入北京二锅头酒 48 克，用汤匙顺时针搅拌 30 圈。"
+  ],
+  "kind": "drink",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "冰粉",
+  "name": "冰粉",
+  "needs": [],
+  "pantry": [],
+  "minutes": 28,
+  "kcal": 110,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "将凉白开倒入盆中；",
+   "将冰粉籽全部用纱布包起来，开口处打结",
+   "将包好的冰粉籽放入凉白开中，在凉白开中用力揉搓 6 分钟",
+   "然后将凉白开放置 2.5 小时，即可成型",
+   "随后将石凉粉用勺子装进准备好的一次性透明塑料杯中，加入 10ml 薄荷汁或者 10g 薄荷粉（柠檬汁、山楂汁、桑椹汁也可），再放入遇水发光冰块，用勺子慢慢搅拌均匀"
+  ],
+  "kind": "drink",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "砂糖椰子冰沙",
+  "name": "砂糖椰子冰沙",
+  "needs": [],
+  "pantry": [
+   "咖啡调糖（黄色粗粒）",
+   "咖啡调糖 10g（两包太古咖啡调糖）"
+  ],
+  "minutes": 32,
+  "kcal": 231,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "500ml 瓶装椰汁倒掉 200ml，立刻拧紧瓶盖。",
+   "将这瓶椰汁放入冰箱冷冻区并冷冻 10 小时以上。",
+   "将这瓶椰汁取出，若确认瓶中椰汁已彻底冻结，则在墙角、椅背、桌角等坚硬表面上用力抽打。（请务必确认表面不会因此受到损伤）",
+   "当抽打到冻结椰汁变成冰沙状态，打开瓶盖倒出冰沙。",
+   "在冰沙表面均匀撒上咖啡调糖或坚果碎。",
+   "完成"
+  ],
+  "kind": "drink",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "耙耙柑茶",
+  "name": "耙耙柑茶",
+  "needs": [],
+  "pantry": [
+   "[蔗糖糖浆](../../condiment/蔗糖糖浆/蔗糖糖浆.md)（可选）",
+   "1 : 1 蔗糖糖浆 10 克（可选）"
+  ],
+  "minutes": 56,
+  "kcal": 81,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "茉莉绿茶调配（推荐比例=>茶 : 水 : 冰 = 1~2 : 50 : 30）",
+   "- 称量 2~4 克茶叶置于容器，加入 100 毫升开水，泡 6 分钟",
+   "- 往泡好的绿茶中放入 60 克冰块冷却，可搅拌加速冷却",
+   "- 待冰块消失后，将茶叶过滤得到茉莉绿茶茶水约 160 毫升",
+   "正式调配",
+   "- 选择一个杯子，建议使用容量在大约 300 毫升的透明玻璃杯",
+   "- 取出耙耙柑的肉瓣，并将外皮剥去，取得果肉",
+   "- 取 130 克果肉和 130 毫升茉莉绿茶放入搅拌机中",
+   "- 倒入 10 克蔗糖糖浆（可选，如果喜甜可放）",
+   "- 封盖启动搅拌机，搅拌 20 秒后将搅拌产物倒入杯中",
+   "- 取一点果肉撕碎撒在液面上",
+   "开始享受"
+  ],
+  "kind": "drink",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "酒酿醪糟",
+  "name": "酒酿醪糟",
+  "needs": [],
+  "pantry": [],
+  "minutes": 76,
+  "kcal": 420,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "将 800g 糯米淘洗干净放入电饭煲，加入 720g 清水选择蒸饭模式",
+   "蒸熟后将米饭倒出摊凉，使用干净的工具将其摊至 30°C （用温度计测量为宜，体感温热但不烫手）",
+   "将 8g 安琪甜酒曲用 20ml 温水（约 30°C）化开，均匀撒在糯米饭中，同时翻拌均匀",
+   "向糯米饭中加入 600g 清水帮助酒曲翻拌均匀。静置 2-3 分钟后发现糯米饭吸饱水分。这次加水可以让酒酿首次发酵便汤汁丰富",
+   "用擀面杖在糯米饭中央挖一个小洞（便于出酒）",
+   "将混合好的米饭装入干净容器中，轻轻压平表面，盖上盖子或保鲜膜密封好",
+   "放置于 28 ～ 32°C 环境下发酵 24 ～ 48 小时。发酵期间不可剧烈摇晃或移动",
+   "发酵成功标准为：中间凹槽有透明酒液渗出，整体略带酒香，无异味、不酸败",
+   "发酵结束后可立即冷藏保存（过程中可以加入桂花），每次食用用干净工具取出，可冷藏保存 7 ～ 10 天",
+   "可以继续二次发酵，加入 500ml 清水增加酒酿产量（800g 水以内即可）",
+   "酒酿会一直持续发酵。如果想停止发酵，可以上锅蒸 10 分钟杀菌，或放入冰箱冷藏",
+   "### 进阶版本 1：提前泡米版本",
+   "将 800g 糯米淘洗干净，倒入清水中浸泡 6 ～ 8 小时（冬季建议泡 8 ～ 10 小时），泡至米粒饱满",
+   "沥干糯米，放入蒸布中，隔水蒸 40 ～ 60 分钟。每 20 分钟打开锅盖翻动一次确保蒸熟均匀",
+   "蒸熟后将米饭倒出摊凉，加入酒曲，后续步骤同上",
+   "### 进阶版本 2：混合米",
+   "当然，酒酿老手可以随意尝试不同米搭配。可以替换 20%的糯米为小米、燕麦、黄米、血糯米等"
+  ],
+  "kind": "drink",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "酸梅汤",
+  "name": "酸梅汤",
+  "needs": [],
+  "pantry": [
+   "黄冰糖",
+   "黄冰糖 100 克"
+  ],
+  "minutes": 32,
+  "kcal": 359,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "冲洗材料（干桂花和冰糖除外）， 1.5 升水常温浸泡两小时以上（干桂花和冰糖除外）",
+   "开中大火煮沸，盖盖，转小火煮 40 分钟，为头煎",
+   "将冰糖放入盆内，再将沥好用材的头汤趁热倒入，搅拌至冰糖融化。",
+   "药材重新装回锅内再 600 毫升的水，开大火煮沸，盖盖，转中火，再煮 20 分钟为二煎",
+   "最后将二煎和冰糖水趁热混合为成品。在成品 60-70℃加入干桂花（不要超过 80℃）加盖晾凉再放入冰箱冷藏 3 小时以上。",
+   "饮用时记得将干桂花沥出。如饮茶般细啜，冰凉振齿，酸醒人、甜适度，滋味丰满而悠长"
+  ],
+  "kind": "drink",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "萝卜炖羊排",
+  "name": "萝卜炖羊排",
+  "needs": [],
+  "pantry": [
+   "大葱",
+   "花椒",
+   "姜",
+   "料酒或者黄酒",
+   "食用盐",
+   "冰糖"
+  ],
+  "minutes": 15,
+  "kcal": 1259,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "萝卜去皮、滚刀切成 3-5cm 的大块，备用",
+   "羊排在购买时可以让卖家切好，因为家用刀一般难以切动，备用",
+   "羊肉冷水下锅，加入一半的料酒，一半的葱姜，煮 10 分钟去掉血腥，（可选）把焯的过程中出现的血沫子可以用勺子盛出来",
+   "另起一锅冷水，放入切好的白萝卜，放入一半的冰糖，等水开后煮 5 分钟去掉白萝卜的辣味",
+   "盛出来焯好的羊排，放入高压锅中，加水没过所有食材后再增加大约 300ml 的水",
+   "将剩余的葱姜料酒，花椒，冰糖，白芷（可选），盐放入锅中，盖锅等待上汽后计时，中火炖大约 15 分钟。",
+   "- 如没有高压锅，则放入普通锅中，炖大约 40 分钟到 1 小时。",
+   "关火，等待高压锅放气完毕，开盖，加入之前焯好的萝卜，调味，加入 3-10g 的食盐或者水，品尝汤的咸淡，",
+   "再开火，中火，高压锅上汽再炖 10 分钟，普通锅盖盖再炖 20 分钟",
+   "关火，盛盘"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "虎皮肘子",
+  "name": "虎皮肘子",
+  "needs": [],
+  "pantry": [
+   "食用植物油",
+   "冰糖",
+   "盐",
+   "老抽",
+   "生抽",
+   "白醋"
+  ],
+  "minutes": 20,
+  "kcal": 1018,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "### 预处理",
+   "猪肘解冻后水泡 1 小时去除血水。",
+   "如有火焰喷枪，则使用火焰喷枪灼烧**猪肘皮**表面至**棕黑色**以去除猪毛，破坏汗腺。注意不要长时间炙烤同一个位置以避免烧焦，当猪肘皮几乎完全呈现棕黑色时则停止灼烧。",
+   "如无火焰喷枪，将铁锅烧至 200 以上，将猪肘直接放入锅内，用锅铲或筷子使猪肘皮充分接触铁锅表面，当猪肘皮与铁锅接触位置呈现出棕色时，更换位置继续烫猪肘皮，直到整个猪肘被充分烫过。注意再次过程中注意铁锅温度，不要使铁锅红热。",
+   "使用清洁球在水中刷洗猪肘，将其表面烧焦的部分去除。刷洗结束后，猪肘再次呈现出未被灼烧前的状态。",
+   "将猪肘置于铁锅中，加尽量多的冷水，具体视铁锅深度与猪肘大小而定，在保证可以拿得动铁锅及其内容物的情况下，能浸没猪肘 3/4 以上为最佳。",
+   "### 去腥",
+   "取 1 棵葱的葱白，分成 3 段，放入锅中。",
+   "取 3 粒蒜，分别用刀身拍扁，放入锅中。",
+   "取 3 克姜，放入锅中。",
+   "将 2 汤匙料酒加入锅中。",
+   "锅中水烧开后，等待五分钟，随后将猪肘取出，捡出锅中所有配料，更换容器保留所有肉汤备用。",
+   "### 油炸",
+   "向锅中加入冷油。用量取计算表：以之前水量为参考，能浸没猪肘 3/5 以上为佳。开中火加热。",
+   "当[油温](tips/advanced/油温判断技巧.md)达到五成时，转为小火，放入猪肘油炸。",
+   "在油炸过程中烹饪者应注意人身安全。",
+   "在油炸过程中，使用锅铲或其他耐高温厨具将锅中的油均匀淋到猪肘未被浸没的部分，如果条件允许应以 3 分钟的间隔翻转猪肘，使其油炸均匀。",
+   "油炸过程持续大约 20 分钟，当观察到猪肘皮已经全部呈现出浅棕色，而瘦肉部分已经微焦，则可捞出备用。",
+   "炸制完后的油可用于制作其他油炸类食物，但注意不要使用太多次。",
+   "### 炒糖色",
+   "取计算表中的 200 ml 冰糖，[炒糖色](../../tips/advanced/糖色的炒制.md)备用。",
+   "### 炖煮",
+   "将猪肘加入高压锅内，加入所有肉汤、糖色、香叶、肉桂皮、豆蔻、花椒、大料、老抽、生抽、白醋。如果喜欢甜口，可以再额外加入 2-3 克冰糖。",
+   "取 1 棵葱的葱白，分成 3 段，放入锅中。",
+   "取 3 粒蒜，分别用刀身拍扁，放入锅中。",
+   "取 3 克姜，放入锅中。",
+   "盖上锅盖，加压炖煮 40 分钟。",
+   "### 收汁",
+   "在炖煮期间调制水淀粉。取碗 1 个，加入 1 汤匙淀粉，100ml 水，搅拌使其成为白色悬浊液",
+   "炖煮时间结束后，打开高压锅锅盖，捡出锅中所有的配料，只保留猪肘。",
+   "将高压锅中剩余的肉汤转移至铁锅内，猪肘转移至盘子或盆内",
+   "将铁锅置于灶台上，开大火。在收汁过程中可以用筷子头蘸取锅内汤汁判断咸淡，并根据口味添加盐。注意，汤汁多的时候味道会比汤汁少的时候味道更淡，加入盐时需要考虑这一点。",
+   "当肉汤沸腾时，注意观察剩余肉汤余量",
+   "当剩余肉汤少于原肉汤体积的 1/2 时，再次搅拌之前调制好的水淀粉，并加入一半",
+   "等待肉汤沸腾，加入剩下的一半",
+   "等待肉汤沸腾，沸腾后等待 1-2 分钟关火，此时锅内的肉汤呈红棕色粘稠状",
+   "用汤匙舀起肉汤均匀地淋在猪肘上，尽量使猪肘的每一处都淋到汤汁。如果在猪肘被完全淋到前汤汁已经用完则可直接上桌，否则剩余汤汁不需要再淋，可直接上桌。"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "姜炒鸡",
+  "name": "姜炒鸡",
+  "needs": [],
+  "pantry": [
+   "生姜",
+   "生抽",
+   "老抽",
+   "盐",
+   "大蒜",
+   "食用油 = 50ml（茶油最好，没有就用菜籽油）"
+  ],
+  "minutes": 36,
+  "kcal": 1539,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "鸡尽量剁成 1cm 的小块，洗净后滤干，再放生抽腌和料酒腌制 30 分钟",
+   "大先热锅到微微冒烟，放入食用油，等 5 秒",
+   "下入姜片后转中火炒 30 秒，",
+   "下入鸡块翻炒 3 分钟，炒干水分，炒出鸡油",
+   "放入各种剁碎的辣椒和大蒜子，加盐和老抽继续翻炒 30 秒",
+   "倒入啤酒，中小火焖 2 分钟",
+   "大火收汁盛盘"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "小炒鸡肝",
+  "name": "小炒鸡肝",
+  "needs": [],
+  "pantry": [
+   "蒜苗（蒜苗指的是：大蒜幼苗发育到一定时期的青苗。有些地方叫做青蒜，特别说明一下。）",
+   "大葱、姜、料酒",
+   "食用盐、鸡精（味精）、五香粉（十三香）、胡椒粉",
+   "烧烤料或孜然粉（可选）",
+   "芝麻（可选）",
+   "食用油"
+  ],
+  "minutes": 90,
+  "kcal": 760,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "鸡肝清洗，备用",
+   "蒜苗清洗，切段，备用",
+   "大葱清洗，取 100g 切段，取 50g 切片，备用",
+   "姜清晰，取 70g 切片， 取 50g 切丁，备用",
+   "第一步：焯水",
+   "- 清洗后的鸡肝放入锅内，加入凉水淹没鸡肝，并放入 100g 切段的大葱、70g 切片的姜和 30ml 料酒",
+   "- 开大火，待水沸腾调至中火并撇去浮沫后**等待5-10分钟**",
+   "- 关火，捞出过凉水并清洗干净",
+   "- 清洗干净后切片，备用",
+   "第二步：炒制",
+   "- 开中火。锅内加入 30ml 食用油，等待 10 秒使油升温",
+   "- 加入 50g 切片的大葱和 50g 切丁的姜，翻炒爆香",
+   "- 爆香后加入切片的鸡肝，翻炒至微微发黄",
+   "- 加入蒜苗，翻炒 30 秒，断生后调至为小火",
+   "- 加入调味料",
+   "- 食用盐 5g",
+   "- 鸡精（味精） 5g",
+   "- 五香粉（十三香） 5g",
+   "- 胡椒粉 5g",
+   "- 烧烤料或 10g （可选）",
+   "- 调至为大火，快速翻炒 30 秒防止糊锅，关火",
+   "- 盛出盘内，可以撒入 5g 芝麻作为装饰，如果不喜欢或者没有则可以不用添加。"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "猪皮冻",
+  "name": "猪皮冻",
+  "needs": [],
+  "pantry": [
+   "大料、花椒、白芷、桂皮、丁香、香叶、小茴香",
+   "调料：盐 13g、味精 10g、鸡精 15g、生抽 50ml、老抽 20ml、葱 10g、葱 10g、姜片 20g",
+   "香料包：八角 10g、花椒 5g"
+  ],
+  "minutes": 32,
+  "kcal": 1630,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "将猪皮，剁成不超过 10cm 小块，用清水浸泡 12 小时，然后冷水下锅，加入姜 10g、料酒 50ml 后，汆烫 5-10 分钟，捞出放入冷水中",
+   "将焯过水的猪皮，放到案板上，将里面的白肉部分全部剔除，然后再切成成不超过 3mm 的长条，放入盆中",
+   "加入白醋 20g，盐 5g，用力搓洗 3 分钟，再用清水洗净，这时的猪皮已经基本没什么腥味",
+   "锅内加入 4kg 水，放入猪皮，葱 10g，姜片 10g，八角 10g，花椒 5g，大火烧开后，小火煲煮 90 分钟至猪皮软烂",
+   "再加入盐 8g、味精 10g、鸡精 15g、生抽 50ml、老抽 20ml 调味后，倒入盘中，将葱姜，八角拣出，晾凉至果冻状",
+   "放冰箱冷藏即可，食用时，切成小块或者厚片"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "红烧猪蹄",
+  "name": "红烧猪蹄",
+  "needs": [],
+  "pantry": [
+   "香叶",
+   "姜",
+   "葱",
+   "老抽",
+   "桂皮",
+   "冰糖"
+  ],
+  "minutes": 44,
+  "kcal": 639,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "### 开始制作",
+   "冷水锅中放入热心摊主剁好的猪蹄，加入 20 ml 料酒与葱姜，煮 15 分钟去掉血腥",
+   "热锅冷油，倒入 30ml 食用油，放入 7-8 粒冰糖，开小火，熬成糖色，期间用锅铲把冰糖压碎，大概熬 2 分钟",
+   "熬成糖色后，放入焯过水的猪蹄，继续小火，翻炒猪蹄，直至所有猪蹄两面微黄",
+   "加入香叶 2 片、桂皮 1 块、八角 4 个、生抽 20 ml、老抽 20 ml、料酒 10 ml、姜 3 片、盐 8 克，转中火、继续翻炒 1 分钟",
+   "加入开水或者冷水，水需要没过猪蹄，盖上锅盖，大火烧开，烧开之后关火",
+   "把锅内的食材全部倒入高压锅中，高压锅中需要 15 分钟（如果同学没有高压锅，可放在锅中大火转小火熬制即可）",
+   "15 分钟之后，把高压锅的食材倒入炒锅中，开大火收汁，此时可用筷子尝下味道、淡的话可以加 2~3g 盐",
+   "大火收汁时长根据锅中的水来算，一般 30 秒即可，多留点也无碍、红烧猪蹄汤也是很下饭的"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "老妈蹄花",
+  "name": "老妈蹄花",
+  "needs": [],
+  "pantry": [
+   "葱",
+   "姜",
+   "料酒",
+   "生抽",
+   "鸡精",
+   "盐"
+  ],
+  "minutes": 40,
+  "kcal": 1425,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "### 开始制作",
+   "200g 白芸豆提前一晚清水浸泡备用",
+   "准备猪前蹄，买菜的时候让师傅从中间劈开，用喷火枪去除毛囊，拿回家清洗",
+   "冷水锅中加入猪蹄、大葱段、姜片、料酒，焯水十分钟，撇去浮沫，捞出洗干净备用",
+   "高压锅中放入猪蹄、当归、白芷、白胡椒粉、姜片，上汽后压三十分钟，放入白芸豆，再压十分钟，这个时候如果汤底是奶白色，那么恭喜是正确的（如果中途需要加水，只能加热水）",
+   "揭盖后加入盐、鸡精、葱花调味",
+   "调制灵魂汁子：放入葱、蒜、小米椒，白胡椒粉、生抽、香醋、油泼辣子、花椒油、猪蹄原汤",
+   "灵魂汁子，浇给"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "茭白炒肉",
+  "name": "茭白炒肉",
+  "needs": [],
+  "pantry": [
+   "淀粉",
+   "食用油",
+   "鸡精",
+   "姜",
+   "蒜",
+   "料酒"
+  ],
+  "minutes": 44,
+  "kcal": 515,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "### 准备",
+   "茭白切片，每片厚度 0.5 cm",
+   "瘦肉切条，厚度 0.3-0.5 cm，加入料酒、生粉、盐、水搅拌",
+   "姜切片、蒜头剁碎",
+   "### 制作",
+   "起锅水烧开，放入茭白，水煮 60-90 S 后取出沥干",
+   "起锅，倒入 15 ml 油，倒入瘦肉，反复翻炒 60 S 取出",
+   "起锅，倒入 15 ml 油，倒入姜、蒜翻炒 30S，加入茭白继续翻炒 30 S",
+   "继续加入瘦肉翻炒 60 S，加入 20 ml 水，加入盐、鸡精后翻炒 60S 出锅"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "酱牛肉",
+  "name": "酱牛肉",
+  "needs": [],
+  "pantry": [
+   "香叶",
+   "姜",
+   "葱",
+   "老抽",
+   "桂皮",
+   "冰糖"
+  ],
+  "minutes": 44,
+  "kcal": 2265,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "牛腱子肉清洗干净，用清水浸泡 1 小时，去除血水",
+   "用牙签或者叉子在牛腱子肉表面扎孔，加料酒、花椒、姜片后，用保鲜膜紧密包裹容器，腌制 4-6 小时",
+   "牛腱子肉切成 8cm，不超过 10cm 的肉块",
+   "牛腱子肉放入锅中，加入冷水至水面没过牛肉，开锅至水沸腾开始计时，同时捞出浮沫。3 分钟后停火，捞出牛肉，用温水洗净",
+   "将洗净后的牛腱子肉放入砂锅或炖锅，加水没过牛腱子肉，开大火，放入除盐之外其他未使用的配料",
+   "水开之后，大火转为小火，持续加热 90 分钟，加盐",
+   "加盐后，继续小火 90 分钟（注：每 30 分钟确认水位线，要求至少达到牛肉面高度的 80%）",
+   "加热 180 分钟后，捞出牛腱子肉，捞出牛腱子肉，用保鲜膜紧密包裹，放入冰箱冷藏数小时",
+   "取出后沿牛肉纹路切片，上桌食用，其他牛腱子肉建议不切片冷藏"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "香辣鸡爪煲",
+  "name": "香辣鸡爪煲",
+  "needs": [],
+  "pantry": [
+   "葱",
+   "姜",
+   "料酒",
+   "香叶",
+   "八角",
+   "生抽"
+  ],
+  "minutes": 40,
+  "kcal": 986,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "给鸡爪剪去指甲。如果买的鸡爪只有脚掌部分，对半切开即可。 如果是整只鸡爪，需要去骨。清水洗干净。",
+   "鸡爪冷水下锅，葱姜料酒焯水，水开，撇去浮沫。",
+   "加入香叶、八角、生抽、老抽，盖盖小火慢煮三十分钟。",
+   "捞出鸡爪，留一碗鸡汤备用。",
+   "起锅烧油，用小火炒香姜末、蒜末、小米椒，能吃辣再放点辣椒面。加入生抽、老抽、蚝油、五香粉、盐，炒出酱香味。",
+   "放入鸡爪，放一点盐调味，翻炒一两分钟，再倒入鸡汤，边炒边搅动。",
+   "放入鸡精提鲜，撒入葱段搅拌均匀即可出锅。",
+   "注：如果需要加入配菜，请在放入鸡爪之前，底料炒香之后执行。"
+  ],
+  "kind": "meat",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "速冻馄饨",
+  "name": "速冻馄饨",
+  "needs": [],
+  "pantry": [
+   "盐（速冻馄饨无调味料包时）",
+   "鸡精（速冻馄饨无调味料包时）",
+   "胡椒粉（速冻馄饨无调味料包时）",
+   "香油（速冻馄饨无调味料包时）",
+   "香菜 1 根（可选）"
+  ],
+  "minutes": 56,
+  "kcal": 540,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "### 烧开水",
+   "将水倒入电饭煲中，按炖或煮的模式运行 35 分钟，此时揭开电饭煲应看到水为沸腾状态。",
+   "### 下馄饨",
+   "将速冻馄饨小心放入水中，注意不要烫伤。",
+   "放入电饭煲前可以适当用水过一下。",
+   "如果馄饨有调料包，此时可一并加入水中。",
+   "### 煮馄饨",
+   "盖上电饭煲，按同样炖或煮的模式运行 20 分钟。",
+   "### 盛馄饨",
+   "将所有馄饨连同能没过所有馄饨的水一同盛入碗中。",
+   "如果此前没有加入调料包，此时可按自身口味轻重加入盐、鸡精、胡椒粉、香油调味。",
+   "也可撒上 5~8 片香菜叶佐味（仅适用于对香菜味道不敏感的人）。"
+  ],
+  "kind": "snack",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "炸薯条",
+  "name": "炸薯条",
+  "needs": [],
+  "pantry": [],
+  "minutes": 64,
+  "kcal": 1132,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "### 开封薯条",
+   "开封大分量半成品薯条注意开口要小，可以有效减少长久储藏下薯条表面结霜。",
+   "### 预热空气炸锅",
+   "插电，200℃预热 5 分钟。",
+   "预热的目的是为了确保放入食材的时候锅内温度已经处于烹饪所需温度。",
+   "注意，预热完再拿出薯条，不应等薯条软化后再炸制。",
+   "### 炸薯条",
+   "取出薯条放入空气炸锅，200℃20 分钟。",
+   "取出薯条的时候注意半成品薯条已经有油，所以要异步去做客户端内刀斯林的话需要使用夹持工具。",
+   "5~10 分钟时可以拿出锅体晃动使薯条受热均匀也防止粘连。",
+   "### 脆化（可选项）",
+   "10 分钟~15 分钟时，拿出锅体，往已经干了的薯条表面喷 1 层面积为薯条表面积 2/3 的油。",
+   "### 取出&装盘",
+   "喜欢脆薯条的，取出后拿着锅体跳舞让空气经过薯条表面后装盘；喜欢软薯条的直接装盘。配合蘸酱或浇上酱汁更佳。"
+  ],
+  "kind": "snack",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "空气炸锅羊排",
+  "name": "空气炸锅羊排",
+  "needs": [],
+  "pantry": [
+   "必备：蒜蓉酱（推荐川娃子的，同样是因为懒）",
+   "可选：黄油（JD 买小盒装的，一片一小盒）",
+   "可选：空气炸锅烤架（用烤架油比较少，底下更容易熟，洗起来麻烦。不用的话比较入味。看个人选择啦）",
+   "蒜蓉酱 20g",
+   "黄油 1 小盒 10g 或 烧烤料 20g"
+  ],
+  "minutes": 24,
+  "kcal": 473,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "羊排放入碗中清水洗净血水",
+   "羊排用厨房纸吸干水分，双面抹上黑椒混合调味料、蒜蓉酱，静置腌制 20 分钟",
+   "锡纸碗放上烤架，羊排放在烤架上，撒上罗勒碎，黄油或烧烤料放在羊排上，空气炸锅 180° 10 分钟",
+   "羊排翻面，撒上罗勒碎，黄油（从锡纸碗里舀上来）或烧烤料放在羊排上，空气炸锅 180° 5 分钟（可以视个人喜好加一点时间，这里写的是不会焦的时间）"
+  ],
+  "kind": "snack",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "速冻汤圆",
+  "name": "速冻汤圆",
+  "needs": [],
+  "pantry": [],
+  "minutes": 6,
+  "kcal": 568,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "取出速冻汤圆，放入碗中。",
+   "倒入开水，直至浸没汤圆。",
+   "微波炉高火 4 分钟。",
+   "假如汤圆均已吸水膨胀，则已熟。",
+   "如果没熟，再加热 1 分钟。"
+  ],
+  "kind": "snack",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "小米粥",
+  "name": "小米粥",
+  "needs": [],
+  "pantry": [],
+  "minutes": 28,
+  "kcal": 362,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "小米 100 克，放入碗中，用水轻淘一遍（用手搅拌一下，将水倒掉，只是去掉外面的浮灰，不可搓洗！！！）",
+   "水烧开，务必烧开！！！",
+   "水烧开沸腾时，将小米倒入锅内。（很容易被忽视的一个很重要的环节）",
+   "搅拌使得小米不会粘连锅底，继续用大火熬 6-10 分钟，注意用中间穿插搅拌几次。",
+   "改中火、文火熬 15-20 分钟，锅盖要错开一条缝，千万不能让小米油溜掉哟，中间继续搅拌几次，不要糊锅底"
+  ],
+  "kind": "soup",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "白萝卜丝清汤",
+  "name": "白萝卜丝清汤",
+  "needs": [],
+  "pantry": [
+   "食盐",
+   "白胡椒粉",
+   "味精",
+   "猪油（或芝麻香油）",
+   "食盐 3g",
+   "白胡椒粉 2g"
+  ],
+  "minutes": 10,
+  "kcal": 65,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "白萝卜去皮，用擦丝器擦成细丝，备用",
+   "锅内加入 800ml 饮用水，同时放入白萝卜丝",
+   "加入食盐 3g、白胡椒粉 2g、味精 3g，用勺子搅拌均匀",
+   "开大火将水烧至沸腾",
+   "沸腾后将火调至中小火，继续煮 5 分钟至白萝卜丝变软呈半透明状",
+   "关火前加入猪油 3g（或芝麻香油 3g），搅拌均匀后关火出锅"
+  ],
+  "kind": "soup",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "银耳莲子粥",
+  "name": "银耳莲子粥",
+  "needs": [],
+  "pantry": [
+   "冰糖",
+   "冰糖 10-20g"
+  ],
+  "minutes": 36,
+  "kcal": 282,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "把银耳、莲子用清水浸泡 2 个小时，红枣浸泡 10 - 20 分钟，枸杞洗净，备用",
+   "在锅中倒入 600ml 水，烧开后依次放入银耳、莲子、红枣",
+   "等待水再次烧开后，盖上锅盖，转至中火继续熬",
+   "熬到大约 1 小时后，放入 5g - 10g 冰糖和 5g - 6g 枸杞，转至小火熬",
+   "小火继续熬 30 分钟，此时银耳开始呈现粘稠状态",
+   "再次放入 5g - 10g 冰糖，用勺子搅拌 5 - 10 分钟",
+   "关火，用勺子盛出"
+  ],
+  "kind": "soup",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "老干妈拌面",
+  "name": "老干妈拌面",
+  "needs": [],
+  "pantry": [
+   "老干妈",
+   "酱油",
+   "老干妈 15ml * 份数",
+   "酱油 5ml * 份数"
+  ],
+  "minutes": 40,
+  "kcal": 502,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "将水倒入锅中并煮沸",
+   "将面均匀放入锅中",
+   "在煮的过程注意搅拌，避免面粘成一坨",
+   "当用筷子挑起一根面且该面能自然地从筷子上滑落时再等 30 秒关火",
+   "将面夹入碗中",
+   "按照上面的计量放入老干妈和酱油",
+   "用筷子将碗里的面、老干妈、酱油拌均匀",
+   "吃"
+  ],
+  "kind": "staple",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "醪糟小汤圆",
+  "name": "醪糟小汤圆",
+  "needs": [],
+  "pantry": [
+   "白糖",
+   "白糖"
+  ],
+  "minutes": 28,
+  "kcal": 957,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "将水倒入锅中并煮沸",
+   "放入小汤圆煮 8 分钟",
+   "放入醪糟和枸杞再煮 2 分钟",
+   "盛入碗中根据个人口味加入白糖并搅拌均匀",
+   "吃"
+  ],
+  "kind": "staple",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "麻油拌面",
+  "name": "麻油拌面",
+  "needs": [],
+  "pantry": [
+   "麻油",
+   "胡椒粉",
+   "老抽",
+   "盐",
+   "麻油 15ml",
+   "老抽 10 克"
+  ],
+  "minutes": 36,
+  "kcal": 451,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "将水倒入锅中并煮沸 （喜欢吃 q 弹面的同学，可在水里加入 30 克盐，用盐水煮出来的面会比较 q 弹）",
+   "将快熟面放入锅中 3 分钟（也可参考当下品牌快熟面的烹饪时间）",
+   "当面开始散了可以开始搅拌，让面受热均匀",
+   "将水滤干把面倒入碗中",
+   "按照上面的计量放入麻油，老抽，胡椒粉，生抽（可选）",
+   "筷子搅拌均匀",
+   "一道简单即省钱的懒人麻油拌面就完成啦"
+  ],
+  "kind": "staple",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "意式肉酱面",
+  "name": "意式肉酱面",
+  "needs": [],
+  "pantry": [
+   "白洋葱（紫洋葱也可以）",
+   "洋葱大半个 （大约 150 克，通常是肉的两倍重）",
+   "食用油 10-15ml"
+  ],
+  "minutes": 40,
+  "kcal": 1199,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "锅中加水，烧开后放入意面（等待 6 - 12 分钟）",
+   "在烧水的时候可以进行下面这些步骤，但请注意煮面的时间",
+   "洋葱切成小丁",
+   "空锅中倒油，中火下入洋葱碎",
+   "时刻搅拌，注意不要让洋葱烧糊，直到洋葱变成半透明状",
+   "下入肉沫，继续搅拌（搅散），直到肉末变成棕色",
+   "加入意大利面酱，稍微搅拌一下即可",
+   "把煮好的意大利面沥干水分并倒入肉酱中搅拌均匀即可（或者直接把做好的肉酱倒在意面上也行）"
+  ],
+  "kind": "staple",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "炒凉粉",
+  "name": "炒凉粉",
+  "needs": [],
+  "pantry": [
+   "玉米油",
+   "大蒜",
+   "香葱",
+   "豆瓣酱",
+   "生抽",
+   "老抽"
+  ],
+  "minutes": 36,
+  "kcal": 567,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "凉粉改刀切麻将块大小",
+   "开小火，起锅烧油，锅烧微热后，下入蒜末爆香后加入豆瓣酱炒出红油",
+   "将凉粉块下入锅中，翻炒 10 秒",
+   "加入生抽提味，老抽上色，翻炒均匀后加入辣椒面继续翻炒均匀",
+   "加入食盐、十三香继续翻炒 10 秒",
+   "加入准备好的矿泉水，再次翻炒 10 秒，待汤汁浓稠后，关火出锅装盘",
+   "撒上葱花即可完成"
+  ],
+  "kind": "staple",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "凉拌油麦菜",
+  "name": "凉拌油麦菜",
+  "needs": [],
+  "pantry": [
+   "油麦菜",
+   "芝麻酱",
+   "酱油",
+   "醋",
+   "蚝油",
+   "白糖"
+  ],
+  "minutes": 24,
+  "kcal": 191,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "蒜拍碎切末",
+   "醋，酱油，芝麻酱，香油，糖，蚝油，蒜末放到碗里搅拌均匀",
+   "油麦菜切段，每段不超过 4cm",
+   "油麦菜放到一个大点的盆里，倒入上述碗中酱料，充分搅拌均匀."
+  ],
+  "kind": "veg",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "水油焖蔬菜",
+  "name": "水油焖蔬菜",
+  "needs": [],
+  "pantry": [
+   "食用油",
+   "盐",
+   "蚝油（可选）"
+  ],
+  "minutes": 36,
+  "kcal": 92,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "洗净蔬菜",
+   "锅中加入 150ml 水，并烧开。（水不需要能完全没过蔬菜）",
+   "加入 3g 盐",
+   "（可选）加入 3ml 蚝油",
+   "加入 2ml 食用油",
+   "下菜， 翻拌一下，然后盖上锅盖焖 1 分钟",
+   "盛盘"
+  ],
+  "kind": "veg",
+  "src": "https://github.com/Anduin2017/HowToCook"
+ },
+ {
+  "id": "话梅煮毛豆",
+  "name": "话梅煮毛豆",
+  "needs": [],
+  "pantry": [
+   "食用盐",
+   "食用盐 2 g"
+  ],
+  "minutes": 20,
+  "kcal": 454,
+  "greens": false,
+  "qty": {},
+  "steps": [
+   "清水加入食用盐，毛豆浸泡 15 分钟",
+   "加入开水，倒入毛豆、话梅，水煮 20-30 分钟",
+   "起锅开吃"
+  ],
+  "kind": "veg",
   "src": "https://github.com/Anduin2017/HowToCook"
  }
 ]
