@@ -9,7 +9,8 @@
   var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
   var NL = String.fromCharCode(10);
 
-  var state = { view: "pick", rows: [], shots: [], cat: "", qty: 1, days: 3, locked: false, busy: false };
+  var state = { view: "pick", rows: [], shots: [], cat: "", qty: 1, days: 3, locked: false, busy: false, editId: "" };
+  var EDIT_ID = (location.search.match(/[?&]edit=([^&]+)/) || [])[1] || "";
   var det = { running: false, timer: null, lm: null, armed: true, last: 0, n: 0 };
 
   var AI_PORT = 8941;
@@ -124,6 +125,7 @@
     $("#mQty").textContent = state.qty;
     $("#mDays").textContent = state.days;
     $("#mUnit").textContent = FD.unitOf ? FD.unitOf(state.cat) : "份";
+    $("#mAdd").textContent = state.editId ? "保存修改" : "加进清单";
   });
   $("#manualEdit").addEventListener("click", function (e) {
     var q = e.target.dataset.q, d = e.target.dataset.d;
@@ -132,6 +134,20 @@
   });
   $("#mAdd").addEventListener("click", function () {
     if (!state.cat) return toast("先选一样");
+    if (state.editId) {
+      var all = FD.items() || [];
+      var it = all.filter(function (x) { return x.id === state.editId; })[0];
+      if (it) {
+        var f = FD.byId[state.cat];
+        it.cat = state.cat; it.name = f ? fname(f) : it.name; it.tag = f ? f.tag : it.tag;
+        it.qty = state.qty; it.unit = FD.unitOf ? FD.unitOf(state.cat) : it.unit;
+        it.life = state.days; it.daysLeft = state.days;
+        FD.saveItems(all);
+        toast("已保存");
+        setTimeout(function () { location.href = "index.html#fridge"; }, 500);
+      }
+      return;
+    }
     addRow(state.cat, state.qty, "manual");
     state.qty = 1; $("#mQty").textContent = 1;
     toast("加进清单了，可以继续选");
@@ -624,6 +640,22 @@
   if (!FD.byId) { document.body.innerHTML = "<p style='padding:20px'>data.js 没加载成功。</p>"; return; }
   paintGrid();
   renderRows();
+  if (EDIT_ID) {
+    var all0 = FD.items() || [];
+    var it0 = all0.filter(function (x) { return x.id === EDIT_ID; })[0];
+    if (it0) {
+      state.editId = EDIT_ID; state.cat = it0.cat; state.qty = it0.qty || 1;
+      state.days = it0.daysLeft || (FD.byId[it0.cat] ? FD.byId[it0.cat].days : 3);
+      go("manual"); paintGrid();
+      $("#manualEdit").hidden = false;
+      $("#mQty").textContent = state.qty;
+      $("#mDays").textContent = state.days;
+      $("#mUnit").textContent = FD.unitOf ? FD.unitOf(state.cat) : "份";
+      $("#mAdd").textContent = "保存修改";
+      $("#title").textContent = "修改这一条";
+      return;
+    }
+  }
   var startView = (location.search.match(/[?&]v=([a-z]+)/) || [])[1];
   if (startView && TITLES[startView] && startView !== "pick") {
     go(startView);

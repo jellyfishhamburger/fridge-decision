@@ -1,4 +1,4 @@
-const CACHE = "fridge-decision-v29";
+const CACHE = "fridge-decision-v30";
 const ASSETS = ["./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", e => {

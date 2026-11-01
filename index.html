@@ -1662,7 +1662,7 @@ function itemRow(it){
      <button class="del" aria-label="${tt("fridge.del", "删除")}" data-del="${it.id}">×</button>`;
   el.addEventListener("click", ev => {
     if(ev.target.closest("button")) return;   /* × 是删除 */
-    openSheet(it, null);                      /* 点行 = 编辑这一条 */
+    location.href = "add.html?edit=" + encodeURIComponent(it.id);   /* 点行 = 去改这一条 */
   });
   return el;
 }
@@ -2834,7 +2834,7 @@ async function scanBarcode(){
 }
 
 /* ---------- events ---------- */
-$("#addBtn").addEventListener("click", () => openSheet(null, null));
+/* #addBtn 现在是链接，直接进 add.html?v=manual */
 $("#cancelBtn").addEventListener("click", closeSheet);
 $("#scrim").addEventListener("click", closeSheet);
 /* #snapBtn / #scanBtn 现在是 <a href>，直接进 capture.html，不再走旧相机逻辑 */
