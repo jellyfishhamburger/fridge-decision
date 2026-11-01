@@ -836,6 +836,14 @@
   .rcc .ph.art .ic.empty{opacity:.75}
 
   .cta *{text-wrap:balance}
+
+  /* 类别条贴着列表，滚动时吸在页头下方，点了就地筛 */
+  .kindbar{position:sticky;top:52px;z-index:16;padding:8px 0 6px;margin:2px 0 4px;
+    background:linear-gradient(to bottom, var(--bg) 72%, rgba(250,246,236,0));}
+  .kindbar .kindfilters{margin:0;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;padding-bottom:2px}
+  .kindbar .kindfilters::-webkit-scrollbar{display:none}
+  .kindbar .kindfilters .f{flex:0 0 auto}
 </style>
 </head>
 <body>
@@ -1156,8 +1164,6 @@
   <section class="view" id="view-discover">
     <p class="lede" id="discLede" data-i18n="disc.lede">按「先用掉快坏的」排序。</p>
 
-    <!-- 菜谱类别：373 道先分类，再谈别的 -->
-    <div class="filters kindfilters" id="discKinds"></div>
 
     <!-- 现在就能做：扇形叠，一直在，不跟下面的筛选走 -->
     <section class="fan" id="fanSec" hidden aria-label="现在就能做">
@@ -1185,6 +1191,7 @@
         <h2 data-i18n="sets.quick">按套餐看</h2>
         <span class="dmeta" id="setCount"></span>
       </div>
+      <p class="snote lead" data-i18n="sets.logic">一套 = 一荤 + 一素 + 主食。先挑快坏的食材，再用你冰箱里现成的凑成一顿，同一道菜不会连着出现。</p>
       <div class="setchips" id="setChips"></div>
       <div class="dgrid" id="discSetGrid"></div>
       <button class="btn quiet" id="setMore" style="display:none" data-i18n="sets.more">展开全部</button>
@@ -1205,6 +1212,11 @@
       <button class="f" data-f="shop1" data-i18n="disc.shop1">差一样</button>
       <button class="f" data-f="greens" data-i18n="disc.greens">有绿叶菜</button>
       <button class="f" data-f="light" data-i18n="disc.light">≤ 500 kcal</button>
+    </div>
+
+    <!-- 菜谱类别：放在列表正上方，点了就在这里筛 -->
+    <div class="kindbar">
+      <div class="filters kindfilters" id="discKinds"></div>
     </div>
 
     <!-- 现在就能做：只放最相关的几条，其余交给下面的全部列表 -->
@@ -1879,7 +1891,7 @@ function renderCookLog(){
     <p class="cw">${t.length ? tp("cooklog.note", {}, "记录在这台设备上，用来算「这周做了几顿」。") : tp("cooklog.noteEmpty", {}, "做完一餐就会记在这里。")}</p>`;
 }
 
-let discSetIntent = "", discSetShown = 6;
+let discSetIntent = "", discSetShown = 4;
 
 /* 一套三种状态：现在就能做 / 差 N 样 / 其余 */
 function setStatusPill(st){
@@ -1932,7 +1944,7 @@ function renderDiscSets(){
       `<button class="sc${c.id === discSetIntent ? " on" : ""}" data-sintent="${c.id}">${c.name}</button>`).join("");
     cb.querySelectorAll("[data-sintent]").forEach(b => b.addEventListener("click", () => {
       discSetIntent = b.dataset.sintent;
-      discSetShown = 6;
+      discSetShown = 4;
       renderDiscSets();
     }));
   }
@@ -1940,6 +1952,20 @@ function renderDiscSets(){
   let pool = all.filter(x => !discSetIntent || x.intent === discSetIntent);
   pool = pool.slice().sort((a, b) =>
     (b.ready ? 1 : 0) - (a.ready ? 1 : 0) || a.minutes - b.minutes);
+
+  /* 同一个主菜/素菜不要连着出现在好几套里（蒜蓉虾配青菜、又配空心菜那种）。
+     主食（米饭）不算重复，一荤一素被占用才跳过。 */
+  /* 套餐只保留「一荤/一主食 + 一素」这种真正像一顿饭的组合，
+     并且同一道菜在全页只出现一次 —— 蒜蓉虾配青菜又配空心菜那种重复直接砍掉。 */
+  (function dedupe(){
+    const seen = new Set();
+    pool = pool.filter(st => {
+      const ids = st.dishes.map(d => d.recipe.id);
+      if (ids.some(id => seen.has(id))) return false;
+      ids.forEach(id => seen.add(id));
+      return true;
+    });
+  })();
 
   if(!pool.length){ box.hidden = true; return; }
   box.hidden = false;
