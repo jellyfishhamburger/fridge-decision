@@ -596,7 +596,7 @@
   .setv .sdi i{font-style:normal;color:var(--muted);font-size:11px;margin-left:2px}
   .setv .snote{margin:8px 0 0;font-size:11.5px;color:var(--muted)}
   /* 套餐里每一道：整行是一颗按钮（够大才像能点的），右边 ⇄ 换一道 */
-  .snote.top{margin:10px 0 6px;font-weight:600;color:var(--ink-2)}
+  .snote.lead{margin:10px 0 6px;font-weight:600;color:var(--ink-2)}
   .setsteps{display:flex;flex-direction:column;gap:8px;margin:0 0 4px}
   .ssrow{display:flex;align-items:stretch;gap:0;background:var(--card-2);
     border:1px solid var(--line);border-radius:14px;overflow:hidden}
@@ -2044,7 +2044,7 @@ function renderResult(list, sel){
         <span class="badge">${tp("sets.kcal", {n: setMeta.kcal}, "约 " + setMeta.kcal + " kcal")}</span>
         <span class="badge">${setMeta.n}${tp("sets.dishes", {}, " 道菜")}${setMeta.rice ? tp("sets.plusRice", {}, " + 米饭") : ""}</span>
       </div>
-      <p class="snote top">${tp("sets.pickOrder", {}, "先做哪道？点一行就从那道开始。")}</p>
+      <p class="snote lead">${tp("sets.pickOrder", {}, "先做哪道？点一行就从那道开始。")}</p>
       <div class="setsteps">${setDishes.map((d, i) =>
         `<div class="ssrow">
            <button class="sshead" data-set-start="${i}">
