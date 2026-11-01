@@ -41,9 +41,14 @@ body.ad{
 
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .grid button{
-  background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 6px;
-  font:inherit;font-size:13px;cursor:pointer;color:inherit;
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 4px 8px;
+  font:inherit;font-size:12.5px;cursor:pointer;color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  transition:transform .12s ease, border-color .12s ease, background .12s ease;
 }
+.grid button:active{transform:scale(.96)}
+.grid button i{font-style:normal;line-height:1.1}
+.grid button .fdico{color:var(--green)}
 .grid button.on{border-color:var(--green);background:#EFF5EE;font-weight:600}
 
 .editrow{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}

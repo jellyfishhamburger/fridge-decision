@@ -109,7 +109,9 @@
   function paintGrid() {
     var box = $("#pickGrid");
     box.innerHTML = FD.CATALOG.map(function (f) {
-      return '<button data-cat="' + f.id + '" class="' + (state.cat === f.id ? "on" : "") + '">' + fname(f) + "</button>";
+      var ic = (window.FD_ICON && FD_ICON(f.id, 26)) || "";
+      return '<button data-cat="' + f.id + '" class="' + (state.cat === f.id ? "on" : "") + '">'
+        + ic + "<i>" + fname(f) + "</i></button>";
     }).join("");
   }
   $("#pickGrid").addEventListener("click", function (e) {
