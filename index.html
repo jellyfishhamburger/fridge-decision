@@ -553,17 +553,12 @@
     border-radius:var(--r-pill);padding:4px 10px}
   .cooklog .cw{margin:8px 0 0;font-size:11.5px;color:var(--muted)}
 
-  /* 菜谱页的套餐速览 */
-  .dsets{margin:0 0 14px}
-  .dsets h2{font-size:15px;margin:0 0 8px}
-  .dsets .dset{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
-    background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
-    padding:11px 12px;margin-bottom:8px;font-family:inherit;cursor:pointer}
-  .dsets .dset .tx{flex:1;min-width:0}
-  .dsets .dset b{display:block;font-size:13.5px;font-weight:600;color:var(--ink);
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .dsets .dset s{display:block;font-size:11.5px;color:var(--muted);text-decoration:none;margin-top:2px}
-  .dsets .dset .go2{flex:none;font-size:12px;font-weight:600;color:var(--action)}
+  /* 菜谱页的套餐：和菜谱卡同一套壳子（照片 + 名字 + pill），只是"三样并成一顿" */
+  .dsets{margin:0 0 16px}
+  .rcc.set .ph .setflag{position:absolute;left:9px;top:9px;font-style:normal;
+    background:rgba(255,253,247,.95);color:var(--green);font-size:10.5px;font-weight:700;
+    border-radius:7px;padding:3px 8px;box-shadow:0 2px 6px rgba(47,60,45,.12)}
+  .rcc.set .nm{font-size:13.5px;line-height:1.35}
 
   /* 套餐卡：今晚这一套 */
   .intents{display:flex;gap:6px;margin:0 0 10px;overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -1050,9 +1045,6 @@
   <section class="view" id="view-discover">
     <p class="lede" id="discLede" data-i18n="disc.lede">按「先用掉快坏的」排序。</p>
 
-    <!-- 套餐：三套现成的，点一行就能开始做 -->
-    <section id="discSets" class="dsets" hidden></section>
-
     <!-- 现在就能做：扇形叠，一直在，不跟下面的筛选走 -->
     <section class="fan" id="fanSec" hidden aria-label="现在就能做">
       <div class="fan-hd">
@@ -1071,6 +1063,15 @@
         <span class="fan-dots" id="fanDots"></span>
         <span class="fan-hint" data-i18n="disc.fanHint">左右滑动切换</span>
       </div>
+    </section>
+
+    <!-- 套餐：和下面的菜谱卡同一种卡，只是三样并成一顿 -->
+    <section id="discSets" class="dsets" hidden>
+      <div class="dhead">
+        <h2 data-i18n="sets.quick">按套餐看</h2>
+        <span class="dmeta" id="setCount"></span>
+      </div>
+      <div class="dgrid" id="discSetGrid"></div>
     </section>
 
     <label class="ds-search" style="margin-bottom:10px">
@@ -1758,13 +1759,37 @@ function renderDiscSets(){
   try{ sets = (FD.buildSets ? FD.buildSets(items, goal, setIntent) : []).filter(x => x.ready).slice(0, 3); }catch(e){}
   if(!sets.length){ box.hidden = true; box.innerHTML = ""; return; }
   box.hidden = false;
-  box.innerHTML = `<h2>${tp("sets.quick", {}, "按套餐看")}<span class="count" style="font-size:12px;color:var(--muted);margin-left:6px">${tp("sets.quickSub", {}, "一人份，整份都能做")}</span></h2>` +
-    sets.map(s => `<button class="dset" data-setic="${s.dishes.map(d => d.recipe.id).join("|")}" data-setn="${(s.name || "").replace(/"/g, "&quot;")}">
-        <span class="tx"><b>${s.dishes.map(d => I18N.recipeName(d.recipe)).join(" + ") + (s.onepot ? "" : tp("sets.riceSuffix", {}, " + 米饭"))}</b><s>${tp("sets.min", {n: s.minutes}, s.minutes + " 分钟")} · ${tp("sets.kcal", {n: s.kcal}, "约 " + s.kcal + " kcal")} · ${s.dishes.length}${tp("sets.dishes", {}, " 道菜")}</s></span>
-        <span class="go2">开始做 →</span>
-      </button>`).join("");
-  box.querySelectorAll("[data-setic]").forEach(b => {
-    b.addEventListener("click", () => startSet(b.dataset.setic.split("|").filter(Boolean), b.dataset.setn));
+  const grid = $("#discSetGrid");
+  if(grid) grid.innerHTML = sets.map(s => {
+    /* 用配菜的照片：两套的主菜常常是同一道，用第一道会让卡片长得一模一样 */
+    const photoDish = (s.dishes[1] || s.dishes[0]).recipe;
+    const ph = dishPhoto(photoDish);
+    const name = s.dishes.map(d => I18N.recipeName(d.recipe)).join(" + ") + (s.onepot ? "" : tp("sets.riceSuffix", {}, " + 米饭"));
+    return `<button class="rcc set" type="button" data-setic="${s.dishes.map(d => d.recipe.id).join("|")}" data-setn="${(s.name || "").replace(/"/g, "&quot;")}" aria-label="${name}">
+      <span class="ph${ph.art ? " art" : ""}">${ph.html}<i class="setflag">${tp("sets.tag", {}, "套餐")}</i></span>
+      <span class="bd">
+        <span class="nm">${name}</span>
+        <span class="mt">
+          <span class="ds-pill">${t("card.min", { n: s.minutes })}</span>
+          <span class="ds-pill">${s.kcal} kcal</span>
+        </span>
+      </span>
+    </button>`;
+  }).join("");
+  const sc = $("#setCount");
+  if(sc) sc.textContent = tp("sets.quickSubN", { n: sets.length }, sets.length + " 套 · 一人份");
+  const scope = $("#discSetGrid") || box;
+  /* 菜谱页只负责「看和挑」：点一套 → 回首页把它展开，由首页决定开始顺序
+     （以前这里直接 startSet，等于跳过选择直接开火，和首页的流程两套逻辑） */
+  scope.querySelectorAll("[data-setic]").forEach(b => {
+    b.addEventListener("click", () => {
+      setChoice = b.dataset.setic.split("|").filter(Boolean);
+      setPick = 0;
+      show("home");
+      renderResult(FD.decide(items, goal), "#homeResult");
+      const r = $("#homeResult");
+      if(r) window.scrollTo({ top: Math.max(0, r.offsetTop - 12), behavior: "smooth" });
+    });
   });
 }
 

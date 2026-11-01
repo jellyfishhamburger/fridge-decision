@@ -4,7 +4,18 @@
 (function () {
   "use strict";
   var $ = function (s) { return document.querySelector(s); };
-  var LANG = (function () { try { return JSON.parse(localStorage.getItem("fd.lang")) || "zh"; } catch (e) { return "zh"; } })();
+  /* fd.lang 存的是纯字符串（"zh"/"en"），不是 JSON —— 以前用 JSON.parse 会抛错，
+     于是这一页永远中文。也别只看一次：切语言后要跟着变。 */
+  window.addEventListener('DOMContentLoaded', function () { if (window.I18N && I18N.apply) I18N.apply(); });
+
+  function curLang() {
+    try {
+      var v = localStorage.getItem("fd.lang");
+      if (window.I18N && I18N.getLang) return I18N.getLang();
+      return (v === "en" || v === "zh") ? v : "zh";
+    } catch (e) { return "zh"; }
+  }
+  var LANG = curLang();
   function fname(f) { return (LANG === "en" ? (f.name || f.cn) : (f.cn || f.name)) || ""; }
   var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
   var NL = String.fromCharCode(10);
@@ -29,12 +40,17 @@
   })();
 
   /* ---------- 视图 ---------- */
-  var TITLES = { pick: "添加食材", manual: "手动添加", detect: "自动检测录入", receipt: "小票识别", batch: "摊开俯拍", review: "确认清单" };
+  var TITLES = { pick: "add.title", manual: "add.mT", detect: "add.dT", receipt: "add.rT", batch: "add.bT", review: "add.revTitle" };
+  function tt(key, fallback) {
+    if (window.I18N && I18N.t) { var v = I18N.t(key); if (v && v !== key) return v; }
+    return fallback || "";
+  }
 
   function go(v) {
     state.view = v;
     $$(".v").forEach(function (el) { el.classList.toggle("on", el.id === "v-" + v); });
-    $("#title").textContent = TITLES[v] || "添加食材";
+    $("#title").textContent = TITLES[v] ? tt(TITLES[v], v) : tt("add.title", "添加食材");
+    document.title = $("#title").textContent;
     $("#bar").hidden = !(v === "review" && state.rows.length);
     if (v !== "detect") stopCam();
     window.scrollTo({ top: 0 });
@@ -74,17 +90,17 @@
       var unit = FD.unitOf ? FD.unitOf(r.cat) : "份";
       return '<div class="row" data-i="' + i + '">' +
         (r.img ? '<img src="' + r.img + '" alt="">' : '<img alt="">') +
-        '<div class="nm">' + selHtml(r) + "<span>" + (f ? f.tag + " · 约 " + f.days + " 天" : "还没选是哪一样") + "</span></div>" +
+        '<div class="nm">' + selHtml(r) + "<span>" + (f ? f.tag + " · " + tt("add.aboutDays", "约 {n} 天").replace("{n}", f.days) : tt("add.notChosen", "还没选是哪一样")) + "</span></div>" +
         '<div class="q"><button data-q="-1">−</button><span>' + r.qty + '</span><button data-q="1">＋</button></div>' +
         '<button class="del" data-del="1" aria-label="删掉">✕</button>' +
         "</div>";
-    }).join("") || '<p class="tiny">还没有东西。用上面的方式加，或者点「＋ 补一件」。</p>';
+    }).join("") || '<p class="tiny">' + tt("add.noRows", "还没有东西。用上面的方式加，或者点「＋ 补一件」。") + '</p>';
     var n = state.rows.filter(function (r) { return !!r.cat; }).length;
-    $("#barTxt").textContent = "共 " + n + " 件要入库";
-    $("#confirm").textContent = n ? "确认入库（" + n + " 件）" : "确认入库";
+    $("#barTxt").textContent = tt("add.barTxt", "共 " + n + " 件要入库").replace("{n}", n);
+    $("#confirm").textContent = n ? tt("add.confirmN", "确认入库").replace("{n}", n) : tt("add.confirm", "确认入库");
     $("#confirm").disabled = !n;
     $("#bar").hidden = !(state.view === "review" && state.rows.length);
-    $("#cnt") && ($("#cnt").textContent = "已拍 " + state.shots.length + " 件");
+    $("#cnt") && ($("#cnt").textContent = tt("add.shotN", "已拍 {n} 件").replace("{n}", state.shots.length));
   }
 
   $("#rows").addEventListener("click", function (e) {
@@ -125,7 +141,7 @@
     $("#mQty").textContent = state.qty;
     $("#mDays").textContent = state.days;
     $("#mUnit").textContent = FD.unitOf ? FD.unitOf(state.cat) : "份";
-    $("#mAdd").textContent = state.editId ? "保存修改" : "加进清单";
+    $("#mAdd").textContent = state.editId ? tt("add.mSave", "保存修改") : tt("add.mAdd", "加进清单");
   });
   $("#manualEdit").addEventListener("click", function (e) {
     var q = e.target.dataset.q, d = e.target.dataset.d;
@@ -410,7 +426,7 @@
     if (!stream) { toast("相机没打开，先用下面的「从相册选」"); return; }
     btn.textContent = "正在加载手部模型…"; btn.disabled = true;
     try { await loadLM(); } catch (e) {
-      btn.disabled = false; btn.textContent = "开始检测";
+      btn.disabled = false; btn.textContent = tt("add.detStart", "开始检测");
       $("#detHint").textContent = "手部模型加载失败：" + (e && e.message);
       return;
     }
@@ -423,7 +439,7 @@
   function detStop() {
     det.running = false;
     if (det.timer) { clearInterval(det.timer); det.timer = null; }
-    var b = $("#detToggle"); b.textContent = "开始检测"; b.classList.remove("on");
+    var b = $("#detToggle"); b.textContent = tt("add.detStart", "开始检测"); b.classList.remove("on");
     if (!state.rows.length) { $("#detHint").textContent = "这一轮没拍到东西。可以再试一次，或从相册选。"; return; }
     go("review");
   }
@@ -659,7 +675,7 @@
       $("#mQty").textContent = state.qty;
       $("#mDays").textContent = state.days;
       $("#mUnit").textContent = FD.unitOf ? FD.unitOf(state.cat) : "份";
-      $("#mAdd").textContent = "保存修改";
+      $("#mAdd").textContent = tt("add.mSave", "保存修改");
       $("#title").textContent = "修改这一条";
       return;
     }

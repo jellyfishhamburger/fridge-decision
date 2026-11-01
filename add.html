@@ -12,7 +12,7 @@
 
 <header class="ad-top">
   <button class="ad-back" id="back" aria-label="返回">‹</button>
-  <h1 id="title">添加食材</h1>
+  <h1 id="title" data-i18n="add.title">添加食材</h1>
   <a class="ad-x" href="index.html#fridge" aria-label="关闭">×</a>
 </header>
 
@@ -22,24 +22,24 @@
 
   <!-- 1 · 选方式 -->
   <section class="v on" id="v-pick">
-    <p class="ad-lede">怎么把这批东西录进去？</p>
+    <p class="ad-lede" data-i18n="add.pickLede">怎么把这批东西录进去？</p>
     <button class="card" data-go="manual">
-      <b>手动添加</b><span>自己选品类、数量、能放几天</span>
+      <b data-i18n="add.mT">手动添加</b><span data-i18n="add.mS">自己选品类、数量、能放几天</span>
     </button>
     <button class="card" data-go="detect">
-      <b>自动检测录入</b><span>点一次开始，手伸进画面就自动拍，放完再按结束</span>
+      <b data-i18n="add.dT">自动检测录入</b><span data-i18n="add.dS">点一次开始，手伸进画面就自动拍，放完再按结束</span>
     </button>
     <button class="card" data-go="receipt">
-      <b>小票识别</b><span>拍一张小票，按上面的商品生成清单</span>
+      <b data-i18n="add.rT">小票识别</b><span data-i18n="add.rS">拍一张小票，按上面的商品生成清单</span>
     </button>
     <button class="card" data-go="batch">
-      <b>摊开俯拍</b><span>把所有东西摊开拍一张，一次认出好几样</span>
+      <b data-i18n="add.bT">摊开俯拍</b><span data-i18n="add.bS">把所有东西摊开拍一张，一次认出好几样</span>
     </button>
   </section>
 
   <!-- 2 · 手动 -->
   <section class="v" id="v-manual">
-    <p class="ad-lede">选一样，改数量和能放几天。</p>
+    <p class="ad-lede" data-i18n="add.manLede">选一样，改数量和能放几天。</p>
     <div class="grid" id="pickGrid"></div>
     <div class="editrow" id="manualEdit" hidden>
       <div class="qty">
@@ -47,7 +47,7 @@
         <span class="u" id="mUnit">份</span>
       </div>
       <div class="days">
-        能放 <button data-d="-1">−</button><span id="mDays">3</span> 天 <button data-d="1">＋</button>
+        <span data-i18n="add.keepPre">能放</span> <button data-d="-1">−</button><span id="mDays">3</span> <span data-i18n="add.keepPost">天</span> <button data-d="1">＋</button>
       </div>
       <button class="btn primary" id="mAdd">加进清单</button>
     </div>
@@ -58,36 +58,36 @@
     <div class="stage">
       <video id="cam" playsinline muted autoplay></video>
       <img id="shot" alt="">
-      <div class="frame" aria-hidden="true"><span>把东西放在框里</span></div>
+      <div class="frame" aria-hidden="true"><span data-i18n="add.frame">把东西放在框里</span></div>
       <div class="hint" id="camHint"></div>
     </div>
-    <div class="rowline"><span id="cnt">已拍 0 件</span><button class="mini" id="undo">删掉上一张</button></div>
+    <div class="rowline"><span id="cnt">已拍 0 件</span><button class="mini" id="undo" data-i18n="add.undo">删掉上一张</button></div>
     <button class="btn primary" id="detToggle">开始检测</button>
-    <p class="tiny" id="detHint">按一次开始；手伸进来就自动拍，放完东西再按一次结束。</p>
+    <p class="tiny" id="detHint" data-i18n="add.detHint">按一次开始；手伸进来就自动拍，放完东西再按一次结束。</p>
   </section>
 
   <!-- 4 · 小票 -->
   <section class="v" id="v-receipt">
-    <p class="ad-lede">拍一张小票，我按上面的商品生成清单。认不准可以手动补。</p>
-    <button class="btn primary" id="rShot">拍小票</button>
-    <button class="btn ghost" id="rPick">从相册选小票</button>
+    <p class="ad-lede" data-i18n="add.recLede">拍一张小票，我按上面的商品生成清单。认不准可以手动补。</p>
+    <button class="btn primary" id="rShot" data-i18n="add.rShot">拍小票</button>
+    <button class="btn ghost" id="rPick" data-i18n="add.rPick">从相册选小票</button>
     <p class="tiny" id="rMsg"></p>
-    <details id="rRawBox" hidden><summary>看看 OCR 读到的原文</summary><pre id="rRaw"></pre></details>
+    <details id="rRawBox" hidden><summary data-i18n="add.rRaw">看看 OCR 读到的原文</summary><pre id="rRaw"></pre></details>
   </section>
 
   <!-- 5 · 摊开俯拍 -->
   <section class="v" id="v-batch">
-    <p class="ad-lede">把这次买的都摊在台面上，从上往下拍一张。</p>
-    <button class="btn primary" id="bShot">拍这一批</button>
-    <button class="btn ghost" id="bPick">从相册选照片</button>
+    <p class="ad-lede" data-i18n="add.batLede">把这次买的都摊在台面上，从上往下拍一张。</p>
+    <button class="btn primary" id="bShot" data-i18n="add.bShot">拍这一批</button>
+    <button class="btn ghost" id="bPick" data-i18n="add.bPick">从相册选照片</button>
     <p class="tiny" id="bMsg"></p>
   </section>
 
   <!-- 6 · 确认清单 -->
   <section class="v" id="v-review">
-    <p class="ad-lede" id="revLede">这些要放进冰箱。认错了点 ✕，数量用加减。</p>
+    <p class="ad-lede" id="revLede" data-i18n="add.revLede">这些要放进冰箱。认错了点 ✕，数量用加减。</p>
     <div id="rows"></div>
-    <button class="btn ghost" id="addMore">＋ 补一件</button>
+    <button class="btn ghost" id="addMore" data-i18n="add.addMore">＋ 补一件</button>
   </section>
 
 </main>
