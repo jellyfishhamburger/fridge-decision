@@ -227,7 +227,8 @@
 
   /* ---------- theme v2 · warm kitchen：色值已收进 ds.css ---------- */
   body{background:var(--bg);color:var(--ink)}
-  .top{background:rgba(250,246,236,.94)}
+  /* 页头必须完全不透明：半透明时，滚上来的大图会从标题后面透出来（菜谱页扇形卡就撞过） */
+  .top{background:#FAF6EC}
   /* 页面大标题：衬线 + 600，和锅页同一个规格（尺寸/字重统一，字号走 ds.css） */
   .topin h1{font-family:var(--font-display);font-size:var(--fs-h1);font-weight:600;
     letter-spacing:-.01em;line-height:var(--lh-tight)}
@@ -652,12 +653,13 @@
   .ds-grp .row-i{padding-left:2px}
 
   /* ================= 菜谱页：现在就能做（扇形叠） ================= */
-  .fan{margin:2px 0 10px}
+  .fan{margin:10px 0 10px}
   .fan[hidden]{display:none}
   .fan-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 8px}
   .fan-t{font-size:var(--fs-h2);font-weight:700;margin:0;letter-spacing:-.01em}
   .fan-c{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-  .fan-stage{position:relative;height:270px;margin:0 -16px;touch-action:pan-y;overflow:hidden}
+  /* z-index:0 把扇形卡的 z(30-i) 关在这一层里，否则它们会盖到吸顶页头上面 */
+  .fan-stage{position:relative;z-index:0;height:270px;margin:0 -16px;touch-action:pan-y;overflow:hidden}
   .fan-card{position:absolute;left:0;top:0;border-radius:20px;overflow:hidden;background:var(--card);
     box-shadow:0 12px 26px rgba(47,60,45,.14),0 2px 6px rgba(47,60,45,.06);
     will-change:transform;cursor:pointer;border:0;padding:0;-webkit-user-select:none;user-select:none}
@@ -2189,8 +2191,15 @@ function setPhotoHtml(dishes, rootCls){
     const r = (d && d.recipe) || d;
     return dishPhoto(r);
   };
-  const a = pick(dishes[0], 0);
-  const b = pick(dishes[1] || dishes[0], 1);
+  /* 两张拼图别每套都以同一道青菜开头：先放有实拍的、再放热量高的（通常是主菜） */
+  const ordered = dishes.slice(0, 2).slice().sort((x, y) => {
+    const rx = (x && x.recipe) || x, ry = (y && y.recipe) || y;
+    const hx = !!(window.DISH_PHOTO && DISH_PHOTO.get(rx.name)) ? 1 : 0;
+    const hy = !!(window.DISH_PHOTO && DISH_PHOTO.get(ry.name)) ? 1 : 0;
+    return (hy - hx) || ((ry.kcal || 0) - (rx.kcal || 0));
+  });
+  const a = pick(ordered[0], 0);
+  const b = pick(ordered[1] || ordered[0], 1);
   const cls = rootCls || "ph set2";
   return `<span class="${cls}${a.art && b.art ? " art" : ""}">
       <i class="h h1">${a.html}</i><i class="hh h2">${b.html}</i>
