@@ -2231,7 +2231,7 @@ function dishPhoto(recipe){
   const p = window.DISH_PHOTO && DISH_PHOTO.get(recipe.name);
   if(p && p.src){
     return {art:false, html:`<img src="${p.src}" alt="${recipe.name}" loading="lazy" decoding="async">`
-      + `<span class="cr"><a href="${p.page}" target="_blank" rel="noopener">${p.credit} · ${p.license}</a></span>`};
+      + (p.credit ? `<span class="cr"><a href="${p.page}" target="_blank" rel="noopener">${p.credit} · ${p.license}</a></span>` : "")};
   }
   const ids = (recipe.needs || []).slice(0,3);
   if(!ids.length){
