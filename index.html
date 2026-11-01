@@ -582,6 +582,10 @@
   .setv .sdi.static{border-style:solid;cursor:default}
   .setv .nearmiss{margin:8px 0 0;padding:8px 11px;border-radius:10px;background:var(--amber-soft);
     color:#7A4A05;font-size:12.5px}
+  /* 套餐详情的做法折叠 */
+  .ssdet{margin:-2px 0 6px;padding:0 4px}
+  .ssdet summary{font-size:12.5px;color:var(--green);cursor:pointer;padding:7px 2px;font-weight:600}
+  .ssdet ol{font-size:13.5px;line-height:1.6}
   .altpanel{margin:8px 0 2px;padding:10px;border-radius:var(--r-sm);background:var(--bg);border:1px solid var(--line)}
   .altpanel .sn2{margin:0 0 6px;font-size:11.5px;color:var(--muted)}
   .altpanel .altbtn{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;
@@ -591,13 +595,36 @@
   .altpanel .altbtn.dim{opacity:.6}
   .setv .sdi i{font-style:normal;color:var(--muted);font-size:11px;margin-left:2px}
   .setv .snote{margin:8px 0 0;font-size:11.5px;color:var(--muted)}
-  /* 套餐里每一道：左边点一下=从这道开始，右边 ⇄=换一道 */
-  .sdiwrap{display:inline-flex;align-items:stretch;background:var(--card-2);
-    border:1px dashed var(--line);border-radius:var(--r-pill);overflow:hidden}
-  .sdiwrap .sdi{background:transparent;border:0;border-radius:0;padding:8px 10px 8px 13px}
-  .sdiwrap .sw{background:transparent;border:0;border-left:1px solid var(--line);
-    color:var(--muted);font:inherit;font-size:12px;padding:0 11px;cursor:pointer;min-height:34px}
-  .sdiwrap .sw:active{background:var(--card)}
+  /* 套餐里每一道：整行是一颗按钮（够大才像能点的），右边 ⇄ 换一道 */
+  .snote.top{margin:10px 0 6px;font-weight:600;color:var(--ink-2)}
+  .setsteps{display:flex;flex-direction:column;gap:8px;margin:0 0 4px}
+  .ssrow{display:flex;align-items:stretch;gap:0;background:var(--card-2);
+    border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .ssrow .sshead{flex:1;display:flex;align-items:center;gap:10px;background:transparent;border:0;
+    padding:12px 12px 12px 13px;font:inherit;text-align:left;cursor:pointer;min-height:58px}
+  .ssrow .sshead:active{background:#EFEDE2}
+  .ssrow .idx{flex:none;width:24px;height:24px;border-radius:99px;background:var(--green);
+    color:#fff;font-size:12.5px;font-weight:700;display:grid;place-items:center}
+  .ssrow .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .ssrow .tx b{font-size:15px;font-weight:700;color:var(--ink);line-height:1.25}
+  .ssrow .tx s{font-size:12px;color:var(--muted);text-decoration:none}
+  .ssrow .go{flex:none;font-size:12.5px;font-weight:700;color:var(--green);
+    background:var(--green-soft);border-radius:99px;padding:7px 11px}
+  .ssrow .sw{flex:none;width:44px;background:transparent;border:0;border-left:1px solid var(--line);
+    color:var(--muted);font:inherit;font-size:15px;cursor:pointer}
+  .ssrow .sw:active{background:#EFEDE2}
+  /* 套餐卡：两道菜各一半照片 */
+  .rcc .ph.set2{display:grid;grid-template-columns:1fr 1fr;gap:2px;aspect-ratio:4/3;background:var(--card-2)}
+  /* 套餐详情面板里的拼合照片（比卡片大一档） */
+  .rb-ph.set2{display:grid;grid-template-columns:1fr 1fr;gap:3px;border-radius:14px;overflow:hidden;
+    background:var(--card-2);height:150px;margin:0 0 12px}
+  .rb-ph.set2 .h,.rb-ph.set2 .hh{display:block;position:relative;overflow:hidden}
+  .rb-ph.set2 img{width:100%;height:100%;object-fit:cover;display:block}
+  .rb-ph.set2.art{place-items:center;padding:8px}
+  .rcc .ph.set2 .h,.rcc .ph.set2 .hh{display:block;overflow:hidden;position:relative;min-height:100%}
+  .rcc .ph.set2 img{width:100%;height:100%;object-fit:cover;display:block}
+  .rcc .ph.set2.art{align-items:center;justify-items:center;padding:6px}
+  .rcc .ph.set2.art .h,.rcc .ph.set2.art .hh{display:grid;place-items:center;height:100%}
   /* 其他套餐 */
   .osrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
   .osrow:first-of-type{border-top:0;padding-top:2px}
@@ -703,6 +730,11 @@
     background:rgba(28,32,30,.45);padding:1px 5px;border-radius:5px}
   .rsheet .rb-ph .cr a{color:#fff;text-decoration:none}
   .rsheet .rb-ph img{display:block;width:100%;height:196px;object-fit:cover}
+  /* 套餐详情里的两半照片：必须自己定高，否则会套用单图 196px 把面板撑爆 */
+  .rsheet .rb-ph.set2{display:grid;grid-template-columns:1fr 1fr;gap:2px;height:144px}
+  .rsheet .rb-ph.set2 .h,.rsheet .rb-ph.set2 .hh{height:144px;overflow:hidden;position:relative}
+  .rsheet .rb-ph.set2 img{height:144px}
+  .rsheet .rb-ph.set2 .cr{font-size:8px;right:4px;bottom:3px}
   .rsheet .rb-ph.art{display:flex;align-items:center;justify-content:center;gap:22px;height:132px;
     background:#F7F2E4;border-bottom:1px solid var(--line-soft)}
   .rsheet .rb-ph.art .ic{display:flex;flex-direction:column;align-items:center;gap:3px;color:#6f7f74}
@@ -1761,12 +1793,9 @@ function renderDiscSets(){
   box.hidden = false;
   const grid = $("#discSetGrid");
   if(grid) grid.innerHTML = sets.map(s => {
-    /* 用配菜的照片：两套的主菜常常是同一道，用第一道会让卡片长得一模一样 */
-    const photoDish = (s.dishes[1] || s.dishes[0]).recipe;
-    const ph = dishPhoto(photoDish);
     const name = s.dishes.map(d => I18N.recipeName(d.recipe)).join(" + ") + (s.onepot ? "" : tp("sets.riceSuffix", {}, " + 米饭"));
     return `<button class="rcc set" type="button" data-setic="${s.dishes.map(d => d.recipe.id).join("|")}" data-setn="${(s.name || "").replace(/"/g, "&quot;")}" aria-label="${name}">
-      <span class="ph${ph.art ? " art" : ""}">${ph.html}<i class="setflag">${tp("sets.tag", {}, "套餐")}</i></span>
+      ${setPhotoHtml(s.dishes)}<i class="setflag">${tp("sets.tag", {}, "套餐")}</i>
       <span class="bd">
         <span class="nm">${name}</span>
         <span class="mt">
@@ -1779,17 +1808,9 @@ function renderDiscSets(){
   const sc = $("#setCount");
   if(sc) sc.textContent = tp("sets.quickSubN", { n: sets.length }, sets.length + " 套 · 一人份");
   const scope = $("#discSetGrid") || box;
-  /* 菜谱页只负责「看和挑」：点一套 → 回首页把它展开，由首页决定开始顺序
-     （以前这里直接 startSet，等于跳过选择直接开火，和首页的流程两套逻辑） */
+  /* 点一套 → 就地展开这套的做法和「从哪道开始」，不再把人踢回首页 */
   scope.querySelectorAll("[data-setic]").forEach(b => {
-    b.addEventListener("click", () => {
-      setChoice = b.dataset.setic.split("|").filter(Boolean);
-      setPick = 0;
-      show("home");
-      renderResult(FD.decide(items, goal), "#homeResult");
-      const r = $("#homeResult");
-      if(r) window.scrollTo({ top: Math.max(0, r.offsetTop - 12), behavior: "smooth" });
-    });
+    b.addEventListener("click", () => openSetSheet(b.dataset.setic.split("|").filter(Boolean), b.dataset.setn));
   });
 }
 
@@ -1901,13 +1922,18 @@ function renderResult(list, sel){
         <span class="badge">${tp("sets.kcal", {n: setMeta.kcal}, "约 " + setMeta.kcal + " kcal")}</span>
         <span class="badge">${setMeta.n}${tp("sets.dishes", {}, " 道菜")}${setMeta.rice ? tp("sets.plusRice", {}, " + 米饭") : ""}</span>
       </div>
-      <div class="setlist">${setDishes.map((d, i) =>
-        `<span class="sdiwrap">
-           <button class="sdi" data-set-start="${i}" title="${tp("sets.startFrom", {}, "从这道开始")}">${i + 1}. ${d.name}<i>${d.minutes}′</i></button>
+      <p class="snote top">${tp("sets.pickOrder", {}, "先做哪道？点一行就从那道开始。")}</p>
+      <div class="setsteps">${setDishes.map((d, i) =>
+        `<div class="ssrow">
+           <button class="sshead" data-set-start="${i}">
+             <span class="idx">${i + 1}</span>
+             <span class="tx"><b>${d.name}</b><s>${t("card.min", { n: d.minutes })}</s></span>
+             <span class="go">▶ ${tp("sets.startFrom", {}, "从这道开始")}</span>
+           </button>
            <button class="sw" data-swapdish="${i}" title="${tp("sets.swapOne", {}, "换一道")}" aria-label="${tp("sets.swapOne", {}, "换一道")}">⇄</button>
-         </span>`).join("")}</div>
+         </div>`).join("")}</div>
       <div class="altpanel" id="altPanel" hidden></div>
-      <p class="snote">${tp("sets.hint", {}, "默认先做耗时的，最后一道起锅就能吃。点哪一道，就从哪一道开始。")}</p>
+      <p class="snote">${tp("sets.hint", {}, "默认先做耗时的，最后一道起锅就能吃。")}</p>
       <div class="setacts">
         <button class="btn primary" data-set-dishes="${setDishes.map(d => d.id).join("|")}" data-set-name="${(setName || "").replace(/"/g, "&quot;")}">${tp("sets.start", {}, "开始做这一套")}</button>
         ${(gen && readySets.length > 1) ? `<button class="btn ghost" data-setswap="1">${tp("sets.swap", {}, "换一套")}</button>` : ""}
@@ -2035,6 +2061,20 @@ function renderResult(list, sel){
    自己挑食材在 cook.html，这里只给一条文字入口，不再放第二个大红按钮。 */
 /* 成品照：有开放图源就放照片（右下角标作者/许可证，可点回原页），
    没有就退回这道的食材插画——比放一张错的照片诚实。 */
+/* 套餐的照片：两道菜各一半拼起来 —— 只放一道菜会被读成"这就是这道菜" */
+function setPhotoHtml(dishes, rootCls){
+  const pick = (d, i) => {
+    const r = (d && d.recipe) || d;
+    return dishPhoto(r);
+  };
+  const a = pick(dishes[0], 0);
+  const b = pick(dishes[1] || dishes[0], 1);
+  const cls = rootCls || "ph set2";
+  return `<span class="${cls}${a.art && b.art ? " art" : ""}">
+      <i class="h h1">${a.html}</i><i class="hh h2">${b.html}</i>
+    </span>`;
+}
+
 function dishPhoto(recipe){
   const p = window.DISH_PHOTO && DISH_PHOTO.get(recipe.name);
   if(p && p.src){
@@ -2302,6 +2342,61 @@ addEventListener("resize", () => {
 });
 
 /* 详情：复用 .sheet 和同一套步骤插画；「跟着做」直接进已有的做饭模式，不另起流程 */
+/* 套餐详情：两道菜各一行（点哪行就从哪道开始），每行都能展开看这一步的做法
+   —— 从菜谱页点套餐时用它，不再把人踢回首页 */
+function openSetSheet(ids, nameHint){
+  const all = FD.decide(items, goal);
+  const evals = (ids || []).map(id => all.find(x => x.recipe.id === id)).filter(Boolean);
+  if(!evals.length) return;
+  /* 默认顺序：耗时的先做 */
+  const ordered = evals.slice().sort((a, b) => (b.recipe.minutes || 0) - (a.recipe.minutes || 0));
+  const name = ordered.map(e => I18N.recipeName(e.recipe)).join(" + ");
+  const minutes = Math.max.apply(null, ordered.map(e => e.recipe.minutes || 0)) + 8;
+  const kcal = ordered.reduce((a, e) => a + (e.recipe.kcal || 0), 0) + (ordered.length > 1 ? 150 : 0);
+  const sep = I18N.getLang() === "en" ? ", " : "、";
+
+  $("#rBody").innerHTML = `
+    <button class="rbclose" id="rClose" aria-label="${t("sheet.cancel")}">✕</button>
+    ${setPhotoHtml(ordered, "rb-ph set2")}
+    <h3 id="rName">${name}</h3>
+    <div class="rbtags">
+      <span class="ds-pill">${t("card.min", { n: minutes })}</span>
+      <span class="ds-pill">${kcal} kcal</span>
+      <span class="ds-pill">${ordered.length}${tp("sets.dishes", {}, " 道菜")}${ordered.length > 1 ? tp("sets.plusRice", {}, " + 米饭") : ""}</span>
+    </div>
+    <p class="rbh">${tp("sets.pickOrder", {}, "先做哪道？点一行就从那道开始。")}</p>
+    <div class="setsteps sheetsteps">
+      ${ordered.map((e, i) => `
+        <div class="ssrow">
+          <button class="sshead" data-start="${i}">
+            <span class="idx">${i + 1}</span>
+            <span class="tx"><b>${I18N.recipeName(e.recipe)}</b><s>${t("card.min", { n: e.recipe.minutes })}${e.recipe.kcal ? " · " + e.recipe.kcal + " kcal" : ""}${e.used.length ? " · " + tp("disc.uses", {}, "用掉") + e.used.map(i2 => cnOf(i2.cat)).join(sep) : ""}</s></span>
+            <span class="go">▶ ${tp("sets.startFrom", {}, "从这道开始")}</span>
+          </button>
+        </div>
+        <details class="ssdet">
+          <summary>${tp("sets.howTo", { n: i + 1 }, "第 " + (i + 1) + " 道的做法")}</summary>
+          <ol>${stepsHtml(e.recipe)}</ol>
+        </details>`).join("")}
+    </div>
+    <div class="sheet-foot">
+      <button class="btn primary" data-startfirst="1">${tp("sets.startAll", {}, "按这个顺序开始")}</button>
+    </div>`;
+
+  $("#rClose").addEventListener("click", closeRecipe);
+  $$("#rBody [data-start]").forEach(b => b.addEventListener("click", () => {
+    const at = Number(b.dataset.start) || 0;
+    closeRecipe();
+    startSet(ordered.map(e => e.recipe.id), name, at);
+  }));
+  const allBtn = $("#rBody [data-startfirst]");
+  if(allBtn) allBtn.addEventListener("click", () => { closeRecipe(); startSet(ordered.map(e => e.recipe.id), name, 0); });
+
+  $("#rScrim").classList.add("on");
+  $("#rSheet").classList.add("on");
+  $("#rSheet").scrollTop = 0;
+}
+
 function openRecipe(id){
   const r = FD.decide(items, goal).find(x => x.recipe.id === id);
   if(!r) return;
