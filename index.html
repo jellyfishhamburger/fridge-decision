@@ -2321,6 +2321,14 @@ function discBase(){
   if(discFilter === "light")  list = list.filter(r => (r.recipe.kcal || 0) <= 500);
   const q = discQuery.trim().toLowerCase();
   if(q) list = list.filter(r => recipeHits(r.recipe, q));
+  /* 排序：现在能做 → 差一样 → 其余；同组里有图的排前面，免得一屏都是占位卡 */
+  const rank = {ready:0, shop1:1};
+  const hasPhoto = r => !!(window.DISH_PHOTO && DISH_PHOTO.get(r.recipe.name));
+  list.sort((a, b) => {
+    const ra = rank[a.status] === undefined ? 2 : rank[a.status];
+    const rb = rank[b.status] === undefined ? 2 : rank[b.status];
+    return ra - rb || (hasPhoto(b) ? 1 : 0) - (hasPhoto(a) ? 1 : 0) || b.score - a.score;
+  });
   return list;
 }
 

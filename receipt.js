@@ -22,6 +22,8 @@
     chili:   ["青椒", "尖椒", "柿子椒", "辣椒"],
     eggplant:["茄子"],
     mushroom:["香菇", "蘑菇", "菌菇", "平菇"],
+    edamame:["毛豆", "枝豆"],
+    tangyuan:["汤圆", "元宵"],
     onion:   ["洋葱"],
     carrot:  ["胡萝卜", "红萝卜"],
     potato:  ["土豆", "马铃薯"],
@@ -105,7 +107,7 @@
     dried_shrimp: ["虾皮"],
     squid:        ["鱿鱼", "鱿鱼须"],
     beef_brisket: ["牛腩"],
-    pork_trotter: ["猪蹄", "猪手"],
+    pork_trotter: ["猪蹄", "猪手", "肘子", "蹄髈", "猪肘"],
     chicken_feet: ["鸡爪", "凤爪"],
     lotus_seed:   ["莲子"],
 

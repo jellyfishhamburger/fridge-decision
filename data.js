@@ -971,6 +971,24 @@ window.FD_DATA = {
   "days": 90,
   "src": "est",
   "shop": "1 包"
+ },
+ {
+  "id": "edamame",
+  "name": "Edamame",
+  "cn": "毛豆",
+  "tag": "veg",
+  "days": 5,
+  "src": "est",
+  "shop": "1 袋"
+ },
+ {
+  "id": "tangyuan",
+  "name": "Frozen tangyuan",
+  "cn": "汤圆",
+  "tag": "carb",
+  "days": 90,
+  "src": "est",
+  "shop": "1 包"
  }
 ],
  "pantry": [
