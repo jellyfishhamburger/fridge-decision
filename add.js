@@ -533,8 +533,16 @@
         go("review");
         return;
       }
+      /* CLIP 先给三个候选，作为提示交给 Qwen：既省它瞎猜，也保留开放性 */
+      var hint = [];
+      try {
+        var cc = await fileToCanvas(file);
+        var ranked = await clipScores(cc);
+        hint = ranked.slice(0, 3).map(function (r) { return r.name; }).filter(Boolean);
+      } catch (e) {}
       var r = await fetch(AI_URL + "/recognize", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: dataUrl })
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: dataUrl, hint: hint })
       }).then(function (x) { return x.json(); });
       var items = (r && r.items) || [];
       if (!items.length) { msg.textContent = "没认出来。" + (r && r.error ? r.error : ""); return; }
@@ -542,7 +550,7 @@
         var cat = catFromName(it.name);
         if (cat) addRow(cat, it.qty || 1, "batch", dataUrl);
       });
-      msg.textContent = "认出 " + items.length + " 样。";
+      msg.textContent = "认出 " + items.length + " 样" + (hint.length ? "（CLIP 提示：" + hint.join("/") + "）" : "") + "。";
       go("review");
     } catch (e) {
       msg.textContent = "连不上识别服务：" + (e && e.message);
