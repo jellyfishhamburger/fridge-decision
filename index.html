@@ -834,6 +834,8 @@
   .rcc .ph.art .ic svg{width:24px;height:24px;stroke-width:1.5;color:#7C8B7E}
   .rcc .ph.art .ic i{font-size:10px;color:#8B8574}
   .rcc .ph.art .ic.empty{opacity:.75}
+
+  .cta *{text-wrap:balance}
 </style>
 </head>
 <body>
@@ -3429,6 +3431,25 @@ if(window.MOTION){
     document.querySelectorAll(sel).forEach(function(el){ MOTION.press(el); });
   });
 }
+</script>
+<script>
+/* 大字体适配：底部固定条（导航 / 锅面板）高度随系统字号变化，
+   用实际占位给正文留白，否则滚到底最后一行会被压住。 */
+(function () {
+  function fit() {
+    var bars = [].slice.call(document.querySelectorAll('.nav,.pot-sec')).filter(function (el) {
+      return getComputedStyle(el).position === 'fixed';
+    });
+    if (!bars.length) { document.body.style.paddingBottom = ''; return; }
+    var top = Math.min.apply(null, bars.map(function (b) { return b.getBoundingClientRect().top; }));
+    document.body.style.paddingBottom = Math.max(24, Math.round(window.innerHeight - top) + 16) + 'px';
+  }
+  window.addEventListener('load', fit);
+  window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', fit);
+  document.addEventListener('DOMContentLoaded', fit);
+  try { new ResizeObserver(fit).observe(document.documentElement); } catch (e) {}
+})();
 </script>
 </body>
 </html>

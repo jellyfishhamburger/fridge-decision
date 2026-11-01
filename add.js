@@ -88,11 +88,14 @@
     box.innerHTML = state.rows.map(function (r, i) {
       var f = FD.byId[r.cat];
       var unit = FD.unitOf ? FD.unitOf(r.cat) : "份";
+      var ico = (f && window.FD_ICON) ? window.FD_ICON(f.id, 30) : "";
       return '<div class="row" data-i="' + i + '">' +
-        (r.img ? '<img src="' + r.img + '" alt="">' : '<img alt="">') +
-        '<div class="nm">' + selHtml(r) + "<span>" + (f ? f.tag + " · " + tt("add.aboutDays", "约 {n} 天").replace("{n}", f.days) : tt("add.notChosen", "还没选是哪一样")) + "</span></div>" +
-        '<div class="q"><button data-q="-1">−</button><span>' + r.qty + '</span><button data-q="1">＋</button></div>' +
-        '<button class="del" data-del="1" aria-label="删掉">✕</button>' +
+        '<div class="thumb">' + (r.img ? '<img src="' + r.img + '" alt="">' : ico) + '</div>' +
+        '<div class="nm">' + selHtml(r) + "<span>" + (f ? f.tag + " · " + tt("add.aboutDays", "{n} 天").replace("{n}", f.days) : tt("add.notChosen", "还没选是哪一样")) + "</span></div>" +
+        '<div class="ctl">' +
+          '<div class="q"><button data-q="-1">−</button><span>' + r.qty + '</span><button data-q="1">＋</button></div>' +
+          '<button class="del" data-del="1" aria-label="删掉">✕</button>' +
+        '</div>' +
         "</div>";
     }).join("") || '<p class="tiny">' + tt("add.noRows", "还没有东西。用上面的方式加，或者点「＋ 补一件」。") + '</p>';
     var n = state.rows.filter(function (r) { return !!r.cat; }).length;
@@ -100,6 +103,11 @@
     $("#confirm").textContent = n ? tt("add.confirmN", "确认入库").replace("{n}", n) : tt("add.confirm", "确认入库");
     $("#confirm").disabled = !n;
     $("#bar").hidden = !(state.view === "review" && state.rows.length);
+    /* 底栏在大字体下会换成两行，高度不固定 → 按实际高度给列表留白 */
+    requestAnimationFrame(function () {
+      var bar = $("#bar");
+      box.style.paddingBottom = (bar && !bar.hidden ? bar.offsetHeight + 18 : 0) + "px";
+    });
     $("#cnt") && ($("#cnt").textContent = tt("add.shotN", "已拍 {n} 件").replace("{n}", state.shots.length));
   }
 

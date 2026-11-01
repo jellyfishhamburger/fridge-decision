@@ -196,7 +196,7 @@
       "add.detStop": "结束检测",
       "add.mAdd": "加进清单",
       "add.mSave": "保存修改",
-      "add.aboutDays": "约 {n} 天",
+      "add.aboutDays": "{n} 天",
       "add.notChosen": "还没选是哪一样",
       "add.noRows": "还没有东西。用上面的方式加，或者点「＋ 补一件」。",
       "set.gateH": "门口摄像头（闸机）", "set.gateHint": "抓拍和识别都在这一页，它跑在冰箱那块屏上；手机这边只负责确认和改。",
