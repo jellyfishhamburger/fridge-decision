@@ -618,30 +618,100 @@
     if (f) readReceipt(f);
   });
 
+  /* 相册里的小票动辄 4000x3000，整张丢给 wasm 会跑到内存发抖、几十秒不返回。
+     统一先缩到长边 1800，识别率不掉，速度快 3-5 倍。 */
+  function shrinkImage(file, maxSide) {
+    return new Promise(function (res, rej) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      var done = false;
+      var to = setTimeout(function () {
+        if (done) return; done = true;
+        URL.revokeObjectURL(url);
+        rej(new Error("图片打不开（可能是 HEIC 或损坏），换一张 JPG 试试"));
+      }, 12000);
+      img.onload = function () {
+        if (done) return; done = true; clearTimeout(to);
+        try {
+          var w = img.naturalWidth, h = img.naturalHeight;
+          var k = Math.min(1, maxSide / Math.max(w, h));
+          var c = document.createElement("canvas");
+          c.width = Math.round(w * k); c.height = Math.round(h * k);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          URL.revokeObjectURL(url);
+          res(c.toDataURL("image/jpeg", 0.92));
+        } catch (e) { rej(e); }
+      };
+      img.onerror = function () {
+        if (done) return; done = true; clearTimeout(to);
+        URL.revokeObjectURL(url);
+        rej(new Error("图片打不开（可能是 HEIC 或损坏），换一张 JPG 试试"));
+      };
+      img.src = url;
+    });
+  }
+
+  function withTimeout(promise, ms, tag) {
+    return new Promise(function (res, rej) {
+      var done = false;
+      var t = setTimeout(function () {
+        if (done) return; done = true;
+        rej(new Error(tag + " 超时" + Math.round(ms / 1000) + "秒"));
+      }, ms);
+      promise.then(function (v) { if (!done) { done = true; clearTimeout(t); res(v); } },
+                   function (e) { if (!done) { done = true; clearTimeout(t); rej(e); } });
+    });
+  }
+
   async function readReceipt(file) {
     var msg = $("#rMsg");
-    msg.textContent = "正在读小票…（约 5 秒）";
+    var t0 = Date.now();
+    msg.textContent = "准备图片…";
     try {
-      var dataUrl = await fileToDataUrl(file);
+      var dataUrl = await shrinkImage(file, 3200);
       /* 小票是热敏纸 + 手机拍的，tesseract 对中文几乎全是乱码（实测把「品名」读成 he）。
          paddle 在同一张图上能读对 90% 以上，所以默认用它；真跑不起来才退回 fast。 */
+      msg.textContent = "正在识别…（第一次加载模型约 10–20 秒，之后 5 秒）";
       var lines = [];
-      try { lines = await RECEIPT.readLines(dataUrl, "paddle"); }
-      catch (e) { lines = await RECEIPT.readLines(dataUrl, "fast"); }
-      if (!lines.length) lines = await RECEIPT.readLines(dataUrl, "fast");
+      try {
+        lines = await withTimeout(RECEIPT.readLines(dataUrl, "paddle"), 45000, "高精度引擎");
+      } catch (e1) {
+        msg.textContent = "高精度引擎没起来，换快速引擎再试…";
+        lines = await withTimeout(RECEIPT.readLines(dataUrl, "fast"), 25000, "快速引擎");
+      }
+      if (!lines || !lines.length) {
+        msg.textContent = "换快速引擎再试…";
+        lines = await withTimeout(RECEIPT.readLines(dataUrl, "fast"), 25000, "快速引擎");
+      }
       var text = lines.join(NL);
       $("#rRaw").textContent = text || "（空）";
       $("#rRawBox").hidden = !text;
       var parsed = RECEIPT.parse(text);
+      /* 缩图偶尔会吃掉一行（实测 2600 时「香甜蕉」整行消失）。
+         商品少于 3 样就用原图再跑一遍，取读到的更多的那个结果。 */
+      if (parsed.length < 3) {
+        msg.textContent = "商品没读全，用原图再试一次…";
+        try {
+          var full = await shrinkImage(file, 99999);
+          var l2 = await withTimeout(RECEIPT.readLines(full, "paddle"), 60000, "高精度引擎");
+          var t2 = l2.join(NL);
+          var p2 = RECEIPT.parse(t2);
+          if (p2.length > parsed.length) { parsed = p2; text = t2; }
+        } catch (e2) {}
+        $("#rRaw").textContent = text || "（空）";
+        $("#rRawBox").hidden = !text;
+      }
       if (!parsed.length) {
         msg.textContent = "没读出商品。可以换一张更清楚的，或者手动添加。";
         return;
       }
       parsed.forEach(function (p) { addRow(p.cat, p.qty || 1, "receipt"); });
-      msg.textContent = "读到 " + parsed.length + " 样，已放进清单。";
+      msg.textContent = "读到 " + parsed.length + " 样，已放进清单（" +
+        Math.round((Date.now() - t0) / 1000) + " 秒）。";
       go("review");
     } catch (e) {
-      msg.textContent = "读不出来：" + (e && e.message);
+      msg.textContent = "读不出来：" + (e && e.message) +
+        "。可以改用「拍小票」，或者手动添加。";
     }
   }
 
