@@ -6,7 +6,7 @@
    ============================================================ */
 window.FD_DATA = {
  "version": "0.3",
- "updated": "2026-10-29",
+ "updated": "2026-11-01",
  "recipeSource": {
   "name": "HowToCook (Anduin2017)",
   "license": "CC-BY-4.0",
@@ -18,232 +18,700 @@ window.FD_DATA = {
   "est": "internal estimate — verify before citing"
  },
  "foods": [
-  {
-   "id": "shrimp",
-   "name": "Shrimp",
-   "cn": "虾",
-   "tag": "protein",
-   "days": 3,
-   "src": "usda",
-   "shop": "1 盒"
-  },
-  {
-   "id": "chicken",
-   "name": "Chicken",
-   "cn": "鸡肉",
-   "tag": "protein",
-   "days": 2,
-   "src": "usda",
-   "shop": "1 盒"
-  },
-  {
-   "id": "pork",
-   "name": "Pork",
-   "cn": "猪肉",
-   "tag": "protein",
-   "days": 3,
-   "src": "usda",
-   "shop": "1 盒"
-  },
-  {
-   "id": "beef",
-   "name": "Beef",
-   "cn": "牛肉",
-   "tag": "protein",
-   "days": 3,
-   "src": "usda",
-   "shop": "1 盒"
-  },
-  {
-   "id": "fish",
-   "name": "Fish",
-   "cn": "鱼",
-   "tag": "protein",
-   "days": 2,
-   "src": "usda",
-   "shop": "1 条"
-  },
-  {
-   "id": "ham",
-   "name": "Ham",
-   "cn": "火腿",
-   "tag": "protein",
-   "days": 4,
-   "src": "usda",
-   "shop": "1 包"
-  },
-  {
-   "id": "egg",
-   "name": "Eggs",
-   "cn": "鸡蛋",
-   "tag": "protein",
-   "days": 21,
-   "src": "usda",
-   "shop": "1 盒"
-  },
-  {
-   "id": "tofu",
-   "name": "Tofu",
-   "cn": "豆腐",
-   "tag": "protein",
-   "days": 4,
-   "src": "est",
-   "shop": "1 盒"
-  },
-  {
-   "id": "greens",
-   "name": "Leafy greens",
-   "cn": "青菜",
-   "tag": "greens",
-   "days": 4,
-   "src": "est",
-   "shop": "1 把"
-  },
-  {
-   "id": "broccoli",
-   "name": "Broccoli",
-   "cn": "西兰花",
-   "tag": "greens",
-   "days": 5,
-   "src": "est",
-   "shop": "1 颗"
-  },
-  {
-   "id": "tomato",
-   "name": "Tomato",
-   "cn": "番茄",
-   "tag": "greens",
-   "days": 6,
-   "src": "est",
-   "shop": "3 个"
-  },
-  {
-   "id": "chili",
-   "name": "Green chili",
-   "cn": "青椒",
-   "tag": "veg",
-   "days": 7,
-   "src": "est",
-   "shop": "3 个"
-  },
-  {
-   "id": "onion",
-   "name": "Onion",
-   "cn": "洋葱",
-   "tag": "veg",
-   "days": 20,
-   "src": "est",
-   "shop": "1 个"
-  },
-  {
-   "id": "carrot",
-   "name": "Carrot",
-   "cn": "胡萝卜",
-   "tag": "veg",
-   "days": 14,
-   "src": "est",
-   "shop": "2 根"
-  },
-  {
-   "id": "potato",
-   "name": "Potato",
-   "cn": "土豆",
-   "tag": "carb",
-   "days": 20,
-   "src": "est",
-   "shop": "3 个"
-  },
-  {
-   "id": "eggplant",
-   "name": "Eggplant",
-   "cn": "茄子",
-   "tag": "veg",
-   "days": 7,
-   "src": "est",
-   "shop": "2 根"
-  },
-  {
-   "id": "mushroom",
-   "name": "Mushrooms",
-   "cn": "香菇",
-   "tag": "veg",
-   "days": 5,
-   "src": "est",
-   "shop": "1 盒"
-  },
-  {
-   "id": "rice",
-   "name": "Cooked rice",
-   "cn": "米饭",
-   "tag": "carb",
-   "days": 3,
-   "src": "usda",
-   "shop": "1 碗"
-  },
-  {
-   "id": "noodle",
-   "name": "Noodles",
-   "cn": "面条",
-   "tag": "carb",
-   "days": 3,
-   "src": "est",
-   "shop": "1 把"
-  },
-  {
-   "id": "dumpling",
-   "name": "Frozen dumplings",
-   "cn": "速冻饺子",
-   "tag": "carb",
-   "days": 90,
-   "src": "est",
-   "shop": "1 包"
-  },
-  {
-   "id": "bread",
-   "name": "Bread",
-   "cn": "面包",
-   "tag": "carb",
-   "days": 5,
-   "src": "est",
-   "shop": "1 袋"
-  },
-  {
-   "id": "milk",
-   "name": "Milk",
-   "cn": "牛奶",
-   "tag": "dairy",
-   "days": 7,
-   "src": "est",
-   "shop": "1 盒"
-  },
-  {
-   "id": "cheese",
-   "name": "Cheese",
-   "cn": "芝士",
-   "tag": "dairy",
-   "days": 21,
-   "src": "usda",
-   "shop": "1 包"
-  },
-  {
-   "id": "yogurt",
-   "name": "Yogurt",
-   "cn": "酸奶",
-   "tag": "dairy",
-   "days": 10,
-   "src": "est",
-   "shop": "1 杯"
-  },
-  {
-   "id": "cola",
-   "name": "Cola",
-   "cn": "可乐",
-   "tag": "other",
-   "days": 180,
-   "src": "est",
-   "shop": "1 罐"
-  }
- ],
+ {
+  "id": "shrimp",
+  "name": "Shrimp",
+  "cn": "虾",
+  "tag": "protein",
+  "days": 3,
+  "src": "usda",
+  "shop": "1 盒"
+ },
+ {
+  "id": "chicken",
+  "name": "Chicken",
+  "cn": "鸡肉",
+  "tag": "protein",
+  "days": 2,
+  "src": "usda",
+  "shop": "1 盒"
+ },
+ {
+  "id": "pork",
+  "name": "Pork",
+  "cn": "猪肉",
+  "tag": "protein",
+  "days": 3,
+  "src": "usda",
+  "shop": "1 盒"
+ },
+ {
+  "id": "beef",
+  "name": "Beef",
+  "cn": "牛肉",
+  "tag": "protein",
+  "days": 3,
+  "src": "usda",
+  "shop": "1 盒"
+ },
+ {
+  "id": "fish",
+  "name": "Fish",
+  "cn": "鱼",
+  "tag": "protein",
+  "days": 2,
+  "src": "usda",
+  "shop": "1 条"
+ },
+ {
+  "id": "ham",
+  "name": "Ham",
+  "cn": "火腿",
+  "tag": "protein",
+  "days": 4,
+  "src": "usda",
+  "shop": "1 包"
+ },
+ {
+  "id": "egg",
+  "name": "Eggs",
+  "cn": "鸡蛋",
+  "tag": "protein",
+  "days": 21,
+  "src": "usda",
+  "shop": "1 盒"
+ },
+ {
+  "id": "tofu",
+  "name": "Tofu",
+  "cn": "豆腐",
+  "tag": "protein",
+  "days": 4,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "greens",
+  "name": "Leafy greens",
+  "cn": "青菜",
+  "tag": "greens",
+  "days": 4,
+  "src": "est",
+  "shop": "1 把"
+ },
+ {
+  "id": "broccoli",
+  "name": "Broccoli",
+  "cn": "西兰花",
+  "tag": "greens",
+  "days": 5,
+  "src": "est",
+  "shop": "1 颗"
+ },
+ {
+  "id": "tomato",
+  "name": "Tomato",
+  "cn": "番茄",
+  "tag": "greens",
+  "days": 6,
+  "src": "est",
+  "shop": "3 个"
+ },
+ {
+  "id": "chili",
+  "name": "Green chili",
+  "cn": "青椒",
+  "tag": "veg",
+  "days": 7,
+  "src": "est",
+  "shop": "3 个"
+ },
+ {
+  "id": "onion",
+  "name": "Onion",
+  "cn": "洋葱",
+  "tag": "veg",
+  "days": 20,
+  "src": "est",
+  "shop": "1 个"
+ },
+ {
+  "id": "carrot",
+  "name": "Carrot",
+  "cn": "胡萝卜",
+  "tag": "veg",
+  "days": 14,
+  "src": "est",
+  "shop": "2 根"
+ },
+ {
+  "id": "potato",
+  "name": "Potato",
+  "cn": "土豆",
+  "tag": "carb",
+  "days": 20,
+  "src": "est",
+  "shop": "3 个"
+ },
+ {
+  "id": "eggplant",
+  "name": "Eggplant",
+  "cn": "茄子",
+  "tag": "veg",
+  "days": 7,
+  "src": "est",
+  "shop": "2 根"
+ },
+ {
+  "id": "mushroom",
+  "name": "Mushrooms",
+  "cn": "香菇",
+  "tag": "veg",
+  "days": 5,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "rice",
+  "name": "Cooked rice",
+  "cn": "米饭",
+  "tag": "carb",
+  "days": 3,
+  "src": "usda",
+  "shop": "1 碗"
+ },
+ {
+  "id": "noodle",
+  "name": "Noodles",
+  "cn": "面条",
+  "tag": "carb",
+  "days": 3,
+  "src": "est",
+  "shop": "1 把"
+ },
+ {
+  "id": "dumpling",
+  "name": "Frozen dumplings",
+  "cn": "速冻饺子",
+  "tag": "carb",
+  "days": 90,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "bread",
+  "name": "Bread",
+  "cn": "面包",
+  "tag": "carb",
+  "days": 5,
+  "src": "est",
+  "shop": "1 袋"
+ },
+ {
+  "id": "milk",
+  "name": "Milk",
+  "cn": "牛奶",
+  "tag": "dairy",
+  "days": 7,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "cheese",
+  "name": "Cheese",
+  "cn": "芝士",
+  "tag": "dairy",
+  "days": 21,
+  "src": "usda",
+  "shop": "1 包"
+ },
+ {
+  "id": "yogurt",
+  "name": "Yogurt",
+  "cn": "酸奶",
+  "tag": "dairy",
+  "days": 10,
+  "src": "est",
+  "shop": "1 杯"
+ },
+ {
+  "id": "cola",
+  "name": "Cola",
+  "cn": "可乐",
+  "tag": "other",
+  "days": 180,
+  "src": "est",
+  "shop": "1 罐"
+ },
+ {
+  "id": "cabbage",
+  "name": "Napa cabbage",
+  "cn": "白菜",
+  "tag": "greens",
+  "days": 21,
+  "src": "est",
+  "shop": "1 颗"
+ },
+ {
+  "id": "baby_cabbage",
+  "name": "Baby cabbage",
+  "cn": "娃娃菜",
+  "tag": "greens",
+  "days": 10,
+  "src": "est",
+  "shop": "1 袋"
+ },
+ {
+  "id": "lettuce",
+  "name": "Lettuce",
+  "cn": "生菜",
+  "tag": "greens",
+  "days": 5,
+  "src": "est",
+  "shop": "1 颗"
+ },
+ {
+  "id": "spinach",
+  "name": "Spinach",
+  "cn": "菠菜",
+  "tag": "greens",
+  "days": 4,
+  "src": "est",
+  "shop": "1 把"
+ },
+ {
+  "id": "celery",
+  "name": "Celery",
+  "cn": "芹菜",
+  "tag": "veg",
+  "days": 10,
+  "src": "est",
+  "shop": "1 把"
+ },
+ {
+  "id": "chives",
+  "name": "Chives",
+  "cn": "韭菜",
+  "tag": "greens",
+  "days": 5,
+  "src": "est",
+  "shop": "1 把"
+ },
+ {
+  "id": "bean_sprout",
+  "name": "Bean sprouts",
+  "cn": "豆芽",
+  "tag": "veg",
+  "days": 3,
+  "src": "est",
+  "shop": "1 袋"
+ },
+ {
+  "id": "cucumber",
+  "name": "Cucumber",
+  "cn": "黄瓜",
+  "tag": "veg",
+  "days": 7,
+  "src": "est",
+  "shop": "2 根"
+ },
+ {
+  "id": "pumpkin",
+  "name": "Pumpkin",
+  "cn": "南瓜",
+  "tag": "veg",
+  "days": 14,
+  "src": "est",
+  "shop": "1 块"
+ },
+ {
+  "id": "wax_gourd",
+  "name": "Wax gourd",
+  "cn": "冬瓜",
+  "tag": "veg",
+  "days": 14,
+  "src": "est",
+  "shop": "1 块"
+ },
+ {
+  "id": "luffa",
+  "name": "Luffa",
+  "cn": "丝瓜",
+  "tag": "veg",
+  "days": 5,
+  "src": "est",
+  "shop": "2 根"
+ },
+ {
+  "id": "lotus_root",
+  "name": "Lotus root",
+  "cn": "莲藕",
+  "tag": "veg",
+  "days": 10,
+  "src": "est",
+  "shop": "1 节"
+ },
+ {
+  "id": "yam",
+  "name": "Chinese yam",
+  "cn": "山药",
+  "tag": "veg",
+  "days": 14,
+  "src": "est",
+  "shop": "1 根"
+ },
+ {
+  "id": "corn",
+  "name": "Sweet corn",
+  "cn": "玉米",
+  "tag": "carb",
+  "days": 5,
+  "src": "est",
+  "shop": "2 根"
+ },
+ {
+  "id": "green_beans",
+  "name": "Green beans",
+  "cn": "豆角",
+  "tag": "veg",
+  "days": 7,
+  "src": "est",
+  "shop": "1 把"
+ },
+ {
+  "id": "snow_peas",
+  "name": "Snow peas",
+  "cn": "荷兰豆",
+  "tag": "veg",
+  "days": 7,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "cauliflower",
+  "name": "Cauliflower",
+  "cn": "花菜",
+  "tag": "veg",
+  "days": 7,
+  "src": "est",
+  "shop": "1 颗"
+ },
+ {
+  "id": "enoki",
+  "name": "Enoki mushroom",
+  "cn": "金针菇",
+  "tag": "veg",
+  "days": 7,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "wood_ear",
+  "name": "Wood ear",
+  "cn": "木耳",
+  "tag": "veg",
+  "days": 5,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "kelp",
+  "name": "Kelp",
+  "cn": "海带",
+  "tag": "veg",
+  "days": 14,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "cherry_tomato",
+  "name": "Cherry tomato",
+  "cn": "小番茄",
+  "tag": "greens",
+  "days": 7,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "red_chili",
+  "name": "Red chili",
+  "cn": "红辣椒",
+  "tag": "veg",
+  "days": 14,
+  "src": "est",
+  "shop": "1 小袋"
+ },
+ {
+  "id": "chicken_wing",
+  "name": "Chicken wings",
+  "cn": "鸡翅",
+  "tag": "protein",
+  "days": 2,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "ribs",
+  "name": "Pork ribs",
+  "cn": "排骨",
+  "tag": "protein",
+  "days": 3,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "bacon",
+  "name": "Bacon",
+  "cn": "培根",
+  "tag": "protein",
+  "days": 7,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "sausage",
+  "name": "Sausage",
+  "cn": "香肠",
+  "tag": "protein",
+  "days": 14,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "peeled_shrimp",
+  "name": "Peeled shrimp",
+  "cn": "虾仁",
+  "tag": "protein",
+  "days": 3,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "dried_tofu",
+  "name": "Firm tofu",
+  "cn": "豆干",
+  "tag": "protein",
+  "days": 7,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "duck",
+  "name": "Duck",
+  "cn": "鸭肉",
+  "tag": "protein",
+  "days": 2,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "lamb",
+  "name": "Lamb",
+  "cn": "羊肉",
+  "tag": "protein",
+  "days": 3,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "mantou",
+  "name": "Steamed bun",
+  "cn": "馒头",
+  "tag": "carb",
+  "days": 5,
+  "src": "est",
+  "shop": "1 袋"
+ },
+ {
+  "id": "flour",
+  "name": "Flour",
+  "cn": "面粉",
+  "tag": "carb",
+  "days": 180,
+  "src": "est",
+  "shop": "1 袋"
+ },
+ {
+  "id": "rice_cake",
+  "name": "Rice cake",
+  "cn": "年糕",
+  "tag": "carb",
+  "days": 14,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "sweet_potato",
+  "name": "Sweet potato",
+  "cn": "红薯",
+  "tag": "carb",
+  "days": 20,
+  "src": "est",
+  "shop": "3 个"
+ },
+ {
+  "id": "butter",
+  "name": "Butter",
+  "cn": "黄油",
+  "tag": "dairy",
+  "days": 60,
+  "src": "est",
+  "shop": "1 块"
+ },
+ {
+  "id": "cream",
+  "name": "Cream",
+  "cn": "淡奶油",
+  "tag": "dairy",
+  "days": 14,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "apple",
+  "name": "Apple",
+  "cn": "苹果",
+  "tag": "fruit",
+  "days": 30,
+  "src": "est",
+  "shop": "3 个"
+ },
+ {
+  "id": "banana",
+  "name": "Banana",
+  "cn": "香蕉",
+  "tag": "fruit",
+  "days": 5,
+  "src": "est",
+  "shop": "1 把"
+ },
+ {
+  "id": "mandarin",
+  "name": "Mandarin",
+  "cn": "砂糖橘",
+  "tag": "fruit",
+  "days": 14,
+  "src": "est",
+  "shop": "1 袋"
+ },
+ {
+  "id": "orange",
+  "name": "Orange",
+  "cn": "橙子",
+  "tag": "fruit",
+  "days": 21,
+  "src": "est",
+  "shop": "3 个"
+ },
+ {
+  "id": "grape",
+  "name": "Grapes",
+  "cn": "葡萄",
+  "tag": "fruit",
+  "days": 7,
+  "src": "est",
+  "shop": "1 串"
+ },
+ {
+  "id": "strawberry",
+  "name": "Strawberry",
+  "cn": "草莓",
+  "tag": "fruit",
+  "days": 3,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "blueberry",
+  "name": "Blueberry",
+  "cn": "蓝莓",
+  "tag": "fruit",
+  "days": 7,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "pear",
+  "name": "Pear",
+  "cn": "梨",
+  "tag": "fruit",
+  "days": 21,
+  "src": "est",
+  "shop": "3 个"
+ },
+ {
+  "id": "watermelon",
+  "name": "Watermelon",
+  "cn": "西瓜",
+  "tag": "fruit",
+  "days": 5,
+  "src": "est",
+  "shop": "1 块"
+ },
+ {
+  "id": "peach",
+  "name": "Peach",
+  "cn": "桃",
+  "tag": "fruit",
+  "days": 5,
+  "src": "est",
+  "shop": "3 个"
+ },
+ {
+  "id": "kiwi",
+  "name": "Kiwi",
+  "cn": "猕猴桃",
+  "tag": "fruit",
+  "days": 14,
+  "src": "est",
+  "shop": "3 个"
+ },
+ {
+  "id": "mango",
+  "name": "Mango",
+  "cn": "芒果",
+  "tag": "fruit",
+  "days": 5,
+  "src": "est",
+  "shop": "2 个"
+ },
+ {
+  "id": "dragon_fruit",
+  "name": "Dragon fruit",
+  "cn": "火龙果",
+  "tag": "fruit",
+  "days": 7,
+  "src": "est",
+  "shop": "1 个"
+ },
+ {
+  "id": "lemon",
+  "name": "Lemon",
+  "cn": "柠檬",
+  "tag": "fruit",
+  "days": 21,
+  "src": "est",
+  "shop": "2 个"
+ },
+ {
+  "id": "avocado",
+  "name": "Avocado",
+  "cn": "牛油果",
+  "tag": "fruit",
+  "days": 5,
+  "src": "est",
+  "shop": "2 个"
+ },
+ {
+  "id": "cherry",
+  "name": "Cherries",
+  "cn": "车厘子",
+  "tag": "fruit",
+  "days": 7,
+  "src": "est",
+  "shop": "1 盒"
+ }
+],
  "pantry": [
   {
    "id": "garlic",

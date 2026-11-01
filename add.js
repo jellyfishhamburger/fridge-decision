@@ -214,7 +214,31 @@
     broccoli: ["西兰花", "青花菜"],
     eggplant: ["茄子"],
     cucumber: ["黄瓜", "青瓜"],
-    cabbage: ["包菜", "卷心菜", "圆白菜"]
+    cabbage: ["白菜", "大白菜"],
+    baby_cabbage: ["娃娃菜"],
+    lettuce: ["生菜"],
+    spinach: ["菠菜"],
+    celery: ["芹菜"],
+    cherry_tomato: ["小番茄", "圣女果"],
+    red_chili: ["红辣椒", "小米辣"],
+    cauliflower: ["花菜", "菜花"],
+    enoki: ["金针菇"],
+    corn: ["玉米"],
+    pumpkin: ["南瓜"],
+    sweet_potato: ["红薯", "地瓜"],
+    mantou: ["馒头"],
+    apple: ["苹果"],
+    banana: ["香蕉"],
+    mandarin: ["砂糖橘", "沙糖橘", "橘子"],
+    orange: ["橙子"],
+    grape: ["葡萄"],
+    strawberry: ["草莓"],
+    blueberry: ["蓝莓"],
+    pear: ["梨"],
+    watermelon: ["西瓜"],
+    kiwi: ["猕猴桃"],
+    mango: ["芒果"],
+    lemon: ["柠檬"],
   };
 
   /* 展开成 CLIP 的候选标签：每个说法对应回品类 */
@@ -577,11 +601,21 @@
     var A = (window.RECEIPT && window.RECEIPT.ALIAS) || {};
     n = String(n || "").trim();
     if (!n) return "";
-    for (var k in A) for (var i = 0; i < A[k].length; i++) {
-      var a = A[k][i];
-      if (n.indexOf(a) >= 0 || a.indexOf(n) >= 0) return k;
+    /* 先要「完全一样」，再要「名字里包含别名」并取最长的，
+       最后才用「别名包含名字」兜底。
+       否则「白菜」会被 greens 的「小白菜」反向命中。 */
+    var best = "", bestLen = 0, bestRev = "", revLen = 0;
+    for (var k in A) {
+      var list = A[k] || [];
+      for (var i = 0; i < list.length; i++) {
+        var a = list[i];
+        if (!a) continue;
+        if (n === a) return k;
+        if (n.indexOf(a) >= 0 && a.length > bestLen) { best = k; bestLen = a.length; }
+        if (a.indexOf(n) >= 0 && n.length > revLen) { bestRev = k; revLen = n.length; }
+      }
     }
-    return "";
+    return best || bestRev || "";
   }
 
   /* ---------- 确认入库 ---------- */
