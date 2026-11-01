@@ -825,6 +825,15 @@
     scrollbar-width:none;margin:0 0 10px;padding-bottom:2px}
   .kindfilters::-webkit-scrollbar{display:none}
   .kindfilters .f{flex:0 0 auto;white-space:nowrap}
+
+  /* 没照片的菜：做成有内容的食材插画卡，而不是一块空白 */
+  .rcc .ph.art{position:relative;background:
+      radial-gradient(120% 90% at 50% 0%, #FDF8EA 0%, #F4ECDA 100%)}
+  .rcc .ph.art::after{content:"";position:absolute;inset:12px;border:1px dashed #E4D7BC;
+    border-radius:12px;pointer-events:none}
+  .rcc .ph.art .ic svg{width:24px;height:24px;stroke-width:1.5;color:#7C8B7E}
+  .rcc .ph.art .ic i{font-size:10px;color:#8B8574}
+  .rcc .ph.art .ic.empty{opacity:.75}
 </style>
 </head>
 <body>
@@ -2226,7 +2235,7 @@ function dishPhoto(recipe){
   }
   const ids = (recipe.needs || []).slice(0,3);
   if(!ids.length){
-    return {art:true, html:`<span class="ic">${window.FD_ICON ? FD_ICON("rice", 34) : ""}<i>${recipe.name}</i></span>`};
+    return {art:true, html:`<span class="ic empty">${window.FD_ICON ? FD_ICON("rice", 26) : ""}<i>自备食材</i></span>`};
   }
   return {art:true, html: ids.map(id =>
     `<span class="ic">${window.FD_ICON ? FD_ICON(id, 26) : ""}<i>${cnOf(id)}</i></span>`).join("")};

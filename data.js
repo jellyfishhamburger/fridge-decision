@@ -710,6 +710,267 @@ window.FD_DATA = {
   "days": 7,
   "src": "est",
   "shop": "1 盒"
+ },
+ {
+  "id": "radish",
+  "name": "White radish",
+  "cn": "白萝卜",
+  "tag": "veg",
+  "days": 14,
+  "src": "est",
+  "shop": "1 根"
+ },
+ {
+  "id": "lamb_chop",
+  "name": "Lamb chops",
+  "cn": "羊排",
+  "tag": "protein",
+  "days": 3,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "taro",
+  "name": "Taro",
+  "cn": "芋头",
+  "tag": "carb",
+  "days": 14,
+  "src": "est",
+  "shop": "3 个"
+ },
+ {
+  "id": "celtuce",
+  "name": "Celtuce",
+  "cn": "莴笋",
+  "tag": "veg",
+  "days": 7,
+  "src": "est",
+  "shop": "1 根"
+ },
+ {
+  "id": "bamboo_shoot",
+  "name": "Bamboo shoots",
+  "cn": "春笋",
+  "tag": "veg",
+  "days": 7,
+  "src": "est",
+  "shop": "1 袋"
+ },
+ {
+  "id": "douchi",
+  "name": "Fermented beans",
+  "cn": "豆豉",
+  "tag": "veg",
+  "days": 180,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "vermicelli",
+  "name": "Glass noodles",
+  "cn": "粉丝",
+  "tag": "carb",
+  "days": 90,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "yuba",
+  "name": "Bean curd stick",
+  "cn": "腐竹",
+  "tag": "protein",
+  "days": 120,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "tofu_skin",
+  "name": "Tofu skin",
+  "cn": "千张",
+  "tag": "protein",
+  "days": 7,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "century_egg",
+  "name": "Century egg",
+  "cn": "皮蛋",
+  "tag": "protein",
+  "days": 30,
+  "src": "est",
+  "shop": "4 个"
+ },
+ {
+  "id": "garlic_sprout",
+  "name": "Garlic sprouts",
+  "cn": "蒜苗",
+  "tag": "veg",
+  "days": 7,
+  "src": "est",
+  "shop": "1 把"
+ },
+ {
+  "id": "red_date",
+  "name": "Red dates",
+  "cn": "红枣",
+  "tag": "other",
+  "days": 90,
+  "src": "est",
+  "shop": "1 袋"
+ },
+ {
+  "id": "chicken_thigh",
+  "name": "Chicken thigh",
+  "cn": "鸡腿肉",
+  "tag": "protein",
+  "days": 2,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "pork_belly",
+  "name": "Pork belly",
+  "cn": "五花肉",
+  "tag": "protein",
+  "days": 3,
+  "src": "est",
+  "shop": "1 块"
+ },
+ {
+  "id": "honey",
+  "name": "Honey",
+  "cn": "蜂蜜",
+  "tag": "other",
+  "days": 365,
+  "src": "est",
+  "shop": "1 瓶"
+ },
+ {
+  "id": "curry_block",
+  "name": "Curry cubes",
+  "cn": "咖喱块",
+  "tag": "other",
+  "days": 180,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "peanut",
+  "name": "Peanuts",
+  "cn": "花生",
+  "tag": "other",
+  "days": 90,
+  "src": "est",
+  "shop": "1 袋"
+ },
+ {
+  "id": "chestnut",
+  "name": "Chestnuts",
+  "cn": "板栗",
+  "tag": "other",
+  "days": 14,
+  "src": "est",
+  "shop": "1 袋"
+ },
+ {
+  "id": "kale",
+  "name": "Chinese kale",
+  "cn": "芥蓝",
+  "tag": "greens",
+  "days": 5,
+  "src": "est",
+  "shop": "1 把"
+ },
+ {
+  "id": "crown_daisy",
+  "name": "Crown daisy",
+  "cn": "茼蒿",
+  "tag": "greens",
+  "days": 4,
+  "src": "est",
+  "shop": "1 把"
+ },
+ {
+  "id": "asparagus",
+  "name": "Asparagus",
+  "cn": "芦笋",
+  "tag": "veg",
+  "days": 5,
+  "src": "est",
+  "shop": "1 把"
+ },
+ {
+  "id": "okra",
+  "name": "Okra",
+  "cn": "秋葵",
+  "tag": "veg",
+  "days": 5,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "seaweed",
+  "name": "Dried seaweed",
+  "cn": "紫菜",
+  "tag": "other",
+  "days": 180,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "dried_shrimp",
+  "name": "Dried shrimp",
+  "cn": "虾皮",
+  "tag": "protein",
+  "days": 90,
+  "src": "est",
+  "shop": "1 包"
+ },
+ {
+  "id": "squid",
+  "name": "Squid",
+  "cn": "鱿鱼",
+  "tag": "protein",
+  "days": 2,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "beef_brisket",
+  "name": "Beef brisket",
+  "cn": "牛腩",
+  "tag": "protein",
+  "days": 3,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "pork_trotter",
+  "name": "Pork trotter",
+  "cn": "猪蹄",
+  "tag": "protein",
+  "days": 3,
+  "src": "est",
+  "shop": "1 只"
+ },
+ {
+  "id": "chicken_feet",
+  "name": "Chicken feet",
+  "cn": "鸡爪",
+  "tag": "protein",
+  "days": 3,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "lotus_seed",
+  "name": "Lotus seeds",
+  "cn": "莲子",
+  "tag": "other",
+  "days": 90,
+  "src": "est",
+  "shop": "1 包"
  }
 ],
  "pantry": [
@@ -1476,6 +1737,7 @@ window.FD_DATA = {
   "id": "咖喱炒蟹",
   "name": "咖喱炒蟹",
   "needs": [
+   "curry_block",
    "egg"
   ],
   "pantry": [
@@ -1542,7 +1804,8 @@ window.FD_DATA = {
   "id": "水煮鱼",
   "name": "水煮鱼",
   "needs": [
-   "fish"
+   "fish",
+   "douchi"
   ],
   "pantry": [
    "红油豆瓣酱",
@@ -1896,8 +2159,10 @@ window.FD_DATA = {
   "needs": [
    "fish",
    "chili",
+   "tofu_skin",
    "bean_sprout",
-   "celery"
+   "celery",
+   "peanut"
   ],
   "pantry": [
    "大葱",
@@ -3129,7 +3394,8 @@ window.FD_DATA = {
    "bread",
    "flour",
    "milk",
-   "egg"
+   "egg",
+   "honey"
   ],
   "pantry": [
    "白砂糖：70g",
@@ -3329,6 +3595,7 @@ window.FD_DATA = {
   "id": "芋泥雪媚娘",
   "name": "芋泥雪媚娘",
   "needs": [
+   "taro",
    "milk"
   ],
   "pantry": [
@@ -3671,6 +3938,7 @@ window.FD_DATA = {
   "name": "牛油果拉西",
   "needs": [
    "yogurt",
+   "honey",
    "milk"
   ],
   "pantry": [
@@ -3838,6 +4106,7 @@ window.FD_DATA = {
   "name": "百香果橙子特调",
   "needs": [
    "orange",
+   "honey",
    "greens"
   ],
   "pantry": [
@@ -4119,6 +4388,7 @@ window.FD_DATA = {
   "name": "商芝肉",
   "needs": [
    "pork",
+   "honey",
    "egg"
   ],
   "pantry": [
@@ -4179,7 +4449,8 @@ window.FD_DATA = {
   "id": "小炒肉",
   "name": "小炒肉",
   "needs": [
-   "pork"
+   "pork",
+   "douchi"
   ],
   "pantry": [
    "豆瓣酱",
@@ -4389,7 +4660,7 @@ window.FD_DATA = {
   "id": "意式烤鸡",
   "name": "意式烤鸡",
   "needs": [
-   "chicken",
+   "chicken_thigh",
    "lemon"
   ],
   "pantry": [
@@ -4968,7 +5239,8 @@ window.FD_DATA = {
   "id": "豉汁排骨",
   "name": "豉汁排骨",
   "needs": [
-   "ribs"
+   "ribs",
+   "douchi"
   ],
   "pantry": [
    "蒜蓉",
@@ -5126,7 +5398,7 @@ window.FD_DATA = {
   "id": "黄油鸡",
   "name": "黄油鸡",
   "needs": [
-   "chicken",
+   "chicken_thigh",
    "yogurt",
    "tomato",
    "red_chili",
@@ -5409,7 +5681,8 @@ window.FD_DATA = {
   "id": "口水鸡",
   "name": "口水鸡",
   "needs": [
-   "chili"
+   "chili",
+   "peanut"
   ],
   "pantry": [
    "花椒",
@@ -5488,7 +5761,8 @@ window.FD_DATA = {
    "milk",
    "carrot",
    "potato",
-   "beef"
+   "beef",
+   "curry_block"
   ],
   "pantry": [
    "香叶",
@@ -5729,6 +6003,7 @@ window.FD_DATA = {
   "id": "姜葱捞鸡",
   "name": "姜葱捞鸡",
   "needs": [
+   "chicken_thigh",
    "chicken"
   ],
   "pantry": [
@@ -5862,7 +6137,8 @@ window.FD_DATA = {
   "needs": [
    "chicken",
    "potato",
-   "chili"
+   "chili",
+   "chicken_thigh"
   ],
   "pantry": [
    "大蒜",
@@ -5896,6 +6172,7 @@ window.FD_DATA = {
   "name": "广式萝卜牛腩",
   "needs": [
    "beef",
+   "radish",
    "chili"
   ],
   "pantry": [
@@ -5994,6 +6271,7 @@ window.FD_DATA = {
   "id": "无骨鸡爪",
   "name": "无骨鸡爪",
   "needs": [
+   "chicken_feet",
    "red_chili",
    "lemon"
   ],
@@ -6045,6 +6323,7 @@ window.FD_DATA = {
   "id": "枝竹羊腩煲",
   "name": "枝竹羊腩煲",
   "needs": [
+   "yuba",
    "mushroom",
    "potato"
   ],
@@ -6429,6 +6708,7 @@ window.FD_DATA = {
   "id": "煎烤羊排",
   "name": "煎烤羊排",
   "needs": [
+   "lamb_chop",
    "chili"
   ],
   "pantry": [
@@ -6515,6 +6795,7 @@ window.FD_DATA = {
   "name": "田螺酿",
   "needs": [
    "pork",
+   "bamboo_shoot",
    "chili"
   ],
   "pantry": [
@@ -6763,6 +7044,7 @@ window.FD_DATA = {
   "id": "羊排焖面",
   "name": "羊排焖面",
   "needs": [
+   "lamb_chop",
    "chili"
   ],
   "pantry": [
@@ -7096,6 +7378,7 @@ window.FD_DATA = {
   "id": "豉汁蒸白鱔",
   "name": "豉汁蒸白鱔",
   "needs": [
+   "douchi",
    "red_chili"
   ],
   "pantry": [
@@ -7645,8 +7928,10 @@ window.FD_DATA = {
   "name": "山药南瓜炖鸡汤",
   "needs": [
    "chicken",
+   "chestnut",
    "yam",
-   "pumpkin"
+   "pumpkin",
+   "red_date"
   ],
   "pantry": [
    "姜",
@@ -7676,7 +7961,8 @@ window.FD_DATA = {
   "name": "生汆丸子汤",
   "needs": [
    "egg",
-   "wood_ear"
+   "wood_ear",
+   "vermicelli"
   ],
   "pantry": [
    "盐",
@@ -7760,7 +8046,7 @@ window.FD_DATA = {
   "id": "皮蛋瘦肉粥",
   "name": "皮蛋瘦肉粥",
   "needs": [
-   "egg",
+   "century_egg",
    "rice",
    "greens"
   ],
@@ -7826,6 +8112,7 @@ window.FD_DATA = {
   "name": "紫菜蛋花汤",
   "needs": [
    "egg",
+   "seaweed",
    "peeled_shrimp"
   ],
   "pantry": [
@@ -7896,6 +8183,10 @@ window.FD_DATA = {
   "name": "腊八粥",
   "needs": [
    "rice",
+   "peanut",
+   "red_date",
+   "lotus_seed",
+   "chestnut",
    "peach",
    "grape"
   ],
@@ -7948,7 +8239,7 @@ window.FD_DATA = {
   "name": "黄瓜皮蛋汤",
   "needs": [
    "cucumber",
-   "egg"
+   "century_egg"
   ],
   "pantry": [
    "大蒜",
@@ -8054,7 +8345,7 @@ window.FD_DATA = {
   "name": "排骨苦瓜汤",
   "needs": [
    "ribs",
-   "shrimp"
+   "dried_shrimp"
   ],
   "pantry": [
    "生姜 5~10g（可选，用于焯水时去腥）"
@@ -8377,7 +8668,7 @@ window.FD_DATA = {
   "name": "印度焖饭",
   "needs": [
    "rice",
-   "chicken",
+   "chicken_thigh",
    "yogurt",
    "tomato",
    "chili",
@@ -8470,7 +8761,8 @@ window.FD_DATA = {
   "name": "咸肉菜饭",
   "needs": [
    "rice",
-   "greens"
+   "greens",
+   "bamboo_shoot"
   ],
   "pantry": [
    "猪油",
@@ -8559,7 +8851,7 @@ window.FD_DATA = {
    "noodle",
    "fish",
    "egg",
-   "tofu",
+   "tofu_skin",
    "carrot",
    "greens"
   ],
@@ -8769,7 +9061,8 @@ window.FD_DATA = {
   "name": "热干面",
   "needs": [
    "green_beans",
-   "pork"
+   "pork",
+   "radish"
   ],
   "pantry": [
    "小葱",
@@ -8799,6 +9092,7 @@ window.FD_DATA = {
   "name": "照烧鸡腿饭",
   "needs": [
    "chicken",
+   "honey",
    "broccoli",
    "carrot",
    "rice"
@@ -8890,7 +9184,8 @@ window.FD_DATA = {
    "rice",
    "tomato",
    "chili",
-   "red_chili"
+   "red_chili",
+   "curry_block"
   ],
   "pantry": [
    "洋葱",
@@ -9093,6 +9388,7 @@ window.FD_DATA = {
   "id": "螺蛳粉",
   "name": "螺蛳粉",
   "needs": [
+   "bamboo_shoot",
    "wood_ear"
   ],
   "pantry": [
@@ -9189,6 +9485,7 @@ window.FD_DATA = {
   "name": "鲜肉烧卖",
   "needs": [
    "pork",
+   "bamboo_shoot",
    "mushroom",
    "peeled_shrimp"
   ],
@@ -9232,7 +9529,8 @@ window.FD_DATA = {
    "tomato",
    "chili",
    "red_chili",
-   "lemon"
+   "lemon",
+   "curry_block"
   ],
   "pantry": [
    "洋葱",
@@ -9291,6 +9589,7 @@ window.FD_DATA = {
   "name": "麻辣减脂荞麦面",
   "needs": [
    "baby_cabbage",
+   "peanut",
    "greens",
    "milk"
   ],
@@ -9366,7 +9665,8 @@ window.FD_DATA = {
   "name": "凉粉",
   "needs": [
    "red_chili",
-   "chili"
+   "chili",
+   "peanut"
   ],
   "pantry": [
    "豌豆淀粉",
@@ -9596,6 +9896,7 @@ window.FD_DATA = {
   "id": "日式咖喱饭",
   "name": "日式咖喱饭",
   "needs": [
+   "curry_block",
    "potato",
    "carrot",
    "bacon",
@@ -9979,7 +10280,9 @@ window.FD_DATA = {
   "id": "老友猪肉粉",
   "name": "老友猪肉粉",
   "needs": [
-   "pork"
+   "pork",
+   "bamboo_shoot",
+   "douchi"
   ],
   "pantry": [
    "大蒜",
@@ -10537,8 +10840,9 @@ window.FD_DATA = {
   "id": "皮蛋豆腐",
   "name": "皮蛋豆腐",
   "needs": [
-   "egg",
-   "tofu"
+   "century_egg",
+   "tofu",
+   "peanut"
   ],
   "pantry": [
    "生抽",
@@ -10737,7 +11041,8 @@ window.FD_DATA = {
   "id": "蒲烧茄子",
   "name": "蒲烧茄子",
   "needs": [
-   "eggplant"
+   "eggplant",
+   "honey"
   ],
   "pantry": [
    "白糖",
@@ -10969,7 +11274,7 @@ window.FD_DATA = {
   "id": "雷椒皮蛋",
   "name": "雷椒皮蛋",
   "needs": [
-   "egg",
+   "century_egg",
    "chili",
    "red_chili"
   ],
@@ -11042,7 +11347,7 @@ window.FD_DATA = {
   "name": "上汤娃娃菜",
   "needs": [
    "baby_cabbage",
-   "egg",
+   "century_egg",
    "ham",
    "enoki"
   ],
@@ -11138,6 +11443,8 @@ window.FD_DATA = {
   "id": "凉拌莴笋",
   "name": "凉拌莴笋",
   "needs": [
+   "celtuce",
+   "radish",
    "red_chili"
   ],
   "pantry": [
@@ -11167,6 +11474,7 @@ window.FD_DATA = {
   "name": "包菜炒鸡蛋粉丝",
   "needs": [
    "egg",
+   "vermicelli",
    "carrot"
   ],
   "pantry": [
@@ -11680,6 +11988,7 @@ window.FD_DATA = {
   "id": "莴笋叶煎饼",
   "name": "莴笋叶煎饼",
   "needs": [
+   "celtuce",
    "egg"
   ],
   "pantry": [
@@ -11926,7 +12235,7 @@ window.FD_DATA = {
   "name": "微波炉鸡蛋羹",
   "needs": [
    "egg",
-   "shrimp"
+   "dried_shrimp"
   ],
   "pantry": [
    "葱 5g *份数（可选）",
@@ -12157,7 +12466,9 @@ window.FD_DATA = {
  {
   "id": "桂圆红枣粥",
   "name": "桂圆红枣粥",
-  "needs": [],
+  "needs": [
+   "red_date"
+  ],
   "pantry": [],
   "minutes": 28,
   "kcal": 617,
@@ -12385,7 +12696,9 @@ window.FD_DATA = {
  {
   "id": "反沙芋头",
   "name": "反沙芋头",
-  "needs": [],
+  "needs": [
+   "taro"
+  ],
   "pantry": [
    "白砂糖或冰糖",
    "葱",
@@ -12652,7 +12965,10 @@ window.FD_DATA = {
  {
   "id": "萝卜炖羊排",
   "name": "萝卜炖羊排",
-  "needs": [],
+  "needs": [
+   "lamb_chop",
+   "radish"
+  ],
   "pantry": [
    "大葱",
    "花椒",
@@ -12836,7 +13152,9 @@ window.FD_DATA = {
  {
   "id": "红烧猪蹄",
   "name": "红烧猪蹄",
-  "needs": [],
+  "needs": [
+   "pork_trotter"
+  ],
   "pantry": [
    "香叶",
    "姜",
@@ -12866,7 +13184,9 @@ window.FD_DATA = {
  {
   "id": "老妈蹄花",
   "name": "老妈蹄花",
-  "needs": [],
+  "needs": [
+   "pork_trotter"
+  ],
   "pantry": [
    "葱",
    "姜",
@@ -12955,7 +13275,9 @@ window.FD_DATA = {
  {
   "id": "香辣鸡爪煲",
   "name": "香辣鸡爪煲",
-  "needs": [],
+  "needs": [
+   "chicken_feet"
+  ],
   "pantry": [
    "葱",
    "姜",
@@ -13044,7 +13366,9 @@ window.FD_DATA = {
  {
   "id": "空气炸锅羊排",
   "name": "空气炸锅羊排",
-  "needs": [],
+  "needs": [
+   "lamb_chop"
+  ],
   "pantry": [
    "必备：蒜蓉酱（推荐川娃子的，同样是因为懒）",
    "可选：黄油（JD 买小盒装的，一片一小盒）",
@@ -13106,7 +13430,9 @@ window.FD_DATA = {
  {
   "id": "白萝卜丝清汤",
   "name": "白萝卜丝清汤",
-  "needs": [],
+  "needs": [
+   "radish"
+  ],
   "pantry": [
    "食盐",
    "白胡椒粉",
@@ -13133,7 +13459,10 @@ window.FD_DATA = {
  {
   "id": "银耳莲子粥",
   "name": "银耳莲子粥",
-  "needs": [],
+  "needs": [
+   "lotus_seed",
+   "red_date"
+  ],
   "pantry": [
    "冰糖",
    "冰糖 10-20g"
