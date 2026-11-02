@@ -1584,6 +1584,7 @@ function renderHome(){
       const np = FD.swapPlanSide(homePlans[i]);
       if(!np){ toast("这套没有更合适的替换了"); return; }
       homePlans[i] = np;
+      window.__homePlans = homePlans;
       paintPlans();
     }));
     plansBox.querySelectorAll("[data-start]").forEach(b => b.addEventListener("click", () => {
@@ -1595,6 +1596,7 @@ function renderHome(){
   function renderHomePlans(){
     const st = FD.settings();
     homePlans = (FD.buildPlans ? FD.buildPlans(items, st, 3) : []);
+    window.__homePlans = homePlans;
     const chip = $("#prefChip");
     if(chip) chip.textContent = styleName(st.style) + " ▾";
     paintPlans();
@@ -1680,9 +1682,10 @@ $$("[data-go]").forEach(el=>{
 });
 
 $("#homeDecide").addEventListener("click", ()=>{
-  renderResult(FD.decide(items, goal), "#homeResult");
+  /* 首页已经给出 3 套完整方案，「帮我决定」直接把第 1 套摊开 —— 不要再算一个单菜结果 */
+  const p = (window.__homePlans || [])[0];
+  if(p && p.ids && p.ids.length){ openSetSheet(p.ids, ""); return; }
   const r = $("#homeResult");
-  /* offsetTop 是相对 offsetParent 的，在首页会算错 —— 用视口坐标换算 */
   const y = r.getBoundingClientRect().top + window.scrollY - 12;
   window.scrollTo({top: y, behavior: "smooth"});
 });
@@ -2049,12 +2052,19 @@ function renderDiscSets(){
   const box = $("#discSets");
   if(!box) return;
 
+  /* 和首页共用同一套 Meal Plan 引擎：一套 = 主项 + 配菜 + 主食，主项不重复 */
+  const st0 = FD.settings();
+  const styleId = discSetIntent || st0.style || "balance";
   let all = [];
-  try{ all = (FD.buildSets ? FD.buildSets(items, goal, "") : []); }catch(e){ all = []; }
+  try{
+    all = (FD.buildPlans ? FD.buildPlans(items, Object.assign({}, st0, { style: styleId }), 8) : [])
+      .map(p => ({ dishes: [p.main, p.side], minutes: p.minutes, kcal: p.kcal,
+                   ready: p.ready, onepot: false, _plan: p }));
+  }catch(e){ all = []; }
 
   /* 分类 = 全部 + 三个意图（和首页那排是同一份定义） */
   const chips = [{ id: "", name: tp("sets.allKind", {}, "全部") }]
-    .concat((FD.INTENTS || []).map(i => ({
+    .concat((FD.STYLES || []).map(i => ({
       id: i.id,
       name: (I18N.getLang() === "en" && i.nameEn) ? i.nameEn : i.name
     })));
@@ -2069,24 +2079,12 @@ function renderDiscSets(){
     }));
   }
 
-  let pool = all.filter(x => !discSetIntent || x.intent === discSetIntent);
-  pool = pool.slice().sort((a, b) =>
+  /* buildPlans 已经保证「主项唯一」，这里只排序 */
+  let pool = all.slice().sort((a, b) =>
     (b.ready ? 1 : 0) - (a.ready ? 1 : 0) || a.minutes - b.minutes);
 
   /* 同一个主菜/素菜不要连着出现在好几套里（蒜蓉虾配青菜、又配空心菜那种）。
      主食（米饭）不算重复，一荤一素被占用才跳过。 */
-  /* 套餐只保留「一荤/一主食 + 一素」这种真正像一顿饭的组合，
-     并且同一道菜在全页只出现一次 —— 蒜蓉虾配青菜又配空心菜那种重复直接砍掉。 */
-  (function dedupe(){
-    const seen = new Set();
-    pool = pool.filter(st => {
-      const ids = st.dishes.map(d => d.recipe.id);
-      if (ids.some(id => seen.has(id))) return false;
-      ids.forEach(id => seen.add(id));
-      return true;
-    });
-  })();
-
   if(!pool.length){ box.hidden = true; return; }
   box.hidden = false;
 
@@ -2688,7 +2686,12 @@ addEventListener("resize", () => {
    —— 从菜谱页点套餐时用它，不再把人踢回首页 */
 function openSetSheet(ids, nameHint){
   const all = FD.decide(items, goal);
-  const evals = (ids || []).map(id => all.find(x => x.recipe.id === id)).filter(Boolean);
+  let evals = (ids || []).map(id => all.find(x => x.recipe.id === id)).filter(Boolean);
+  /* 套餐里的菜不一定在 decide() 的前若干名里 —— 缺的按 id 补评估 */
+  if(evals.length !== (ids || []).length && FD.evalsByIds){
+    const got = new Set(evals.map(e => e.recipe.id));
+    FD.evalsByIds(ids, items, FD.settings()).forEach(e => { if(!got.has(e.recipe.id)) evals.push(e); });
+  }
   if(!evals.length) return;
   /* 默认顺序：耗时的先做 */
   const ordered = evals.slice().sort((a, b) => (b.recipe.minutes || 0) - (a.recipe.minutes || 0));
@@ -3413,11 +3416,6 @@ $("#saveBtn").addEventListener("click", ()=>{
   items = FD.mergeItems(items);
   FD.saveItems(items); renderItems(); closeSheet();
   toast(t("toast.added", {name: I18N.foodName(picked.id), n: pendingQty, days: pendingDays}));
-});
-
-if($("#decideBtn")) $("#decideBtn").addEventListener("click", ()=>{
-  renderResult(FD.decide(items, goal));
-  const r = $("#result"); if(r) window.scrollTo({top:r.offsetTop - 70, behavior:"smooth"});
 });
 
 const __unusedDemo = (()=>{

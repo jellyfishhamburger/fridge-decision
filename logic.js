@@ -682,6 +682,14 @@
     return out;
   }
 
+  /* 按 id 直接评估（decide() 只返回前若干名，套餐里的菜可能不在里面） */
+  function evalsByIds(ids, items, st) {
+    st = st || settings();
+    const map = {};
+    RECIPES.filter(isDish).forEach(r => { map[r.id] = r; });
+    return (ids || []).map(id => map[id]).filter(Boolean).map(r => evaluate(r, items, st));
+  }
+
   /* 只换配菜，主项和主食不动 */
   function swapPlanSide(plan) {
     if (!plan || !plan.alts || !plan.alts.length) return null;
@@ -893,7 +901,7 @@
   global.FD = {
     CATALOG, RECIPES, PANTRY, byId, pantryById, DB, SETS,
     evaluateSet, decideSets, buildSets, INTENTS, tagOf, altDishes, composeSet, compareSet,
-    buildPlans, swapPlanSide, STYLES, DIET, usedIds,
+    buildPlans, swapPlanSide, evalsByIds, STYLES, DIET, usedIds,
     cookLog, noteCooked, cookMeals, cookSummary,
     LS_ITEMS, LS_SETTINGS, LS_LOG, LS_PANTRY, LS_HOUSEHOLD,
     read, write,
