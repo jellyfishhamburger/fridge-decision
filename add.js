@@ -356,7 +356,10 @@
     if (AI_OK !== null) return AI_OK;
     if (!AI_URL) { AI_OK = false; return AI_OK; }
     try {
-      var d = await fetch(AI_URL + "/health").then(function (x) { return x.json(); });
+      /* 电脑关机时这个请求会一直挂着等 TCP 超时 → 页面就「一直加载」。
+         3 秒拿不到就当没有服务，直接走浏览器模型。 */
+      var d = await withTimeout(fetch(AI_URL + "/health", { cache: "no-store" })
+        .then(function (x) { return x.json(); }), 3000, "健康检查");
       AI_OK = !!(d && d.ok);
     } catch (e) { AI_OK = false; }
     return AI_OK;
@@ -738,9 +741,12 @@
 
   async function readBatch(file) {
     var msg = $("#bMsg");
-    msg.textContent = "正在识别…";
+    msg.textContent = "准备图片…";
     try {
-      var dataUrl = await fileToDataUrl(file);
+      /* 俯拍图动辄 4000x3000：整张 base64 上传到本地服务要十几秒，
+         服务端还要自己缩一遍。这里先缩到长边 1600，传输和推理都快 3-5 倍。 */
+      var dataUrl = await shrinkImage(file, 1600);
+      msg.textContent = "正在识别…（CLIP 找候选 + 千问确认，约 5–15 秒）";
       var useAI = AI_URL && await aiReady();
       if (!useAI) {
         /* 没有本地服务：用浏览器里的 CLIP 认这一张的主体 */
@@ -756,13 +762,14 @@
       var hint = [];
       try {
         var cc = await fileToCanvas(file);
-        var ranked = await clipScores(cc);
+        var ranked = await withTimeout(clipScores(cc), 5000, "CLIP");
         hint = ranked.slice(0, 3).map(function (r) { return r.name; }).filter(Boolean);
-      } catch (e) {}
-      var r = await fetch(AI_URL + "/recognize", {
+      } catch (e) { /* CLIP 超时或失败都不影响千问 */ }
+      msg.textContent = "千问正在看图…（最多等 45 秒）";
+      var r = await withTimeout(fetch(AI_URL + "/recognize", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: dataUrl, hint: hint })
-      }).then(function (x) { return x.json(); });
+      }).then(function (x) { return x.json(); }), 45000, "识别服务");
       var items = (r && r.items) || [];
       if (!items.length) { msg.textContent = "没认出来。" + (r && r.error ? r.error : ""); return; }
       items.forEach(function (it) {
@@ -772,7 +779,10 @@
       msg.textContent = "认出 " + items.length + " 样" + (hint.length ? "（CLIP 提示：" + hint.join("/") + "）" : "") + "。";
       go("review");
     } catch (e) {
-      msg.textContent = "连不上识别服务：" + (e && e.message);
+      var t = String((e && e.message) || e);
+      msg.textContent = /超时/.test(t)
+        ? "识别服务没响应（" + t + "）。电脑上的 start.py 还开着吗？也可以改用「从相册选」。"
+        : "连不上识别服务：" + t;
     }
   }
 
