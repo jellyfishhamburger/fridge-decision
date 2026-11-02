@@ -185,6 +185,7 @@
     if (t) t.textContent = "已选 " + n + " 样";
     var btn = $("#mBarAdd");
     if (btn) btn.textContent = "加入清单（" + n + "）";
+    document.body.classList.toggle("has-pick", n > 0 && !state.editId);
   }
 
   $("#pickGrid").addEventListener("click", function (e) {
