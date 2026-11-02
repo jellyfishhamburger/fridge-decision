@@ -21,7 +21,7 @@
       "home.badgeEmpty": "空冰箱",
       "home.cta": "帮我决定今晚吃什么",
       "home.ctaSub": "根据库存、临期和你的口味",
-      "home.cook": "今晚能做",
+      "home.cook": "今晚这样吃",
       "sets.logic": "一套 = 一荤 + 一素 + 主食。先挑快坏的食材，再用你冰箱里现成的凑成一顿，同一道菜不会连着出现。",
       "sets.readyNow": "现在就能做", "sets.needN": "差 {n} 样",
       "sets.countN": "共 {n} 套 · 现在能做 {r} 套", "sets.moreN": "展开另外 {n} 套",

@@ -28,7 +28,11 @@
     rotMs: 6000,
     auto: true,
     greensPerDay: 1,
-    maxMinutes: 20
+    maxMinutes: 20,
+    /* 推荐偏好：style 默认「家常均衡」，restrict 是硬性忌口，goals 是进阶营养倾向 */
+    style: "balance",
+    restrict: [],
+    goals: []
   };
 
   const read  = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
@@ -477,6 +481,226 @@
     if (need.some(c => ["egg","tofu","ham"].indexOf(c) >= 0)) return "mid";
     return "low";
   }
+
+  /* ============================================================
+     一顿饭（Meal Plan）
+     - 一道主项 + 至多两道配菜 + 主食；同一主项只出一套
+     - 同一主项下另外能配的菜，作为这套饭里的「可替换」，不拆成新套餐
+     - 风格只影响打分/结构，不改变「能不能做」
+     ============================================================ */
+
+  /* 硬性忌口用的食材集合。来源是 foods 表里的 id，不是菜名推测。 */
+  const IDS_SEAFOOD = ["shrimp","fish","peeled_shrimp","squid","dried_shrimp"];
+  const IDS_PORK    = ["pork","ribs","bacon","sausage","pork_belly","pork_trotter"];
+  const IDS_BEEF    = ["beef","beef_brisket"];
+  const IDS_MEAT    = IDS_SEAFOOD.concat(IDS_PORK, IDS_BEEF,
+                      ["chicken","ham","duck","lamb","lamb_chop","chicken_wing","chicken_thigh","chicken_feet"]);
+  const IDS_EGG     = ["egg","century_egg"];
+  const IDS_DAIRY   = ["milk","cheese","yogurt","butter","cream"];
+  const IDS_SOY     = ["tofu","dried_tofu","yuba","tofu_skin"];
+
+  const DIET = [
+    { id: "veg",        name: "素食",     nameEn: "Vegetarian" },
+    { id: "vegan",      name: "纯素",     nameEn: "Vegan" },
+    { id: "eggdairy",   name: "蛋奶素",   nameEn: "Vegetarian + egg/dairy" },
+    { id: "nopork",     name: "不吃猪肉", nameEn: "No pork" },
+    { id: "nobeef",     name: "不吃牛肉", nameEn: "No beef" },
+    { id: "noseafood",  name: "不吃海鲜", nameEn: "No seafood" },
+    { id: "al_peanut",  name: "花生过敏", nameEn: "Peanut allergy" },
+    { id: "al_egg",     name: "鸡蛋过敏", nameEn: "Egg allergy" },
+    { id: "al_milk",    name: "乳制品过敏", nameEn: "Dairy allergy" },
+    { id: "al_soy",     name: "大豆过敏", nameEn: "Soy allergy" },
+    { id: "al_shell",   name: "甲壳类过敏", nameEn: "Shellfish allergy" }
+  ];
+
+  const STYLES = [
+    { id: "balance", name: "家常均衡", nameEn: "Home-style",
+      main: ["mainProtein","halfProtein","onepot"], sides: ["veg","vegProtein","soup"], staple: true },
+    { id: "protein", name: "高蛋白", nameEn: "Protein-forward",
+      main: ["mainProtein","halfProtein","vegProtein"], sides: ["veg","vegProtein"], staple: true },
+    { id: "plant",   name: "植物为主", nameEn: "Plant-forward", noMeat: true,
+      main: ["vegProtein","veg"], sides: ["veg","vegProtein"], staple: true },
+    { id: "light",   name: "清爽轻食", nameEn: "Light", maxSpicy: 0, kcalMax: 720,
+      main: ["vegProtein","veg","soup"], sides: ["veg","soup"], staple: false },
+    { id: "hearty",  name: "满足感",   nameEn: "Hearty", kcalMin: 480,
+      main: ["mainProtein","halfProtein","onepot"], sides: ["veg","vegProtein"], staple: true },
+    { id: "quick",   name: "省时省事", nameEn: "Quick", maxMinutes: 25, maxSpicy: 2,
+      main: ["mainProtein","halfProtein","vegProtein","veg","onepot"], sides: ["veg","vegProtein"], staple: true }
+  ];
+
+  /* HowToCook 的配料表对部分菜是错的（咸肉菜饭里没有咸肉、荔枝肉里没有猪肉），
+     所以忌口判断在 needs 之外再加一层「菜名关键词」兜底。
+     宁可多排除，也不能漏 —— 过敏是安全问题，不是推荐问题。 */
+  const NAME_RULES = [
+    { ids: IDS_SEAFOOD, re: /鱼|虾|蟹|贝|鱿|鳝|蚝|蛤|海参|墨鱼|海鲜/ },
+    { ids: IDS_PORK,    re: /猪|排骨|五花|培根|香肠|火腿|肘|蹄|腊肉|里脊/ },
+    { ids: IDS_BEEF,    re: /牛/ },
+    { ids: [],          re: /肉|鸡|鸭|鹅|羊|培根|香肠/ },
+    { ids: IDS_EGG,     re: /蛋/ },
+    { ids: IDS_DAIRY,   re: /奶|黄油|芝士|奶酪/ },
+    { ids: IDS_SOY,     re: /豆腐|豆干|腐竹|千张|豆皮|豆泡/ }
+  ];
+
+  function nameHits(recipe, ids) {
+    const name = recipe.name || "";
+    for (const rule of NAME_RULES) {
+      if (!rule.re.test(name)) continue;
+      const overlap = rule.ids.length ? rule.ids.some(x => ids.indexOf(x) >= 0) : true;
+      if (overlap) return true;
+    }
+    return false;
+  }
+
+  function usedIds(recipe, st) {
+    const r = (st && st.restrict) || [];
+    const n = recipe.needs || [];
+    const hit = ids => ids.some(x => n.indexOf(x) >= 0);
+    if (r.indexOf("veg") >= 0 && hit(IDS_MEAT)) return true;
+    if (r.indexOf("eggdairy") >= 0 && hit(IDS_MEAT)) return true;
+    if (r.indexOf("vegan") >= 0 && (hit(IDS_MEAT) || hit(IDS_EGG) || hit(IDS_DAIRY))) return true;
+    if (r.indexOf("nopork") >= 0 && hit(IDS_PORK)) return true;
+    if (r.indexOf("nobeef") >= 0 && hit(IDS_BEEF)) return true;
+    if (r.indexOf("noseafood") >= 0 && hit(IDS_SEAFOOD)) return true;
+    if (r.indexOf("al_peanut") >= 0 && hit(["peanut"])) return true;
+    if (r.indexOf("al_egg") >= 0 && hit(IDS_EGG)) return true;
+    if (r.indexOf("al_milk") >= 0 && hit(IDS_DAIRY)) return true;
+    if (r.indexOf("al_soy") >= 0 && hit(IDS_SOY)) return true;
+    if (r.indexOf("al_shell") >= 0 && hit(IDS_SEAFOOD)) return true;
+
+    /* 菜名兜底（配料表不可靠时的安全网） */
+    const nm = recipe.name || "";
+    const meaty = /肉|猪|牛|羊|鸡|鸭|鹅|鱼|虾|蟹|贝|鱿|鳝|蚝|蛤|排骨|培根|香肠|火腿|肘|蹄/.test(nm);
+    if ((r.indexOf("veg") >= 0 || r.indexOf("vegan") >= 0 || r.indexOf("eggdairy") >= 0) && meaty) return true;
+    if (r.indexOf("nopork") >= 0 && /猪|排骨|五花|培根|香肠|火腿|肘|蹄|腊肉|里脊/.test(nm)) return true;
+    if (r.indexOf("nobeef") >= 0 && /牛/.test(nm)) return true;
+    if (r.indexOf("noseafood") >= 0 && /鱼|虾|蟹|贝|鱿|鳝|蚝|蛤|海鲜/.test(nm)) return true;
+    if (r.indexOf("al_peanut") >= 0 && /花生/.test(nm)) return true;
+    if (r.indexOf("al_egg") >= 0 && /蛋/.test(nm)) return true;
+    if (r.indexOf("al_milk") >= 0 && /奶|黄油|芝士|奶酪/.test(nm)) return true;
+    if (r.indexOf("al_soy") >= 0 && /豆腐|豆干|腐竹|千张|豆皮/.test(nm)) return true;
+    if (r.indexOf("al_shell") >= 0 && /虾|蟹|贝|鱿|蛤|蚝/.test(nm)) return true;
+    return false;
+  }
+
+  function styleBonus(ev, style, st) {
+    const t = tagOf(ev.recipe);
+    let b = 0;
+    if (style.id === "quick")  b += Math.max(0, 30 - (ev.recipe.minutes || 20)) * 0.5;
+    if (style.id === "protein") b += t.protein === "high" ? 7 : 0;
+    if (style.id === "plant")   b += t.role === "vegProtein" ? 6 : 0;
+    if (style.id === "light")   b += (ev.recipe.kcal || 500) <= 350 ? 5 : 0;
+    if (style.id === "hearty")  b += (ev.recipe.kcal || 0) >= 380 ? 4 : 0;
+    if (style.id === "balance" && ev.recipe.greens) b += 3;
+    return b;
+  }
+
+  function planRank(ev, style, st) {
+    const base = ev.score + (ev.status === "ready" ? 26 : (ev.status === "shop1" ? -18 : -99));
+    return base + styleBonus(ev, style, st);
+  }
+
+  function planReasons(main, side, totalMin, style, staple) {
+    const out = [];
+    const soon = [];
+    [main, side].forEach(ev => (ev.used || []).forEach(i => {
+      const d = daysLeftOf(i);
+      if (d <= 3) soon.push({ name: i.cn || (byId[i.cat] || {}).cn || i.name || i.cat, d: d });
+    }));
+    soon.sort((a, b) => a.d - b.d);
+    if (soon.length) {
+      const top = soon[0];
+      out.push((top.d <= 0 ? "今天到期：" : "还剩 " + top.d + " 天：") + top.name + "，这顿先用掉");
+    }
+    const miss = []
+      .concat(main.missing || [], side.missing || [])
+      .filter((x, i, a) => a.indexOf(x) === i);
+    if (!miss.length) out.push("食材冰箱里都有，不用再买");
+    else if (miss.length <= 2) out.push("只差 " + miss.length + " 样，顺路买一下就行");
+    out.push("约 " + totalMin + " 分钟");
+    out.push("按「" + style.name + "」配的" + (staple ? "，带主食" : "，主食另配"));
+    return out.slice(0, 3);
+  }
+
+  function buildPlans(items, st, n) {
+    st = st || settings();
+    n = n || 3;
+    const style = STYLES.filter(s => s.id === (st.style || "balance"))[0] || STYLES[0];
+
+    const usable = RECIPES.filter(isDish)
+      .filter(r => !usedIds(r, st))
+      .map(r => evaluate(r, items, st))
+      .filter(ev => ev.status !== "blocked" && (!style.noMeat || !(ev.recipe.needs || []).some(c => IDS_MEAT.indexOf(c) >= 0)))
+      .filter(ev => style.maxSpicy == null || tagOf(ev.recipe).spicy <= style.maxSpicy);
+
+    const roleIn = (ev, roles) => roles.indexOf(tagOf(ev.recipe).role) >= 0;
+    const mains = usable.filter(ev => roleIn(ev, style.main))
+      .sort((a, b) => (styleBonus(b, style, st) - styleBonus(a, style, st)) ||
+                      (planRank(b, style, st) - planRank(a, style, st)));
+    const pool = usable.slice().sort((a, b) => planRank(b, style, st) - planRank(a, style, st));
+
+    const out = [];
+    const usedMain = {};
+    const usedSide = {};
+    for (const m of mains) {
+      if (out.length >= n) break;
+      if (usedMain[m.recipe.id]) continue;
+      let sides = pool.filter(ev => ev.recipe.id !== m.recipe.id && roleIn(ev, style.sides));
+      if (!sides.length) continue;
+      /* 配菜尽量不重复：三套都配炒茄子会显得像只有一道菜 */
+      const fresh = sides.filter(ev => !usedSide[ev.recipe.id]);
+      if (fresh.length) sides = fresh;
+      const side = sides[0];
+      const totalMin = Math.max(m.recipe.minutes || 20, side.recipe.minutes || 15) + 8;
+      if (style.maxMinutes && totalMin > style.maxMinutes + 12) continue;
+      const kcal = (m.recipe.kcal || 0) + (side.recipe.kcal || 0) + (style.staple ? 150 : 0);
+      if (style.kcalMax && kcal > style.kcalMax) continue;
+      if (style.kcalMin && kcal < style.kcalMin) continue;
+
+      usedMain[m.recipe.id] = 1;
+      usedSide[side.recipe.id] = 1;
+      out.push({
+        id: m.recipe.id + "|" + side.recipe.id,
+        style: style.id,
+        styleName: style.name,
+        main: m,
+        side: side,
+        alts: sides.slice(1, 4),
+        staple: !!style.staple,
+        minutes: totalMin,
+        kcal: kcal,
+        ready: m.status === "ready" && side.status === "ready",
+        missing: [].concat(m.missing || [], side.missing || []).filter((x, i, a) => a.indexOf(x) === i),
+        reasons: planReasons(m, side, totalMin, style, style.staple),
+        ids: [m.recipe.id, side.recipe.id]
+      });
+    }
+    out.sort((a, b) => (b.ready ? 1 : 0) - (a.ready ? 1 : 0) ||
+                        a.missing.length - b.missing.length || a.minutes - b.minutes);
+    if (!out.length && style.id !== "balance") {
+      return buildPlans(items, Object.assign({}, st, { style: "balance" }), n);
+    }
+    return out;
+  }
+
+  /* 只换配菜，主项和主食不动 */
+  function swapPlanSide(plan) {
+    if (!plan || !plan.alts || !plan.alts.length) return null;
+    const next = plan.alts[0];
+    const rest = plan.alts.slice(1);
+    const kcal = (plan.main.recipe.kcal || 0) + (next.recipe.kcal || 0) + (plan.staple ? 150 : 0);
+    return {
+      id: plan.main.recipe.id + "|" + next.recipe.id,
+      style: plan.style, styleName: plan.styleName,
+      main: plan.main, side: next, alts: rest, staple: plan.staple,
+      minutes: Math.max(plan.main.recipe.minutes || 20, next.recipe.minutes || 15) + 8,
+      kcal: kcal,
+      ready: plan.main.status === "ready" && next.status === "ready",
+      missing: [].concat(plan.main.missing || [], next.missing || []).filter((x, i, a) => a.indexOf(x) === i),
+      reasons: plan.reasons,
+      ids: [plan.main.recipe.id, next.recipe.id]
+    };
+  }
+
   function tagOf(recipe) {
     const t = TAGS[recipe.id] || {};
     return {
@@ -669,6 +893,7 @@
   global.FD = {
     CATALOG, RECIPES, PANTRY, byId, pantryById, DB, SETS,
     evaluateSet, decideSets, buildSets, INTENTS, tagOf, altDishes, composeSet, compareSet,
+    buildPlans, swapPlanSide, STYLES, DIET, usedIds,
     cookLog, noteCooked, cookMeals, cookSummary,
     LS_ITEMS, LS_SETTINGS, LS_LOG, LS_PANTRY, LS_HOUSEHOLD,
     read, write,

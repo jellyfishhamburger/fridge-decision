@@ -844,6 +844,50 @@
     scrollbar-width:none;padding-bottom:2px}
   .kindbar .kindfilters::-webkit-scrollbar{display:none}
   .kindbar .kindfilters .f{flex:0 0 auto}
+
+  /* 偏好入口：一个字都不用填，点开才设置 */
+  .prefchip{flex:none;border:1px solid var(--line);background:#fff;color:var(--green);
+    border-radius:999px;padding:5px 11px;font:inherit;font-size:12.5px;font-weight:600}
+  .pref-mask{position:fixed;inset:0;background:rgba(30,34,30,.35);z-index:60}
+  .pref-sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--bg);
+    border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));
+    max-width:560px;margin:0 auto;max-height:82vh;overflow:auto;
+    box-shadow:0 -12px 30px rgba(30,40,30,.18)}
+  .pref-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .pref-hd b{font-size:16px}
+  .pref-hd button{border:0;background:none;font-size:17px;color:var(--muted);padding:4px 6px}
+  .pref-lead{margin:0 0 12px;font-size:12.5px;color:var(--muted)}
+  .pref-grp{margin-bottom:14px}
+  .pref-grp s{display:block;text-decoration:none;font-size:12px;color:var(--muted);margin-bottom:7px}
+  .pref-opts{display:flex;flex-wrap:wrap;gap:8px}
+  .pref-opts button{border:1px solid var(--line);background:#fff;color:var(--ink);
+    border-radius:999px;padding:7px 13px;font:inherit;font-size:13px}
+  .pref-opts button.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+  .pref-note{margin:0 0 14px;font-size:11.5px;color:var(--muted);line-height:1.5}
+
+  /* 一顿饭卡片 */
+  .plans{display:flex;flex-direction:column;gap:10px}
+  .plan{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 13px;
+    box-shadow:var(--shadow)}
+  .plan-hd{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+  .plan-no{flex:none;width:20px;height:20px;border-radius:50%;background:var(--green-soft);
+    color:var(--green);font-size:11.5px;font-weight:700;display:grid;place-items:center}
+  .plan-hd b{font-size:15.5px;font-weight:700;line-height:1.3}
+  .plan-hd .st{margin-left:auto;flex:none;font-size:11px;color:var(--green);
+    background:var(--green-soft);border-radius:999px;padding:2px 8px}
+  .plan-hd .st.warn{color:#8a6d1f;background:#FBF1D8}
+  .plan-dishes{display:flex;gap:6px;margin:8px 0 6px;flex-wrap:wrap}
+  .plan-dishes span{font-size:12.5px;color:var(--ink);background:#F7F3E7;
+    border:1px solid var(--line);border-radius:9px;padding:3px 8px}
+  .plan-dishes span em{font-style:normal;color:var(--muted);font-size:11px;margin-right:4px}
+  .plan-why{margin:0;padding:0;list-style:none}
+  .plan-why li{font-size:12px;color:var(--muted);line-height:1.55;padding-left:12px;position:relative}
+  .plan-why li::before{content:"·";position:absolute;left:3px}
+  .plan-ft{display:flex;gap:8px;margin-top:10px}
+  .plan-ft button{flex:1;border-radius:12px;padding:9px 10px;font:inherit;font-size:13px;font-weight:600}
+  .plan-ft .sw2{border:1px solid var(--line);background:#fff;color:var(--green);flex:0 0 auto;padding:9px 14px}
+  .plan-ft .go2{border:0;background:var(--green);color:#fff}
+  .plan-ft .go2:disabled{background:#D9D5C6;color:#fff}
 </style>
 </head>
 <body>
@@ -1061,10 +1105,10 @@
     <div id="homeResult"></div>
 
     <div class="hb">
-      <h2 data-i18n="home.cook">今晚能做</h2>
-      <button data-goto="discover" data-focus="sets" data-i18n="home.seeAll">查看全部 →</button>
+      <h2 data-i18n="home.cook">今晚这样吃</h2>
+      <button type="button" class="prefchip" id="prefChip">家常均衡 ▾</button>
     </div>
-    <div class="hcards" id="homeCook"></div>
+    <div class="plans" id="homeCook"></div>
 
     <div class="hb">
       <h2 data-i18n="home.soon">先吃这些</h2>
@@ -1229,6 +1273,17 @@
     <button class="btn quiet" id="discMore" style="margin-top:6px" data-i18n="disc.more">加载更多</button>
 
     <a class="findlink" href="cook.html" data-i18n="disc.selfPick">想自己挑食材 →</a>
+  </section>
+
+
+  <div class="pref-mask" id="prefMask" hidden></div>
+  <section class="pref-sheet" id="prefSheet" hidden aria-label="搭配偏好">
+    <div class="pref-hd"><b>搭配偏好</b><button type="button" id="prefClose" aria-label="关闭">✕</button></div>
+    <p class="pref-lead">不选也行 —— 默认就是「家常均衡」。</p>
+    <div class="pref-grp"><s>搭配风格</s><div class="pref-opts" id="prefStyles"></div></div>
+    <div class="pref-grp"><s>不能吃（会直接排除，不是打分）</s><div class="pref-opts" id="prefRestrict"></div></div>
+    <p class="pref-note">忌口按食材清单 + 菜名双重判断；菜名兜底宁可多排除，避免漏掉。</p>
+    <button type="button" class="btn primary" id="prefDone">就用这些</button>
   </section>
 
   <!-- ============ view 3: build ============ -->
@@ -1485,33 +1540,98 @@ function renderHome(){
   }
   if(subEl) subEl.textContent = n ? t("home.sub", {n:n, u:u}) : t("home.subEmpty");
 
-  /* 今晚能做：单菜（套餐在下面按 CTA 展开，首页不重复推荐） */
-  const ranked = FD.decide(items, goal);
-  let list = ranked.filter(r => r.status === "ready").slice(0,2);
-  if(!list.length) list = ranked.filter(r => r.status === "shop1").slice(0,2);
+  /* ---------- 今晚这样吃：2-3 顿完整餐食（Meal Plan） ---------- */
+  const plansBox = $("#homeCook");
+  let homePlans = [];
 
-  const box = $("#homeCook");
-  if(box){
-    box.innerHTML = list.length ? list.map(r=>{
-      const p = window.DISH_PHOTO && DISH_PHOTO.get(r.recipe.name);
-      const art = (p && p.src)
-        ? `<img src="${p.src}" alt="" loading="lazy" decoding="async">`
-        : `<span class="hart">${(r.recipe.needs||[]).slice(0,3).map(id => window.FD_ICON ? FD_ICON(id,26) : "").join("")}</span>`;
-      const sep = I18N.getLang() === "en" ? " / " : "、";
-      const miss = r.status === "shop1"
-        ? `<span class="miss">${t("home.need", {x:r.missing.map(cnOf).join(sep)})}</span>` : "";
-      return `<button class="hcard" data-take="${r.recipe.id}">
-        ${art}
-        <span class="m">
-          <b>${I18N.recipeName(r.recipe)}</b>
-          <span class="mt">${t("card.min", {n:r.recipe.minutes})}${miss}</span>
-          ${actionStrip(r.recipe)}
-        </span>
-      </button>`;
-    }).join("") : `<p class="empty" style="margin:0">${t("home.none")}</p>`;
-    box.querySelectorAll("[data-take]").forEach(b =>
-      b.addEventListener("click", () => openCook(b.dataset.take)));
+  function styleName(id){
+    const x = (FD.STYLES || []).filter(s => s.id === id)[0];
+    return x ? x.name : "家常均衡";
   }
+
+  /* 只重画，不重建 —— 否则「换配菜」刚换好的会被重新生成覆盖掉 */
+  function paintPlans(){
+    if(!plansBox) return;
+    if(!homePlans.length){
+      plansBox.innerHTML = `<p class="empty" style="margin:0">${t("home.none")}</p>`;
+      return;
+    }
+
+    plansBox.innerHTML = homePlans.map((p, i) => {
+      const miss = p.missing.length ? `差 ${p.missing.length} 样` : "现在能做";
+      return `<div class="plan" data-plan="${i}">
+        <div class="plan-hd">
+          <span class="plan-no">${i + 1}</span>
+          <b>${I18N.recipeName(p.main.recipe)}</b>
+          <span class="st ${p.ready ? "" : "warn"}">${miss}</span>
+        </div>
+        <div class="plan-dishes">
+          <span><em>主</em>${I18N.recipeName(p.main.recipe)}</span>
+          <span><em>配</em>${I18N.recipeName(p.side.recipe)}</span>
+          ${p.staple ? `<span><em>主食</em>米饭</span>` : ""}
+        </div>
+        <ul class="plan-why">${p.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
+        <div class="plan-ft">
+          <button type="button" class="sw2" data-swap="${i}" ${p.alts.length ? "" : "disabled"}>⇄ 换配菜</button>
+          <button type="button" class="go2" data-start="${i}" ${p.ready ? "" : "disabled"}>
+            ${p.ready ? "开始做这顿" : "差 " + p.missing.length + " 样"}</button>
+        </div>
+      </div>`;
+    }).join("");
+
+    plansBox.querySelectorAll("[data-swap]").forEach(b => b.addEventListener("click", () => {
+      const i = +b.dataset.swap;
+      const np = FD.swapPlanSide(homePlans[i]);
+      if(!np){ toast("这套没有更合适的替换了"); return; }
+      homePlans[i] = np;
+      paintPlans();
+    }));
+    plansBox.querySelectorAll("[data-start]").forEach(b => b.addEventListener("click", () => {
+      const p = homePlans[+b.dataset.start];
+      if(p && p.ids && p.ids.length) openSetSheet(p.ids, "");
+    }));
+  }
+
+  function renderHomePlans(){
+    const st = FD.settings();
+    homePlans = (FD.buildPlans ? FD.buildPlans(items, st, 3) : []);
+    const chip = $("#prefChip");
+    if(chip) chip.textContent = styleName(st.style) + " ▾";
+    paintPlans();
+  }
+
+  /* ---------- 偏好：默认就有一份，不设置也能用 ---------- */
+  function renderPrefs(){
+    const st = FD.settings();
+    const sb = $("#prefStyles"), rb = $("#prefRestrict");
+    if(sb) sb.innerHTML = (FD.STYLES || []).map(x =>
+      `<button type="button" data-style="${x.id}" class="${st.style === x.id ? "on" : ""}">${x.name}</button>`).join("");
+    if(rb) rb.innerHTML = (FD.DIET || []).map(x =>
+      `<button type="button" data-restrict="${x.id}" class="${(st.restrict || []).indexOf(x.id) >= 0 ? "on" : ""}">${x.name}</button>`).join("");
+
+    if(sb) sb.querySelectorAll("[data-style]").forEach(b => b.addEventListener("click", () => {
+      FD.saveSettings({ style: b.dataset.style });
+      renderPrefs(); renderHomePlans();
+    }));
+    if(rb) rb.querySelectorAll("[data-restrict]").forEach(b => b.addEventListener("click", () => {
+      const cur = (FD.settings().restrict || []).slice();
+      const id = b.dataset.restrict;
+      const i = cur.indexOf(id);
+      if(i >= 0) cur.splice(i, 1); else cur.push(id);
+      FD.saveSettings({ restrict: cur });
+      renderPrefs(); renderHomePlans();
+    }));
+  }
+
+  function openPrefs(){ renderPrefs(); $("#prefMask").hidden = false; $("#prefSheet").hidden = false; }
+  function closePrefs(){ $("#prefMask").hidden = true; $("#prefSheet").hidden = true; }
+  if($("#prefChip")) $("#prefChip").addEventListener("click", openPrefs);
+  if($("#prefMask")) $("#prefMask").addEventListener("click", closePrefs);
+  if($("#prefClose")) $("#prefClose").addEventListener("click", closePrefs);
+  if($("#prefDone")) $("#prefDone").addEventListener("click", closePrefs);
+
+  renderHomePlans();
+  renderPrefs();
 
   /* 先吃这些 */
   const soon = FD.urgent(items, 3);
