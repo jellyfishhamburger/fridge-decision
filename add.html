@@ -42,9 +42,13 @@
 
   <!-- 2 · 手动 -->
   <section class="v" id="v-manual">
-    <p class="ad-lede" data-i18n="add.manLede">选一样，改数量和能放几天。</p>
+    <p class="ad-lede" data-i18n="add.manLede">点几样一起加；想改数量点它一下。</p>
     <div class="catjump" id="catJump"></div>
     <div class="pickwrap" id="pickGrid"></div>
+    <div class="pickedbar" id="mBar" hidden>
+      <span id="mBarTxt">已选 0 样</span>
+      <button class="btn primary" id="mBarAdd">加入清单</button>
+    </div>
     <div class="editrow" id="manualEdit" hidden>
       <div class="qty">
         <button data-q="-1">−</button><span id="mQty">1</span><button data-q="1">＋</button>

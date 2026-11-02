@@ -172,3 +172,16 @@ body.ad{
 .detitem b{position:absolute;left:-4px;top:-4px;width:18px;height:18px;border-radius:50%;
   background:var(--green);color:#fff;font-size:11px;line-height:18px;text-align:center;
   box-shadow:0 1px 4px rgba(0,0,0,.25)}
+
+/* 多选：底部一条常驻确认条 */
+.pickedbar{position:sticky;bottom:0;z-index:20;display:flex;align-items:center;gap:10px;
+  margin:14px -2px 0;padding:10px 12px;border-radius:16px;
+  background:rgba(250,246,236,.97);border:1px solid var(--line);
+  box-shadow:0 -10px 24px -18px rgba(40,50,40,.6)}
+.pickedbar[hidden]{display:none}
+.pickedbar span{flex:1;min-width:0;font-size:13px;color:var(--muted)}
+.pickedbar .btn{width:auto;min-width:120px;margin:0}
+.grid button.on{position:relative}
+.grid button.on::after{content:"✓";position:absolute;right:4px;top:3px;font-size:11px;
+  width:15px;height:15px;line-height:15px;text-align:center;border-radius:50%;
+  background:var(--green);color:#fff}

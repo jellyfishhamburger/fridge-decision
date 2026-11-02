@@ -20,7 +20,7 @@
   var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
   var NL = String.fromCharCode(10);
 
-  var state = { view: "pick", rows: [], shots: [], cat: "", qty: 1, days: 3, locked: false, busy: false, editId: "" };
+  var state = { view: "pick", rows: [], shots: [], cat: "", qty: 1, days: 3, locked: false, busy: false, editId: "", picked: {} };
   var EDIT_ID = (location.search.match(/[?&]edit=([^&]+)/) || [])[1] || "";
   var det = { running: false, timer: null, lm: null, armed: true, last: 0, n: 0 };
 
@@ -154,7 +154,7 @@
         + '<div class="grid">'
         + items.map(function (f) {
             var ic = (window.FD_ICON && FD_ICON(f.id, 26)) || "";
-            return '<button data-cat="' + f.id + '" class="' + (state.cat === f.id ? "on" : "") + '">'
+            return '<button data-cat="' + f.id + '" class="' + ((state.editId ? state.cat === f.id : !!state.picked[f.id]) ? "on" : "") + '">'
               + ic + "<i>" + fname(f) + "</i></button>";
           }).join("")
         + '</div></section>';
@@ -177,8 +177,24 @@
       });
     }
   }
+  function paintBar() {
+    var n = Object.keys(state.picked).length;
+    var bar = $("#mBar");
+    if (bar) bar.hidden = !n || !!state.editId;
+    var t = $("#mBarTxt");
+    if (t) t.textContent = "已选 " + n + " 样";
+    var btn = $("#mBarAdd");
+    if (btn) btn.textContent = "加入清单（" + n + "）";
+  }
+
   $("#pickGrid").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-cat]"); if (!b) return;
+    if (!state.editId) {
+      var pid = b.dataset.cat;
+      if (state.picked[pid]) delete state.picked[pid]; else state.picked[pid] = 1;
+      paintGrid(); paintBar();
+      return;
+    }
     state.cat = b.dataset.cat;
     var f = FD.byId[state.cat];
     state.days = f ? f.days : 3;
@@ -194,6 +210,20 @@
     if (q) { state.qty = Math.max(1, state.qty + (+q)); $("#mQty").textContent = state.qty; }
     if (d) { state.days = Math.max(1, state.days + (+d)); $("#mDays").textContent = state.days; }
   });
+  $("#mBarAdd").addEventListener("click", function () {
+    var ids = Object.keys(state.picked);
+    if (!ids.length) return;
+    ids.forEach(function (id) {
+      var f = FD.byId[id];
+      addRow(id, 1, "manual");
+      var row = state.rows.filter(function (r) { return r.cat === id; })[0];
+      if (row && f) row.days = f.days;
+    });
+    state.picked = {};
+    paintGrid(); paintBar();
+    go("review");
+  });
+
   $("#mAdd").addEventListener("click", function () {
     if (!state.cat) return toast("先选一样");
     if (state.editId) {
