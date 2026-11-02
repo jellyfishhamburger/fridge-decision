@@ -103,6 +103,14 @@
     $("#confirm").textContent = n ? tt("add.confirmN", "确认入库").replace("{n}", n) : tt("add.confirm", "确认入库");
     $("#confirm").disabled = !n;
     $("#bar").hidden = !(state.view === "review" && state.rows.length);
+    /* 识别完再回来看小票/俯拍页时，给一个直接回清单的入口 —— 不然只能重新上传 */
+    var nRows = state.rows.filter(function (r) { return !!r.cat; }).length;
+    ["#rGoList", "#bGoList"].forEach(function (sel) {
+      var b = $(sel);
+      if (!b) return;
+      b.hidden = !nRows || state.view === "review";
+      if (nRows) b.textContent = "查看清单（" + nRows + " 样）→";
+    });
     /* 底栏在大字体下会换成两行，高度不固定 → 按实际高度给列表留白 */
     requestAnimationFrame(function () {
       var bar = $("#bar");
@@ -110,6 +118,11 @@
     });
     $("#cnt") && ($("#cnt").textContent = tt("add.shotN", "已拍 {n} 件").replace("{n}", state.shots.length));
   }
+
+  ["#rGoList", "#bGoList"].forEach(function (sel) {
+    var b = $(sel);
+    if (b) b.addEventListener("click", function () { go("review"); });
+  });
 
   $("#rows").addEventListener("click", function (e) {
     if (e.target.tagName === "SELECT") return;
