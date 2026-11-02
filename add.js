@@ -739,6 +739,19 @@
     if (f) readBatch(f);
   });
 
+  /* 线上是 https，浏览器不允许它去请求 http://电脑IP:8941（混合内容会被拦），
+     所以「摊开俯拍 / 多品识别」只有在局域网 http 地址下才可用。这里提前说清楚。 */
+  (function batchEnvHint(){
+    if (AI_URL) return;
+    var box = $("#v-batch");
+    if (!box || box.querySelector(".envhint")) return;
+    var p = document.createElement("p");
+    p.className = "tiny envhint";
+    p.style.cssText = "margin:10px 0 0;color:#8a6d1f";
+    p.textContent = "当前是线上版（https），连不到你电脑上的识别服务。摊开俯拍要在同一个 WiFi 下用 http://电脑IP:8766 打开才认得出。";
+    box.appendChild(p);
+  })();
+
   async function readBatch(file) {
     var msg = $("#bMsg");
     msg.textContent = "准备图片…";
