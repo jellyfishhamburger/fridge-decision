@@ -79,6 +79,7 @@
     flour:        ["面粉"],
     rice_cake:    ["年糕"],
     sweet_potato: ["红薯", "地瓜", "番薯"],
+    purple_potato: ["紫薯", "紫心红薯"],
     butter:       ["黄油"],
     cream:        ["淡奶油", "奶油"],
     radish:       ["白萝卜", "萝卜", "青萝卜"],

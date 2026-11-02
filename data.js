@@ -550,6 +550,15 @@ window.FD_DATA = {
   "shop": "3 个"
  },
  {
+  "id": "purple_potato",
+  "name": "Purple sweet potato",
+  "cn": "紫薯",
+  "tag": "carb",
+  "days": 18,
+  "src": "est",
+  "shop": "1 斤"
+ },
+ {
   "id": "butter",
   "name": "Butter",
   "cn": "黄油",

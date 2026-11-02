@@ -89,6 +89,8 @@
           <circle cx="9" cy="13.6" r="1.4"/><circle cx="13.4" cy="12" r="1.4"/>`,
     root: `<path d="M12 3.8c2.2 3 4 5.6 4 8.4a4 4 0 01-8 0c0-2.8 1.8-5.4 4-8.4z"/>
            <path d="M12 12v8M9.4 17.4l2.6 2.4 2.6-2.4"/>`,
+    ptuber: `<path d="M14.1 4.4c2.1 1.3 2.9 4.1 1.6 6.6-1.4 2.7-4.7 5-7 4.2-1.9-.7-1.8-3.3-.2-5.2 1.6-1.9 3.9-3.1 5.6-5.6z"/>
+      <path d="M9.6 12.3c.7.4 1.7.5 2.5.3"/>`,
     bun: `<path d="M4.8 14.6c0-3.4 3.2-6 7.2-6s7.2 2.6 7.2 6-3.2 5.4-7.2 5.4-7.2-2-7.2-5.4z"/>
           <path d="M8.6 9.8c1-1.6 5.8-1.6 6.8 0"/>`,
     bag: `<path d="M6.6 8.8h10.8l1.2 10.6H5.4z"/><path d="M9.2 8.8V6.6a2.8 2.8 0 015.6 0v2.2"/>`,
@@ -162,7 +164,7 @@
     cucumber:"cucumber", luffa:"luffa", wax_gourd:"gourd",
     pumpkin:"pumpkin", corn:"corn", green_beans:"pod", snow_peas:"pod",
     cauliflower:"broccoli", enoki:"mushroom", cherry_tomato:"tomato", red_chili:"chili",
-    yam:"yam", lotus_root:"lotus", sweet_potato:"root",
+    yam:"yam", lotus_root:"lotus", sweet_potato:"root", purple_potato:"ptuber",
     mantou:"bun", flour:"bag", rice_cake:"rice", butter:"cheese", cream:"milk",
     chicken_wing:"chicken", ribs:"meat", duck:"meat", lamb:"meat", bacon:"ham", sausage:"ham",
     peeled_shrimp:"shrimp", dried_tofu:"tofu",
