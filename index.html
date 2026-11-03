@@ -2229,8 +2229,14 @@ function renderItems(){
         seen[i.cat] = merged.length;
         merged.push({ id: i.id, cat: i.cat, qty: q });
       });
-      const top = merged;      /* 临期的全部放进去，横向滑动看 */
-      soonBox.innerHTML = `<h3 class="fhd">${tt("fridge.soonH", "先吃这些")}</h3>` +
+      /* 「先吃这些」只放三天内到期的：6 天的水果/酸奶不该占这里 */
+      const top = merged.filter(it => {
+        const src = items.find(x => x.id === it.id);
+        const d = src ? FD.daysLeftOf(src) : 99;
+        return d >= 0 && d <= 3;
+      }).slice(0, 6);
+      if (!top.length) { soonBox.hidden = true; soonBox.innerHTML = ""; }
+      else soonBox.innerHTML = `<h3 class="fhd">${tt("fridge.soonH", "先吃这些")}</h3>` +
         `<div class="soonrow">` + top.map(it => {
           const src = items.find(x => x.id === it.id) || {};
           const d = FD.daysLeftOf(src);
