@@ -614,8 +614,9 @@
       if (!cn || (x.recipe.needs || []).indexOf(c) < 0) return false;
       return x.recipe.name.indexOf(cn) >= 0 || x.recipe.name.indexOf(cn.charAt(0)) >= 0;
     }).length;
+    /* 先看能对上几样，再看菜名里有没有它：辣椒炒肉(对上2样)要压过虎皮青椒(只对上青椒) */
     ranked.sort((a, b) => rank(a) - rank(b)
-      || nameHit(b) - nameHit(a) || fit(b) - fit(a) || b.score - a.score);
+      || fit(b) - fit(a) || nameHit(b) - nameHit(a) || b.score - a.score);
     curGoal = goal;
     $("#result").innerHTML = "";       /* 上一轮的经典菜 / AI 卡不能留在新食材里 */
     curList = ranked.slice(0, 3);
@@ -771,8 +772,20 @@
   }
 
   /* ---------- 本地经典菜：词表 + 技法卡，不依赖 AI ---------- */
-  function classicFor(have) {
+  /* 鸡腿肉/鸡翅也算「鸡肉」，牛腩也算「牛肉」，五花肉也算「猪肉」——
+     词表里按大类写，锅里放的是具体部位时也能命中 */
+  const FAMILY = {
+    chicken: ["chicken_thigh", "chicken_wing", "chicken_feet"],
+    beef: ["beef_brisket"],
+    pork: ["pork_belly"]
+  };
+
+  function classicFor(haveIn) {
     const libNames = new Set(FD.RECIPES.map(r => r.name));
+    const have = new Set(haveIn);
+    Object.keys(FAMILY).forEach(k => {
+      if (FAMILY[k].some(c => haveIn.has(c))) have.add(k);
+    });
     const out = [];
     (window.FD_DISHES || []).forEach(d => {
       if (d.lib && libNames.has(d.lib)) return;        /* 库里有的走上面那三张卡，不重复 */
