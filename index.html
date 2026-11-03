@@ -3485,10 +3485,6 @@ function openSheet(item, pendItem){
   });
   /* 改库存时不再摊开 109 个格子：先只显示当前这一样，想看别的再展开 */
   setPickMode(editing ? "current" : "grid");
-  const hint = $("#sheet .hint");
-  if(hint) hint.textContent = editing
-    ? tp("sheet.editHint", {}, "改保质期或份数，改完点保存。")
-    : tt("sheet.hint", "选一样食物；保质期按食物预设，可以自己改。");
   if($("#sheetTitle")) $("#sheetTitle").textContent = item ? tt("sheet.editTitle", "修改这一条") : tt("sheet.title", "加入一样东西");
   if($("#saveBtn")) $("#saveBtn").textContent = item ? tt("sheet.saveEdit", "保存修改") : tt("sheet.save", "加进冰箱");
 }
@@ -3509,6 +3505,10 @@ function setPickMode(mode){
     const cl = $("#pickClear"); if(cl) cl.hidden = true;
     filterPicks("");
   }
+  const hint = $("#sheet .hint");
+  if(hint) hint.textContent = isCur
+    ? tp("sheet.editHint", {}, "改保质期或份数，改完点保存。")
+    : (editTarget ? tp("sheet.changeHint", {}, "选一样新的食材，再点保存。") : tt("sheet.hint", "选一样食物；保质期按食物预设，可以自己改。"));
 }
 
 function paintPickCur(){
