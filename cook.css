@@ -804,3 +804,9 @@ body[data-mode="loading"] .steam.s3{animation-delay:.6s}
 .clfoot{position:sticky;bottom:-2px;background:var(--card);padding:10px 0 2px;margin-top:14px;z-index:2}
 .clfoot::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px;pointer-events:none;
   background:linear-gradient(to top, var(--card), rgba(255,253,247,0))}
+
+/* 菜品自己的用料：对上的绿、缺的红 */
+.dish .use.needs span.ok{background:var(--green-soft);border-color:var(--green-line)}
+.dish .use.needs span.miss{background:var(--red-soft);border-color:#EFCFC7;color:#8E3B32}
+.dish .use span i{font-style:normal;font-size:10px;font-weight:700;color:var(--red);
+  background:#fff;border-radius:99px;padding:0 5px;margin-left:2px}

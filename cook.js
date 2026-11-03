@@ -89,7 +89,7 @@
     "cook.aiSavedToast": "已收藏「{s}」",
     "cook.aiSavedAlready": "这道已经收藏过了",
     "cook.favGo": "已收藏 {n} 道 · 去菜谱页看 →",
-    "cook.youPut": "你放入了", "cook.potDone": "出锅了", "cook.moreRefs": "更多做法参考", "cook.expired": "这样已经过期了，别下锅",
+    "cook.youPut": "你放入了", "cook.dishNeeds": "这道菜用", "cook.gapShort": "缺", "cook.potDone": "出锅了", "cook.moreRefs": "更多做法参考", "cook.expired": "这样已经过期了，别下锅",
     "cook.xhsGo": "小红书「{s}」", "cook.biliGo": "B 站「{s}」",
     "cook.expandAll": "展开全部", "cook.collapseAll": "收起食材", "cook.pickedSum": "已选", "cook.editPick": "修改",
     "cook.startCook": "开始做饭", "cook.another": "换一道", "cook.reselect": "重新选", "cook.onlyOne": "这组食材只有这一道能直接做",
@@ -192,7 +192,7 @@
     "cook.aiSavedToast": "Saved “{s}”",
     "cook.aiSavedAlready": "Already saved",
     "cook.favGo": "{n} saved — open them in Recipes →",
-    "cook.youPut": "You put in", "cook.potDone": "Done", "cook.moreRefs": "More references", "cook.expired": "That one is past its date — leave it out",
+    "cook.youPut": "You put in", "cook.dishNeeds": "This dish uses", "cook.gapShort": "need", "cook.potDone": "Done", "cook.moreRefs": "More references", "cook.expired": "That one is past its date — leave it out",
     "cook.xhsGo": "RED “{s}”", "cook.biliGo": "Bilibili “{s}”",
     "cook.expandAll": "Show all", "cook.collapseAll": "Show less", "cook.pickedSum": "Picked", "cook.editPick": "Edit",
     "cook.startCook": "Start cooking", "cook.another": "Another", "cook.reselect": "Change picks", "cook.onlyOne": "Only one dish fits these picks",
@@ -608,7 +608,14 @@
     const rank = x => (x.status === "ready" ? 0 : x.status === "shop1" ? 1 : 2);
     /* 用得上的食材越多越靠前：选了三样只用到一样，不该排第一 */
     const fit = x => x.recipe.needs.filter(n => sel.has(n)).length;
-    ranked.sort((a, b) => rank(a) - rank(b) || fit(b) - fit(a) || b.score - a.score);
+    /* 菜名里带着你选的食材，说明它才是"用这个做的菜"（鸡腿肉 → 姜葱捞鸡） */
+    const nameHit = x => [...sel].filter(c => {
+      const cn = (FD.byId[c] || {}).cn || "";
+      if (!cn || (x.recipe.needs || []).indexOf(c) < 0) return false;
+      return x.recipe.name.indexOf(cn) >= 0 || x.recipe.name.indexOf(cn.charAt(0)) >= 0;
+    }).length;
+    ranked.sort((a, b) => rank(a) - rank(b)
+      || nameHit(b) - nameHit(a) || fit(b) - fit(a) || b.score - a.score);
     curGoal = goal;
     $("#result").innerHTML = "";       /* 上一轮的经典菜 / AI 卡不能留在新食材里 */
     curList = ranked.slice(0, 3);
@@ -698,6 +705,11 @@
       : hero.status === "shop1" ? `<span class="gap">${t("cook.gap1")}</span>`
       : `<span class="gap">${t("cook.gapN", { n: hero.missing.length })}</span>`;
     const used = [...sel].map(c => `<span>${art(c)}${foodName(c)}</span>`).join("");
+    /* 这道菜自己要用哪几样：对上的打勾，缺的直接标出来 */
+    const needs = (hero.recipe.needs || []).map(id => {
+      const have = sel.has(id);
+      return `<span class="${have ? "ok" : "miss"}">${art(id)}${foodName(id)}${have ? "" : `<i>${t("cook.gapShort")}</i>`}</span>`;
+    }).join("");
 
     const buy = hero.missing.length
       ? `<p class="meta"><span class="gap">${t("cook.needBuy", { s: hero.missing.map(id => foodName(id)).join("、") })}</span></p>` : "";
@@ -719,7 +731,8 @@
         <span class="ok">${t("cook.match", { a: hero.recipe.needs.filter(id => sel.has(id)).length, b: hero.recipe.needs.length })}</span>
       </div>
       ${used ? `<p class="useline">${t("cook.youPut")} ${[...sel].map(foodName).join(" · ")}</p>` : ""}
-      ${buy}
+      <p class="useline">${t("cook.dishNeeds")}</p>
+      <div class="use needs">${needs}</div>
       <details><summary>${t("cook.steps")}</summary><ol>${steps}</ol></details>
       <div class="dact">
         <button class="primary" type="button" data-act-cook>${t("cook.startCook")}</button>
