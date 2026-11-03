@@ -820,6 +820,11 @@
 
   /* ================= 菜谱详情（复用 .sheet） ================= */
   .rsheet{padding:0 16px 0}
+  /* 没有顶部大图的面板（如「用这个食材能做什么」）要自己留出上边距，
+     否则标题贴着弹层上边缘 */
+  .rsheet.no-photo{padding-top:20px}
+  /* 右上角有悬浮关闭按钮：标题让出这一块，长名字不会钻到按钮底下 */
+  .rsheet.no-photo h3{padding-right:44px}
   .rsheet .rb-ph{position:relative;margin:0 -16px 14px;background:var(--card-2);overflow:hidden}
   .rsheet .rb-ph .cr{position:absolute;right:8px;bottom:6px;font-size:9px;line-height:1.4;color:#fff;
     background:rgba(28,32,30,.45);padding:1px 5px;border-radius:5px}
@@ -2934,6 +2939,7 @@ addEventListener("resize", () => {
 /* 套餐详情：两道菜各一行（点哪行就从哪道开始），每行都能展开看这一步的做法
    —— 从菜谱页点套餐时用它，不再把人踢回首页 */
 function openSetSheet(ids, nameHint){
+  $("#rSheet").classList.remove("no-photo");
   const all = FD.decide(items, goal);
   let evals = (ids || []).map(id => all.find(x => x.recipe.id === id)).filter(Boolean);
   /* 套餐里的菜不一定在 decide() 的前若干名里 —— 缺的按 id 补评估 */
@@ -2993,6 +2999,7 @@ function openSetSheet(ids, nameHint){
 
 /* 点「先吃这些」的卡片：这个食材能做成什么菜（最多 3 道） */
 function openDishIdeas(cat){
+  $("#rSheet").classList.add("no-photo");       /* 这一屏没有顶部大图，标题要留上边距 */
   const name = cnOf(cat);
   let list = [];
   try{
@@ -3028,6 +3035,7 @@ function openDishIdeas(cat){
 }
 
 function openRecipe(id){
+  $("#rSheet").classList.remove("no-photo");
   const r = FD.decide(items, goal).find(x => x.recipe.id === id);
   if(!r) return;
   recipeOpen = r;
