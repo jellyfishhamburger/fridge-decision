@@ -780,3 +780,27 @@ body[data-mode="loading"] .steam.s3{animation-delay:.6s}
 #stage[data-mode="result"]::before{display:none}
 /* 页面本来就能滚，展开全部不再需要 */
 #pickToggle{display:none}
+
+/* 经典菜弹层：收藏一行，小红书 / B 站等宽同级 */
+.clsheet{max-width:520px;margin:0 auto}
+.clfoot{display:grid;gap:8px;margin-top:16px}
+.clfoot .cllink.fav{justify-content:center;width:100%;height:46px;flex:none;border-radius:var(--r-sm);
+  background:var(--card-2);border:1px solid var(--line);color:var(--ink);font-weight:700}
+.clfoot .cllink.fav.on{background:var(--green-soft);border-color:var(--green-line);color:var(--green)}
+.clrefs{display:flex;gap:8px}
+.clrefs .cllink.ref{flex:1;height:42px;background:var(--card-2);border:1px solid var(--line);
+  color:var(--ink-2);font-weight:650;font-size:13px;border-radius:var(--r-sm)}
+
+/* 做法步骤：去掉 <ol> 自带的序号，只留自己的圆号 */
+.dish ol{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:9px}
+.dish ol li{display:grid;grid-template-columns:18px 22px minmax(0,1fr);gap:6px;align-items:start;
+  font-size:13px;line-height:1.6;color:var(--ink-2)}
+.dish ol li .n{width:18px;height:18px;border-radius:99px;background:var(--green-soft);color:var(--green);
+  font-size:11px;font-weight:700;display:grid;place-items:center;margin-top:2px}
+.dish ol li .act{display:grid;place-items:center;margin-top:1px}
+.dish ol li .act svg{width:16px;height:16px}
+
+/* 弹层底部操作条常驻，不用滚到底才看见小红书 / B 站 */
+.clfoot{position:sticky;bottom:-2px;background:var(--card);padding:10px 0 2px;margin-top:14px;z-index:2}
+.clfoot::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px;pointer-events:none;
+  background:linear-gradient(to top, var(--card), rgba(255,253,247,0))}

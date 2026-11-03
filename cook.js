@@ -89,7 +89,7 @@
     "cook.aiSavedToast": "已收藏「{s}」",
     "cook.aiSavedAlready": "这道已经收藏过了",
     "cook.favGo": "已收藏 {n} 道 · 去菜谱页看 →",
-    "cook.youPut": "你放入了", "cook.potDone": "出锅了", "cook.moreRefs": "更多做法参考",
+    "cook.youPut": "你放入了", "cook.potDone": "出锅了", "cook.moreRefs": "更多做法参考", "cook.expired": "这样已经过期了，别下锅",
     "cook.xhsGo": "小红书「{s}」", "cook.biliGo": "B 站「{s}」",
     "cook.expandAll": "展开全部", "cook.collapseAll": "收起食材", "cook.pickedSum": "已选", "cook.editPick": "修改",
     "cook.startCook": "开始做饭", "cook.another": "换一道", "cook.reselect": "重新选", "cook.onlyOne": "这组食材只有这一道能直接做",
@@ -192,7 +192,7 @@
     "cook.aiSavedToast": "Saved “{s}”",
     "cook.aiSavedAlready": "Already saved",
     "cook.favGo": "{n} saved — open them in Recipes →",
-    "cook.youPut": "You put in", "cook.potDone": "Done", "cook.moreRefs": "More references",
+    "cook.youPut": "You put in", "cook.potDone": "Done", "cook.moreRefs": "More references", "cook.expired": "That one is past its date — leave it out",
     "cook.xhsGo": "RED “{s}”", "cook.biliGo": "Bilibili “{s}”",
     "cook.expandAll": "Show all", "cook.collapseAll": "Show less", "cook.pickedSum": "Picked", "cook.editPick": "Edit",
     "cook.startCook": "Start cooking", "cook.another": "Another", "cook.reselect": "Change picks", "cook.onlyOne": "Only one dish fits these picks",
@@ -337,6 +337,11 @@
 
   /* ---------- 选中 / 取消 ---------- */
   function toggle(cat, el, fromDrop) {
+    /* 过期的不能下锅：否则会出现「你放入了猪肉 / 还差：猪肉」这种自相矛盾 */
+    if (!sel.has(cat)) {
+      const fresh = items.filter(i => i.cat === cat).some(i => FD.daysLeftOf(i) >= 0);
+      if (!fresh) { toast(t("cook.expired")); return; }
+    }
     /* 已经出过菜，再动食材就回到「选菜」状态，避免端着一道对不上的菜 */
     if (pageState === "result") { setState("pick"); const d = $("#dish"); if (d) d.innerHTML = ""; }
     const adding = !sel.has(cat);
@@ -595,12 +600,17 @@
       greensPerDay: goal.greens ? 1 : 0
     });
     let ranked = FD.decide(virtual, st)
-      .filter(x => x.recipe.needs.some(n => sel.has(n)));
+      .filter(x => x.recipe.needs.some(n => sel.has(n)))
+      /* 名字里的主料不在食材目录（兔/鹅/蟹…）就做不了，别出现在结果里 */
+      .filter(x => !/兔|鹅|蟹|螺|蛙|鳝|泥鳅|鸽|鹌鹑/.test(x.recipe.name));
     if (goal.kcalMax) ranked = ranked.filter(x => !x.recipe.kcal || x.recipe.kcal <= goal.kcalMax);
     if (goal.fibre)   ranked = ranked.filter(x => highFibre(x.recipe));
     const rank = x => (x.status === "ready" ? 0 : x.status === "shop1" ? 1 : 2);
-    ranked.sort((a, b) => rank(a) - rank(b) || b.score - a.score);
+    /* 用得上的食材越多越靠前：选了三样只用到一样，不该排第一 */
+    const fit = x => x.recipe.needs.filter(n => sel.has(n)).length;
+    ranked.sort((a, b) => rank(a) - rank(b) || fit(b) - fit(a) || b.score - a.score);
     curGoal = goal;
+    $("#result").innerHTML = "";       /* 上一轮的经典菜 / AI 卡不能留在新食材里 */
     curList = ranked.slice(0, 3);
     curIdx = 0;
     paintResults();
@@ -828,8 +838,10 @@
       ${body}
       <div class="clfoot">
         <button type="button" class="cllink fav${saved ? " on" : ""}" data-clfav="${d.id}">${saved ? t("cook.clSaved") : t("cook.clSave")}</button>
-        <a class="cllink" href="https://www.xiaohongshu.com/search_result?keyword=${enc}" target="_blank" rel="noopener">${t("cook.clXhs", { s: d.n })}</a>
-        <a class="cllink ghost" href="https://search.bilibili.com/all?keyword=${enc}" target="_blank" rel="noopener">${t("cook.clBili")}</a>
+        <div class="clrefs">
+          <a class="cllink ref" href="https://www.xiaohongshu.com/search_result?keyword=${enc}" target="_blank" rel="noopener">小红书</a>
+          <a class="cllink ref" href="https://search.bilibili.com/all?keyword=${enc}" target="_blank" rel="noopener">B 站</a>
+        </div>
       </div>`;
     w.querySelectorAll("[data-clclose]").forEach(b => b.addEventListener("click", closeClassic));
     const favBtn = w.querySelector("[data-clfav]");
@@ -864,6 +876,8 @@
     if (!core.length || !box) return;
     const names = core.map(foodName).join(sep());
     const alt = !allUsed && nClassic > 0;      /* 上面已经给了本地经典菜，措辞别再说「库里没有」 */
+    const old = document.getElementById("aiBox");
+    if (old) old.remove();                     /* 重新生成时只留一个 AI 入口 */
     const card = document.createElement("div");
     card.id = "aiBox";
     card.className = "aibox" + (allUsed ? " minor" : "");
