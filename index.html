@@ -208,7 +208,34 @@
     background:var(--green);color:#fff;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.25)}
   /* iOS Safari: 按钮里的 SVG 会吞掉 click，图标一律不接收指针事件 */
   button svg, button svg *{pointer-events:none}
+  /* 改库存：当前这一样单独一行，格子收起来 */
+  .pickcur{display:flex;align-items:center;gap:10px;margin:2px 0 12px;padding:10px 12px;
+    border:1px solid var(--green-line);background:var(--green-soft);border-radius:14px}
+  .pickcur[hidden]{display:none}
+  .pickcur .pc-art{flex:none;width:38px;height:38px;border-radius:11px;background:#fff;
+    display:grid;place-items:center;color:var(--green)}
+  .pickcur .pc-art svg{width:24px;height:24px}
+  .pickcur .pc-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+  .pickcur .pc-tx b{font-size:15px;font-weight:700;color:var(--ink);line-height:1.3}
+  .pickcur .pc-tx s{text-decoration:none;font-size:11.5px;color:var(--muted)}
+  .pickcur .pc-change{flex:none;border:1px solid #BCD3C4;background:#fff;color:var(--green);
+    border-radius:10px;padding:7px 10px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
+  .picktools{margin:0 0 2px}
+  .picktools[hidden]{display:none}
+  .picknone{margin:12px 0;text-align:center;font-size:13px;color:var(--muted)}
+  .picknone[hidden]{display:none}
+  #picks[hidden]{display:none}
   .pick, .pf, .chip button{touch-action:manipulation}
+  /* display:flex 会盖掉 [hidden]，搜食材时要显式关掉 */
+  .pick[hidden]{display:none}
+  /* 三种录入入口排一行：弹层上半截不再被三个大按钮占满 */
+  .airow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}
+  .ai{display:flex;align-items:center;justify-content:center;min-height:42px;padding:6px 6px;
+    border:1px solid var(--line);background:var(--card);border-radius:12px;font-family:inherit;
+    font-size:11.5px;font-weight:600;color:var(--ink-2);text-decoration:none;text-align:center;
+    line-height:1.3;cursor:pointer}
+  .ai:active{transform:scale(.98)}
+  .ai[hidden]{display:none}
   .pick svg{color:var(--green);display:block}
   .field{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;font-size:14px}
   /* 保质期：按食物自己的范围调，不再用一根 1–60 的通用滑条 */
@@ -293,7 +320,11 @@
   .hcard .mt{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:5px;
     font-size:11.5px;color:var(--muted)}
   .hcard .miss{color:var(--amber);font-weight:600}
-  .hsoon{display:flex;gap:8px;flex-wrap:wrap}
+  /* 首页「先吃这些」：里面放的是横滑条（.soonrow），容器必须 block。
+     用 flex 的话 .soonrow 会被压成内容宽度，卡片跟着塌成一根竖条。 */
+  .hsoon{display:block}
+  .hsoon .soonrow{width:100%}
+  .hsoon .soonrow .wc{flex:0 0 29%}
   .soonc{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
     border-radius:999px;padding:8px 13px 8px 9px;font-size:13px;font-weight:600}
   .soonc svg{width:19px;height:19px;color:var(--green)}
@@ -414,8 +445,8 @@
   .fsum .warn b{color:var(--red)}
   .fsum .warn{color:var(--red)}
 
-  .soon{margin:0 0 14px}
-  .soon .fhd{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 8px}
+  .soon{margin:18px 0 16px}
+  .soon .fhd{font-size:14px;font-weight:700;color:var(--ink);margin:0 0 10px;letter-spacing:-.01em}
   /* 和锅页的橱柜同一套：插画在上、名字、剩余天数 —— 比一排窄胶囊好认 */
   .soonrow{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;margin:0 -2px}
@@ -564,8 +595,16 @@
     border-radius:var(--r-pill);padding:4px 10px}
   .cooklog .cw{margin:8px 0 0;font-size:11.5px;color:var(--muted)}
 
-  /* 菜谱页的套餐：和菜谱卡同一套壳子（照片 + 名字 + pill），只是"三样并成一顿" */
-  .dsets{margin:0 0 16px}
+  /* 菜谱页的套餐：整块抬到奶油底上，和上面的单菜叠、下面的菜库分开 */
+  .dsets{margin:0 0 24px;padding:16px 14px 14px;background:var(--card-2);
+    border:1px solid var(--line-soft);border-radius:var(--r)}
+  .dsets[hidden]{display:none}
+  .dsets .dhead{margin:0 0 2px}
+  .dsets .dhead h2{font-size:16px}
+  .dsub{margin:0 0 10px;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .dsets .snote.lead{margin:0 0 10px;font-weight:500;font-size:12px;line-height:1.55;color:var(--ink-2)}
+  .dsets .setchips{padding-bottom:12px}
+  .dsets .btn.quiet{margin-top:10px;background:var(--card)}
   .rcc.set .ph .setflag{position:absolute;left:9px;top:9px;font-style:normal;
     background:rgba(255,253,247,.95);color:var(--green);font-size:10.5px;font-weight:700;
     border-radius:7px;padding:3px 8px;box-shadow:0 2px 6px rgba(47,60,45,.12)}
@@ -679,7 +718,8 @@
   .fan-card .ph.art .ic{display:flex;flex-direction:column;align-items:center;gap:4px;color:#6f7f74}
   .fan-card .ph.art .ic svg{width:44px;height:44px;stroke-width:1.5}
   .fan-card .ph.art .ic i{font-style:normal;font-size:11px;color:#8b8574}
-  .fan-card .ph .cr{position:absolute;right:6px;bottom:6px;display:block;max-width:78%;
+  /* 署名挪到右上角：照片下缘留给菜名和用料 */
+  .fan-card .ph .cr{position:absolute;right:8px;top:8px;display:block;max-width:70%;
     font-size:8px;line-height:1.3;color:#fff;background:rgba(28,32,30,.42);padding:1px 5px;
     border-radius:5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
   .fan-card .ph .cr a{color:#fff;text-decoration:none;white-space:nowrap}
@@ -690,26 +730,69 @@
     color:var(--green);font-size:11px;font-weight:700;border-radius:8px;padding:3px 7px;
     box-shadow:0 2px 6px rgba(47,60,45,.12);opacity:0;transition:opacity .22s}
   .fan-card.front .tag{opacity:1}
-  .fan-info{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
-    border-radius:18px;padding:12px 14px;box-shadow:var(--shadow);margin-top:2px}
-  .fan-tx{flex:1;min-width:0}
-  .fan-tx b{display:block;font-size:15.5px;font-weight:700;color:var(--ink);line-height:1.3;
+  /* 名字和用料压在最前面那张照片的下缘：和叠图是同一张卡，不再另起一个白框。
+     这层深色渐变是「照片上写字」的压底，不算装饰性渐变。 */
+  .fan-cap{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;flex-direction:column;
+    gap:3px;padding:52px 14px 14px;color:#fff;text-align:left;
+    background:linear-gradient(to top,rgba(13,21,17,.9) 0%,rgba(13,21,17,.66) 34%,rgba(13,21,17,.22) 64%,rgba(13,21,17,0) 100%);
+    opacity:0;transition:opacity .22s;pointer-events:none}
+  .fan-card.front .fan-cap{opacity:1}
+  .fan-cap b{font-size:16.5px;font-weight:700;line-height:1.28;letter-spacing:-.01em;
+    text-shadow:0 1px 3px rgba(0,0,0,.45);
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .fan-tx span{display:block;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4;
+  .fan-cap s{text-decoration:none;font-size:11.5px;line-height:1.4;color:rgba(255,255,255,.9);
+    text-shadow:0 1px 2px rgba(0,0,0,.4);
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .fan-go{flex:none;border:0;border-radius:var(--r-pill);background:var(--green-soft);color:var(--green);
-    font-size:12.5px;font-weight:700;padding:9px 15px;font-family:inherit;cursor:pointer}
-  .fan-go:active{transform:scale(.96)}
-  .fan-foot{display:flex;align-items:center;gap:8px;margin:9px 0 2px;min-height:12px}
+  .fan-cap i{font-style:normal;font-size:11.5px;font-weight:700;color:#fff;opacity:.95;margin-top:2px;
+    text-shadow:0 1px 2px rgba(0,0,0,.4)}
+  .fan-foot{display:flex;align-items:center;gap:8px;margin:11px 0 2px;min-height:12px}
   .fan-dots{display:flex;align-items:center;gap:5px}
   .fan-dots i{display:block;width:6px;height:6px;border-radius:99px;background:#D9D3C3;
     transition:width .26s var(--ease),background .26s var(--ease)}
   .fan-dots i.on{width:16px;background:var(--green)}
-  .fan-hint{margin-left:auto;font-size:11.5px;color:var(--muted-2)}
+  .fan-hint{font-size:11.5px;color:var(--muted-2)}
+  .fan-all{margin-left:auto;border:0;background:none;padding:4px 0;font-family:inherit;
+    font-size:12.5px;font-weight:700;color:var(--green);cursor:pointer;font-variant-numeric:tabular-nums}
+  .fan-all:active{opacity:.65}
 
   .dhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:4px 0 9px}
   .dhead h2{font-size:var(--fs-h2);font-weight:700;margin:0;letter-spacing:-.01em}
   .dmeta{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  /* 菜库这一段：和上面的套餐拉开，标题带一句说明，筛选只留一处入口 */
+  .dishlib{margin-top:2px}
+  .dishlib .dhead{margin:0 0 10px}
+  .filters.kinds{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:0 16px 10px 0;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .filters.kinds::-webkit-scrollbar{display:none}
+  .filters.kinds .f{flex:0 0 auto;padding:7px 11px;font-size:12.5px}
+  .filterbtn{flex:none;display:inline-flex;align-items:center;gap:5px;height:38px;padding:0 12px;
+    border:1px solid var(--line);background:var(--card);border-radius:12px;font-family:inherit;
+    font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer}
+  .filterbtn svg{width:16px;height:16px;color:var(--muted)}
+  .filterbtn.on{border-color:var(--green-line);background:var(--green-soft);color:var(--green)}
+  .filterbtn.on svg{color:var(--green)}
+  .filterbtn .condn{min-width:16px;height:16px;border-radius:99px;background:var(--green);color:#fff;
+    font-size:10.5px;line-height:16px;text-align:center;font-variant-numeric:tabular-nums}
+  .filterbtn .condn[hidden]{display:none}
+
+  /* 条件筛选面板 */
+  .condsheet{padding-top:16px}
+  .cond-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 4px}
+  .cond-hd b{font-size:17px;font-weight:700;letter-spacing:-.01em}
+  .cond-x{width:32px;height:32px;border:0;border-radius:99px;background:var(--card-2);
+    color:var(--muted);font-size:14px;line-height:1;cursor:pointer;font-family:inherit}
+  .cond-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px}
+  .cond{display:flex;align-items:center;justify-content:center;min-height:46px;padding:8px 10px;
+    border:1px solid var(--line);background:var(--card);border-radius:12px;font-family:inherit;
+    font-size:13.5px;font-weight:600;color:var(--ink-2);cursor:pointer;text-align:center}
+  .cond.on{border-color:var(--green-line);background:var(--green-soft);color:#0b5c44}
+  .cond:active{transform:scale(.98)}
+  .cond-foot{display:flex;gap:8px;margin:14px -16px 0;padding:12px 16px calc(16px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--line-soft);background:var(--card)}
+  .cond-foot .btn{margin:0;min-height:48px}
+  .cond-foot .btn.quiet{flex:0 0 96px;font-size:14px}
+  .cond-foot .btn.primary{flex:1}
 
   /* ================= 菜谱页：双列紧凑卡片 ================= */
   .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -752,8 +835,10 @@
   .rsheet .rb-ph.art .ic{display:flex;flex-direction:column;align-items:center;gap:3px;color:#6f7f74}
   .rsheet .rb-ph.art .ic svg{width:26px;height:26px;stroke-width:1.6}
   .rsheet .rb-ph.art .ic i{font-style:normal;font-size:10.5px;color:#8b8574}
-  .rsheet h3{font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-.01em;
-    margin:0 0 8px;line-height:1.25}
+  /* 弹层里的标题：和页面里其他标题（区块标题、按钮）用同一套无衬线，
+     衬线只留给整页大标题，否则一打开弹层像换了字体。 */
+  .rsheet h3{font-family:var(--font-ui);font-size:18px;font-weight:700;letter-spacing:-.02em;
+    margin:0 0 6px;line-height:1.3}
   .rsheet .rbtags{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 10px}
   .rsheet .rbline{font-size:13px;color:var(--ink-2);line-height:1.55;margin:0 0 8px}
   .rsheet .rbline b{color:var(--ink)}
@@ -904,7 +989,10 @@
     border-radius:14px;border:1px solid #E7C9C2;background:#FDF0ED;color:#8C3A2C;
     font:inherit;font-size:13px;font-weight:600;text-align:left}
   .expbar[hidden]{display:none}
-  .expbar + .soon{margin-top:22px}
+  /* 提醒条和「先吃这些」中间隔着 .undo 节点，相邻选择器（+）接不上；
+     用一般兄弟选择器，并给区块之间留出清楚的层级空隙。 */
+  .expbar:not([hidden]) ~ .soon{margin-top:20px}
+  .soon + .fblock{margin-top:18px}
   .soon + .stockcard{margin-top:22px}
   .fhd{margin:0 0 10px}
   .expbar b{font-variant-numeric:tabular-nums}
@@ -934,7 +1022,7 @@
   .plan-miss{margin:6px 0 2px;font-size:12px;font-weight:600;color:#8a6d1f;
     background:#FBF5E3;border-radius:8px;padding:4px 9px;display:inline-block}
 
-  .idea-sub{margin:-6px 0 12px;font-size:12.5px;color:var(--muted)}
+  .idea-sub{margin:8px 0 14px;font-size:13px;line-height:1.5;color:var(--muted)}
 
   #sheetTitle{font-size:17px;font-weight:700;letter-spacing:-.01em}
   #sheet .sect, #sheet h4{font-size:12.5px;color:var(--muted);font-weight:600}
@@ -1246,7 +1334,6 @@
         <a class="btn ghost" id="addBtn" href="add.html" data-i18n="fridge.add"
    style="text-decoration:none;display:flex;align-items:center;justify-content:center">＋ 加一样</a>
       </div>
-      <a class="findlink" href="add.html" style="margin-top:4px" data-i18n="cap.fridgeLink">刚买完菜？把东西录进冰箱 →</a>
     </div>
 
     <!-- 5 · 我的调味料（默认折叠） -->
@@ -1267,71 +1354,86 @@
   <section class="view" id="view-discover">
     <p class="lede" id="discLede" data-i18n="disc.lede">按「先用掉快坏的」排序。</p>
 
-
-    <!-- 现在就能做：扇形叠，一直在，不跟下面的筛选走 -->
+    <!-- 1 · 现在就能做：扇形叠。名字/用料直接压在最前面那张照片上，
+         不再单独挂一个白框，免得和叠图分成两块。 -->
     <section class="fan" id="fanSec" hidden aria-label="现在就能做">
       <div class="fan-hd">
         <h2 class="fan-t" id="fanTitle">现在就能做</h2>
         <span class="fan-c" id="fanCount"></span>
       </div>
       <div class="fan-stage" id="fanStage"></div>
-      <div class="fan-info">
-        <div class="fan-tx">
-          <b id="fanName">—</b>
-          <span id="fanMeta"></span>
-        </div>
-        <button class="fan-go" id="fanOpen" type="button">看做法</button>
-      </div>
       <div class="fan-foot">
         <span class="fan-dots" id="fanDots"></span>
         <span class="fan-hint" data-i18n="disc.fanHint">左右滑动切换</span>
+        <button class="fan-all" id="fanAll" type="button">全部菜谱 →</button>
       </div>
     </section>
 
-    <!-- 套餐：和下面的菜谱卡同一种卡，只是三样并成一顿 -->
+    <!-- 2 · 套餐：一整块奶油底，和上面的单菜、下面的菜库分开 -->
     <section id="discSets" class="dsets" hidden>
       <div class="dhead">
         <h2 data-i18n="sets.quick">按套餐看</h2>
-        <span class="dmeta" id="setCount"></span>
       </div>
-      <p class="snote lead" data-i18n="sets.logic">一套 = 一荤 + 一素 + 主食。先挑快坏的食材，再用你冰箱里现成的凑成一顿，同一道菜不会连着出现。</p>
+      <p class="dsub" id="setCount"></p>
+      <p class="snote lead" data-i18n="sets.logic">一套 = 主菜 + 配菜（多数配米饭）。先挑快坏的食材，用冰箱里现成的凑成一顿，同一道菜不会连着出现。</p>
       <div class="setchips" id="setChips"></div>
       <div class="dgrid" id="discSetGrid"></div>
       <button class="btn quiet" id="setMore" style="display:none" data-i18n="sets.more">展开全部</button>
     </section>
 
-    <label class="ds-search" style="margin-bottom:10px">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-           stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.4"/>
-        <path d="M15.8 15.8 20.4 20.4"/></svg>
-      <input id="discSearch" type="search" autocomplete="off" enterkeyhint="search"
-             data-i18n-ph="disc.search" placeholder="搜菜名或食材">
-      <button type="button" class="ds-clear" id="discClear" hidden aria-label="清空搜索">✕</button>
-    </label>
+    <!-- 3 · 全部菜谱：搜索 + 类别（一排横滑）+ 条件（收进「筛选」） -->
+    <section class="dishlib">
+      <div class="dhead">
+        <h2 data-i18n="disc.allH">全部菜谱</h2>
+        <span class="dmeta" id="discCount"></span>
+      </div>
 
-    <div class="filters" id="discFilters">
-      <button class="f on" data-f="all" data-i18n="disc.all">全部</button>
-      <button class="f" data-f="ready" data-i18n="disc.ready">现在就能做</button>
-      <button class="f" data-f="shop1" data-i18n="disc.shop1">差一样</button>
-      <button class="f" data-f="greens" data-i18n="disc.greens">有绿叶菜</button>
-      <button class="f" data-f="light" data-i18n="disc.light">≤ 500 kcal</button>
-    </div>
+      <div class="ftools">
+        <label class="ds-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.4"/>
+            <path d="M15.8 15.8 20.4 20.4"/></svg>
+          <input id="discSearch" type="search" autocomplete="off" enterkeyhint="search"
+                 data-i18n-ph="disc.search" placeholder="搜菜名或食材">
+          <button type="button" class="ds-clear" id="discClear" hidden aria-label="清空搜索">✕</button>
+        </label>
+        <button type="button" class="filterbtn" id="condBtn" aria-expanded="false" aria-controls="condSheet">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
+          <span data-i18n="disc.filter">筛选</span>
+          <b class="condn" id="condN" hidden></b>
+        </button>
+      </div>
 
-    <!-- 菜谱类别：放在列表正上方，点了就在这里筛 -->
-    <div class="kindbar">
-      <div class="filters kindfilters" id="discKinds"></div>
-    </div>
+      <!-- 类别：只有这一排会改列表；条件在「筛选」里 -->
+      <div class="filters kinds" id="discKinds"></div>
 
-    <!-- 现在就能做：只放最相关的几条，其余交给下面的全部列表 -->
-    <div class="dhead">
-      <h2 data-i18n="disc.allH">全部菜谱</h2>
-      <span class="dmeta" id="discCount"></span>
-    </div>
-    <div class="dgrid" id="discList"></div>
-    <p class="ds-empty" id="discEmpty" style="display:none" data-i18n="disc.noMatch">没有匹配的菜。</p>
-    <button class="btn quiet" id="discMore" style="margin-top:6px" data-i18n="disc.more">加载更多</button>
+      <div class="dgrid" id="discList"></div>
+      <p class="ds-empty" id="discEmpty" style="display:none" data-i18n="disc.noMatch">没有匹配的菜。</p>
+      <button class="btn quiet" id="discMore" style="margin-top:6px" data-i18n="disc.more">加载更多</button>
 
-    <a class="findlink" href="cook.html" data-i18n="disc.selfPick">想自己挑食材 →</a>
+      <a class="findlink" href="cook.html" data-i18n="disc.selfPick">想自己挑食材 →</a>
+    </section>
+
+    <!-- 条件筛选：只在「全部菜谱」生效，可多选 -->
+    <div class="scrim" id="condScrim"></div>
+    <section class="sheet condsheet" id="condSheet" aria-label="筛选">
+      <div class="cond-hd">
+        <b data-i18n="disc.filter">筛选</b>
+        <button type="button" class="cond-x" id="condClose" aria-label="关闭">✕</button>
+      </div>
+      <p class="hint" data-i18n="disc.filterLead">可以多选，只作用于下面的「全部菜谱」。</p>
+      <div class="cond-opts" id="condOpts">
+        <button type="button" class="cond" data-c="ready" data-i18n="disc.ready">现在就能做</button>
+        <button type="button" class="cond" data-c="shop1" data-i18n="disc.shop1">差一样</button>
+        <button type="button" class="cond" data-c="greens" data-i18n="disc.greens">有绿叶菜</button>
+        <button type="button" class="cond" data-c="light" data-i18n="disc.light">≤ 500 kcal</button>
+      </div>
+      <div class="cond-foot">
+        <button type="button" class="btn quiet" id="condReset" data-i18n="disc.clear">清除</button>
+        <button type="button" class="btn primary" id="condDone">看这些菜</button>
+      </div>
+    </section>
   </section>
 
 
@@ -1426,21 +1528,35 @@
   <p class="hint" data-i18n="sheet.hint"></p>
   <video class="cam" id="cam" playsinline muted autoplay></video>
   <img class="shotpreview" id="shot" alt="刚拍的照片">
-  <div class="row" style="margin-bottom:10px">
-    <a class="btn quiet" id="snapBtn" href="add.html?v=detect" data-i18n="sheet.aiAdd"
-       style="text-decoration:none;display:flex;align-items:center;justify-content:center">自动检测录入</a>
-    <button class="btn quiet" id="flipBtn" style="display:none" data-i18n="sheet.flip">换镜头</button>
+  <div class="airow" id="airow">
+    <a class="ai" id="snapBtn" href="add.html?v=detect" data-i18n="sheet.aiAdd">自动检测录入</a>
+    <a class="ai" id="scanBtn" href="add.html?v=receipt" data-i18n="sheet.rcptAdd">小票识别</a>
+    <a class="ai" id="batchBtn" href="add.html?v=batch" data-i18n="sheet.batchAdd">整批俯拍</a>
+    <button class="ai" id="flipBtn" style="display:none" data-i18n="sheet.flip">换镜头</button>
   </div>
   <div class="zoomrow" id="zoomRow" hidden>
     <span><span data-i18n="sheet.zoom">焦距</span> <b id="zoomLbl">1×</b></span>
     <input type="range" id="zoom" min="1" max="8" step="0.1" value="1">
   </div>
-  <a class="btn quiet" id="scanBtn" href="add.html?v=receipt" data-i18n="sheet.rcptAdd"
-     style="text-decoration:none;display:flex;align-items:center;justify-content:center;margin-bottom:10px">小票识别</a>
-  <a class="btn quiet" id="batchBtn" href="add.html?v=batch" data-i18n="sheet.batchAdd"
-     style="text-decoration:none;display:flex;align-items:center;justify-content:center;margin-bottom:10px">摊开俯拍（整批）</a>
   <p class="cammsg" id="camMsg" data-i18n="sheet.camMsg"></p>
+  <!-- 改库存时先把当前这一样摆出来；109 个格子收起来，点「改成别的食材」再展开 -->
+  <div class="pickcur" id="pickCur" hidden>
+    <span class="pc-art" id="pickCurArt"></span>
+    <span class="pc-tx"><b id="pickCurName">—</b><s id="pickCurEn"></s></span>
+    <button type="button" class="pc-change" id="pickChange" data-i18n="sheet.changeFood">改成别的食材</button>
+  </div>
+  <div class="picktools" id="pickTools">
+    <label class="ds-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+           stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.4"/>
+        <path d="M15.8 15.8 20.4 20.4"/></svg>
+      <input id="pickSearch" type="search" autocomplete="off" enterkeyhint="search"
+             data-i18n-ph="sheet.searchFood" placeholder="搜食材，比如紫薯">
+      <button type="button" class="ds-clear" id="pickClear" hidden aria-label="清空搜索">✕</button>
+    </label>
+  </div>
   <div class="grid" id="picks"></div>
+  <p class="picknone" id="pickNone" hidden data-i18n="sheet.noFood">没有这个食材 —— 换个说法试试。</p>
   <div class="keep" id="keepBox">
     <div class="keep-top">
       <span class="keep-lbl" data-i18n="sheet.keep">可以放</span>
@@ -1507,7 +1623,7 @@
 <script src="auth.js?v=20261101-3"></script>
 <script src="cloud.js?v=20261101-4"></script>
 <script src="realtime.js?v=20261101-5"></script>
-<script src="i18n.js?v=20261101-1"></script>
+<script src="i18n.js?v=20261103-1"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -1530,7 +1646,9 @@ let setIntent = (function(){
   catch(e){ return "hearty"; }
 })(), setPick = 0;   /* 今晚想要什么（记住上次） + 换到第几套 */
 let setChoice = null;                    /* 用户手动换过菜之后的组合（dish id 数组） */
-let discFilter = "all", discKind = "all", buildPicks = new Set();
+let discKind = "all", buildPicks = new Set();
+/* 条件筛选：收在「筛选」面板里，可多选；类别是另一套维度，不再并排挤在列表上方 */
+let discConds = { ready:false, shop1:false, greens:false, light:false };
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 const today = () => FD.localDate();
@@ -1696,7 +1814,11 @@ function renderHome(){
   renderPrefs();
 
   /* 先吃这些 */
-  const soon = FD.urgent(items, 3).filter(i => FD.daysLeftOf(i) >= 0);
+  /* 先去掉过期的，再取最近到期的三道。
+     以前是先取三条再过滤 —— 冰箱里有过期货时，排在前面的全被滤掉，只剩一张卡。 */
+  const soon = items.filter(i => FD.daysLeftOf(i) >= 0)
+    .sort((a, b) => FD.daysLeftOf(a) - FD.daysLeftOf(b))
+    .slice(0, 3);
   const soonBox = $("#homeSoon");
   if(soonBox){
     soonBox.innerHTML = soon.length
@@ -2548,10 +2670,10 @@ function renderKinds(){
   const en = I18N.getLang() === "en";
   const cnt = {};
   FD.RECIPES.forEach(r => { cnt[r.kind || "meat"] = (cnt[r.kind || "meat"] || 0) + 1; });
-  box.innerHTML = KINDS.filter(k => k.id === "all" || cnt[k.id]).map(k => {
-    const n = k.id === "all" ? FD.RECIPES.length : cnt[k.id];
-    return `<button class="f${discKind === k.id ? " on" : ""}" data-kind="${k.id}">${en ? k.en : k.zh} ${n}</button>`;
-  }).join("");
+  /* 不带数字：一排能放下全部分类，不用横滑；数量看右边「N 道」就够 */
+  box.innerHTML = KINDS.filter(k => k.id === "all" || cnt[k.id]).map(k =>
+    `<button class="f${discKind === k.id ? " on" : ""}" data-kind="${k.id}">${en ? k.en : k.zh}</button>`
+  ).join("");
   box.querySelectorAll("[data-kind]").forEach(b => b.addEventListener("click", () => {
     discKind = b.dataset.kind;
     discShown = DISC_PAGE;
@@ -2559,13 +2681,22 @@ function renderKinds(){
   }));
 }
 
+function condOn(){ return Object.keys(discConds).filter(k => discConds[k]); }
+function condFilter(list){
+  const want = condOn();
+  if(!want.length) return list;
+  const st = want.filter(k => k === "ready" || k === "shop1");
+  let out = list;
+  if(st.length) out = out.filter(r => st.indexOf(r.status) >= 0);
+  if(discConds.greens) out = out.filter(r => r.recipe.greens);
+  if(discConds.light)  out = out.filter(r => (r.recipe.kcal || 0) <= 500);
+  return out;
+}
+
 function discBase(){
   let list = FD.decide(items, goal, {all:true});
   if(discKind !== "all") list = list.filter(r => (r.recipe.kind || "meat") === discKind);
-  if(discFilter === "ready")  list = list.filter(r => r.status === "ready");
-  if(discFilter === "shop1")  list = list.filter(r => r.status === "shop1");
-  if(discFilter === "greens") list = list.filter(r => r.recipe.greens);
-  if(discFilter === "light")  list = list.filter(r => (r.recipe.kcal || 0) <= 500);
+  list = condFilter(list);
   const q = discQuery.trim().toLowerCase();
   if(q) list = list.filter(r => recipeHits(r.recipe, q));
   /* 排序：现在能做 → 差一样 → 其余；同组里有图的排前面，免得一屏都是占位卡 */
@@ -2602,15 +2733,21 @@ function compactCard(r){
 }
 
 /* ---- 现在就能做：扇形叠 ----
-   和下面「全部菜谱」的分工：这一块永远显示、永远只放「现在/差一样就能做」的少量推荐，
-   不跟搜索和筛选联动；筛选只改下面那张库。卡是叠着摞的，一次只看清一张。 */
-const FAN_MAX = 4;
-let fanCards = [], fanIdx = 0, fanBusy = false, fanSig = "", fanList = [];
+   和下面「全部菜谱」的分工：这一块永远显示、只放最该先吃的几道，
+   不跟搜索和筛选联动；筛选只改下面那张库。卡是叠着摞的，一次看一张。
+   名字和用料压在照片下缘，卡片本身就是完整的「一道菜」，不再另挂说明框。 */
+const FAN_MAX = 6;
+let fanCards = [], fanIdx = 0, fanBusy = false, fanSig = "", fanList = [], fanReadyN = 0;
 
 function fanPool(){
   const ranked = FD.decide(items, goal);
-  let list = ranked.filter(r => r.status === "ready").slice(0, FAN_MAX);
-  if(!list.length) list = ranked.filter(r => r.status === "shop1").slice(0, FAN_MAX);
+  const ready = ranked.filter(r => r.status === "ready");
+  /* 计数按「全部菜谱」那一池算，和「全部 N 道 →」点进去的数字对得上 */
+  let allReady = 0;
+  try{ allReady = FD.decide(items, goal, {all:true}).filter(r => r.status === "ready").length; }catch(e){}
+  fanReadyN = allReady || ready.length;
+  let list = ready.slice(0, FAN_MAX);
+  if(!list.length){ list = ranked.filter(r => r.status === "shop1").slice(0, FAN_MAX); fanReadyN = 0; }
   return list;
 }
 
@@ -2618,7 +2755,8 @@ function fanSlotOf(i){
   const d = i - fanIdx;                       /* 0 = 最前面那张 */
   if(!d) return [0, 0, 0, 1];
   const side = d % 2 ? 1 : -1, mag = Math.ceil(Math.abs(d) / 2);
-  return [side * mag * 34, Math.abs(d) * 6, side * mag * 8, 1 - Math.abs(d) * 0.05];
+  /* 六张一叠：步距收窄，最外侧那张也不会被屏幕切掉 */
+  return [side * mag * 26, Math.abs(d) * 5, side * mag * 6, 1 - Math.abs(d) * 0.045];
 }
 
 function fanPlace(i, v){
@@ -2642,20 +2780,30 @@ function fanArrange(vel){
 }
 
 function fanHead(){
-  const r = fanList[fanIdx];
-  if(!r) return;
-  const sep = I18N.getLang() === "en" ? ", " : "、";
-  $("#fanName").textContent = I18N.recipeName(r.recipe);
-  const used = r.used.slice(0, 2).map(i => cnOf(i.cat)).join(sep);
-  $("#fanMeta").textContent = r.status === "ready"
-    ? t("card.min", {n:r.recipe.minutes}) + (used ? " · " + t("disc.uses") + used : "")
-    : t("card.min", {n:r.recipe.minutes}) + " · " + t("disc.gapN", {n:r.missing.length})
-      + "：" + r.missing.map(cnOf).join(sep);
   const cnt = $("#fanCount");
-  if(cnt) cnt.textContent = t("disc.countOf", {n: fanList.length});
+  if(cnt) cnt.textContent = fanReadyN
+    ? tp("disc.readyN", {n: fanReadyN}, fanReadyN + " 道")
+    : t("disc.countOf", {n: fanList.length});
   const ttl = $("#fanTitle");
   if(ttl) ttl.textContent = fanList.some(x => x.status === "ready") ? t("disc.readyH") : t("disc.shop1H");
   [...document.querySelectorAll("#fanDots i")].forEach((d, i) => d.classList.toggle("on", i === fanIdx));
+  const all = $("#fanAll");
+  if(all){
+    all.hidden = !fanReadyN;
+    all.textContent = tp("disc.seeAllN", {n: fanReadyN}, "全部 " + fanReadyN + " 道 →");
+  }
+}
+
+/* 一张卡自己的说明：菜名 + 「多久 · 用掉什么」+ 看做法 */
+function fanCapHTML(r){
+  const sep = I18N.getLang() === "en" ? ", " : "、";
+  const used = r.used.slice(0, 2).map(i => cnOf(i.cat)).join(sep);
+  const meta = r.status === "ready"
+    ? t("card.min", {n:r.recipe.minutes}) + (used ? " · " + t("disc.uses") + used : "")
+    : t("card.min", {n:r.recipe.minutes}) + " · " + t("disc.gapN", {n:r.missing.length})
+      + "：" + r.missing.map(cnOf).join(sep);
+  return `<span class="fan-cap"><b>${I18N.recipeName(r.recipe)}</b><s>${meta}</s>` +
+         `<i>${tp("disc.seeIt", {}, "看做法 →")}</i></span>`;
 }
 
 function fanBuild(){
@@ -2674,7 +2822,7 @@ function fanBuild(){
     const badge = r.status === "ready"
       ? `<span class="tag">${t("disc.ready1")}</span>`
       : `<span class="tag">${t("disc.gapN", {n:r.missing.length})}</span>`;
-    c.innerHTML = `<span class="ph${ph.art ? " art" : ""}">${ph.html}</span>${badge}`;
+    c.innerHTML = `<span class="ph${ph.art ? " art" : ""}">${ph.html}</span>${badge}` + fanCapHTML(r);
     c.addEventListener("keydown", e => {
       if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openRecipe(r.recipe.id); }
     });
@@ -2868,9 +3016,8 @@ function openDishIdeas(cat){
   $("#rBody").innerHTML = `
     <button class="rbclose" id="rCloseIdea" aria-label="关闭">✕</button>
     <h3 id="rName">用「${name}」能做什么</h3>
-    <p class="idea-sub">${list.length ? "按现在冰箱里的食材排的序，最多 3 道" : ""}</p>
-    ${list.length ? `<p class="tiny" style="margin:0 0 10px">按你冰箱里现有的食材排的序。</p>
-      <div class="idearows">${rows}</div>`
+    <p class="idea-sub">${list.length ? `按冰箱里现有的食材排序，先列能直接做的 ${list.length} 道` : ""}</p>
+    ${list.length ? `<div class="idearows">${rows}</div>`
       : `<p class="tiny">现在用「${name}」还做不成一道菜，加点别的食材再看看。</p>`}`;
   $("#rCloseIdea").addEventListener("click", closeRecipe);
   $("#rBody").querySelectorAll("[data-rid]").forEach(b =>
@@ -2888,7 +3035,7 @@ function openRecipe(id){
   const ph = dishPhoto(r.recipe);
   const used = r.used.map(i => {
     const d = FD.daysLeftOf(i);
-    return `${cnOf(i.cat)}<b>${d <= 0 ? t("days.today") : t("days.n", {n:d})}</b>`;
+    return `${cnOf(i.cat)} <b>${d <= 0 ? t("days.today") : t("days.n", {n:d})}</b>`;
   }).join(sep);
   const gap = r.missing.length
     ? `<p class="rbgap">${t("disc.gapN", {n:r.missing.length})}：${r.missing.map(cnOf).join(sep)}` +
@@ -2937,11 +3084,22 @@ $("#setMore") && $("#setMore").addEventListener("click", () => {
   renderDiscSets();
 });
 
+function renderCondBtn(){
+  const btn = $("#condBtn"), n = $("#condN"), done = $("#condDone"), sheet = $("#condSheet");
+  const on = condOn().length;
+  if(btn) btn.classList.toggle("on", !!on);
+  if(n){ n.hidden = !on; n.textContent = on; }
+  if(btn && sheet) btn.setAttribute("aria-expanded", String(sheet.classList.contains("on")));
+  if(done){ const c = discBase().length; done.textContent = tp("disc.applyN", {n:c}, "看 " + c + " 道菜"); }
+  $$("#condOpts .cond").forEach(b => b.classList.toggle("on", !!discConds[b.dataset.c]));
+}
+
 function renderDiscover(){
   renderKinds();
   renderDiscSets();
   renderFan();
   const all = discBase();
+  renderCondBtn();
   const cnt = $("#discCount");
   if(cnt) cnt.textContent = t("disc.countOf", {n: all.length});
 
@@ -2980,11 +3138,6 @@ function renderDiscover(){
   }
   const more = $("#discMore");
   if(more) more.addEventListener("click", () => { discShown += DISC_PAGE * 2; renderDiscover(); });
-  const fanGo = $("#fanOpen");
-  if(fanGo) fanGo.addEventListener("click", () => {
-    const r = fanList[fanIdx];
-    if(r) openRecipe(r.recipe.id);
-  });
   const scrim = $("#rScrim");
   if(scrim) scrim.addEventListener("click", closeRecipe);
   addEventListener("keydown", e => { if(e.key === "Escape" && recipeOpen) closeRecipe(); });
@@ -3327,11 +3480,57 @@ function openSheet(item, pendItem){
   openSheetLegacy();                       /* 建网格 + 回填状态 */
   /* 编辑既有条目时不需要相机（东西已经在冰箱里了） */
   const editing = !!item;
-  ["#snapBtn", "#zoomRow", "#scanBtn", "#camMsg", "#pickHint"].forEach(sel => {
+  ["#airow", "#zoomRow", "#camMsg", "#pickHint"].forEach(sel => {
     const el = $(sel); if(el) el.style.display = editing ? "none" : "";
   });
+  /* 改库存时不再摊开 109 个格子：先只显示当前这一样，想看别的再展开 */
+  setPickMode(editing ? "current" : "grid");
+  const hint = $("#sheet .hint");
+  if(hint) hint.textContent = editing
+    ? tp("sheet.editHint", {}, "改保质期或份数，改完点保存。")
+    : tt("sheet.hint", "选一样食物；保质期按食物预设，可以自己改。");
   if($("#sheetTitle")) $("#sheetTitle").textContent = item ? tt("sheet.editTitle", "修改这一条") : tt("sheet.title", "加入一样东西");
   if($("#saveBtn")) $("#saveBtn").textContent = item ? tt("sheet.saveEdit", "保存修改") : tt("sheet.save", "加进冰箱");
+}
+
+/* current = 只显示当前食材（编辑态）；grid = 展开全部食材 + 搜索（新增 / 改成别的） */
+function setPickMode(mode){
+  const cur = $("#pickCur"), tools = $("#pickTools"), grid = $("#picks"), none = $("#pickNone");
+  const isCur = mode === "current";
+  if(cur) cur.hidden = !isCur;
+  if(tools) tools.hidden = isCur;
+  if(grid) grid.hidden = isCur;
+  if(none && isCur) none.hidden = true;
+  if(isCur){
+    paintPickCur();
+  }else{
+    const s = $("#pickSearch");
+    if(s) s.value = "";
+    const cl = $("#pickClear"); if(cl) cl.hidden = true;
+    filterPicks("");
+  }
+}
+
+function paintPickCur(){
+  const c = picked;
+  if(!c) return;
+  const art = $("#pickCurArt"), nm = $("#pickCurName"), en = $("#pickCurEn");
+  if(art) art.innerHTML = window.FD_ICON ? FD_ICON(c.id, 24) : "";
+  if(nm) nm.textContent = I18N.foodName(c.id);
+  if(en) en.textContent = I18N.getLang() === "en" ? (c.cn || "") : (c.name || "");
+}
+
+/* 搜食材：中英文、拼音都认（直接匹配格子上的两行字 + id） */
+function filterPicks(q){
+  const s = String(q || "").trim().toLowerCase();
+  let hit = 0;
+  document.querySelectorAll("#picks .pick").forEach(b => {
+    const ok = !s || (b.dataset.k || "").indexOf(s) >= 0;
+    b.hidden = !ok;
+    if(ok) hit++;
+  });
+  const none = $("#pickNone");
+  if(none) none.hidden = !s || hit > 0;
 }
 function openSheetLegacy(){
   $("#scrim").classList.add("on"); $("#sheet").classList.add("on");
@@ -3342,11 +3541,13 @@ function openSheetLegacy(){
   }).forEach(c=>{
     const b = document.createElement("button");
     b.className = "pick"; b.type = "button";
+    b.dataset.k = [c.id, c.cn, c.name, I18N.foodName(c.id)].filter(Boolean).join(" ").toLowerCase();
     b.innerHTML = window.FD_ICON(c.id,22) + `<span>${I18N.foodName(c.id)}</span><small>${I18N.getLang()==="en" ? c.cn : c.name}</small>`;
     b.addEventListener("click", ()=>{
       picked = c; pendingDays = c.days;
       g.querySelectorAll(".pick").forEach(x=>x.classList.remove("on"));
       b.classList.add("on");
+      paintPickCur();                                 /* 编辑态那一行跟着换 */
       paintKeep();                                    /* 换成这类食物自己的天数范围 */
       /* 选完食物把保质期这一块带到眼前：格子有 19 个，不然要往下翻很久才找得到。
          滚完再校正一次，避免它被贴底按钮压住一点。 */
@@ -3395,6 +3596,27 @@ function paintQty(){
 }
 $("#qMinus").addEventListener("click", ()=>{ pendingQty = Math.max(1, pendingQty - 1); paintQty(); });
 $("#qPlus").addEventListener("click", ()=>{ pendingQty = Math.min(99, pendingQty + 1); paintQty(); });
+
+/* 食材搜索 + 「改成别的食材」 */
+(function(){
+  const s = $("#pickSearch"), cl = $("#pickClear"), ch = $("#pickChange");
+  if(s){
+    s.addEventListener("input", () => {
+      filterPicks(s.value);
+      if(cl) cl.hidden = !s.value.trim();
+    });
+  }
+  if(cl) cl.addEventListener("click", () => {
+    if(s) s.value = "";
+    filterPicks("");
+    cl.hidden = true;
+    if(s) s.focus();
+  });
+  if(ch) ch.addEventListener("click", () => {
+    setPickMode("grid");
+    const t = $("#pickSearch"); if(t) setTimeout(() => t.focus(), 60);
+  });
+})();
 
 /* ---------- 保质期：按食物自己的范围 ----------
    「一根 1–60 的滑条」对速冻水饺（默认 90 天）和绿叶菜（4 天）是同一把尺子，
@@ -3600,13 +3822,56 @@ $("#items").addEventListener("click", e=>{
   FD.saveItems(items); renderItems();
 });
 
-$("#discFilters").addEventListener("click", e=>{
-  const b = e.target.closest("[data-f]"); if(!b) return;
-  discFilter = b.dataset.f;
-  discShown = DISC_PAGE;                       /* 换筛选条件回到第一屏 */
-  $$("#discFilters .f").forEach(x=>x.classList.toggle("on", x===b));
-  renderDiscover();
-});
+/* ---------- 条件筛选面板（只在「全部菜谱」生效） ---------- */
+(function(){
+  const btn = $("#condBtn"), sheet = $("#condSheet"), scrim = $("#condScrim");
+  if(!btn || !sheet) return;
+  const openCond = () => {
+    scrim.classList.add("on"); sheet.classList.add("on");
+    renderCondBtn();
+  };
+  const closeCond = () => {
+    scrim.classList.remove("on"); sheet.classList.remove("on");
+    renderCondBtn();
+  };
+  btn.addEventListener("click", openCond);
+  $("#condClose").addEventListener("click", closeCond);
+  scrim.addEventListener("click", closeCond);
+  $("#condOpts").addEventListener("click", e => {
+    const b = e.target.closest("[data-c]"); if(!b) return;
+    discConds[b.dataset.c] = !discConds[b.dataset.c];
+    renderCondBtn();
+  });
+  $("#condReset").addEventListener("click", () => {
+    Object.keys(discConds).forEach(k => discConds[k] = false);
+    discShown = DISC_PAGE;
+    renderDiscover();
+  });
+  $("#condDone").addEventListener("click", () => {
+    discShown = DISC_PAGE;
+    renderDiscover();
+    closeCond();
+    const lib = document.querySelector(".dishlib");
+    if(lib) window.scrollTo({top: lib.getBoundingClientRect().top + scrollY - 56, behavior:"smooth"});
+  });
+  addEventListener("keydown", e => { if(e.key === "Escape" && sheet.classList.contains("on")) closeCond(); });
+})();
+
+/* 「全部 N 道 →」= 直接在菜库里筛出「现在就能做」 */
+(function(){
+  const all = $("#fanAll");
+  if(!all) return;
+  all.addEventListener("click", () => {
+    Object.keys(discConds).forEach(k => discConds[k] = false);
+    discConds.ready = true;
+    discKind = "all"; discQuery = ""; discShown = DISC_PAGE;
+    const s = $("#discSearch"); if(s){ s.value = ""; }
+    const c = $("#discClear"); if(c) c.hidden = true;
+    renderDiscover();
+    const lib = document.querySelector(".dishlib");
+    if(lib) window.scrollTo({top: lib.getBoundingClientRect().top + scrollY - 56, behavior:"smooth"});
+  });
+})();
 
 /* ---------- keep the clock honest ----------
    剩余天数是按日期算的，但如果页面一直开着（装到主屏的 PWA 就是），
