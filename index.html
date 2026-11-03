@@ -795,6 +795,42 @@
   .cond-foot .btn.quiet{flex:0 0 96px;font-size:14px}
   .cond-foot .btn.primary{flex:1}
 
+  /* ---------- 收藏：卡片书签 + 收藏视图 ---------- */
+  .rccwrap{position:relative;display:flex}
+  .rccwrap .rcc{flex:1 1 auto;min-width:0}
+  .favbtn{position:absolute;top:6px;right:6px;z-index:2;width:28px;height:28px;border-radius:99px;
+    display:grid;place-items:center;background:rgba(255,253,247,.92);color:#8B978D;
+    border:1px solid var(--line);cursor:pointer;box-shadow:0 1px 3px rgba(47,60,45,.12)}
+  .favbtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;
+    stroke-linejoin:round}
+  .favbtn.on{color:#fff;background:var(--green);border-color:var(--green)}
+  .favbtn.on svg{fill:currentColor}
+  .favbtn:active{transform:scale(.94)}
+  .favdel{position:absolute;top:6px;right:6px;z-index:2;width:26px;height:26px;border-radius:99px;
+    display:grid;place-items:center;background:rgba(255,253,247,.94);color:#9AA69C;
+    border:1px solid var(--line);cursor:pointer;font-size:12px;font-family:inherit;line-height:1}
+  .favdel:active{background:#F7E9E4;color:var(--red)}
+  .favchip b{font-weight:700;font-variant-numeric:tabular-nums;margin-left:2px}
+
+  /* AI 收藏卡 / AI 详情 */
+  .rcc.ai{border-style:dashed;border-color:#D9C69A;background:#FFFDF4}
+  .rcc.ai .ph.art{background:#F8F1DD;justify-content:center;width:100%;align-self:stretch}
+  .rcc.ai .ph.art .ic svg{width:26px;height:26px}
+  .rcc .ai-pill{background:#FBEEDC;color:#7A5E1C;border-color:#E7D2A8}
+  .ai-head{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+  .ai-badge{font-size:10.5px;font-weight:700;letter-spacing:.04em;color:#7A5E1C;
+    background:#FBEEDC;border:1px solid #E7D2A8;border-radius:99px;padding:2px 8px}
+  .ai-by{font-size:11px;color:var(--muted-2);line-height:1.3}
+  .ai-ings{display:grid;gap:5px;margin:6px 0 10px}
+  .ai-ings span{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+    font-size:12.5px;background:#F7F1E1;border-radius:9px;padding:6px 10px;color:var(--ink)}
+  .ai-ings i{font-style:normal;color:var(--muted);flex:none;font-variant-numeric:tabular-nums}
+  /* AI 步骤没有动作图标，两列就够；套默认的三列会把正文挤成竖排 */
+  .rsheet ol.ai-steps li{grid-template-columns:18px minmax(0,1fr)}
+  .sf-row{display:flex;gap:8px;align-items:stretch}
+  .sf-row .btn{flex:1;margin:0}
+  .sf-row .btn.quiet{flex:0 0 auto;min-width:104px;padding-left:16px;padding-right:16px}
+
   /* ================= 菜谱页：双列紧凑卡片 ================= */
   .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .rcc{display:flex;flex-direction:column;padding:0;overflow:hidden;text-align:left;
@@ -1410,7 +1446,7 @@
     <!-- 3 · 全部菜谱：搜索 + 类别（一排横滑）+ 条件（收进「筛选」） -->
     <section class="dishlib">
       <div class="dhead">
-        <h2 data-i18n="disc.allH">全部菜谱</h2>
+        <h2 id="discLibTitle">全部菜谱</h2>
         <span class="dmeta" id="discCount"></span>
       </div>
 
@@ -1644,16 +1680,18 @@
 <script src="icons.js?v=20261029-17"></script>
 <script src="dish-photos.js?v=20261029-19"></script>
 <script src="sync.js?v=20261029-17"></script>
-<script src="logic.js?v=20261103-5"></script>
+<script src="logic.js?v=20261103-6"></script>
 <script src="store.js?v=20261101-2"></script>
 <script src="auth.js?v=20261101-3"></script>
 <script src="cloud.js?v=20261101-4"></script>
 <script src="realtime.js?v=20261101-5"></script>
-<script src="i18n.js?v=20261103-1"></script>
+<script src="i18n.js?v=20261103-2"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
+/* 只用于拼 HTML 属性/文本，别把菜名里的引号带进属性 */
+const escA = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 let items  = (() => {
   const m = FD.migrate(FD.items());
   const merged = FD.mergeItems(m.items);
@@ -2765,7 +2803,11 @@ function renderKinds(){
   const cnt = {};
   FD.RECIPES.forEach(r => { cnt[r.kind || "meat"] = (cnt[r.kind || "meat"] || 0) + 1; });
   /* 不带数字：一排能放下全部分类，不用横滑；数量看右边「N 道」就够 */
-  box.innerHTML = KINDS.filter(k => k.id === "all" || cnt[k.id]).map(k =>
+  const favN = (window.FD && FD.favList) ? FD.favList().length : 0;
+  const favChip = favN
+    ? `<button class="f favchip${discKind === "fav" ? " on" : ""}" data-kind="fav">${t("disc.fav")} <b>${favN}</b></button>`
+    : "";
+  box.innerHTML = favChip + KINDS.filter(k => k.id === "all" || cnt[k.id]).map(k =>
     `<button class="f${discKind === k.id ? " on" : ""}" data-kind="${k.id}">${en ? k.en : k.zh}</button>`
   ).join("");
   box.querySelectorAll("[data-kind]").forEach(b => b.addEventListener("click", () => {
@@ -2787,7 +2829,30 @@ function condFilter(list){
   return out;
 }
 
+/* 收藏视图：库里的菜按 id 取回并在当前库存下重新评估；AI 菜直接拿存下来的整份 */
+function favRows(){
+  const out = [];
+  const list = (window.FD && FD.favList) ? FD.favList() : [];
+  list.forEach(f => {
+    if(f.type === "lib"){
+      const rec = FD.RECIPES.filter(r => r.id === f.id)[0];
+      if(!rec) return;
+      let ev; try { ev = FD.evaluate(rec, items, goal); } catch(e){ return; }
+      ev._fav = f.key; ev._ts = f.ts || 0;
+      out.push(ev);
+    } else {
+      out.push({ _fav: f.key, _ts: f.ts || 0, aiFav: true,
+                 recipe: f.recipe || {}, name: f.name || (f.recipe || {}).name || "",
+                 minutes: f.minutes || (f.recipe && f.recipe.cooking_time) || 0 });
+    }
+  });
+  out.sort((a, b) => (b._ts || 0) - (a._ts || 0));
+  const q = discQuery.trim().toLowerCase();
+  return q ? out.filter(r => (r.aiFav ? r.name : I18N.recipeName(r.recipe)).toLowerCase().indexOf(q) >= 0) : out;
+}
+
 function discBase(){
+  if(discKind === "fav") return favRows();
   let list = FD.decide(items, goal, {all:true});
   if(discKind !== "all") list = list.filter(r => (r.recipe.kind || "meat") === discKind);
   list = condFilter(list);
@@ -2813,7 +2878,15 @@ function statusPill(r){
 
 function compactCard(r){
   const ph = dishPhoto(r.recipe);
-  return `<button class="rcc" type="button" data-open="${r.recipe.id}" aria-label="${I18N.recipeName(r.recipe)}">
+  const on = r._fav ? true : ((window.__favKeys && window.__favKeys.has("lib:" + r.recipe.id)) ||
+                              (window.FD && FD.favHas({ type: "lib", id: r.recipe.id })));
+  const favBtn = r._fav
+    ? `<button class="favdel" type="button" data-unfav="${escA(r._fav)}" aria-label="${t("fav.remove")}" title="${t("fav.remove")}">✕</button>`
+    : `<button class="favbtn${on ? " on" : ""}" type="button" data-fav="${escA(r.recipe.id)}" aria-pressed="${on ? "true" : "false"}" aria-label="${on ? t("fav.saved") : t("fav.add")}" title="${on ? t("fav.saved") : t("fav.add")}">
+         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.4h10a1.5 1.5 0 0 1 1.5 1.5v14.2l-6.5-4.1-6.5 4.1V5.9A1.5 1.5 0 0 1 7 4.4z"/></svg>
+       </button>`;
+  return `<div class="rccwrap">
+    <button class="rcc" type="button" data-open="${r.recipe.id}" aria-label="${I18N.recipeName(r.recipe)}">
     <span class="ph${ph.art ? " art" : ""}">${ph.html}</span>
     <span class="bd">
       <span class="nm">${I18N.recipeName(r.recipe)}</span>
@@ -2823,7 +2896,28 @@ function compactCard(r){
         ${statusPill(r)}
       </span>
     </span>
-  </button>`;
+  </button>
+  ${favBtn}
+  </div>`;
+}
+
+/* AI 收藏：库里没有这道菜，卡片单独一套样子（虚线 + AI 角标） */
+function aiFavCard(r){
+  return `<div class="rccwrap">
+    <button class="rcc ai" type="button" data-aifav="${escA(r._fav)}" aria-label="${escA(r.name)}">
+      <span class="ph art ai-ph"><span class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.6l1.7 4.3 4.4 1.7-4.4 1.7L12 15.6l-1.7-4.3L5.9 9.6l4.4-1.7z"/><path d="M18.4 15.2l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>
+        <i>AI</i></span></span>
+      <span class="bd">
+        <span class="nm">${escA(r.name)}</span>
+        <span class="mt">
+          <span class="ds-pill">${t("card.min", {n:r.minutes || 0})}</span>
+          <span class="ds-pill ai-pill">${t("fav.ai")}</span>
+        </span>
+      </span>
+    </button>
+    <button class="favdel" type="button" data-unfav="${escA(r._fav)}" aria-label="${t("fav.remove")}" title="${t("fav.remove")}">✕</button>
+  </div>`;
 }
 
 /* ---- 现在就能做：扇形叠 ----
@@ -3123,6 +3217,47 @@ function openDishIdeas(cat){
   $("#rSheet").scrollTop = 0;
 }
 
+/* 收藏里的 AI 菜：菜谱库里没有这条，直接读存下来的整份 */
+function openAiFav(key){
+  const f = (window.FD && FD.favList ? FD.favList() : []).filter(x => FD.favKey(x) === key)[0];
+  if(!f) return;
+  const r = f.recipe || {};
+  const ings = (r.ingredients || []).map(x =>
+    `<span><b>${escA(x.name)}</b><i>${escA(x.amount || "")}</i></span>`).join("");
+  const steps = (r.steps || []).map((s, i) =>
+    `<li><span class="n">${i + 1}</span><span class="tx">${escA(s)}</span></li>`).join("");
+  const extra = (r.extra_ingredients || []).filter(Boolean);
+  const warns = (r.warnings || []).filter(Boolean);
+
+  $("#rBody").innerHTML = `
+    <button class="rbclose" id="rCloseFav" aria-label="${t("sheet.cancel")}">✕</button>
+    <div class="ai-head"><span class="ai-badge">${t("fav.ai")}</span>
+      <span class="ai-by">${t("fav.onlyLocal")}</span></div>
+    <h3>${escA(r.name || f.name)}</h3>
+    <div class="rbtags"><span class="ds-pill">${t("card.min", {n: f.minutes || r.cooking_time || 0})}</span></div>
+    <p class="rbh">${t("fav.ingredients")}</p>
+    <div class="ai-ings">${ings}</div>
+    <p class="rbh">${t("disc.steps")}</p>
+    <ol class="ai-steps">${steps}</ol>
+    ${extra.length ? `<p class="rbline">${t("fav.extra", {s: extra.join("、")})}</p>` : ""}
+    ${warns.length ? `<p class="rbgap">${warns.join("；")}</p>` : ""}
+    <div class="sheet-foot sf-row">
+      <button class="btn quiet" id="favDel">${t("fav.removeShort")}</button>
+    </div>`;
+
+  $("#rSheet").classList.add("no-photo");
+  $("#rCloseFav").addEventListener("click", closeRecipe);
+  $("#favDel").addEventListener("click", () => {
+    FD.favRemove(key);
+    closeRecipe();
+    toast(t("fav.removed"));
+    renderDiscover();
+  });
+  $("#rScrim").classList.add("on");
+  $("#rSheet").classList.add("on");
+  $("#rSheet").scrollTop = 0;
+}
+
 function openRecipe(id){
   $("#rSheet").classList.remove("no-photo");
   const r = FD.decide(items, goal).find(x => x.recipe.id === id);
@@ -3140,6 +3275,7 @@ function openRecipe(id){
     : "";
   const pantry = r.pantryMissing.length
     ? `<p class="rbline">${t("card.pantry")}${r.pantryMissing.map(pantryLabel).join(sep)}</p>` : "";
+  const favOn = !!(window.FD && FD.favHas({ type: "lib", id: r.recipe.id }));
 
   $("#rBody").innerHTML = `
     <button class="rbclose" id="rClose" aria-label="${t("sheet.cancel")}">✕</button>
@@ -3157,13 +3293,31 @@ function openRecipe(id){
     <ol>${stepsHtml(r.recipe)}</ol>
     ${pantry}
     <div class="srcline">${t("card.src")}<a href="${r.recipe.src}" target="_blank" rel="noopener">HowToCook</a> · ${t("card.srcNote")}</div>
-    <div class="sheet-foot">
+    <div class="sheet-foot sf-row">
+      <button class="btn quiet" data-favsheet="${r.recipe.id}" aria-pressed="${favOn ? "true" : "false"}">${favOn ? t("fav.saved") : t("fav.add")}</button>
       <button class="btn primary" data-cook="${r.recipe.id}">${t("disc.cook")}</button>
     </div>`;
 
   $("#rClose").addEventListener("click", closeRecipe);
   const cookBtn = $("#rBody [data-cook]");
   if(cookBtn) cookBtn.addEventListener("click", () => { closeRecipe(); openCook(cookBtn.dataset.cook); });
+  const favBtn = $("#rBody [data-favsheet]");
+  if(favBtn) favBtn.addEventListener("click", () => {
+    const key = "lib:" + r.recipe.id;
+    if(FD.favHas({ type: "lib", id: r.recipe.id })){
+      FD.favRemove(key);
+      favBtn.textContent = t("fav.add");
+      favBtn.setAttribute("aria-pressed", "false");
+      toast(t("fav.removed"));
+    } else {
+      FD.favAdd({ type: "lib", id: r.recipe.id, name: I18N.recipeName(r.recipe), minutes: r.recipe.minutes });
+      favBtn.textContent = t("fav.saved");
+      favBtn.setAttribute("aria-pressed", "true");
+      toast(t("fav.added", { s: I18N.recipeName(r.recipe) }));
+    }
+    renderKinds();
+    if(discKind === "fav") renderDiscover();
+  });
   $("#rScrim").classList.add("on");
   $("#rSheet").classList.add("on");
   $("#rSheet").scrollTop = 0;
@@ -3192,19 +3346,45 @@ function renderCondBtn(){
 }
 
 function renderDiscover(){
+  /* 收藏删空之后不要卡在一个空视图里 */
+  if(discKind === "fav" && (!window.FD || !FD.favList || !FD.favList().length)) discKind = "all";
   renderKinds();
   renderDiscSets();
   renderFan();
   const all = discBase();
   renderCondBtn();
+  const libTitle = $("#discLibTitle");
+  if(libTitle) libTitle.textContent = discKind === "fav" ? t("disc.fav") : t("disc.allH");
   const cnt = $("#discCount");
   if(cnt) cnt.textContent = t("disc.countOf", {n: all.length});
 
   const box = $("#discList");
   const slice = all.slice(0, discShown);
-  box.innerHTML = slice.map(compactCard).join("");
+  /* 一次算出收藏集合：每张卡都去 parse localStorage 太浪费 */
+  window.__favKeys = new Set((FD.favList ? FD.favList() : []).map(FD.favKey));
+  box.innerHTML = slice.map(r => r.aiFav ? aiFavCard(r) : compactCard(r)).join("");
   box.querySelectorAll("[data-open]").forEach(b =>
     b.addEventListener("click", () => openRecipe(b.dataset.open)));
+  box.querySelectorAll("[data-aifav]").forEach(b =>
+    b.addEventListener("click", () => openAiFav(b.dataset.aifav)));
+
+  /* 卡片右上角的书签：收藏 / 取消收藏（不打开详情，所以单独 stopPropagation） */
+  box.querySelectorAll("[data-fav]").forEach(b => b.addEventListener("click", e => {
+    e.preventDefault(); e.stopPropagation();
+    const rec = FD.RECIPES.filter(r => r.id === b.dataset.fav)[0];
+    const res = FD.favAdd({ type: "lib", id: b.dataset.fav,
+      name: rec ? I18N.recipeName(rec) : b.dataset.fav, minutes: rec ? rec.minutes : 0 });
+    b.classList.add("on");
+    b.setAttribute("aria-pressed", "true");
+    toast(res.exists ? t("fav.saved") : t("fav.added", { s: rec ? I18N.recipeName(rec) : "" }));
+    renderKinds();                     /* 分类那一排的收藏数跟着变 */
+  }));
+  box.querySelectorAll("[data-unfav]").forEach(b => b.addEventListener("click", e => {
+    e.preventDefault(); e.stopPropagation();
+    FD.favRemove(b.dataset.unfav);
+    toast(t("fav.removed"));
+    renderDiscover();
+  }));
 
   const more = $("#discMore");
   if(more){
@@ -3213,7 +3393,10 @@ function renderDiscover(){
     more.textContent = t("disc.moreN", {n: rest});
   }
   const empty = $("#discEmpty");
-  if(empty) empty.style.display = all.length ? "none" : "block";
+  if(empty){
+    empty.style.display = all.length ? "none" : "block";
+    empty.textContent = discKind === "fav" ? t("fav.empty") : t("disc.noMatch");
+  }
 
   if(recipeOpen) openRecipe(recipeOpen.recipe.id);     /* 切语言时把详情也重画一次 */
 }

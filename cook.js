@@ -87,6 +87,8 @@
     "cook.aiSave": "收藏这一道",
     "cook.aiSaved": "已收藏",
     "cook.aiSavedToast": "已收藏「{s}」",
+    "cook.aiSavedAlready": "这道已经收藏过了",
+    "cook.favGo": "已收藏 {n} 道 · 去菜谱页看 →",
     "cook.aiAgain": "再配一道",
     "cook.aiRetry": "重试",
     "cook.aiFail": "连不上本地 AI 服务（{s}）",
@@ -167,6 +169,8 @@
     "cook.aiSave": "Save this one",
     "cook.aiSaved": "Saved",
     "cook.aiSavedToast": "Saved “{s}”",
+    "cook.aiSavedAlready": "Already saved",
+    "cook.favGo": "{n} saved — open them in Recipes →",
     "cook.aiAgain": "Another one",
     "cook.aiRetry": "Retry",
     "cook.aiFail": "Can't reach the local AI service ({s})",
@@ -202,11 +206,8 @@
     return location.protocol === "http:" ? "http://" + (location.hostname || "127.0.0.1") + ":" + AI_PORT : "";
   })();
 
-  const AI_SAVED = "fd.ai.saved.v1";
-  let aiBusy = false, aiLast = null;
-  const aiSavedList = () => { try { return JSON.parse(localStorage.getItem(AI_SAVED) || "[]") || []; } catch (e) { return []; } };
-  const aiStoreSave = list => { try { localStorage.setItem(AI_SAVED, JSON.stringify(list.slice(-30))); } catch (e) {} };
   const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  let aiBusy = false, aiLast = null, aiSeen = [];    /* aiSeen：本页生成过的菜名，用来「再配一道」时避开 */
 
   /* ---------- 状态 ---------- */
   let items = [];              // 真实库存快照（FD.items()）
@@ -651,25 +652,20 @@
       go.addEventListener("click", askAi);
       MOTION.press(go, { scale: 0.97 });
     }
-    renderAiSaved(box);
+    renderFavLink(box);
   }
 
-  function renderAiSaved(box) {
-    const list = aiSavedList();
-    const old = box.querySelector(".ai-saved");
+  /* 收藏都去「菜谱页」里看；这里只留一条入口，不再把清单塞进结果流 */
+  function renderFavLink(box) {
+    const n = (window.FD && FD.favList) ? FD.favList().length : 0;
+    const old = box && box.querySelector(".ai-favlink");
     if (old) old.remove();
-    if (!list.length) return;
-    const d = document.createElement("details");
-    d.className = "ai-saved";
-    d.innerHTML = `<summary>${t("cook.aiSavedN", { n: list.length })}</summary><ul>` +
-      list.map((x, i) => `<li><span>${esc((x.recipe || {}).name)}</span>
-        <button type="button" data-del="${i}" aria-label="${t("cook.aiRemove")}">✕</button></li>`).join("") +
-      `</ul>`;
-    box.appendChild(d);
-    d.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => {
-      const l = aiSavedList(); l.splice(+b.dataset.del, 1); aiStoreSave(l);
-      d.remove(); toast(t("cook.aiRemoved"));
-    }));
+    if (!n || !box) return;
+    const a = document.createElement("a");
+    a.className = "ai-favlink ai-link";
+    a.href = "index.html#discover";
+    a.textContent = t("cook.favGo", { n: n });
+    box.appendChild(a);
   }
 
   function renderAiResult(d, box) {
@@ -708,14 +704,14 @@
 
     box.querySelector("[data-ai-again]").addEventListener("click", askAi);
     const save = box.querySelector("[data-ai-save]");
+    const already = !!(FD.favHas && FD.favHas({ type: "ai", name: rc.name }));
+    if (already) { save.textContent = t("cook.aiSaved"); save.disabled = true; }
     save.addEventListener("click", () => {
-      const l = aiSavedList();
-      l.push({ ts: Date.now(), recipe: rc, meta: meta, must: meta.must_use || [] });
-      aiStoreSave(l);
+      const res = FD.favAdd({ type: "ai", name: rc.name, minutes: rc.cooking_time, recipe: rc, meta: meta });
       save.textContent = t("cook.aiSaved");
       save.disabled = true;
-      toast(t("cook.aiSavedToast", { s: rc.name }));
-      renderAiSaved($("#result"));
+      toast(res.exists ? t("cook.aiSavedAlready", { s: rc.name }) : t("cook.aiSavedToast", { s: rc.name }));
+      renderFavLink($("#result"));
     });
   }
 
@@ -730,6 +726,9 @@
     const avail = [...new Set(items.map(i => i.cat))]
       .filter(c => core.indexOf(c) < 0)
       .map(c => (FD.byId[c] && FD.byId[c].cn) || foodName(c)).slice(0, 12);
+    /* 「再配一道」要真的换：把本页生成过的、以及已经收藏的菜名带过去，让服务端避开 */
+    const saved = (window.FD && FD.favList ? FD.favList().filter(f => f.type === "ai").map(f => f.name) : []);
+    const avoid = [...new Set(aiSeen.concat(saved))].filter(Boolean).slice(-6);
 
     aiBusy = true;
     box.innerHTML = `<article class="rcard ai loading">
@@ -747,13 +746,15 @@
         body: JSON.stringify({
           must_use: must,
           available: avail,
-          max_minutes: (goal && goal.maxMinutes) || 30
+          max_minutes: (goal && goal.maxMinutes) || 30,
+          avoid: avoid
         }),
         signal: ctl.signal
       });
       const d = await r.json().catch(() => ({}));
       if (!r.ok || d.error || !d.recipe) throw new Error(d.reason || d.error || ("HTTP " + r.status));
       aiLast = d;
+      if (d.recipe && d.recipe.name) aiSeen.push(d.recipe.name);
       renderAiResult(d, box);
     } catch (e) {
       const msg = (e && e.name === "AbortError") ? t("cook.aiTimeout") : (e.message || String(e));

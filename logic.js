@@ -956,10 +956,51 @@
     };
   }
 
+  /* ---------- 收藏（想做的菜）----------
+     库里菜按 id 存一条指针；AI 菜没有 id，整份存下来。
+     只在本机：localStorage['fd.favorites.v1']；跨设备同步留到二期。 */
+  const LS_FAV = "fd.favorites.v1";
+  const favKey = o => (o && o.type === "ai")
+    ? "ai:" + String(o.name || "").trim()
+    : "lib:" + String((o && o.id) || "");
+
+  function favMigrate() {
+    const cur = read(LS_FAV, null);
+    if (Array.isArray(cur)) return cur;
+    const old = read("fd.ai.saved.v1", null);       /* 上一版的 AI 收藏，搬过来 */
+    const out = (Array.isArray(old) ? old : []).map(x => {
+      const r = x.recipe || {};
+      return { key: "ai:" + String(r.name || ""), type: "ai", name: r.name || "",
+               ts: x.ts || Date.now(), minutes: r.cooking_time || 0,
+               recipe: r, meta: x.meta || {} };
+    });
+    write(LS_FAV, out);
+    return out;
+  }
+  const favList = () => favMigrate();
+  const favHas = o => favList().some(x => favKey(x) === favKey(o));
+  function favAdd(o) {
+    const l = favList();
+    const k = favKey(o);
+    if (l.some(x => favKey(x) === k)) return { ok: true, exists: true };
+    l.push(o.type === "ai"
+      ? { key: k, type: "ai", name: o.name, ts: Date.now(), minutes: o.minutes || 0,
+          recipe: o.recipe, meta: o.meta || {} }
+      : { key: k, type: "lib", id: o.id, name: o.name, ts: Date.now(), minutes: o.minutes || 0 });
+    write(LS_FAV, l);
+    return { ok: true, exists: false };
+  }
+  function favRemove(key) {
+    const l = favList().filter(x => favKey(x) !== key);
+    write(LS_FAV, l);
+    return l;
+  }
+
   global.FD = {
     CATALOG, RECIPES, PANTRY, byId, pantryById, DB, SETS,
     evaluateSet, decideSets, buildSets, INTENTS, tagOf, altDishes, composeSet, compareSet,
     buildPlans, swapPlanSide, makePlan, sideOptions, dishOptions, evalsByIds, STYLES, DIET, usedIds,
+    LS_FAV, favList, favKey, favHas, favAdd, favRemove,
     cookLog, noteCooked, cookMeals, cookSummary,
     LS_ITEMS, LS_SETTINGS, LS_LOG, LS_PANTRY, LS_HOUSEHOLD,
     read, write,
