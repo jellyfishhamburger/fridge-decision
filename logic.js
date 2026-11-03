@@ -740,8 +740,14 @@
     const sideId = plan && plan.side && plan.side.recipe ? plan.side.recipe.id : "";
     const roles = role === "main" ? (style.main || []) : (style.sides || []);
     const keepId = role === "main" ? sideId : mainId;      /* 另一半固定不动 */
+    /* 纯主食（只需要米/面）不算一道主菜：米饭、白粥出现在「换主菜」里没有意义 */
+    const pureCarb = r => {
+      const need = r.needs || [];
+      return need.length > 0 && need.every(c => ((byId[c] || {}).tag === "carb"));
+    };
     return RECIPES.filter(isDish)
       .filter(r => r.id !== keepId && !usedIds(r, st))
+      .filter(r => role !== "main" || !pureCarb(r))
       .map(r => evaluate(r, items, st))
       .filter(ev => ev.status !== "blocked")
       .filter(ev => !(style.noMeat && (ev.recipe.needs || []).some(c => IDS_MEAT.indexOf(c) >= 0)))

@@ -89,6 +89,7 @@
   .f{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 13px;font-size:13px;
     white-space:nowrap;cursor:pointer;font-family:inherit;color:var(--ink)}
   .f.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44;font-weight:600}
+  .f:disabled{opacity:.45;cursor:default}
   .rc{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:0 0 10px;box-shadow:var(--shadow)}
   .rc h4{margin:0 0 6px;font-size:17px;letter-spacing:-.01em;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
   /* 成品照：贴在卡片顶端，撑满左右；没有可靠图源时退回食材插画 */
@@ -1643,7 +1644,7 @@
 <script src="icons.js?v=20261029-17"></script>
 <script src="dish-photos.js?v=20261029-19"></script>
 <script src="sync.js?v=20261029-17"></script>
-<script src="logic.js?v=20261103-4"></script>
+<script src="logic.js?v=20261103-5"></script>
 <script src="store.js?v=20261101-2"></script>
 <script src="auth.js?v=20261101-3"></script>
 <script src="cloud.js?v=20261101-4"></script>
@@ -1823,10 +1824,12 @@ function renderHome(){
     $("#rBody").innerHTML = `
       <button class="rbclose" id="rCloseSide" aria-label="关闭">✕</button>
       <h3>${isMain ? "换一道主菜" : "换一道配菜"}</h3>
-      <p class="idea-sub">${isMain ? "配菜" : "主菜"}：${I18N.recipeName(fixed.recipe)} · ${readyN} 道现在就能配</p>
+      <p class="idea-sub">${isMain ? "配菜" : "主菜"}：${I18N.recipeName(fixed.recipe)} · ${readyN
+        ? readyN + " 道现在就能配"
+        : "现在没有能直接做的" + (isMain ? "主菜" : "配菜") + "，下面都还差一点"}</p>
       <div class="filters sidefilter">
         <button type="button" class="f${readyFirst && readyN ? "" : " on"}" data-sf="all">全部 ${opts.length}</button>
-        <button type="button" class="f${readyFirst && readyN ? " on" : ""}" data-sf="ready">现在能做 ${readyN}</button>
+        <button type="button" class="f${readyFirst && readyN ? " on" : ""}" data-sf="ready" ${readyN ? "" : "disabled"}>现在能做 ${readyN}</button>
       </div>
       <div class="idearows" id="dishList">${rows}</div>`;
 
