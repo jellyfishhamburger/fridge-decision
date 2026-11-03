@@ -75,9 +75,15 @@
   }
 
   /* 每一行都能直接改成正确的食材：认错了不用删掉重来 */
+  /* 下拉里的食材按拼音排，虾、虾仁、虾皮会挨在一起，不用满屏找 */
+  var SORTED_CATALOG = FD.CATALOG.slice().sort(function (a, b) {
+    var A = (a.cn || a.name || ""), B = (b.cn || b.name || "");
+    try { return A.localeCompare(B, "zh-Hans-CN"); } catch (e) { return A < B ? -1 : 1; }
+  });
+
   function selHtml(r) {
     var opts = '<option value="">' + (r.guess ? "认成「" + r.guess + "」，选一样" : "选一样…") + "</option>" +
-      FD.CATALOG.map(function (c) {
+      SORTED_CATALOG.map(function (c) {
         return '<option value="' + c.id + '"' + (c.id === r.cat ? " selected" : "") + ">" + fname(c) + "</option>";
       }).join("");
     return '<select data-sel="1">' + opts + "</select>";
@@ -170,7 +176,11 @@
     var en = (window.I18N && I18N.getLang && I18N.getLang() === "en") ? 1 : 0;
     var html = "";
     GROUPS.forEach(function (g) {
-      var items = FD.CATALOG.filter(function (f) { return g.tags.indexOf(f.tag) >= 0; });
+      var items = FD.CATALOG.filter(function (f) { return g.tags.indexOf(f.tag) >= 0; })
+        .sort(function (a, b) {
+          try { return (a.cn || "").localeCompare(b.cn || "", "zh-Hans-CN"); }
+          catch (e) { return 0; }
+        });
       if (!items.length) return;
       html += '<section class="grp" id="grp-' + g.id + '">'
         + '<h3><b>' + g.label[en] + '</b><span>' + items.length + '</span></h3>'

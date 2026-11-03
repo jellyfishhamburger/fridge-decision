@@ -895,6 +895,9 @@
     border-radius:14px;border:1px solid #E7C9C2;background:#FDF0ED;color:#8C3A2C;
     font:inherit;font-size:13px;font-weight:600;text-align:left}
   .expbar[hidden]{display:none}
+  .expbar + .soon{margin-top:22px}
+  .soon + .stockcard{margin-top:22px}
+  .fhd{margin:0 0 10px}
   .expbar b{font-variant-numeric:tabular-nums}
   .expbar .ar{margin-left:auto;flex:none;opacity:.7}
   .expbar.soft{border-color:#EDDCB6;background:#FBF5E3;color:#7A5E1C}
@@ -908,12 +911,19 @@
 
   /* 「用这个食材能做什么」弹层 */
   .idearows{display:flex;flex-direction:column;gap:8px;margin:4px 0 0}
-  .idearow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
-    border:1px solid var(--line);background:#fff;border-radius:14px;padding:11px 12px;font:inherit}
+  .idearows{gap:10px}
+  .idearow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+    border:1px solid var(--line);background:#fff;border-radius:16px;padding:14px 14px;font:inherit;
+    box-shadow:0 1px 2px rgba(40,50,40,.04)}
+  .idearow:active{background:#F7F9F4;border-color:var(--green)}
   .idearow .tx{flex:1;min-width:0}
-  .idearow .tx b{display:block;font-size:14.5px;line-height:1.35}
-  .idearow .tx s{display:block;text-decoration:none;font-size:12px;color:var(--muted);margin-top:2px}
-  .idearow .go{flex:none;color:var(--green);font-size:12.5px;font-weight:600}
+  .idearow .tx b{display:block;font-size:16px;font-weight:700;line-height:1.3;color:var(--ink);
+    letter-spacing:-.01em}
+  .idearow .tx s{display:block;text-decoration:none;font-size:12.5px;color:var(--muted);margin-top:4px}
+  .idearow .go{flex:none;color:var(--green);font-size:13px;font-weight:700}
+
+  .plan-miss{margin:6px 0 2px;font-size:12px;font-weight:600;color:#8a6d1f;
+    background:#FBF5E3;border-radius:8px;padding:4px 9px;display:inline-block}
 </style>
 </head>
 <body>
@@ -1605,6 +1615,7 @@ function renderHome(){
           <span><em>配</em>${I18N.recipeName(p.side.recipe)}</span>
           ${p.staple ? `<span><em>主食</em>米饭</span>` : ""}
         </div>
+        ${(!p.ready && p.missing && p.missing.length) ? `<div class="plan-miss">还差：${p.missing.map(c => cnOf(c)).join("、")}</div>` : ""}
         <ul class="plan-why">${p.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
         <div class="plan-ft">
           <button type="button" class="sw2" data-swap="${i}" ${p.alts.length ? "" : "disabled"}>⇄ 换配菜</button>
