@@ -116,7 +116,8 @@
       const added = new Date(it.addedAt + "T00:00:00");
       if (!isNaN(added)) {
         const elapsed = Math.floor((Date.now() - added.getTime()) / 86400000);
-        return Math.max(0, it.life - elapsed);
+        /* 不要压到 0：过期要能算出负数，否则界面永远只显示「今天到期」 */
+        return it.life - elapsed;
       }
     }
     return typeof it.daysLeft === "number" ? it.daysLeft : 0;

@@ -441,6 +441,7 @@
   .row-i .q{font-size:11.5px;font-weight:600;color:var(--muted);background:#eef2ef;border-radius:6px;padding:1px 6px}
   .row-i .meta{font-size:11.5px;color:#9AA69C}
   .row-i .d{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .row-i .d.bad{color:#B3261E;background:#FBE9E7;border-radius:6px;padding:1px 6px}
   .row-i .d.hot{color:var(--red)} .row-i .d.warm{color:var(--amber)} .row-i .d.ok{color:var(--green)}
   .row-i .del{width:26px;height:26px;border-radius:8px;border:0;background:none;color:#B9C2BB;
     font-size:16px;line-height:1;cursor:pointer;font-family:inherit}
@@ -888,6 +889,15 @@
   .plan-ft .sw2{border:1px solid var(--line);background:#fff;color:var(--green);flex:0 0 auto;padding:9px 14px}
   .plan-ft .go2{border:0;background:var(--green);color:#fff}
   .plan-ft .go2:disabled{background:#D9D5C6;color:#fff}
+
+  /* 过期/临期提醒条：比摘要更醒目，点一下按到期排序 */
+  .expbar{display:flex;align-items:center;gap:8px;width:100%;margin:10px 0 0;padding:10px 12px;
+    border-radius:14px;border:1px solid #E7C9C2;background:#FDF0ED;color:#8C3A2C;
+    font:inherit;font-size:13px;font-weight:600;text-align:left}
+  .expbar[hidden]{display:none}
+  .expbar b{font-variant-numeric:tabular-nums}
+  .expbar .ar{margin-left:auto;flex:none;opacity:.7}
+  .expbar.soft{border-color:#EDDCB6;background:#FBF5E3;color:#7A5E1C}
 </style>
 </head>
 <body>
@@ -1144,6 +1154,7 @@
 
     <!-- 1 · 紧凑摘要 -->
     <div class="fsum" id="fsum"></div>
+    <button class="expbar" id="expBar" hidden></button>
 
     <div class="undo" id="undoBar">
       <span id="undoText"></span>
@@ -1645,8 +1656,9 @@ function renderHome(){
           const art = (window.COOK_ART && COOK_ART.has(i.cat))
             ? COOK_ART.svg(i.cat)
             : (window.FD_ICON ? FD_ICON(i.cat, 44) : "");
-          const left = d <= 0 ? tt("fridge.today", "今天到期")
-                     : (d === 1 ? tt("fridge.oneDay", "还剩 1 天") : t("fridge.left", {n: d}));
+          const left = d < 0 ? ("已过期 " + (-d) + " 天")
+                     : (d === 0 ? tt("fridge.today", "今天到期")
+                     : (d === 1 ? tt("fridge.oneDay", "还剩 1 天") : t("fridge.left", {n: d})));
           return `<button class="wc ${daysClass(d)}" data-going="fridge">
             <span class="wart">${art}</span>
             <span class="wn">${cnOf(i.cat)}</span>
@@ -1703,7 +1715,7 @@ $$("[data-goto]").forEach(b => b.addEventListener("click", () => {
 
 /* ============ view 1: fridge ============ */
 function expiryClass(d){ return d <= 2 ? "urgent" : d <= 5 ? "warn" : ""; }
-function expiryText(d){ return d <= 0 ? t("fridge.today") : (d === 1 ? t("fridge.oneDay") : t("fridge.left", {n: d})); }
+function expiryText(d){ if(d < 0) return "已过期 " + (-d) + " 天"; return d === 0 ? t("fridge.today") : (d === 1 ? t("fridge.oneDay") : t("fridge.left", {n: d})); }
 
 /* ---------------- 待确认（数据在 FD 里，手机和门口屏幕共用）---------------- */
 function renderPending(){
@@ -1786,7 +1798,7 @@ function shelfOf(it){
   const s = SHELVES.find(x => x.tags.includes(it.tag));
   return s ? s.id : 2;
 }
-const daysClass = d => d <= 1 ? "hot" : (d <= 3 ? "warm" : "ok");
+const daysClass = d => d < 0 ? "bad" : (d <= 1 ? "hot" : (d <= 3 ? "warm" : "ok"));
 
 /* 一道菜的步骤：每一步配一个动作插画（和锅页共用 cook-steps.js 的 9 个动作） */
 function cleanSteps(recipe){
@@ -1855,6 +1867,25 @@ function renderItems(){
     `<span><b>${items.length}</b>${tt("fridge.sumItems", "样存货")}</span>` +
     `<span class="${soon.length ? "warn" : ""}"><b>${soon.length}</b>${tt("fridge.sumSoon", "样该先吃")}</span>`;
 
+  /* 1.5 · 过期 / 临期提醒条：比摘要更早被看到 */
+  const expBar = $("#expBar");
+  if(expBar){
+    const expired = sorted.filter(i => FD.daysLeftOf(i) < 0).length;
+    const todayN  = sorted.filter(i => FD.daysLeftOf(i) === 0).length;
+    const soonN   = sorted.filter(i => { const d = FD.daysLeftOf(i); return d >= 1 && d <= 3; }).length;
+    if(!items.length || (!expired && !todayN && !soonN)){
+      expBar.hidden = true;
+    } else {
+      expBar.hidden = false;
+      expBar.classList.toggle("soft", !expired && !todayN);
+      const msg = expired
+        ? `⚠ 有 <b>${expired}</b> 样已经过期${todayN ? "，" + todayN + " 样今天到期" : ""}`
+        : (todayN ? `<b>${todayN}</b> 样今天到期${soonN ? "，" + soonN + " 样 3 天内到期" : ""}`
+                  : `<b>${soonN}</b> 样 3 天内到期，先吃掉`);
+      expBar.innerHTML = msg + `<span class="ar">按到期看 →</span>`;
+    }
+  }
+
   /* 2 · 先吃这些（最多三条，按现有排序规则：先到期先上） */
   const soonBox = $("#soonBox");
   if(soonBox){
@@ -1868,8 +1899,9 @@ function renderItems(){
           const art = (window.COOK_ART && COOK_ART.has(it.cat))
             ? COOK_ART.svg(it.cat)
             : (window.FD_ICON ? FD_ICON(it.cat, 44) : "");
-          const left = d <= 0 ? tt("fridge.today", "今天到期")
-                     : (d === 1 ? tt("fridge.oneDay", "还剩 1 天") : t("fridge.left", {n: d}));
+          const left = d < 0 ? ("已过期 " + (-d) + " 天")
+                     : (d === 0 ? tt("fridge.today", "今天到期")
+                     : (d === 1 ? tt("fridge.oneDay", "还剩 1 天") : t("fridge.left", {n: d})));
           return `<button class="wc ${daysClass(d)}" data-edit="${it.id}">
             <span class="wart">${art}</span>
             <span class="wn">${cnOf(it.cat)}</span>
@@ -2864,6 +2896,15 @@ function renderDiscover(){
       $("#fridgeClear").hidden = true; renderItems(); fs.focus();
     });
   }
+  const expBarBtn = $("#expBar");
+  if(expBarBtn) expBarBtn.addEventListener("click", () => {
+    fridgeSort = "expiry";
+    const sg = $("#fridgeSort");
+    if(sg) [...sg.querySelectorAll("button")].forEach(x => x.classList.toggle("on", x.dataset.sort === "expiry"));
+    renderItems();
+    window.scrollTo({ top: $("#items").getBoundingClientRect().top + window.scrollY - 70, behavior: "smooth" });
+  });
+
   const seg = $("#fridgeSort");
   if(seg) seg.addEventListener("click", e => {
     const b = e.target.closest("[data-sort]"); if(!b) return;
