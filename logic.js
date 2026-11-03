@@ -711,6 +711,56 @@
     };
   }
 
+  /* 由「主菜 + 配菜」两块评估结果拼成一份套餐。
+     换配菜、手动挑配菜都走这里，保证字段和 buildPlans 生成的一致。 */
+  function makePlan(main, side, opts) {
+    opts = opts || {};
+    const style = opts.style || STYLES[0];
+    const staple = opts.staple != null ? !!opts.staple : !!(style && style.staple);
+    const minutes = Math.max(main.recipe.minutes || 20, side.recipe.minutes || 15) + 8;
+    const kcal = (main.recipe.kcal || 0) + (side.recipe.kcal || 0) + (staple ? 150 : 0);
+    return {
+      id: main.recipe.id + "|" + side.recipe.id,
+      style: style.id, styleName: style.name,
+      main: main, side: side, alts: [], staple: staple,
+      minutes: minutes, kcal: kcal,
+      ready: main.status === "ready" && side.status === "ready",
+      missing: [].concat(main.missing || [], side.missing || []).filter((x, i, a) => a.indexOf(x) === i),
+      reasons: planReasons(main, side, minutes, style, staple),
+      ids: [main.recipe.id, side.recipe.id]
+    };
+  }
+
+  /* 这道主菜能配的所有配菜（按「能做 → 缺得少 → 先用快坏的 → 快」排）。
+     换配菜用它开一张可选清单，不再一次只给一张、点完就没了。 */
+  function dishOptions(plan, role, items, st) {
+    st = st || settings();
+    const style = STYLES.filter(s => s.id === (plan.style || st.style || "balance"))[0] || STYLES[0];
+    const mainId = plan && plan.main && plan.main.recipe ? plan.main.recipe.id : "";
+    const sideId = plan && plan.side && plan.side.recipe ? plan.side.recipe.id : "";
+    const roles = role === "main" ? (style.main || []) : (style.sides || []);
+    const keepId = role === "main" ? sideId : mainId;      /* 另一半固定不动 */
+    return RECIPES.filter(isDish)
+      .filter(r => r.id !== keepId && !usedIds(r, st))
+      .map(r => evaluate(r, items, st))
+      .filter(ev => ev.status !== "blocked")
+      .filter(ev => !(style.noMeat && (ev.recipe.needs || []).some(c => IDS_MEAT.indexOf(c) >= 0)))
+      .filter(ev => style.maxSpicy == null || tagOf(ev.recipe).spicy <= style.maxSpicy)
+      .filter(ev => roles.indexOf(tagOf(ev.recipe).role) >= 0)
+      .sort((a, b) => {
+        const ar = a.status === "ready" ? 1 : 0, br = b.status === "ready" ? 1 : 0;
+        if(ar !== br) return br - ar;
+        /* 主菜按 buildPlans 同一把尺子排（蛋白/绿叶/风格加分），
+           否则「电饭煲蒸米饭」会因为快而排到第一 */
+        if(role === "main") return planRank(b, style, st) - planRank(a, style, st);
+        return (a.missing || []).length - (b.missing || []).length ||
+               a.soonest - b.soonest ||
+               (a.recipe.minutes || 0) - (b.recipe.minutes || 0);
+      });
+  }
+
+  function sideOptions(plan, items, st) { return dishOptions(plan, "side", items, st); }
+
   function tagOf(recipe) {
     const t = TAGS[recipe.id] || {};
     return {
@@ -903,7 +953,7 @@
   global.FD = {
     CATALOG, RECIPES, PANTRY, byId, pantryById, DB, SETS,
     evaluateSet, decideSets, buildSets, INTENTS, tagOf, altDishes, composeSet, compareSet,
-    buildPlans, swapPlanSide, evalsByIds, STYLES, DIET, usedIds,
+    buildPlans, swapPlanSide, makePlan, sideOptions, dishOptions, evalsByIds, STYLES, DIET, usedIds,
     cookLog, noteCooked, cookMeals, cookSummary,
     LS_ITEMS, LS_SETTINGS, LS_LOG, LS_PANTRY, LS_HOUSEHOLD,
     read, write,
