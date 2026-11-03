@@ -1711,6 +1711,8 @@ let setIntent = (function(){
 })(), setPick = 0;   /* 今晚想要什么（记住上次） + 换到第几套 */
 let setChoice = null;                    /* 用户手动换过菜之后的组合（dish id 数组） */
 let discKind = "all", buildPicks = new Set();
+/* 从锅页面「去菜谱页看收藏」过来时直接落到收藏视图 */
+if(new URLSearchParams(location.search).get("fav") === "1") discKind = "fav";
 /* 条件筛选：收在「筛选」面板里，可多选；类别是另一套维度，不再并排挤在列表上方 */
 let discConds = { ready:false, shop1:false, greens:false, light:false };
 

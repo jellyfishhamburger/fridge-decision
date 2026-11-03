@@ -663,7 +663,7 @@
     if (!n || !box) return;
     const a = document.createElement("a");
     a.className = "ai-favlink ai-link";
-    a.href = "index.html#discover";
+    a.href = "index.html?fav=1#discover";
     a.textContent = t("cook.favGo", { n: n });
     box.appendChild(a);
   }
