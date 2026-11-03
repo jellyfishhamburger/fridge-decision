@@ -89,6 +89,9 @@
     "cook.aiSavedToast": "已收藏「{s}」",
     "cook.aiSavedAlready": "这道已经收藏过了",
     "cook.favGo": "已收藏 {n} 道 · 去菜谱页看 →",
+    "cook.expandAll": "展开全部", "cook.collapseAll": "收起食材", "cook.pickedSum": "已选", "cook.editPick": "修改",
+    "cook.startCook": "开始做饭", "cook.another": "换一道", "cook.reselect": "重新选", "cook.onlyOne": "这组食材只有这一道能直接做",
+    "cook.cooking": "正在为你寻找合适的做法……", "cook.alsoN": "还可以做 {n} 道",
     "cook.clTitle": "用这几样还能做",
     "cook.clN": "{n} 道",
     "cook.clAll": "食材齐了",
@@ -102,6 +105,7 @@
     "cook.clXhs": "去小红书搜「{s}」",
     "cook.clBili": "B 站",
     "cook.clClose": "关闭",
+    "cook.clSave": "收藏这道", "cook.clSaved": "已收藏", "cook.clSaveToast": "已收藏「{s}」", "cook.clUnsaveToast": "已取消收藏",
     "cook.aiCtaTitle2": "想再换个吃法？让本机模型另配一道",
     "cook.aiCtaBody2": "上面几道是本地词表里的经典做法；AI 会按「{s}」另写一道，约 3–15 秒，同样不入库。",
     "cook.aiAgain": "再配一道",
@@ -186,6 +190,9 @@
     "cook.aiSavedToast": "Saved “{s}”",
     "cook.aiSavedAlready": "Already saved",
     "cook.favGo": "{n} saved — open them in Recipes →",
+    "cook.expandAll": "Show all", "cook.collapseAll": "Show less", "cook.pickedSum": "Picked", "cook.editPick": "Edit",
+    "cook.startCook": "Start cooking", "cook.another": "Another", "cook.reselect": "Change picks", "cook.onlyOne": "Only one dish fits these picks",
+    "cook.cooking": "Finding the right dish…", "cook.alsoN": "{n} more options",
     "cook.clTitle": "Also possible with these",
     "cook.clN": "{n} dishes",
     "cook.clAll": "all in",
@@ -199,6 +206,7 @@
     "cook.clXhs": "Search “{s}” on RED",
     "cook.clBili": "Bilibili",
     "cook.clClose": "Close",
+    "cook.clSave": "Save this dish", "cook.clSaved": "Saved", "cook.clSaveToast": "Saved “{s}”", "cook.clUnsaveToast": "Removed",
     "cook.aiCtaTitle2": "Want another take? Let the local model write one",
     "cook.aiCtaBody2": "The dishes above come from the local dish list; the AI writes a different one from “{s}” in 3–15s, and nothing is saved.",
     "cook.aiAgain": "Another one",
@@ -252,7 +260,8 @@
       const qty = it.qty == null ? 1 : it.qty;
       const cur = map.get(it.cat);
       if (cur) { cur.qty += qty; cur.days = Math.min(cur.days, days); }
-      else map.set(it.cat, { cat: it.cat, qty, days, name: it.name, tag: it.tag });
+      else map.set(it.cat, { cat: it.cat, qty, days, name: it.name,
+        tag: it.tag || (FD.byId[it.cat] || {}).tag || "" });   /* 老数据没存 tag 时按目录补 */
     });
     return [...map.values()].sort((a, b) => a.days - b.days || a.cat.localeCompare(b.cat));
   }
@@ -262,6 +271,22 @@
     { id: "veg", label: "菜 · veg", tags: ["veg", "greens"] },
     { id: "carb", label: "主食 · others", tags: ["carb", "dairy", "other", ""] }
   ];
+
+  function markCut() {
+    const b = document.getElementById("fridgeBody");
+    const panel = document.getElementById("potSec");
+    if (panel) {
+      document.documentElement.style.setProperty("--panel-h", Math.round(panel.offsetHeight) + "px");
+      /* 让食材区正好吃到「锅面板上沿」，不留一条空白也不被遮住 */
+      if (!b.hidden) {
+        /* 锅面板是吸底的，还留了导航条的高度，所以用它的实际上沿算 */
+        const avail = panel.getBoundingClientRect().top - b.getBoundingClientRect().top - 22;
+        b.style.maxHeight = (b.classList.contains("expanded") ? "" : Math.max(200, Math.round(avail)) + "px");
+      }
+    }
+    if (!b) return;
+    b.classList.toggle("is-cut", !b.classList.contains("expanded") && b.scrollHeight > b.clientHeight + 4);
+  }
 
   function renderFridge() {
     items = FD.items();
@@ -284,6 +309,8 @@
       shelves.appendChild(row);
     });
     renderPot();
+    requestAnimationFrame(markCut);
+    setTimeout(markCut, 60);
   }
 
   function tile(x) {
@@ -341,6 +368,7 @@
     $("#askBtn").disabled = sel.size === 0;
     /* 这一页刻意不启动 sync.start()：无论在云端开着还是关着，它都只写本地 */
     $("#syncNote").textContent = t("cook.local");
+    requestAnimationFrame(markCut);
   }
 
   /* ---------- 飞进锅：clone → WAAPI 弧线 ---------- */
@@ -556,7 +584,10 @@
     if (goal.fibre)   ranked = ranked.filter(x => highFibre(x.recipe));
     const rank = x => (x.status === "ready" ? 0 : x.status === "shop1" ? 1 : 2);
     ranked.sort((a, b) => rank(a) - rank(b) || b.score - a.score);
-    renderResult(ranked.slice(0, 3), goal);
+    curGoal = goal;
+    curList = ranked.slice(0, 3);
+    curIdx = 0;
+    paintResults();
     const nClassic = renderClassic(new Set([...sel]));
     /* 库里有多少道真的同时用上锅里这几样 —— 0 就把「让 AI 现配」摆到台面上 */
     renderAiCta(dbAllUsedCount([...sel]), nClassic);
@@ -564,10 +595,132 @@
 
   function pick() {
     if (!sel.size) { toast(t("cook.none")); return; }
-    generate(goal);            /* 偏好已经常驻，直接生成 */
+    /* 三态：选择 → 生成中（让锅站出来）→ 结果 */
+    setState("loading");
+    showSkeleton();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+      generate(goal);          /* 偏好已经常驻，直接生成 */
+      setState("result");
+    }, 460);
   }
 
-  function renderResult(list, goal) {
+  /* ---------- 页面三态 ---------- */
+  let pageState = "select", curList = [], curIdx = 0, curGoal = null, currentHero = null;
+
+  function setState(s) {
+    pageState = s;
+    document.body.dataset.state = s;
+    const on = (el, v) => { if (el) el.hidden = !v; };
+    on($("#fridgeBody"), s !== "loading" && s !== "result");
+    on($("#pickSum"), s === "result");
+    on($("#askBtn"), s === "select");
+    on($("#acts"), s === "result");
+    on($("#cookNote"), s === "loading");
+    on($("#pot"), s !== "result");
+    on($("#potCount"), s !== "result");
+    on($("#prefs"), s === "select");
+    if (s !== "select") { const pb = $("#prefsBody"); if (pb) pb.hidden = true; }
+    if (s === "result") renderPickSum();
+  }
+
+  function renderPickSum() {
+    const box = $("#pickSumTxt");
+    if (!box) return;
+    /* 做完之后 sel 已经清空，用这一顿实际用掉的食材当摘要 */
+    if (!sel.size && cooked) {
+      box.textContent = cooked.used.map(u => foodName(u.cat)).join(" · ");
+      return;
+    }
+    const names = [...sel].map(foodName);
+    box.textContent = names.length ? names.join(" · ") : t("cook.picked0");
+  }
+
+  function showSkeleton() {
+    $("#result").innerHTML = `<article class="skel" aria-hidden="true">
+      <div class="s1"></div><div class="s2"></div><div class="s3"></div></article>`;
+  }
+
+  function paintResults() {
+    renderResult(curList, curGoal, curIdx);
+  }
+
+  function syncActFav() {
+    const b = $("#actFav");
+    if (!b) return;
+    if (!currentHero) { b.textContent = t("fav.add"); return; }
+    const on = FD.favHas && FD.favHas({ type: "lib", id: currentHero.id });
+    b.textContent = on ? t("fav.saved") : t("fav.add");
+    b.classList.toggle("on", !!on);
+  }
+
+  /* ---------- 结果：一张主菜 + 一排备选 ---------- */
+  function heroPhoto(r){
+    const dp = window.DISH_PHOTO && DISH_PHOTO.get(r.recipe.name);
+    if (dp) return `<div class="rphoto"><img src="${dp.src}" alt="${I18N.recipeName(r.recipe)}" loading="lazy" decoding="async">${dp.credit?`<span class="cr"><a href="${dp.page}" target="_blank" rel="noopener">${dp.credit} · ${dp.license}</a></span>`:""}</div>`;
+    const arts = (r.recipe.needs || []).slice(0,3)
+      .map(id => `<span class="ic">${art(id)}<i>${foodName(id)}</i></span>`).join("");
+    return `<div class="rphoto art">${arts}</div>`;
+  }
+
+  function heroCard(r){
+    const status = r.status === "ready" ? `<span class="ok">${t("cook.ready")}</span>`
+      : r.status === "shop1" ? `<span class="gap">${t("cook.gap1")}</span>`
+      : `<span class="gap">${t("cook.gapN", { n: r.missing.length })}</span>`;
+    const needs = r.recipe.needs.map(id => `<span>${art(id)}${foodName(id)}</span>`).join("");
+    const buy = r.missing.length
+      ? r.missing.map(id => `${foodName(id)}${FD.byId[id] && FD.byId[id].shop ? "（" + FD.byId[id].shop + "）" : ""}`).join("、")
+      : "";
+    const pantry = r.pantryMissing.length
+      ? `<p class="meta">${t("cook.needPantry", { s: r.pantryMissing.map(pantryName).join("、") })}</p>` : "";
+    const steps = (I18N.recipeSteps(r.recipe) || [])
+      .filter(x => x && !/^!\[/.test(x.trim()))
+      .map((x, i) => {
+        const act = COOK_STEPS.of(x, r.recipe.id + "#" + i);
+        return `<li data-act="${act.id}"><span class="n">${i + 1}</span>
+          <span class="act" title="${I18N.getLang() === "en" ? act.en : act.zh}">${COOK_STEPS.svg(act.id)}</span>
+          <span class="tx">${x}</span></li>`;
+      }).join("");
+    const card = document.createElement("article");
+    card.className = "rcard hero";
+    card.dataset.recipe = r.recipe.id;
+    card.innerHTML = `
+      ${heroPhoto(r)}
+      <div class="hero-body">
+        <h3>${I18N.recipeName(r.recipe)}</h3>
+        <div class="meta">
+          ${status}
+          <span>${t("cook.mins", { n: r.recipe.minutes })}</span>
+          <span>${t("cook.kcal", { n: r.recipe.kcal })}</span>
+          <span class="ok">${t("cook.match", { a: r.recipe.needs.filter(id => sel.has(id)).length, b: r.recipe.needs.length })}</span>
+        </div>
+        <div class="use">${needs}</div>
+        ${buy ? `<p class="meta"><span class="gap">${t("cook.needBuy", { s: buy })}</span></p>` : ""}
+        ${pantry}
+        <details><summary>${t("cook.steps")}</summary><ol>${steps}</ol></details>
+      </div>`;
+    return card;
+  }
+
+  function altCard(r, i){
+    const dp = window.DISH_PHOTO && DISH_PHOTO.get(r.recipe.name);
+    const ph = dp ? `<img src="${dp.src}" alt="" loading="lazy" decoding="async">`
+                  : `<span class="ic">${art((r.recipe.needs || [])[0] || "rice")}</span>`;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "altcard";
+    b.style.animationDelay = (i * 60) + "ms";
+    b.dataset.alt = r.recipe.id;
+    b.innerHTML = `
+      <span class="ph${dp ? "" : " art"}">${ph}</span>
+      <span class="bd">
+        <span class="nm">${I18N.recipeName(r.recipe)}</span>
+        <span class="mt">${r.status === "ready" ? t("cook.ready") : t("cook.gapN", { n: r.missing.length })} · ${t("cook.mins", { n: r.recipe.minutes })}</span>
+      </span>`;
+    return b;
+  }
+
+  function renderResult(list, goal, idx) {
     const box = $("#result");
     box.innerHTML = "";
     if (!list.length) {
@@ -583,70 +736,40 @@
       if (parts.length) box.insertAdjacentHTML("afterbegin",
         `<p class="applied">${t("cook.applied", { s: parts.join(" · ") })}</p>`);
     }
-    list.forEach((r, i) => {
-      const card = document.createElement("article");
-      card.className = "rcard";
-      card.style.animationDelay = i * 70 + "ms";
-      const status = r.status === "ready" ? `<span class="ok">${t("cook.ready")}</span>`
-        : r.status === "shop1" ? `<span class="gap">${t("cook.gap1")}</span>`
-        : `<span class="gap">${t("cook.gapN", { n: r.missing.length })}</span>`;
-      const needs = r.recipe.needs.map(id =>
-        `<span>${art(id)}${foodName(id)}</span>`).join("");
-      // 自己拼缺料，不用 FD.shoppingHint（它已经带「买」字，英文界面也不合适）
-      const buy = r.missing.length
-        ? r.missing.map(id => `${foodName(id)}${FD.byId[id] && FD.byId[id].shop ? "（" + FD.byId[id].shop + "）" : ""}`).join("、")
-        : "";
-      const pantry = r.pantryMissing.length
-        ? `<p class="meta">${t("cook.needPantry", { s: r.pantryMissing.map(pantryName).join("、") })}</p>` : "";
-      // 注意：这里拿到的是 evaluate() 的包裹对象，真正的菜谱在 r.recipe 上
-      const steps = (I18N.recipeSteps(r.recipe) || [])
-        .filter(s => s && !/^!\[/.test(s.trim()))
-        .map((s, i) => {
-          const act = COOK_STEPS.of(s, r.recipe.id + "#" + i);   // 人工校正优先，其次关键词
-          return `<li data-act="${act.id}">
-            <span class="n">${i + 1}</span>
-            <span class="act" title="${I18N.getLang() === "en" ? act.en : act.zh}">${COOK_STEPS.svg(act.id)}</span>
-            <span class="tx">${s}</span>
-          </li>`;
-        }).join("");
-      const dp = window.DISH_PHOTO && DISH_PHOTO.get(r.recipe.name);
-      const photo = dp ? { src: dp.src, credit: dp.credit, license: dp.license, page: dp.page } : null;
-      const arts = (r.recipe.needs || []).slice(0,3)
-        .map(id => `<span class="ic">${art(id)}<i>${foodName(id)}</i></span>`).join("");
-      card.innerHTML = `
-        ${photo ? `<div class="rphoto"><img src="${photo.src}" alt="${I18N.recipeName(r.recipe)}" loading="lazy" decoding="async">${photo.credit?`<span class="cr"><a href="${photo.page}" target="_blank" rel="noopener">${photo.credit} · ${photo.license}</a></span>`:""}</div>` : `<div class="rphoto art">${arts}</div>`}
-        <h3>${I18N.recipeName(r.recipe)}</h3>
-        <div class="meta">
-          ${status}
-          <span>${t("cook.mins", { n: r.recipe.minutes })}</span>
-          <span>${t("cook.kcal", { n: r.recipe.kcal })}</span>
-          <span class="ok">${t("cook.match", { a: r.recipe.needs.filter(id => sel.has(id)).length, b: r.recipe.needs.length })}</span>
-        </div>
-        <div class="use">${needs}</div>
-        ${buy ? `<p class="meta"><span class="gap">${t("cook.needBuy", { s: buy })}</span></p>` : ""}
-        ${pantry}
-        <details><summary>${t("cook.steps")}</summary><ol>${steps}</ol></details>
-        <button class="cook" data-recipe="${r.recipe.id}" ${r.status === "ready" ? "" : "disabled"}>
-          ${r.status === "ready" ? t("cook.cook") : t("cook.cookLocked")}
-        </button>`;
-      const btn = card.querySelector(".cook");
-      btn.addEventListener("click", () => cook(r.recipe, btn));
-      box.appendChild(card);
-      MOTION.press(btn, { scale: 0.97 });
-      /* 入场：从下方 18px + 轻微缩小弹上来，逐张错开 70ms */
-      card.style.opacity = "0";
-      card.style.transform = "translateY(18px) scale(.985)";
-      setTimeout(function(){
-        MOTION.spring({
-          from: 0, to: 1, stiffness: 320, damping: 26,
-          onUpdate: function(v){
-            card.style.opacity = String(v);
-            card.style.transform = "translateY(" + (18 * (1 - v)) + "px) scale(" + (0.985 + 0.015 * v) + ")";
-          },
-          onComplete: function(){ card.style.opacity = ""; card.style.transform = ""; }
-        });
-      }, 80 + i * 70);
+    const hero = list[idx % list.length];
+    const rest = list.filter((x, i) => i !== idx % list.length);
+    const card = heroCard(hero);
+    card.style.opacity = "0";
+    card.style.transform = "translateY(10px) scale(.99)";
+    box.appendChild(card);
+    requestAnimationFrame(() => {
+      MOTION.spring({
+        from: 0, to: 1, stiffness: 300, damping: 26,
+        onUpdate: v => {
+          card.style.opacity = String(v);
+          card.style.transform = "translateY(" + (10 * (1 - v)) + "px) scale(" + (0.99 + 0.01 * v) + ")";
+        },
+        onComplete: () => { card.style.opacity = ""; card.style.transform = ""; }
+      });
     });
+    if (rest.length) {
+      const row = document.createElement("div");
+      row.className = "altrow";
+      row.innerHTML = `<div class="altlabel">${t("cook.alsoN", { n: rest.length })}</div>`;
+      rest.forEach((r, i) => {
+        const b = altCard(r, i);
+        b.addEventListener("click", () => {
+          const target = curList.indexOf(r);
+          if (target >= 0) { curIdx = target; paintResults(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+        });
+        row.appendChild(b);
+      });
+      box.appendChild(row);
+    }
+    currentHero = hero.recipe;
+    syncActFav();
+    const cookBtn = $("#actCook");
+    if (cookBtn) cookBtn.disabled = !currentHero;
   }
 
   /* ---------- 本地经典菜：词表 + 技法卡，不依赖 AI ---------- */
@@ -724,6 +847,7 @@
       : `<h4>${t("cook.clTipHead")}</h4><p class="cldesc">${d.tip || ""}</p>`;
     const enc = encodeURIComponent(d.n);
     const w = clSheet();
+    const saved = (window.FD && FD.favHas) ? FD.favHas({ type: "classic", id: d.id }) : false;
     w.querySelector(".clsheet").innerHTML = `
       <button class="clclose" type="button" data-clclose aria-label="${t("cook.clClose")}">✕</button>
       <span class="clbadge">${d.cuisine}</span>
@@ -732,10 +856,25 @@
       <div class="clchips">${chips}</div>
       ${body}
       <div class="clfoot">
+        <button type="button" class="cllink fav${saved ? " on" : ""}" data-clfav="${d.id}">${saved ? t("cook.clSaved") : t("cook.clSave")}</button>
         <a class="cllink" href="https://www.xiaohongshu.com/search_result?keyword=${enc}" target="_blank" rel="noopener">${t("cook.clXhs", { s: d.n })}</a>
         <a class="cllink ghost" href="https://search.bilibili.com/all?keyword=${enc}" target="_blank" rel="noopener">${t("cook.clBili")}</a>
       </div>`;
     w.querySelectorAll("[data-clclose]").forEach(b => b.addEventListener("click", closeClassic));
+    const favBtn = w.querySelector("[data-clfav]");
+    if (favBtn) favBtn.addEventListener("click", () => {
+      const on = FD.favHas({ type: "classic", id: d.id });
+      if (on) {
+        FD.favRemove(FD.favKey({ type: "classic", id: d.id }));
+        favBtn.classList.remove("on"); favBtn.textContent = t("cook.clSave");
+        toast(t("cook.clUnsaveToast", { s: d.n }));
+      } else {
+        FD.favAdd({ type: "classic", id: d.id, name: d.n, minutes: d.min, tech: d.tech || null,
+                    tip: d.tip || "", cuisine: d.cuisine, sig: d.sig, need: d.need || [] });
+        favBtn.classList.add("on"); favBtn.textContent = t("cook.clSaved");
+        toast(t("cook.clSaveToast", { s: d.n }));
+      }
+    });
     w.classList.add("on");
     document.body.classList.add("clopen");
   }
@@ -825,6 +964,7 @@
       </div>
     </article>`;
 
+    try { box.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {}
     box.querySelector("[data-ai-again]").addEventListener("click", askAi);
     const save = box.querySelector("[data-ai-save]");
     const already = !!(FD.favHas && FD.favHas({ type: "ai", name: rc.name }));
@@ -845,6 +985,7 @@
     if (!core.length) { toast(t("cook.none")); return; }
     const box = $("#aiBox");
     if (!box) return;
+    try { box.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {}
     const must = core.map(c => (FD.byId[c] && FD.byId[c].cn) || foodName(c));
     const avail = [...new Set(items.map(i => i.cat))]
       .filter(c => core.indexOf(c) < 0)
@@ -950,7 +1091,17 @@
     if ($("#prefToggle")) paintPrefs();
     $("#langBtn").textContent = I18N.getLang() === "en" ? "EN" : "中";
     renderFridge();
-    if (cooked) renderResult([]);           // 换语言时清掉旧结果，避免中英混排
+    if (pageState === "result") {
+      paintResults();
+      renderClassic(new Set([...sel]));
+      renderPickSum();
+    } else if (cooked) {
+      renderResult([]);                   // 选择态没有结果可留，清掉避免中英混排
+    }
+    syncActFav();
+    const pt = $("#pickToggle");
+    if (pt) pt.textContent = $("#fridgeBody").classList.contains("expanded") ? t("cook.collapseAll") : t("cook.expandAll");
+
   }
 
   /* ---------- 启动 ---------- */
@@ -974,6 +1125,58 @@
     applyLang();
   });
   // 锅本身也能当放置目标：点一下等于「把选中的都收进来」（键盘可达）
+  /* 展开 / 收起食材 */
+  const pickToggle = $("#pickToggle");
+  if (pickToggle) pickToggle.addEventListener("click", () => {
+    const body = $("#fridgeBody");
+    const open = body.classList.toggle("expanded");
+    pickToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    pickToggle.textContent = open ? t("cook.collapseAll") : t("cook.expandAll");
+    requestAnimationFrame(markCut);
+  });
+  const pickEdit = $("#pickEdit");
+  if (pickEdit) pickEdit.addEventListener("click", () => {
+    setState("select");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  /* 结果态：开始做饭 / 换一道 / 收藏 / 重新选 */
+  const actCook = $("#actCook");
+  if (actCook) actCook.addEventListener("click", () => {
+    if (currentHero) cook(currentHero, actCook);
+  });
+  const actSwap = $("#actSwap");
+  if (actSwap) actSwap.addEventListener("click", () => {
+    if (curList.length > 1) {
+      curIdx = (curIdx + 1) % curList.length;
+      paintResults();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (uiHasAi()) {
+      askAi();
+    } else {
+      toast(t("cook.onlyOne"));
+    }
+  });
+  const actFav = $("#actFav");
+  if (actFav) actFav.addEventListener("click", () => {
+    if (!currentHero) return;
+    const on = FD.favHas && FD.favHas({ type: "lib", id: currentHero.id });
+    if (on) {
+      FD.favRemove("lib:" + currentHero.id);
+      toast(t("fav.removed"));
+    } else {
+      FD.favAdd({ type: "lib", id: currentHero.id, name: currentHero.name, minutes: currentHero.minutes });
+      toast(t("fav.added", { s: currentHero.name }));
+    }
+    syncActFav();
+  });
+  const actReselect = $("#actReselect");
+  if (actReselect) actReselect.addEventListener("click", () => {
+    setState("select");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  function uiHasAi() { return !!document.querySelector("#aiBox [data-ai-again]"); }
+
   $("#pot").addEventListener("keydown", e => {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); }
   });
@@ -1036,8 +1239,8 @@
   function setupScroll(){
     const fridge = document.querySelector(".fridge-sec");
     if (fridge && "IntersectionObserver" in window) {
-      new IntersectionObserver(function(es){ setCompact(!es[0].isIntersecting); },
-                               { threshold: 0, rootMargin: "-8px 0px 0px 0px" }).observe(fridge);
+      /* 旧版是「滚出视野就把锅收起来」；现在锅的高度由三态决定，不再跟着滚动收 */
+      void fridge;
     }
     let lastY = window.scrollY, ticking = false;
     window.addEventListener("scroll", function(){
@@ -1065,5 +1268,8 @@
   bindPrefs();
   setupScroll();
   renderFridge();
+  setState("select");
+  markCut();
+  window.addEventListener("resize", markCut);
   applyLang();
 })();

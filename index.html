@@ -817,6 +817,17 @@
   .rcc.ai .ph.art{background:#F8F1DD;justify-content:center;width:100%;align-self:stretch}
   .rcc.ai .ph.art .ic svg{width:26px;height:26px}
   .rcc .ai-pill{background:#FBEEDC;color:#7A5E1C;border-color:#E7D2A8}
+  /* 经典菜收藏：绿色调的同一套卡 */
+  .rcc.ai.cl{border-color:#CFE3D9;background:#FBFDF9}
+  .rcc.ai.cl .ph.art{background:#EFF5EC}
+  .ai-badge.cl{color:var(--green);background:var(--green-soft);border-color:var(--green-line)}
+  .clchips{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 12px}
+  .clchip{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 10px;
+    border-radius:99px;background:var(--card-2);border:1px solid var(--line);color:var(--muted)}
+  .clchip.ok{background:var(--green-soft);border-color:var(--green-line);color:var(--ink)}
+  .clchip i{font-style:normal;font-size:10.5px;font-weight:700;color:var(--red);background:var(--red-soft);
+    border-radius:99px;padding:1px 6px}
+  .clsrc{font-size:11.5px;color:var(--muted-2);margin-top:10px;line-height:1.5}
   .ai-head{display:flex;align-items:center;gap:8px;margin:0 0 8px}
   .ai-badge{font-size:10.5px;font-weight:700;letter-spacing:.04em;color:#7A5E1C;
     background:#FBEEDC;border:1px solid #E7D2A8;border-radius:99px;padding:2px 8px}
@@ -1680,12 +1691,13 @@
 <script src="icons.js?v=20261029-17"></script>
 <script src="dish-photos.js?v=20261029-19"></script>
 <script src="sync.js?v=20261029-17"></script>
-<script src="logic.js?v=20261103-6"></script>
+<script src="logic.js?v=20261103-7"></script>
 <script src="store.js?v=20261101-2"></script>
 <script src="auth.js?v=20261101-3"></script>
 <script src="cloud.js?v=20261101-4"></script>
 <script src="realtime.js?v=20261101-5"></script>
-<script src="i18n.js?v=20261103-2"></script>
+<script src="i18n.js?v=20261103-3"></script>
+<script src="techniques.js?v=20261103-1"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -2842,6 +2854,10 @@ function favRows(){
       let ev; try { ev = FD.evaluate(rec, items, goal); } catch(e){ return; }
       ev._fav = f.key; ev._ts = f.ts || 0;
       out.push(ev);
+    } else if(f.type === "classic"){
+      out.push({ _fav: f.key, _ts: f.ts || 0, clFav: true, id: f.id, name: f.name || "",
+                 minutes: f.minutes || 0, cuisine: f.cuisine || "", tech: f.tech || null,
+                 tip: f.tip || "", sig: f.sig || [], need: f.need || [] });
     } else {
       out.push({ _fav: f.key, _ts: f.ts || 0, aiFav: true,
                  recipe: f.recipe || {}, name: f.name || (f.recipe || {}).name || "",
@@ -2850,7 +2866,7 @@ function favRows(){
   });
   out.sort((a, b) => (b._ts || 0) - (a._ts || 0));
   const q = discQuery.trim().toLowerCase();
-  return q ? out.filter(r => (r.aiFav ? r.name : I18N.recipeName(r.recipe)).toLowerCase().indexOf(q) >= 0) : out;
+  return q ? out.filter(r => (r.aiFav || r.clFav ? r.name : I18N.recipeName(r.recipe)).toLowerCase().indexOf(q) >= 0) : out;
 }
 
 function discBase(){
@@ -2904,6 +2920,24 @@ function compactCard(r){
 }
 
 /* AI 收藏：库里没有这道菜，卡片单独一套样子（虚线 + AI 角标） */
+function clFavCard(r){
+  return `<div class="rccwrap">
+    <button class="rcc ai cl" type="button" data-clfav="${escA(r._fav)}" aria-label="${escA(r.name)}">
+      <span class="ph art ai-ph"><span class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.6 10.6h14.8c0 4-2.7 6.2-5.8 6.2H10.4c-3.1 0-5.8-2.2-5.8-6.2z"/><path d="M3.4 10h17.2"/><path d="M8 7.4c-.7-.9.5-1.4 0-2.3M13 7.4c-.7-.9.5-1.4 0-2.3"/></svg>
+        <i>${t("fav.classic")}</i></span></span>
+      <span class="bd">
+        <span class="nm">${escA(r.name)}</span>
+        <span class="mt">
+          <span class="ds-pill">${t("card.min", {n:r.minutes || 0})}</span>
+          <span class="ds-pill ai-pill">${escA(r.cuisine || t("fav.classic"))}</span>
+        </span>
+      </span>
+    </button>
+    <button class="favdel" type="button" data-unfav="${escA(r._fav)}" aria-label="${t("fav.remove")}" title="${t("fav.remove")}">✕</button>
+  </div>`;
+}
+
 function aiFavCard(r){
   return `<div class="rccwrap">
     <button class="rcc ai" type="button" data-aifav="${escA(r._fav)}" aria-label="${escA(r.name)}">
@@ -3220,6 +3254,44 @@ function openDishIdeas(cat){
 }
 
 /* 收藏里的 AI 菜：菜谱库里没有这条，直接读存下来的整份 */
+/* 收藏里的经典菜：做法来自技法卡；没有卡就只显示一句要点 */
+function openClassicFav(key){
+  const f = (FD.favList ? FD.favList() : []).filter(x => FD.favKey(x) === key)[0];
+  if(!f) return;
+  const lang = I18N.getLang();
+  const tech = f.tech && window.FD_TECH ? FD_TECH[f.tech] : null;
+  const have = new Set((items || []).map(i => i.cat));
+  const nm = c => (lang === "en" ? (food(c).name || food(c).cn) : (food(c).cn || food(c).name));
+  const chips = (f.sig || []).concat(f.need || []).map(c =>
+    `<span class="clchip${have.has(c) ? " ok" : ""}">${nm(c)}${have.has(c) ? "" : `<i>${t("fav.need")}</i>`}</span>`).join("");
+  const body = tech
+    ? `<p class="rbh">${t("fav.method", { s: lang === "en" ? tech.en : tech.zh })}</p>
+       <ol class="ai-steps">${tech.steps.map((s, i) => `<li><span class="n">${i+1}</span><span class="tx">${escA(s)}</span></li>`).join("")}</ol>
+       <p class="clsrc">${t("fav.srcTech", { s: tech.src })}</p>`
+    : `<p class="rbline">${escA(f.tip || "")}</p>`;
+  const enc = encodeURIComponent(f.name || "");
+  $("#rBody").innerHTML = `
+    <button class="rbclose" id="rCloseFav" aria-label="${t("sheet.cancel")}">✕</button>
+    <div class="ai-head"><span class="ai-badge cl">${t("fav.classic")}</span>
+      <span class="ai-by">${escA(f.cuisine || "")} · ${t("fav.local")}</span></div>
+    <h3>${escA(f.name)}</h3>
+    <div class="rbtags"><span class="ds-pill">${t("card.min", { n: f.minutes || 0 })}</span></div>
+    <div class="clchips">${chips}</div>
+    ${body}
+    <div class="sheet-foot sf-row">
+      <button class="btn quiet" id="favDel">${t("fav.removeShort")}</button>
+      <a class="btn primary" href="https://www.xiaohongshu.com/search_result?keyword=${enc}" target="_blank" rel="noopener">${t("fav.xhs")}</a>
+    </div>`;
+  $("#rSheet").classList.add("no-photo");
+  $("#rCloseFav").addEventListener("click", closeRecipe);
+  $("#favDel").addEventListener("click", () => {
+    FD.favRemove(key); closeRecipe(); toast(t("fav.removed")); renderDiscover();
+  });
+  $("#rScrim").classList.add("on");
+  $("#rSheet").classList.add("on");
+  $("#rSheet").scrollTop = 0;
+}
+
 function openAiFav(key){
   const f = (window.FD && FD.favList ? FD.favList() : []).filter(x => FD.favKey(x) === key)[0];
   if(!f) return;
@@ -3364,11 +3436,13 @@ function renderDiscover(){
   const slice = all.slice(0, discShown);
   /* 一次算出收藏集合：每张卡都去 parse localStorage 太浪费 */
   window.__favKeys = new Set((FD.favList ? FD.favList() : []).map(FD.favKey));
-  box.innerHTML = slice.map(r => r.aiFav ? aiFavCard(r) : compactCard(r)).join("");
+  box.innerHTML = slice.map(r => r.clFav ? clFavCard(r) : r.aiFav ? aiFavCard(r) : compactCard(r)).join("");
   box.querySelectorAll("[data-open]").forEach(b =>
     b.addEventListener("click", () => openRecipe(b.dataset.open)));
   box.querySelectorAll("[data-aifav]").forEach(b =>
     b.addEventListener("click", () => openAiFav(b.dataset.aifav)));
+  box.querySelectorAll("[data-clfav]").forEach(b =>
+    b.addEventListener("click", () => openClassicFav(b.dataset.clfav)));
 
   /* 卡片右上角的书签：收藏 / 取消收藏（不打开详情，所以单独 stopPropagation） */
   box.querySelectorAll("[data-fav]").forEach(b => b.addEventListener("click", e => {

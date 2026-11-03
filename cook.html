@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#FBF6EC">
 <link rel="icon" href="icon.svg">
 <link rel="stylesheet" href="ds.css?v=20261031-1">
-<link rel="stylesheet" href="cook.css?v=20261103-3">
+<link rel="stylesheet" href="cook.css?v=20261103-7">
 <link rel="stylesheet" href="nav.css?v=20261031-1">
 </head>
 <body>
@@ -20,16 +20,29 @@
 
 <main class="wrap">
 
-  <section class="fridge-sec" aria-labelledby="fridgeHead">
+  <section class="fridge-sec" id="fridgeSec" aria-labelledby="fridgeHead">
     <div class="sec-head">
       <h2 id="fridgeHead" data-i18n="cook.myFridge">我的冰箱</h2>
-      <p class="lede" data-i18n="cook.lede">点一下食材，或者直接把它拖进锅里。</p>
+      <button class="mini" id="pickToggle" type="button" aria-expanded="false" aria-controls="fridgeBody" data-i18n="cook.expandAll">展开全部</button>
     </div>
 
-    <div class="fridge" id="fridge">
-      <div class="fridge-door" aria-hidden="true"></div>
-      <div class="shelves" id="shelves"></div>
-      <div class="fridge-foot" aria-hidden="true"></div>
+    <p class="pick-sum" id="pickSum" hidden>
+      <span class="pslabel" data-i18n="cook.pickedSum">已选</span>
+      <span class="pstxt" id="pickSumTxt"></span>
+      <button class="psedit" id="pickEdit" type="button" data-i18n="cook.editPick">修改</button>
+    </p>
+
+    <div class="fridge-body" id="fridgeBody">
+      <div class="fridge" id="fridge">
+        <div class="fridge-door" aria-hidden="true"></div>
+        <div class="shelves" id="shelves"></div>
+        <div class="fridge-foot" aria-hidden="true"></div>
+      </div>
+
+      <div class="empty" id="empty" hidden>
+        <p data-i18n="cook.empty">冰箱还是空的。先载入一份示例，看看这个玩法长什么样。</p>
+        <button class="ghost" id="demoBtn" data-i18n="cook.demo">载入示例</button>
+      </div>
     </div>
 
     <p class="legend">
@@ -37,18 +50,10 @@
       <span><i class="g2"></i><span data-i18n="cook.legSoon">3 天内</span></span>
       <span><i class="g3"></i><span data-i18n="cook.legNow">今天到期</span></span>
     </p>
-
-    <div class="empty" id="empty" hidden>
-      <p data-i18n="cook.empty">冰箱还是空的。先载入一份示例，看看这个玩法长什么样。</p>
-      <button class="ghost" id="demoBtn" data-i18n="cook.demo">载入示例</button>
-    </div>
   </section>
 
-  <aside class="pot-sec" id="potSec" aria-labelledby="potHead">
-    <div class="sec-head">
-      <h2 id="potHead" data-i18n="cook.pot">锅里</h2>
-      <p class="lede" id="potCount" data-i18n="cook.picked0">还没放东西</p>
-    </div>
+  <aside class="pot-sec" id="potSec" aria-labelledby="potCount">
+    <p class="pot-count" id="potCount" data-i18n="cook.picked0">还没放东西</p>
 
     <div class="pot" id="pot" tabindex="0" role="button"
          aria-label="锅：把食材放进来" data-i18n-aria="cook.dropHere">
@@ -67,7 +72,11 @@
       <p class="pot-hint" id="potHint" data-i18n="cook.dropHint">把食材拖进来</p>
     </div>
 
-    <!-- 偏好常驻在这里，不随每次生成弹窗 -->
+    <p class="cook-note" id="cookNote" hidden>
+      <span class="cdot" aria-hidden="true"></span>
+      <span data-i18n="cook.cooking">正在为你寻找合适的做法……</span>
+    </p>
+
     <div class="prefs" id="prefs">
       <button type="button" class="pref-toggle" id="prefToggle" aria-expanded="false" aria-controls="prefsBody">
         <span class="pico" aria-hidden="true">☰</span>
@@ -88,6 +97,16 @@
       </div>
 
     <button class="primary" id="askBtn" disabled data-i18n="cook.ask">帮我做一道菜</button>
+
+    <div class="acts" id="acts" hidden>
+      <button class="primary" id="actCook" type="button" data-i18n="cook.startCook">开始做饭</button>
+      <div class="actrow">
+        <button class="alt" id="actSwap" type="button" data-i18n="cook.another">换一道</button>
+        <button class="alt" id="actFav" type="button" data-i18n="fav.add">收藏</button>
+        <button class="alt" id="actReselect" type="button" data-i18n="cook.reselect">重新选</button>
+      </div>
+    </div>
+
     <p class="sync" id="syncNote"></p>
   </aside>
 
@@ -143,11 +162,11 @@
 <script src="cook-art.js?v=20261030-4"></script>
 <script src="cook-steps.js?v=20261030-4"></script>
 <script src="sync.js?v=20261030-4"></script>
-<script src="logic.js?v=20261103-6"></script>
-<script src="i18n.js?v=20261103-2"></script>
+<script src="logic.js?v=20261103-7"></script>
+<script src="i18n.js?v=20261103-3"></script>
 <script src="dishes.js?v=20261103-1"></script>
 <script src="techniques.js?v=20261103-1"></script>
-<script src="cook.js?v=20261103-13"></script>
+<script src="cook.js?v=20261103-17"></script>
 <script src="nav.js?v=20261031-1" defer></script>
 <script>
 /* 大字体适配：底部固定条（导航 / 锅面板）高度随系统字号变化，

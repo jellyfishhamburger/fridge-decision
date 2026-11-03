@@ -962,7 +962,9 @@
   const LS_FAV = "fd.favorites.v1";
   const favKey = o => (o && o.type === "ai")
     ? "ai:" + String(o.name || "").trim()
-    : "lib:" + String((o && o.id) || "");
+    : (o && o.type === "classic")
+      ? "cl:" + String(o.id || "")
+      : "lib:" + String((o && o.id) || "");
 
   function favMigrate() {
     const cur = read(LS_FAV, null);
@@ -986,7 +988,10 @@
     l.push(o.type === "ai"
       ? { key: k, type: "ai", name: o.name, ts: Date.now(), minutes: o.minutes || 0,
           recipe: o.recipe, meta: o.meta || {} }
-      : { key: k, type: "lib", id: o.id, name: o.name, ts: Date.now(), minutes: o.minutes || 0 });
+      : o.type === "classic"
+        ? { key: k, type: "classic", id: o.id, name: o.name, ts: Date.now(), minutes: o.minutes || 0,
+            tech: o.tech || null, tip: o.tip || "", cuisine: o.cuisine || "", sig: o.sig || [], need: o.need || [] }
+        : { key: k, type: "lib", id: o.id, name: o.name, ts: Date.now(), minutes: o.minutes || 0 });
     write(LS_FAV, l);
     return { ok: true, exists: false };
   }

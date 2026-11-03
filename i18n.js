@@ -80,6 +80,8 @@
       "fav.empty": "还没有收藏。菜谱卡右上角点书签，或者让 AI 配一道后收藏。",
       "fav.added": "已收藏「{s}」", "fav.removed": "已取消收藏",
       "fav.onlyLocal": "收藏只存在这台设备上", "fav.ingredients": "食材", "fav.extra": "还要买：{s}",
+      "fav.classic": "经典", "fav.local": "本地词表", "fav.need": "缺", "fav.method": "做法 · {s}", "fav.srcTech": "做法来自 {s}，用量按 2 人份。", "fav.xhs": "去小红书看做法", "fav.removeShort": "移出收藏",
+
       "disc.empty": "这个条件下没有菜。换个筛选，或者往冰箱里再加一样。",
       "disc.uses": "用掉：", "disc.steps": "看做法", "cook.usesHere": "这一步用到", "cook.usesAll": "整道菜用到", "cook.potNow": "锅里已有", "cook.usesDish": "这道菜要用", "cook.usesStep": "这一步要用", "disc.cook": "跟着做",
       "disc.none": "还做不了菜", "disc.noneHint": "冰箱里的东西凑不出任何一道菜。再加一样，或者载入示例。",
@@ -320,6 +322,8 @@
       "fav.empty": "Nothing saved yet. Tap the bookmark on a recipe card, or save an AI dish.",
       "fav.added": "Saved “{s}”", "fav.removed": "Removed",
       "fav.onlyLocal": "Saved dishes live on this device only", "fav.ingredients": "Ingredients", "fav.extra": "Also needed: {s}",
+      "fav.classic": "Classic", "fav.local": "local list", "fav.need": "need", "fav.method": "Method · {s}", "fav.srcTech": "Method from {s}; amounts for two.", "fav.xhs": "See it on RED", "fav.removeShort": "Remove",
+
       "disc.empty": "Nothing under these filters. Loosen one, or add something to the fridge.",
       "disc.uses": "Uses: ", "disc.steps": "Method", "cook.usesHere": "In this step", "cook.usesAll": "For the whole dish", "cook.potNow": "In the pot", "cook.usesDish": "This dish needs", "cook.usesStep": "This step uses", "disc.cook": "Cook along",
       "disc.none": "Nothing cookable yet", "disc.noneHint": "Nothing in your fridge pairs into a dish. Add one more thing, or load the demo fridge.",

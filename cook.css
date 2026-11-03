@@ -472,3 +472,154 @@ body.past-fridge .backtop{opacity:1;pointer-events:auto}
   background:var(--green);color:#fff;font-size:14px;font-weight:650;text-decoration:none}
 .cllink.ghost{flex:0 0 96px;background:var(--card-2);color:var(--ink);border:1px solid var(--line)}
 body.clopen{overflow:hidden}
+
+/* 经典菜弹层底部：收藏 + 小红书一排，B 站退成小字 */
+.cllink.fav{flex:0 0 auto;padding:0 16px;background:var(--card);border:1px solid var(--line);color:var(--ink);font-weight:600}
+.cllink.fav.on{background:var(--green-soft);border-color:var(--green-line);color:var(--green)}
+.clfoot{flex-wrap:wrap}
+.clfoot .cllink.ghost{flex:1 0 100%;height:auto;padding:10px 0 0;background:none;border:0;color:var(--muted-2);font-size:12px;font-weight:600}
+
+/* ================= 三态改造：选食材 / 生成中 / 结果 ================= */
+.sec-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.mini{flex:none;font-size:12.5px;font-weight:700;color:var(--green);background:var(--green-soft);
+  border:1px solid var(--green-line);border-radius:99px;padding:6px 12px;line-height:1.2}
+
+/* 食材区：默认限高、内部滚动；展开后不限 */
+.fridge-body{max-height:44vh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  touch-action:pan-y;padding-right:2px;margin-right:-2px}
+.fridge-body.expanded{max-height:none;overflow:visible}
+body[data-state="loading"] .fridge-body,body[data-state="result"] .fridge-body{display:none}
+
+/* 已选摘要（结果态） */
+.pick-sum{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:9px 12px;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);font-size:13px}
+.pick-sum .pslabel{flex:none;color:var(--muted);font-size:12px}
+.pick-sum .pstxt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-weight:600;color:var(--ink)}
+.pick-sum .psedit{flex:none;font-size:12.5px;font-weight:700;color:var(--green);padding:2px 4px}
+
+/* 更紧凑的食材砖：三列、图标 38、名称 10.5 */
+.shelves{gap:5px;padding-top:8px}
+.shelf{grid-template-columns:repeat(3,1fr);gap:8px;min-height:0;padding:6px 2px 8px}
+.shelf + .shelf::before{top:-3px;height:6px}
+.tile{padding:6px 4px 5px;border-radius:12px;gap:0}
+.tile .art{width:38px;height:38px}
+.tile .nm{font-size:10.5px}
+.tile .qt{font-size:9.5px}
+.tile .exp{top:4px;left:5px;width:5px;height:5px}
+.fridge{padding:12px 10px 14px}
+
+/* 锅里的一行状态 */
+.pot-count{font-size:12px;color:var(--muted);text-align:center;margin:0 0 2px;min-height:16px}
+body[data-state="result"] .pot-count,body[data-state="result"] #pot{display:none}
+
+/* 生成中：锅站出来 */
+body[data-state="loading"] #pot{transform:scale(1.06)}
+body[data-state="loading"] .pot-art{animation:potbob 2.2s ease-in-out infinite}
+body[data-state="loading"] .steam{opacity:.9;animation:steamup 1.8s ease-in-out infinite}
+body[data-state="loading"] .steam.s2{animation-delay:.3s}
+body[data-state="loading"] .steam.s3{animation-delay:.6s}
+@keyframes potbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes steamup{0%{opacity:.15;transform:translateY(3px)}45%{opacity:.85}100%{opacity:.15;transform:translateY(-5px)}}
+.cook-note{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--ink-2);margin:2px 0 6px}
+.cook-note .cdot{width:8px;height:8px;border-radius:99px;background:var(--tomato);animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+
+/* 结果态：底部换成操作条 */
+body[data-state="select"] .result{display:none}
+.acts{display:grid;gap:8px}
+.actrow{display:flex;gap:8px}
+.actrow .alt{flex:1;height:42px;border-radius:var(--r-sm);background:var(--card-2);border:1px solid var(--line);
+  font-size:13px;font-weight:650;color:var(--ink-2)}
+.actrow .alt.on{background:var(--green-soft);border-color:var(--green-line);color:var(--green)}
+.actrow .alt:active{transform:scale(.98)}
+
+/* 主菜卡 */
+.hero{padding:0;overflow:hidden}
+.hero .rphoto{border-radius:0;margin:0;aspect-ratio:4/3}
+.hero .rphoto img{aspect-ratio:4/3}
+.hero .rphoto.art{display:flex;align-items:center;justify-content:center;gap:14px;background:var(--card-2);min-height:150px}
+.hero .rphoto.art .ic svg{width:34px;height:34px}
+.hero .hero-body{padding:14px 16px 16px}
+.hero h3{font-size:23px;line-height:1.2;margin-bottom:6px}
+.hero .use{margin-bottom:6px}
+.hero details summary{font-size:13px}
+
+/* 备选：一排小卡 */
+.altrow{display:flex;gap:10px;overflow-x:auto;max-width:100%;padding:2px 2px 4px;scrollbar-width:none}
+.altrow::-webkit-scrollbar{display:none}
+.altlabel{flex:0 0 auto;align-self:center;font-size:11.5px;color:var(--muted);writing-mode:horizontal-tb;
+  max-width:56px;line-height:1.3}
+.altcard{flex:0 0 148px;display:flex;flex-direction:column;text-align:left;padding:0;overflow:hidden;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
+  animation:altin .3s var(--ease) both}
+.altcard .ph{display:block;aspect-ratio:16/10;background:var(--card-2);overflow:hidden}
+.altcard .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.altcard .ph.art{display:flex;align-items:center;justify-content:center}
+.altcard .ph.art svg{width:26px;height:26px}
+.altcard .bd{display:flex;flex-direction:column;gap:2px;padding:8px 10px 10px}
+.altcard .nm{font-size:13px;font-weight:650;color:var(--ink);line-height:1.25;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.altcard .mt{font-size:11px;color:var(--muted)}
+@keyframes altin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* 生成中的骨架 */
+.skel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.skel .s1{height:170px;background:linear-gradient(90deg,#F3ECDC 20%,#FBF6E9 40%,#F3ECDC 60%);
+  background-size:220% 100%;animation:sh 1.3s linear infinite}
+.skel .s2{height:18px;width:56%;margin:16px 16px 10px;border-radius:6px;
+  background:linear-gradient(90deg,#F1EADA 20%,#FAF4E7 40%,#F1EADA 60%);background-size:220% 100%;animation:sh 1.3s linear infinite}
+.skel .s3{height:12px;width:78%;margin:0 16px 20px;border-radius:6px;
+  background:linear-gradient(90deg,#F1EADA 20%,#FAF4E7 40%,#F1EADA 60%);background-size:220% 100%;animation:sh 1.3s linear infinite}
+@keyframes sh{from{background-position:120% 0}to{background-position:-120% 0}}
+
+/* hidden 必须真的隐藏：面板里有一堆 display:flex/grid 的规则会盖掉 UA 的 [hidden] */
+[hidden]{display:none!important}
+@media (max-width:879px){
+  .tile{width:100%}                    /* 旧规则把砖固定成 80px，网格里会留大缝 */
+  .pot{padding:0 6px 2px;gap:4px}
+  .pot-art{width:78px;height:62px}
+  .chips{min-height:22px}
+  .primary{margin-top:8px}
+}
+
+/* 修正：筛选改成右上角的小胶囊，不再压在锅上 */
+.prefs{top:6px;right:8px}
+.pref-toggle{width:auto;flex-direction:row;gap:4px;padding:5px 10px;border-radius:99px}
+.pref-toggle .pico{font-size:11px}
+.pref-toggle .plabel{font-size:11px;font-weight:700}
+
+/* 分类标题和砖块别打架 */
+.shelves{gap:16px}
+.shelf-label{top:-11px;font-size:9px}
+.shelf{padding:4px 2px 6px}
+
+/* 食材区被限高时，底部加一层渐隐，表明下面还有 */
+.fridge-body.is-cut{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent 100%);
+  mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent 100%)}
+
+/* 分类标题改成行内一行，避免和上一层隔板打架 */
+.shelf-label{position:static;grid-column:1/-1;margin:0 0 2px;font-size:9.5px;letter-spacing:.12em}
+
+/* 生成中 / 结果态：冰箱标题和「展开全部」都不再出现（食材区已收起） */
+body[data-state="loading"] .fridge-sec .sec-head,
+body[data-state="result"] .fridge-sec .sec-head{display:none}
+
+/* 空锅时别留一条空芯 */
+.chips:empty{display:none}
+.pot{gap:2px}
+.pot-hint{font-size:11px;margin-top:2px}
+
+/* 食材区吃满「标题和锅之间」的高度，不留一条空白 */
+.fridge-body{max-height:calc(100dvh - var(--panel-h, 213px) - 168px)}
+@supports not (height: 100dvh){ .fridge-body{max-height:calc(100vh - var(--panel-h, 213px) - 168px)} }
+@media (min-width:880px){ .fridge-body{max-height:none;overflow:visible} }
+
+/* 手机上不显示图例：一行小字正好卡在锅面板边上，看着像被切了 */
+@media (max-width:879px){ .legend{display:none} }
+
+/* 生成中只放大锅本身，别把整个容器撑大压到标签 */
+body[data-state="loading"] #pot{transform:none}
+body[data-state="loading"] .pot-art{transform:scale(1.08)}
+body[data-state="loading"] .steam{opacity:.9;animation:steamup 1.8s ease-in-out infinite}
+@keyframes potbob{0%,100%{transform:scale(1.08) translateY(0)}50%{transform:scale(1.08) translateY(-3px)}}
