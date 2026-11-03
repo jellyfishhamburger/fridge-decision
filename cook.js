@@ -89,6 +89,21 @@
     "cook.aiSavedToast": "已收藏「{s}」",
     "cook.aiSavedAlready": "这道已经收藏过了",
     "cook.favGo": "已收藏 {n} 道 · 去菜谱页看 →",
+    "cook.clTitle": "用这几样还能做",
+    "cook.clN": "{n} 道",
+    "cook.clAll": "食材齐了",
+    "cook.clMiss": "还差 {n} 样",
+    "cook.clNeed": "缺",
+    "cook.clHow": "做法 · {t}",
+    "cook.clKeys": "关键三点",
+    "cook.clSrc": "做法骨架来自 {s}，用量按 2 人份。",
+    "cook.clTipHead": "一句要点",
+    "cook.clServe": "按 2 人份",
+    "cook.clXhs": "去小红书搜「{s}」",
+    "cook.clBili": "B 站",
+    "cook.clClose": "关闭",
+    "cook.aiCtaTitle2": "想再换个吃法？让本机模型另配一道",
+    "cook.aiCtaBody2": "上面几道是本地词表里的经典做法；AI 会按「{s}」另写一道，约 3–15 秒，同样不入库。",
     "cook.aiAgain": "再配一道",
     "cook.aiRetry": "重试",
     "cook.aiFail": "连不上本地 AI 服务（{s}）",
@@ -171,6 +186,21 @@
     "cook.aiSavedToast": "Saved “{s}”",
     "cook.aiSavedAlready": "Already saved",
     "cook.favGo": "{n} saved — open them in Recipes →",
+    "cook.clTitle": "Also possible with these",
+    "cook.clN": "{n} dishes",
+    "cook.clAll": "all in",
+    "cook.clMiss": "{n} missing",
+    "cook.clNeed": "need",
+    "cook.clHow": "Method · {t}",
+    "cook.clKeys": "Three things that matter",
+    "cook.clSrc": "Method from {s}; amounts for two.",
+    "cook.clTipHead": "One tip",
+    "cook.clServe": "serves 2",
+    "cook.clXhs": "Search “{s}” on RED",
+    "cook.clBili": "Bilibili",
+    "cook.clClose": "Close",
+    "cook.aiCtaTitle2": "Want another take? Let the local model write one",
+    "cook.aiCtaBody2": "The dishes above come from the local dish list; the AI writes a different one from “{s}” in 3–15s, and nothing is saved.",
     "cook.aiAgain": "Another one",
     "cook.aiRetry": "Retry",
     "cook.aiFail": "Can't reach the local AI service ({s})",
@@ -527,8 +557,9 @@
     const rank = x => (x.status === "ready" ? 0 : x.status === "shop1" ? 1 : 2);
     ranked.sort((a, b) => rank(a) - rank(b) || b.score - a.score);
     renderResult(ranked.slice(0, 3), goal);
+    const nClassic = renderClassic(new Set([...sel]));
     /* 库里有多少道真的同时用上锅里这几样 —— 0 就把「让 AI 现配」摆到台面上 */
-    renderAiCta(dbAllUsedCount([...sel]));
+    renderAiCta(dbAllUsedCount([...sel]), nClassic);
   }
 
   function pick() {
@@ -618,6 +649,97 @@
     });
   }
 
+  /* ---------- 本地经典菜：词表 + 技法卡，不依赖 AI ---------- */
+  function classicFor(have) {
+    const libNames = new Set(FD.RECIPES.map(r => r.name));
+    const out = [];
+    (window.FD_DISHES || []).forEach(d => {
+      if (d.lib && libNames.has(d.lib)) return;        /* 库里有的走上面那三张卡，不重复 */
+      if (!d.sig.every(c => have.has(c))) return;
+      if (have.size >= 3 && d.sig.length < 2) return;    /* 选得多时，只用上一样的不算「用这几样」 */
+      out.push(Object.assign({}, d, { miss: (d.need || []).filter(c => !have.has(c)) }));
+    });
+    out.sort((a, b) => a.miss.length - b.miss.length || b.sig.length - a.sig.length || a.min - b.min);
+    return out.slice(0, 4);
+  }
+
+  function renderClassic(have) {
+    const box = $("#result");
+    if (!box) return;
+    const old = box.querySelector(".clsec");
+    if (old) old.remove();
+    const list = classicFor(have);
+    if (!list.length) return 0;
+    const sec = document.createElement("section");
+    sec.className = "clsec";
+    sec.innerHTML = `
+      <div class="clhead"><h3>${t("cook.clTitle")}</h3><span>${t("cook.clN", { n: list.length })}</span></div>
+      <div class="clrow">${list.map(d => `
+        <button type="button" class="clcard" data-cl="${d.id}">
+          <span class="cltag">${d.cuisine}</span>
+          <span class="clnm">${d.n}</span>
+          <span class="clmeta">${t("cook.mins", { n: d.min })} · ${d.miss.length ? t("cook.clMiss", { n: d.miss.length }) : t("cook.clAll")}</span>
+        </button>`).join("")}</div>`;
+    box.appendChild(sec);
+    sec.querySelectorAll("[data-cl]").forEach(b =>
+      b.addEventListener("click", () => openClassic(b.dataset.cl)));
+    return list.length;
+  }
+
+  function clSheet() {
+    let w = document.getElementById("clWrap");
+    if (w) return w;
+    w = document.createElement("div");
+    w.id = "clWrap";
+    w.className = "clwrap";
+    w.innerHTML = `<div class="clscrim" data-clclose></div>
+      <div class="clsheet" role="dialog" aria-modal="true" aria-labelledby="clName"></div>`;
+    document.body.appendChild(w);
+    w.querySelector("[data-clclose]").addEventListener("click", closeClassic);
+    return w;
+  }
+
+  function closeClassic() {
+    const w = document.getElementById("clWrap");
+    if (w) w.classList.remove("on");
+    document.body.classList.remove("clopen");
+  }
+
+  function openClassic(id) {
+    const d = (window.FD_DISHES || []).filter(x => x.id === id)[0];
+    if (!d) return;
+    const en = I18N.getLang() === "en";
+    const tech = d.tech && window.FD_TECH ? FD_TECH[d.tech] : null;
+    const have = new Set([...sel]);
+    const chips = d.sig.concat(d.need || []).map(c =>
+      `<span class="clchip${have.has(c) ? " ok" : ""}">${art(c)}${foodName(c)}${have.has(c) ? "" : `<i>${t("cook.clNeed")}</i>`}</span>`
+    ).join("");
+    const body = tech
+      ? `<h4>${t("cook.clHow", { t: en ? tech.en : tech.zh })}</h4>
+         <p class="cldesc">${en ? tech.descEn : tech.desc}</p>
+         <ol class="clsteps">${tech.steps.map(s => `<li>${s}</li>`).join("")}</ol>
+         <h4>${t("cook.clKeys")}</h4>
+         <ul class="clkeys">${tech.keys.map(k => `<li>${k}</li>`).join("")}</ul>
+         <p class="clsrc">${t("cook.clSrc", { s: tech.src })}</p>`
+      : `<h4>${t("cook.clTipHead")}</h4><p class="cldesc">${d.tip || ""}</p>`;
+    const enc = encodeURIComponent(d.n);
+    const w = clSheet();
+    w.querySelector(".clsheet").innerHTML = `
+      <button class="clclose" type="button" data-clclose aria-label="${t("cook.clClose")}">✕</button>
+      <span class="clbadge">${d.cuisine}</span>
+      <h3 id="clName">${d.n}</h3>
+      <div class="clsub">${t("cook.mins", { n: d.min })} · ${t("cook.clServe")}</div>
+      <div class="clchips">${chips}</div>
+      ${body}
+      <div class="clfoot">
+        <a class="cllink" href="https://www.xiaohongshu.com/search_result?keyword=${enc}" target="_blank" rel="noopener">${t("cook.clXhs", { s: d.n })}</a>
+        <a class="cllink ghost" href="https://search.bilibili.com/all?keyword=${enc}" target="_blank" rel="noopener">${t("cook.clBili")}</a>
+      </div>`;
+    w.querySelectorAll("[data-clclose]").forEach(b => b.addEventListener("click", closeClassic));
+    w.classList.add("on");
+    document.body.classList.add("clopen");
+  }
+
   /* ---------- 本地 AI：现配一道 ---------- */
   const sep = () => (I18N.getLang() === "en" ? ", " : "、");
 
@@ -626,11 +748,12 @@
     return FD.RECIPES.filter(r => core.every(c => (r.needs || []).indexOf(c) >= 0)).length;
   }
 
-  function renderAiCta(allUsed) {
+  function renderAiCta(allUsed, nClassic) {
     const core = [...sel];
     const box = $("#result");
     if (!core.length || !box) return;
     const names = core.map(foodName).join(sep());
+    const alt = !allUsed && nClassic > 0;      /* 上面已经给了本地经典菜，措辞别再说「库里没有」 */
     const card = document.createElement("div");
     card.id = "aiBox";
     card.className = "aibox" + (allUsed ? " minor" : "");
@@ -641,8 +764,8 @@
       : `<article class="rcard ai">
            <div class="ai-head"><span class="ai-badge">${t("cook.aiBadge")}</span>
              <span class="ai-by">${t("cook.aiBy")}</span></div>
-           <h3>${t("cook.aiCtaTitle", { s: names })}</h3>
-           <p class="ai-note">${t("cook.aiCtaBody")}</p>
+           <h3>${t(alt ? "cook.aiCtaTitle2" : "cook.aiCtaTitle", { s: names })}</h3>
+           <p class="ai-note">${t(alt ? "cook.aiCtaBody2" : "cook.aiCtaBody")}</p>
            ${AI_URL ? `<button type="button" class="cook" id="aiGo">${t("cook.aiGo")}</button>`
                     : `<p class="ai-warn">${t("cook.aiNoUrl")}</p>`}
          </article>`;
