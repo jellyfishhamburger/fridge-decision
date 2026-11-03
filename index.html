@@ -823,7 +823,7 @@
   .rsheet{padding:0 16px 0}
   /* 没有顶部大图的面板（如「用这个食材能做什么」）要自己留出上边距，
      否则标题贴着弹层上边缘 */
-  .rsheet.no-photo{padding-top:20px}
+  .rsheet.no-photo{padding-top:20px;padding-bottom:calc(26px + env(safe-area-inset-bottom))}
   /* 右上角有悬浮关闭按钮：标题让出这一块，长名字不会钻到按钮底下 */
   .rsheet.no-photo h3{padding-right:44px}
   .rsheet .rb-ph{position:relative;margin:0 -16px 14px;background:var(--card-2);overflow:hidden}
