@@ -66,7 +66,34 @@
     "cook.legNow": "今天到期",
     "cook.leftN": "剩 {n}",
     "cook.today": "今天到期",
-    "cook.dayN": "{n} 天"
+    "cook.dayN": "{n} 天",
+    /* AI 现配 */
+    "cook.aiBadge": "AI 生成",
+    "cook.aiBy": "本机模型 · 未入库",
+    "cook.aiNotSaved": "未入库",
+    "cook.aiCtaTitle": "库里没有同时用上「{s}」的菜",
+    "cook.aiCtaBody": "让你电脑上的本地模型现配一道，约 3–15 秒。生成的菜只在这里显示，不会写进菜谱库。",
+    "cook.aiGo": "让 AI 配一道",
+    "cook.aiLink": "也可以用这几样让 AI 配一道 →",
+    "cook.aiNoUrl": "这一步需要本机 AI 服务：先用 python start.py 启动，再用带 ?ai= 的地址打开页面。",
+    "cook.aiThinking": "正在配菜…",
+    "cook.aiThinkingBody": "用 {s} 现配一道，通常几秒钟。",
+    "cook.aiUses": "用了 {s}",
+    "cook.aiNote": "这道是本机模型现写的，不是菜谱库里的菜；觉得合适可以收藏。",
+    "cook.aiZhNote": "",
+    "cook.aiExtra": "还要买：{s}",
+    "cook.aiWarn": "注意：{s}",
+    "cook.aiMissing": "模型没按要求用上：{s}",
+    "cook.aiSave": "收藏这一道",
+    "cook.aiSaved": "已收藏",
+    "cook.aiSavedToast": "已收藏「{s}」",
+    "cook.aiAgain": "再配一道",
+    "cook.aiRetry": "重试",
+    "cook.aiFail": "连不上本地 AI 服务（{s}）",
+    "cook.aiTimeout": "等太久了，模型没有在 60 秒内返回",
+    "cook.aiSavedN": "收藏的 AI 菜谱（{n}）",
+    "cook.aiRemove": "删除",
+    "cook.aiRemoved": "已删除"
   });
   Object.assign(I18N.STR.en, {
     "cook.back": "Fridge",
@@ -119,7 +146,34 @@
     "cook.legNow": "due today",
     "cook.leftN": "{n} left",
     "cook.today": "today",
-    "cook.dayN": "{n} d"
+    "cook.dayN": "{n} d",
+    /* AI 现配 */
+    "cook.aiBadge": "AI generated",
+    "cook.aiBy": "local model · not in the library",
+    "cook.aiNotSaved": "not saved",
+    "cook.aiCtaTitle": "Nothing in the library uses {s} together",
+    "cook.aiCtaBody": "Let the local model on your computer invent one — 3 to 15 seconds. It stays here; nothing is written to the recipe library.",
+    "cook.aiGo": "Ask the AI for a dish",
+    "cook.aiLink": "Or let the AI build one from these →",
+    "cook.aiNoUrl": "This needs the local AI service: run python start.py, then open the page with the ?ai= address.",
+    "cook.aiThinking": "Cooking up an idea…",
+    "cook.aiThinkingBody": "Writing one recipe with {s}. Usually a few seconds.",
+    "cook.aiUses": "Uses {s}",
+    "cook.aiNote": "Written just now by the local model — not a library recipe. Save it if you like it.",
+    "cook.aiZhNote": "The model answers in Chinese, so the dish text below stays Chinese.",
+    "cook.aiExtra": "Also needed: {s}",
+    "cook.aiWarn": "Watch out: {s}",
+    "cook.aiMissing": "The model left out: {s}",
+    "cook.aiSave": "Save this one",
+    "cook.aiSaved": "Saved",
+    "cook.aiSavedToast": "Saved “{s}”",
+    "cook.aiAgain": "Another one",
+    "cook.aiRetry": "Retry",
+    "cook.aiFail": "Can't reach the local AI service ({s})",
+    "cook.aiTimeout": "The model didn't answer within 60 seconds",
+    "cook.aiSavedN": "Saved AI recipes ({n})",
+    "cook.aiRemove": "Remove",
+    "cook.aiRemoved": "Removed"
   });
 
   const t = (k, v) => I18N.t(k, v);
@@ -132,6 +186,27 @@
   };
   const art = (id, cls) => COOK_ART.svg(id, cls);
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- 本地 AI：现配一道（只展示，不写菜谱库、不写云端） ----------
+     地址沿用 add.js 那套约定：?ai=<隧道> → 记进 localStorage；http 页面默认直连本机 8941。
+     https 页面（GitHub Pages）没有 ?ai= 时就拿不到 http 地址，这里如实提示，不去猜。 */
+  const AI_PORT = 8941, AI_TIMEOUT = 60000;
+  const AI_URL = (function () {
+    const q = (location.search.match(/[?&]ai=([^&]+)/) || [])[1];
+    if (q) {
+      const u = decodeURIComponent(q).replace(/\/$/, "");
+      try { localStorage.setItem("fd.ai.url", u); } catch (e) {}
+      return u;
+    }
+    try { const s = localStorage.getItem("fd.ai.url"); if (s) return s.replace(/\/$/, ""); } catch (e) {}
+    return location.protocol === "http:" ? "http://" + (location.hostname || "127.0.0.1") + ":" + AI_PORT : "";
+  })();
+
+  const AI_SAVED = "fd.ai.saved.v1";
+  let aiBusy = false, aiLast = null;
+  const aiSavedList = () => { try { return JSON.parse(localStorage.getItem(AI_SAVED) || "[]") || []; } catch (e) { return []; } };
+  const aiStoreSave = list => { try { localStorage.setItem(AI_SAVED, JSON.stringify(list.slice(-30))); } catch (e) {} };
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   /* ---------- 状态 ---------- */
   let items = [];              // 真实库存快照（FD.items()）
@@ -451,6 +526,8 @@
     const rank = x => (x.status === "ready" ? 0 : x.status === "shop1" ? 1 : 2);
     ranked.sort((a, b) => rank(a) - rank(b) || b.score - a.score);
     renderResult(ranked.slice(0, 3), goal);
+    /* 库里有多少道真的同时用上锅里这几样 —— 0 就把「让 AI 现配」摆到台面上 */
+    renderAiCta(dbAllUsedCount([...sel]));
   }
 
   function pick() {
@@ -538,6 +615,156 @@
         });
       }, 80 + i * 70);
     });
+  }
+
+  /* ---------- 本地 AI：现配一道 ---------- */
+  const sep = () => (I18N.getLang() === "en" ? ", " : "、");
+
+  function dbAllUsedCount(core) {
+    if (!core.length) return 0;
+    return FD.RECIPES.filter(r => core.every(c => (r.needs || []).indexOf(c) >= 0)).length;
+  }
+
+  function renderAiCta(allUsed) {
+    const core = [...sel];
+    const box = $("#result");
+    if (!core.length || !box) return;
+    const names = core.map(foodName).join(sep());
+    const card = document.createElement("div");
+    card.id = "aiBox";
+    card.className = "aibox" + (allUsed ? " minor" : "");
+    card.innerHTML = allUsed
+      ? `<button type="button" class="ai-link" id="aiGo">${t("cook.aiLink", { s: names })}</button>`
+      : `<article class="rcard ai">
+           <div class="ai-head"><span class="ai-badge">${t("cook.aiBadge")}</span>
+             <span class="ai-by">${t("cook.aiBy")}</span></div>
+           <h3>${t("cook.aiCtaTitle", { s: names })}</h3>
+           <p class="ai-note">${t("cook.aiCtaBody")}</p>
+           ${AI_URL ? `<button type="button" class="cook" id="aiGo">${t("cook.aiGo")}</button>`
+                    : `<p class="ai-warn">${t("cook.aiNoUrl")}</p>`}
+         </article>`;
+    box.appendChild(card);
+    const go = $("#aiGo", card);
+    if (go) {
+      go.addEventListener("click", askAi);
+      MOTION.press(go, { scale: 0.97 });
+    }
+    renderAiSaved(box);
+  }
+
+  function renderAiSaved(box) {
+    const list = aiSavedList();
+    const old = box.querySelector(".ai-saved");
+    if (old) old.remove();
+    if (!list.length) return;
+    const d = document.createElement("details");
+    d.className = "ai-saved";
+    d.innerHTML = `<summary>${t("cook.aiSavedN", { n: list.length })}</summary><ul>` +
+      list.map((x, i) => `<li><span>${esc((x.recipe || {}).name)}</span>
+        <button type="button" data-del="${i}" aria-label="${t("cook.aiRemove")}">✕</button></li>`).join("") +
+      `</ul>`;
+    box.appendChild(d);
+    d.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => {
+      const l = aiSavedList(); l.splice(+b.dataset.del, 1); aiStoreSave(l);
+      d.remove(); toast(t("cook.aiRemoved"));
+    }));
+  }
+
+  function renderAiResult(d, box) {
+    const rc = d.recipe || {};
+    const meta = d.meta || {};
+    const chk = (d.checks && d.checks.must_use) || {};
+    const bad = Object.keys(chk).filter(k => !(chk[k].in_ingredients && chk[k].in_steps));
+    const ings = (rc.ingredients || [])
+      .map(x => `<span><b>${esc(x.name)}</b><i>${esc(x.amount || "")}</i></span>`).join("");
+    const steps = (rc.steps || [])
+      .map((s, i) => `<li><span class="n">${i + 1}</span><span class="tx">${esc(s)}</span></li>`).join("");
+    const extra = (rc.extra_ingredients || []).filter(Boolean);
+    const warns = (rc.warnings || []).filter(Boolean);
+    const used = (meta.must_use || []).join(sep());
+
+    box.innerHTML = `<article class="rcard ai" id="aiCard">
+      <div class="ai-head"><span class="ai-badge">${t("cook.aiBadge")}</span>
+        <span class="ai-by">${esc(meta.model || "")}${meta.seconds ? " · " + meta.seconds + "s" : ""} · ${t("cook.aiNotSaved")}</span></div>
+      <h3>${esc(rc.name)}</h3>
+      <div class="meta">
+        <span>${t("cook.mins", { n: rc.cooking_time })}</span>
+        ${used ? `<span class="ok">${t("cook.aiUses", { s: used })}</span>` : ""}
+      </div>
+      ${bad.length ? `<p class="ai-warn">${t("cook.aiMissing", { s: bad.join(sep()) })}</p>` : ""}
+      ${I18N.getLang() === "en" ? `<p class="ai-note">${t("cook.aiZhNote")}</p>` : ""}
+      <p class="ai-note">${t("cook.aiNote")}</p>
+      <div class="ai-ings">${ings}</div>
+      <details open><summary>${t("cook.steps")}</summary><ol>${steps}</ol></details>
+      ${extra.length ? `<p class="meta"><span class="gap">${t("cook.aiExtra", { s: extra.join(sep()) })}</span></p>` : ""}
+      ${warns.length ? `<p class="ai-warn">${t("cook.aiWarn", { s: warns.join("；") })}</p>` : ""}
+      <div class="ai-actions">
+        <button type="button" class="cook" data-ai-save="1">${t("cook.aiSave")}</button>
+        <button type="button" class="ghost" data-ai-again="1">${t("cook.aiAgain")}</button>
+      </div>
+    </article>`;
+
+    box.querySelector("[data-ai-again]").addEventListener("click", askAi);
+    const save = box.querySelector("[data-ai-save]");
+    save.addEventListener("click", () => {
+      const l = aiSavedList();
+      l.push({ ts: Date.now(), recipe: rc, meta: meta, must: meta.must_use || [] });
+      aiStoreSave(l);
+      save.textContent = t("cook.aiSaved");
+      save.disabled = true;
+      toast(t("cook.aiSavedToast", { s: rc.name }));
+      renderAiSaved($("#result"));
+    });
+  }
+
+  async function askAi() {
+    if (aiBusy) return;
+    if (!AI_URL) { toast(t("cook.aiNoUrl")); return; }
+    const core = [...sel];
+    if (!core.length) { toast(t("cook.none")); return; }
+    const box = $("#aiBox");
+    if (!box) return;
+    const must = core.map(c => (FD.byId[c] && FD.byId[c].cn) || foodName(c));
+    const avail = [...new Set(items.map(i => i.cat))]
+      .filter(c => core.indexOf(c) < 0)
+      .map(c => (FD.byId[c] && FD.byId[c].cn) || foodName(c)).slice(0, 12);
+
+    aiBusy = true;
+    box.innerHTML = `<article class="rcard ai loading">
+      <div class="ai-head"><span class="ai-badge">${t("cook.aiBadge")}</span>
+        <span class="ai-by">${t("cook.aiThinking")}</span></div>
+      <p class="ai-note">${t("cook.aiThinkingBody", { s: must.join(sep()) })}</p>
+    </article>`;
+
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), AI_TIMEOUT);
+    try {
+      const r = await fetch(AI_URL + "/api/generate-recipe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          must_use: must,
+          available: avail,
+          max_minutes: (goal && goal.maxMinutes) || 30
+        }),
+        signal: ctl.signal
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || d.error || !d.recipe) throw new Error(d.reason || d.error || ("HTTP " + r.status));
+      aiLast = d;
+      renderAiResult(d, box);
+    } catch (e) {
+      const msg = (e && e.name === "AbortError") ? t("cook.aiTimeout") : (e.message || String(e));
+      box.innerHTML = `<article class="rcard ai">
+        <div class="ai-head"><span class="ai-badge">${t("cook.aiBadge")}</span></div>
+        <p class="ai-warn">${t("cook.aiFail", { s: AI_URL })}<br><span class="ai-err">${esc(msg)}</span></p>
+        <div class="ai-actions"><button type="button" class="cook" data-ai-retry="1">${t("cook.aiRetry")}</button></div>
+      </article>`;
+      box.querySelector("[data-ai-retry]").addEventListener("click", askAi);
+    } finally {
+      clearTimeout(timer);
+      aiBusy = false;
+    }
   }
 
   /* ---------- 真正扣库存：唯一写入口 ---------- */
