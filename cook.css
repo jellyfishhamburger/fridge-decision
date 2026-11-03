@@ -749,3 +749,34 @@ body[data-mode="loading"] .steam.s3{animation-delay:.6s}
 #stage[data-mode="result"] .pot-plus{display:block}
 #stage[data-mode="result"] .pot-art{width:108px;height:86px}
 .pot-hint{text-align:center;width:100%}
+
+/* 舞台收一点，给食材区腾出一行：锅仍然大，但不至于把分类都挤没 */
+.stage{padding:8px 12px 12px}
+.pot{min-height:132px}
+.pot-art{width:160px;height:128px}
+.pot-count{font-size:11.5px}
+.shelf-label{font-size:8.5px}
+
+/* 最后一档压缩：锅 150、图标 30，小屏也能看到两个分类的开头 */
+.stage{padding:6px 12px 10px}
+.pot{min-height:122px}
+.pot-art{width:150px;height:120px}
+.tile .art{width:30px;height:30px}
+.tile .nm{font-size:9.5px}
+.tile .qt{font-size:8.5px}
+.tile{padding:4px 3px 3px}
+.shelf{padding:2px 2px 4px}
+.shelves{gap:10px}
+
+/* 食材区放开：跟着页面滚，锅用 sticky 贴在导航上方 */
+.fridge-body{height:auto!important;max-height:none;overflow:visible}
+.stage{position:sticky;bottom:calc(var(--nav-h,60px) + 6px + env(safe-area-inset-bottom));z-index:30;
+  box-shadow:0 -14px 30px -24px rgba(47,60,42,.55), 0 14px 30px -26px rgba(51,48,42,.7)}
+#stage[data-mode="result"]{position:static;box-shadow:0 14px 30px -26px rgba(51,48,42,.7)}
+
+/* 锅面板上沿的渐隐，避免食材被硬切 */
+.stage::before{content:"";position:absolute;left:0;right:0;top:-22px;height:22px;pointer-events:none;
+  background:linear-gradient(to top, rgba(250,246,236,.96), rgba(250,246,236,0))}
+#stage[data-mode="result"]::before{display:none}
+/* 页面本来就能滚，展开全部不再需要 */
+#pickToggle{display:none}

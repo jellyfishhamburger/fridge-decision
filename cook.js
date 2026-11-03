@@ -280,14 +280,11 @@
     const b = document.getElementById("fridgeBody");
     const stage = document.getElementById("stage");
     if (!b) return;
+    /* 食材区不再自己开小窗：跟页面一起滚，所有分类都能摸到；锅用 sticky 贴住 */
+    b.style.height = "auto";
+    b.classList.remove("is-cut");
     const nav = document.querySelector(".nav");
-    const navH = nav ? nav.offsetHeight : 60;
-    const stageH = stage ? stage.offsetHeight : 220;
-    /* 用文档坐标算：食谱区正好填满「顶栏之下、舞台上沿之上」这一段 */
-    const bodyTop = b.getBoundingClientRect().top + window.scrollY;
-    const avail = window.innerHeight - stageH - navH - 44 - bodyTop;
-    b.style.height = b.classList.contains("expanded") ? "auto" : Math.max(220, Math.round(avail)) + "px";
-    b.classList.toggle("is-cut", b.scrollHeight > b.clientHeight + 4);
+    document.documentElement.style.setProperty("--nav-h", (nav ? nav.offsetHeight : 60) + "px");
   }
 
   function renderFridge() {
