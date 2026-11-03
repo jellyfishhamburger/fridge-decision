@@ -905,6 +905,15 @@
   .expact p{margin:0 0 10px;font-size:12.5px;color:#8C3A2C;line-height:1.5}
   .expact-btns{display:flex;gap:8px;flex-wrap:wrap}
   .expact-btns .btn{flex:1 1 0;min-width:92px;margin:0;padding:10px 8px;font-size:13px}
+
+  /* 「用这个食材能做什么」弹层 */
+  .idearows{display:flex;flex-direction:column;gap:8px;margin:4px 0 0}
+  .idearow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    border:1px solid var(--line);background:#fff;border-radius:14px;padding:11px 12px;font:inherit}
+  .idearow .tx{flex:1;min-width:0}
+  .idearow .tx b{display:block;font-size:14.5px;line-height:1.35}
+  .idearow .tx s{display:block;text-decoration:none;font-size:12px;color:var(--muted);margin-top:2px}
+  .idearow .go{flex:none;color:var(--green);font-size:12.5px;font-weight:600}
 </style>
 </head>
 <body>
@@ -1917,25 +1926,35 @@ function renderItems(){
     else{
       soonBox.hidden = false;
       const edible = sorted.filter(i => FD.daysLeftOf(i) >= 0);
-      const top = (edible.length ? edible : []).slice(0, 3);
+      /* 同一种食材合并成一张卡（青菜 ×2），不然三张卡全是青菜，信息量反而少 */
+      const merged = [];
+      const seen = {};
+      edible.forEach(i => {
+        const q = i.qty == null ? 1 : i.qty;
+        if (seen[i.cat] != null) { merged[seen[i.cat]].qty += q; return; }
+        seen[i.cat] = merged.length;
+        merged.push({ id: i.id, cat: i.cat, qty: q });
+      });
+      const top = merged.slice(0, 3);
       soonBox.innerHTML = `<h3 class="fhd">${tt("fridge.soonH", "先吃这些")}</h3>` +
         `<div class="soonrow">` + top.map(it => {
-          const d = FD.daysLeftOf(it);
+          const src = items.find(x => x.id === it.id) || {};
+          const d = FD.daysLeftOf(src);
           const art = (window.COOK_ART && COOK_ART.has(it.cat))
             ? COOK_ART.svg(it.cat)
             : (window.FD_ICON ? FD_ICON(it.cat, 44) : "");
-          const left = d < 0 ? ("已过期 " + (-d) + " 天")
-                     : (d === 0 ? tt("fridge.today", "今天到期")
-                     : (d === 1 ? tt("fridge.oneDay", "还剩 1 天") : t("fridge.left", {n: d})));
+          const left = d === 0 ? tt("fridge.today", "今天到期")
+                     : (d === 1 ? tt("fridge.oneDay", "还剩 1 天") : t("fridge.left", {n: d}));
           return `<button class="wc ${daysClass(d)}" data-edit="${it.id}">
             <span class="wart">${art}</span>
-            <span class="wn">${cnOf(it.cat)}</span>
+            <span class="wn">${cnOf(it.cat)}${it.qty > 1 ? `<span class="q">×${it.qty}</span>` : ""}</span>
             <span class="wd">${left}</span>
           </button>`;
         }).join("") + `</div>`;
+      /* 点卡片 = 弹层看这食材能做什么菜；改数量/保质期去下面的清单点行 */
       soonBox.querySelectorAll("[data-edit]").forEach(btn => btn.addEventListener("click", () => {
         const it = items.find(x => x.id === btn.dataset.edit);
-        if(it) openSheet(it, null);
+        if(it) openDishIdeas(it.cat);
       }));
     }
   }
@@ -2794,6 +2813,42 @@ function openSetSheet(ids, nameHint){
   const allBtn = $("#rBody [data-startfirst]");
   if(allBtn) allBtn.addEventListener("click", () => { closeRecipe(); startSet(ordered.map(e => e.recipe.id), name, 0); });
 
+  $("#rScrim").classList.add("on");
+  $("#rSheet").classList.add("on");
+  $("#rSheet").scrollTop = 0;
+}
+
+/* 点「先吃这些」的卡片：这个食材能做成什么菜（最多 3 道） */
+function openDishIdeas(cat){
+  const name = cnOf(cat);
+  let list = [];
+  try{
+    list = FD.decide(items, goal)
+      .filter(x => (x.recipe.needs || []).includes(cat))
+      .sort((a,b) => (a.status === "ready" ? 0 : a.status === "shop1" ? 1 : 2) -
+                     (b.status === "ready" ? 0 : b.status === "shop1" ? 1 : 2))
+      .slice(0, 3);
+  }catch(e){ list = []; }
+
+  const rows = list.map(r => {
+    const st = r.status === "ready" ? "现在就能做"
+             : (r.status === "shop1" ? "还差 1 样" : "还差 " + (r.missing || []).length + " 样");
+    return `<button class="idearow" data-rid="${r.recipe.id}">
+      <span class="tx"><b>${I18N.recipeName(r.recipe)}</b>
+        <s>${t("card.min", {n: r.recipe.minutes})} · ${st}</s></span>
+      <span class="go">看做法 →</span>
+    </button>`;
+  }).join("");
+
+  $("#rBody").innerHTML = `
+    <button class="rbclose" id="rCloseIdea" aria-label="关闭">✕</button>
+    <h3 id="rName">用「${name}」能做什么</h3>
+    ${list.length ? `<p class="tiny" style="margin:0 0 10px">按你冰箱里现有的食材排的序。</p>
+      <div class="idearows">${rows}</div>`
+      : `<p class="tiny">现在用「${name}」还做不成一道菜，加点别的食材再看看。</p>`}`;
+  $("#rCloseIdea").addEventListener("click", closeRecipe);
+  $("#rBody").querySelectorAll("[data-rid]").forEach(b =>
+    b.addEventListener("click", () => openRecipe(b.dataset.rid)));
   $("#rScrim").classList.add("on");
   $("#rSheet").classList.add("on");
   $("#rSheet").scrollTop = 0;

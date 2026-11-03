@@ -70,7 +70,7 @@
     if (cat && !f) return;
     var same = state.rows.filter(function (r) { return r.cat === cat; })[0];
     if (same && src !== "receipt") { same.qty += (qty || 1); renderRows(); return; }
-    state.rows.push({ cat: cat || "", qty: Math.max(1, qty || 1), src: src || "", img: img || "", guess: guessName || "" });
+    state.rows.push({ cat: cat || "", qty: Math.max(1, qty || 1), src: src || "", img: img || "", guess: guessName || "", days: cat && FD.byId[cat] ? FD.byId[cat].days : 3 });
     renderRows();
   }
 
@@ -91,7 +91,9 @@
       var ico = (f && window.FD_ICON) ? window.FD_ICON(f.id, 30) : "";
       return '<div class="row" data-i="' + i + '">' +
         '<div class="thumb">' + (r.img ? '<img src="' + r.img + '" alt="">' : ico) + '</div>' +
-        '<div class="nm">' + selHtml(r) + "<span>" + (f ? f.tag + " · " + tt("add.aboutDays", "{n} 天").replace("{n}", f.days) : tt("add.notChosen", "还没选是哪一样")) + "</span></div>" +
+        '<div class="nm">' + selHtml(r) + '<span class="mtl">' + (f
+            ? f.tag + ' · <button type="button" class="dbtn" data-d="-1" aria-label="少一天">−</button><b>' + (r.days == null ? f.days : r.days) + '</b> 天<button type="button" class="dbtn" data-d="1" aria-label="多一天">＋</button>'
+            : tt("add.notChosen", "还没选是哪一样")) + "</span></div>" +
         '<div class="ctl">' +
           '<div class="q"><button data-q="-1">−</button><span>' + r.qty + '</span><button data-q="1">＋</button></div>' +
           '<button class="del" data-del="1" aria-label="删掉">✕</button>' +
@@ -129,6 +131,14 @@
     var row = e.target.closest(".row"); if (!row) return;
     var i = +row.dataset.i;
     if (e.target.dataset.del) { state.rows.splice(i, 1); renderRows(); return; }
+    if (e.target.dataset.d) {
+      var dlt = +e.target.dataset.d;
+      var cur = state.rows[i].days;
+      if (cur == null) cur = (FD.byId[state.rows[i].cat] || {}).days || 3;
+      state.rows[i].days = Math.max(0, Math.min(365, cur + dlt));
+      renderRows();
+      return;
+    }
     var q = e.target.dataset.q;
     if (q) {
       state.rows[i].qty = Math.max(1, state.rows[i].qty + (+q));
@@ -897,7 +907,7 @@
       items.push({
         id: "i" + Date.now() + Math.floor(Math.random() * 1e4),
         cat: f.id, name: fname(f), tag: f.tag, qty: r.qty, unit: FD.unitOf ? FD.unitOf(f.id) : "份",
-        daysLeft: f.days, life: f.days, addedAt: today
+        daysLeft: (r.days == null ? f.days : r.days), life: (r.days == null ? f.days : r.days), addedAt: today
       });
       added++;
     });
@@ -909,7 +919,7 @@
     var sid = await AUTH.rpc("start_capture_session", {});
     var payload = state.rows.map(function (r) {
       var f = FD.byId[r.cat];
-      return { action: "add", cat: f.id, name: fname(f), tag: f.tag, qty: r.qty, unit: FD.unitOf ? FD.unitOf(f.id) : "份", life: f.days };
+      return { action: "add", cat: f.id, name: fname(f), tag: f.tag, qty: r.qty, unit: FD.unitOf ? FD.unitOf(f.id) : "份", life: (r.days == null ? f.days : r.days) };
     });
     var res = await AUTH.rpc("confirm_purchase", { p_session: sid, p_rows: payload, p_key: sid + ":confirm" });
     return { added: (res && res.added) | 0, adjusted: (res && res.adjusted) | 0 };
