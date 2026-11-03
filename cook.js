@@ -634,7 +634,9 @@
     card.id = "aiBox";
     card.className = "aibox" + (allUsed ? " minor" : "");
     card.innerHTML = allUsed
-      ? `<button type="button" class="ai-link" id="aiGo">${t("cook.aiLink", { s: names })}</button>`
+      ? (AI_URL
+          ? `<button type="button" class="ai-link" id="aiGo">${t("cook.aiLink", { s: names })}</button>`
+          : `<p class="ai-warn">${t("cook.aiNoUrl")}</p>`)
       : `<article class="rcard ai">
            <div class="ai-head"><span class="ai-badge">${t("cook.aiBadge")}</span>
              <span class="ai-by">${t("cook.aiBy")}</span></div>
