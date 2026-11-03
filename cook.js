@@ -89,6 +89,8 @@
     "cook.aiSavedToast": "已收藏「{s}」",
     "cook.aiSavedAlready": "这道已经收藏过了",
     "cook.favGo": "已收藏 {n} 道 · 去菜谱页看 →",
+    "cook.youPut": "你放入了", "cook.potDone": "出锅了", "cook.moreRefs": "更多做法参考",
+    "cook.xhsGo": "小红书「{s}」", "cook.biliGo": "B 站「{s}」",
     "cook.expandAll": "展开全部", "cook.collapseAll": "收起食材", "cook.pickedSum": "已选", "cook.editPick": "修改",
     "cook.startCook": "开始做饭", "cook.another": "换一道", "cook.reselect": "重新选", "cook.onlyOne": "这组食材只有这一道能直接做",
     "cook.cooking": "正在为你寻找合适的做法……", "cook.alsoN": "还可以做 {n} 道",
@@ -190,6 +192,8 @@
     "cook.aiSavedToast": "Saved “{s}”",
     "cook.aiSavedAlready": "Already saved",
     "cook.favGo": "{n} saved — open them in Recipes →",
+    "cook.youPut": "You put in", "cook.potDone": "Done", "cook.moreRefs": "More references",
+    "cook.xhsGo": "RED “{s}”", "cook.biliGo": "Bilibili “{s}”",
     "cook.expandAll": "Show all", "cook.collapseAll": "Show less", "cook.pickedSum": "Picked", "cook.editPick": "Edit",
     "cook.startCook": "Start cooking", "cook.another": "Another", "cook.reselect": "Change picks", "cook.onlyOne": "Only one dish fits these picks",
     "cook.cooking": "Finding the right dish…", "cook.alsoN": "{n} more options",
@@ -274,18 +278,16 @@
 
   function markCut() {
     const b = document.getElementById("fridgeBody");
-    const panel = document.getElementById("potSec");
-    if (panel) {
-      document.documentElement.style.setProperty("--panel-h", Math.round(panel.offsetHeight) + "px");
-      /* 让食材区正好吃到「锅面板上沿」，不留一条空白也不被遮住 */
-      if (!b.hidden) {
-        /* 锅面板是吸底的，还留了导航条的高度，所以用它的实际上沿算 */
-        const avail = panel.getBoundingClientRect().top - b.getBoundingClientRect().top - 22;
-        b.style.maxHeight = (b.classList.contains("expanded") ? "" : Math.max(200, Math.round(avail)) + "px");
-      }
-    }
+    const stage = document.getElementById("stage");
     if (!b) return;
-    b.classList.toggle("is-cut", !b.classList.contains("expanded") && b.scrollHeight > b.clientHeight + 4);
+    const nav = document.querySelector(".nav");
+    const navH = nav ? nav.offsetHeight : 60;
+    const stageH = stage ? stage.offsetHeight : 220;
+    /* 用文档坐标算：食谱区正好填满「顶栏之下、舞台上沿之上」这一段 */
+    const bodyTop = b.getBoundingClientRect().top + window.scrollY;
+    const avail = window.innerHeight - stageH - navH - 44 - bodyTop;
+    b.style.height = b.classList.contains("expanded") ? "auto" : Math.max(220, Math.round(avail)) + "px";
+    b.classList.toggle("is-cut", b.scrollHeight > b.clientHeight + 4);
   }
 
   function renderFridge() {
@@ -338,24 +340,40 @@
 
   /* ---------- 选中 / 取消 ---------- */
   function toggle(cat, el, fromDrop) {
-    if (sel.has(cat)) sel.delete(cat);
-    else {
-      sel.add(cat);
-      if (!fromDrop) flyToPot(el, cat);
+    /* 已经出过菜，再动食材就回到「选菜」状态，避免端着一道对不上的菜 */
+    if (pageState === "result") { setState("pick"); const d = $("#dish"); if (d) d.innerHTML = ""; }
+    const adding = !sel.has(cat);
+    if (adding) sel.add(cat); else sel.delete(cat);
+    if (el) el.setAttribute("aria-pressed", adding ? "true" : "false");
+    if (adding && !fromDrop && el) {
+      /* 先让名字标签出现，图标等「落进锅」再显示 */
+      flyPending = cat;
+      renderPot();
+      flyToPot(el, cat, () => { flyPending = null; renderPot(); });
+      return;
     }
-    if (el) el.setAttribute("aria-pressed", sel.has(cat) ? "true" : "false");
+    flyPending = null;
     renderPot();
   }
 
+  let flyPending = null;
+
   function renderPot() {
-    const pot = $("#pot"), chips = $("#chips");
+    const pot = $("#pot"), chips = $("#chips"), items = $("#potItems"), plus = $("#potPlus");
     chips.innerHTML = "";
+    if (items) {
+      const arr = [...sel];
+      const shown = arr.filter(c => c !== flyPending);
+      items.innerHTML = shown.slice(0, 4).map(c => `<li>${art(c)}</li>`).join("");
+      if (plus) { plus.hidden = shown.length <= 4; plus.textContent = shown.length > 4 ? "+" + (shown.length - 4) : ""; }
+    }
     sel.forEach(cat => {
       const li = document.createElement("li");
       li.className = "chip";
       li.innerHTML = `${art(cat)}<span>${foodName(cat)}</span>
         <button type="button" aria-label="移除 ${foodName(cat)}">×</button>`;
       li.querySelector("button").addEventListener("click", () => {
+        if (pageState === "result") { setState("pick"); const d = $("#dish"); if (d) d.innerHTML = ""; }
         sel.delete(cat);
         const el = $(`.tile[data-cat="${cat}"]`); if (el) el.setAttribute("aria-pressed", "false");
         renderPot();
@@ -364,7 +382,8 @@
     });
     pot.classList.toggle("has", sel.size > 0);
     pot.classList.toggle("warm", sel.size > 0);
-    $("#potCount").textContent = sel.size ? t("cook.pickedN", { n: sel.size }) : t("cook.picked0");
+    $("#potCount").textContent = pageState === "result" ? t("cook.potDone")
+      : sel.size ? t("cook.pickedN", { n: sel.size }) : t("cook.picked0");
     $("#askBtn").disabled = sel.size === 0;
     /* 这一页刻意不启动 sync.start()：无论在云端开着还是关着，它都只写本地 */
     $("#syncNote").textContent = t("cook.local");
@@ -372,7 +391,7 @@
   }
 
   /* ---------- 飞进锅：clone → WAAPI 弧线 ---------- */
-  function flyToPot(el, cat) {
+  function flyToPot(el, cat, done) {
     if (reduce || !el) return bump();
     const from = el.getBoundingClientRect();
     const pot = $("#pot").getBoundingClientRect();
@@ -390,7 +409,7 @@
       { transform: `translate(${dx * 0.45}px,${lift}px) scale(1.15) rotate(-12deg)`, opacity: 1, offset: .45 },
       { transform: `translate(${dx}px,${dy}px) scale(.35) rotate(8deg)`, opacity: .2 }
     ], { duration: 560, easing: "cubic-bezier(.3,.7,.2,1)" });
-    anim.onfinish = () => { flyer.remove(); bump(); };
+    anim.onfinish = () => { flyer.remove(); bump(); if (done) done(); };
   }
   function bump() {
     const pot = $("#pot");
@@ -593,183 +612,138 @@
     renderAiCta(dbAllUsedCount([...sel]), nClassic);
   }
 
-  function pick() {
-    if (!sel.size) { toast(t("cook.none")); return; }
-    /* 三态：选择 → 生成中（让锅站出来）→ 结果 */
-    setState("loading");
-    showSkeleton();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    setTimeout(() => {
-      generate(goal);          /* 偏好已经常驻，直接生成 */
-      setState("result");
-    }, 460);
+  function scrollStage(offset) {
+    const st = $("#stage");
+    if (!st) return;
+    const y = st.getBoundingClientRect().top + window.scrollY - (offset || 70);
+    window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
   }
 
-  /* ---------- 页面三态 ---------- */
-  let pageState = "select", curList = [], curIdx = 0, curGoal = null, currentHero = null;
+  function pick() {
+    if (!sel.size) { toast(t("cook.none")); return; }
+    /* 同一个场景：锅开始煮 → 端出菜；不换页 */
+    setState("loading");
+    scrollStage(96);
+    setTimeout(() => {
+      generate(goal);
+      setState("result");
+      /* 出锅后把「锅 + 菜」一起留在视野里：等食材区收缩完再定位，否则会滚过头 */
+      scrollStage(70);
+      setTimeout(() => scrollStage(70), 120);
+      setTimeout(() => scrollStage(70), 320);
+    }, 620);
+  }
+
+  /* ---------- 场景状态：pick / loading / result ---------- */
+  let pageState = "pick", curList = [], curIdx = 0, curGoal = null, currentHero = null;
 
   function setState(s) {
     pageState = s;
-    document.body.dataset.state = s;
+    document.body.dataset.mode = s;
+    const stage = $("#stage");
+    if (stage) stage.dataset.mode = s;
     const on = (el, v) => { if (el) el.hidden = !v; };
-    on($("#fridgeBody"), s !== "loading" && s !== "result");
-    on($("#pickSum"), s === "result");
-    on($("#askBtn"), s === "select");
-    on($("#acts"), s === "result");
     on($("#cookNote"), s === "loading");
-    on($("#pot"), s !== "result");
-    on($("#potCount"), s !== "result");
-    on($("#prefs"), s === "select");
-    if (s !== "select") { const pb = $("#prefsBody"); if (pb) pb.hidden = true; }
+    on($("#stageAct"), s === "pick");
+    on($("#dish"), s === "result");
+    on($("#prefsBody"), false);
+    const pt = $("#prefToggle");
+    if (pt) pt.setAttribute("aria-expanded", "false");
+    const pc = $("#potCount");
+    if (pc) pc.textContent = s === "result" ? t("cook.potDone")
+      : sel.size ? t("cook.pickedN", { n: sel.size }) : t("cook.picked0");
     if (s === "result") renderPickSum();
+    requestAnimationFrame(markCut);
   }
 
   function renderPickSum() {
     const box = $("#pickSumTxt");
     if (!box) return;
-    /* 做完之后 sel 已经清空，用这一顿实际用掉的食材当摘要 */
-    if (!sel.size && cooked) {
-      box.textContent = cooked.used.map(u => foodName(u.cat)).join(" · ");
-      return;
-    }
-    const names = [...sel].map(foodName);
-    box.textContent = names.length ? names.join(" · ") : t("cook.picked0");
+    if (!sel.size && cooked) { box.textContent = cooked.used.map(u => foodName(u.cat)).join(" · "); return; }
+    box.textContent = [...sel].map(foodName).join(" · ") || t("cook.picked0");
   }
 
-  function showSkeleton() {
-    $("#result").innerHTML = `<article class="skel" aria-hidden="true">
-      <div class="s1"></div><div class="s2"></div><div class="s3"></div></article>`;
-  }
-
-  function paintResults() {
-    renderResult(curList, curGoal, curIdx);
-  }
+  function paintResults() { renderResult(curList, curGoal, curIdx); }
 
   function syncActFav() {
-    const b = $("#actFav");
-    if (!b) return;
-    if (!currentHero) { b.textContent = t("fav.add"); return; }
+    const b = $("#dish [data-act-fav]");
+    if (!b || !currentHero) return;
     const on = FD.favHas && FD.favHas({ type: "lib", id: currentHero.id });
     b.textContent = on ? t("fav.saved") : t("fav.add");
     b.classList.toggle("on", !!on);
   }
 
-  /* ---------- 结果：一张主菜 + 一排备选 ---------- */
-  function heroPhoto(r){
+  /* ---------- 成品菜：从锅里端出来 ---------- */
+  function dishPhoto(r) {
     const dp = window.DISH_PHOTO && DISH_PHOTO.get(r.recipe.name);
-    if (dp) return `<div class="rphoto"><img src="${dp.src}" alt="${I18N.recipeName(r.recipe)}" loading="lazy" decoding="async">${dp.credit?`<span class="cr"><a href="${dp.page}" target="_blank" rel="noopener">${dp.credit} · ${dp.license}</a></span>`:""}</div>`;
-    const arts = (r.recipe.needs || []).slice(0,3)
-      .map(id => `<span class="ic">${art(id)}<i>${foodName(id)}</i></span>`).join("");
-    return `<div class="rphoto art">${arts}</div>`;
+    if (dp) return `<div class="dphoto"><img src="${dp.src}" alt="${I18N.recipeName(r.recipe)}" loading="lazy" decoding="async">${dp.credit?`<span class="cr"><a href="${dp.page}" target="_blank" rel="noopener">${dp.credit} · ${dp.license}</a></span>`:""}</div>`;
+    const arts = (r.recipe.needs || []).slice(0,3).map(id => `<span class="ic">${art(id)}<i>${foodName(id)}</i></span>`).join("");
+    return `<div class="dphoto art">${arts}</div>`;
   }
 
-  function heroCard(r){
-    const status = r.status === "ready" ? `<span class="ok">${t("cook.ready")}</span>`
-      : r.status === "shop1" ? `<span class="gap">${t("cook.gap1")}</span>`
-      : `<span class="gap">${t("cook.gapN", { n: r.missing.length })}</span>`;
-    const needs = r.recipe.needs.map(id => `<span>${art(id)}${foodName(id)}</span>`).join("");
-    const buy = r.missing.length
-      ? r.missing.map(id => `${foodName(id)}${FD.byId[id] && FD.byId[id].shop ? "（" + FD.byId[id].shop + "）" : ""}`).join("、")
-      : "";
-    const pantry = r.pantryMissing.length
-      ? `<p class="meta">${t("cook.needPantry", { s: r.pantryMissing.map(pantryName).join("、") })}</p>` : "";
-    const steps = (I18N.recipeSteps(r.recipe) || [])
-      .filter(x => x && !/^!\[/.test(x.trim()))
+  function renderResult(list, goal, idx) {
+    const box = $("#dish");
+    if (!box) return;
+    if (!list.length) { box.innerHTML = `<p class="lede">${t("cook.noMatch")}</p>`; return; }
+    const hero = list[idx % list.length];
+    currentHero = hero.recipe;
+    const st = hero.status === "ready" ? `<span class="ok">${t("cook.ready")}</span>`
+      : hero.status === "shop1" ? `<span class="gap">${t("cook.gap1")}</span>`
+      : `<span class="gap">${t("cook.gapN", { n: hero.missing.length })}</span>`;
+    const used = [...sel].map(c => `<span>${art(c)}${foodName(c)}</span>`).join("");
+
+    const buy = hero.missing.length
+      ? `<p class="meta"><span class="gap">${t("cook.needBuy", { s: hero.missing.map(id => foodName(id)).join("、") })}</span></p>` : "";
+    const steps = (I18N.recipeSteps(hero.recipe) || []).filter(x => x && !/^!\[/.test(x.trim()))
       .map((x, i) => {
-        const act = COOK_STEPS.of(x, r.recipe.id + "#" + i);
+        const act = COOK_STEPS.of(x, hero.recipe.id + "#" + i);
         return `<li data-act="${act.id}"><span class="n">${i + 1}</span>
           <span class="act" title="${I18N.getLang() === "en" ? act.en : act.zh}">${COOK_STEPS.svg(act.id)}</span>
           <span class="tx">${x}</span></li>`;
       }).join("");
-    const card = document.createElement("article");
-    card.className = "rcard hero";
-    card.dataset.recipe = r.recipe.id;
-    card.innerHTML = `
-      ${heroPhoto(r)}
-      <div class="hero-body">
-        <h3>${I18N.recipeName(r.recipe)}</h3>
-        <div class="meta">
-          ${status}
-          <span>${t("cook.mins", { n: r.recipe.minutes })}</span>
-          <span>${t("cook.kcal", { n: r.recipe.kcal })}</span>
-          <span class="ok">${t("cook.match", { a: r.recipe.needs.filter(id => sel.has(id)).length, b: r.recipe.needs.length })}</span>
+    const favOn = !!(FD.favHas && FD.favHas({ type: "lib", id: hero.recipe.id }));
+    const enc = encodeURIComponent(hero.recipe.name);
+    box.innerHTML = `
+      ${dishPhoto(hero)}
+      <h3>${I18N.recipeName(hero.recipe)}</h3>
+      <div class="dmeta">${st}
+        <span>${t("cook.mins", { n: hero.recipe.minutes })}</span>
+        <span>${t("cook.kcal", { n: hero.recipe.kcal })}</span>
+        <span class="ok">${t("cook.match", { a: hero.recipe.needs.filter(id => sel.has(id)).length, b: hero.recipe.needs.length })}</span>
+      </div>
+      ${used ? `<p class="useline">${t("cook.youPut")}</p><div class="use">${used}</div>` : ""}
+      ${buy}
+      <details><summary>${t("cook.steps")}</summary><ol>${steps}</ol></details>
+      <div class="dact">
+        <button class="primary" type="button" data-act-cook>${t("cook.startCook")}</button>
+        <button class="alt" type="button" data-act-swap>${t("cook.another")}</button>
+        <button class="alt${favOn ? " on" : ""}" type="button" data-act-fav>${favOn ? t("fav.saved") : t("fav.add")}</button>
+      </div>
+      <button class="back" type="button" data-act-back>← ${t("cook.reselect")}</button>
+      <div class="refs">
+        <h4>${t("cook.moreRefs")}</h4>
+        <div class="links">
+          <a href="https://www.xiaohongshu.com/search_result?keyword=${enc}" target="_blank" rel="noopener">${t("cook.xhsGo", { s: hero.recipe.name })}</a>
+          <a href="https://search.bilibili.com/all?keyword=${enc}" target="_blank" rel="noopener">${t("cook.biliGo", { s: hero.recipe.name })}</a>
         </div>
-        <div class="use">${needs}</div>
-        ${buy ? `<p class="meta"><span class="gap">${t("cook.needBuy", { s: buy })}</span></p>` : ""}
-        ${pantry}
-        <details><summary>${t("cook.steps")}</summary><ol>${steps}</ol></details>
       </div>`;
-    return card;
-  }
-
-  function altCard(r, i){
-    const dp = window.DISH_PHOTO && DISH_PHOTO.get(r.recipe.name);
-    const ph = dp ? `<img src="${dp.src}" alt="" loading="lazy" decoding="async">`
-                  : `<span class="ic">${art((r.recipe.needs || [])[0] || "rice")}</span>`;
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "altcard";
-    b.style.animationDelay = (i * 60) + "ms";
-    b.dataset.alt = r.recipe.id;
-    b.innerHTML = `
-      <span class="ph${dp ? "" : " art"}">${ph}</span>
-      <span class="bd">
-        <span class="nm">${I18N.recipeName(r.recipe)}</span>
-        <span class="mt">${r.status === "ready" ? t("cook.ready") : t("cook.gapN", { n: r.missing.length })} · ${t("cook.mins", { n: r.recipe.minutes })}</span>
-      </span>`;
-    return b;
-  }
-
-  function renderResult(list, goal, idx) {
-    const box = $("#result");
-    box.innerHTML = "";
-    if (!list.length) {
-      box.innerHTML = `<div class="rcard note">${t("cook.noMatch")}</div>`;
-      return;
-    }
-    if (goal) {
-      const parts = [];
-      if (goal.kcalMax) parts.push("≤ " + goal.kcalMax + " kcal");
-      if (goal.maxMinutes && goal.maxMinutes < 60) parts.push("≤ " + goal.maxMinutes + " " + t("cook.minUnit"));
-      if (goal.greens) parts.push(t("cook.greens"));
-      if (goal.fibre) parts.push(t("cook.fibre"));
-      if (parts.length) box.insertAdjacentHTML("afterbegin",
-        `<p class="applied">${t("cook.applied", { s: parts.join(" · ") })}</p>`);
-    }
-    const hero = list[idx % list.length];
-    const rest = list.filter((x, i) => i !== idx % list.length);
-    const card = heroCard(hero);
-    card.style.opacity = "0";
-    card.style.transform = "translateY(10px) scale(.99)";
-    box.appendChild(card);
-    requestAnimationFrame(() => {
-      MOTION.spring({
-        from: 0, to: 1, stiffness: 300, damping: 26,
-        onUpdate: v => {
-          card.style.opacity = String(v);
-          card.style.transform = "translateY(" + (10 * (1 - v)) + "px) scale(" + (0.99 + 0.01 * v) + ")";
-        },
-        onComplete: () => { card.style.opacity = ""; card.style.transform = ""; }
-      });
+    const cookBtn = box.querySelector("[data-act-cook]");
+    cookBtn.addEventListener("click", () => cook(hero.recipe, cookBtn));
+    box.querySelector("[data-act-swap]").addEventListener("click", () => {
+      if (curList.length > 1) { curIdx = (curIdx + 1) % curList.length; paintResults(); }
+      else if (uiHasAi()) askAi();
+      else toast(t("cook.onlyOne"));
     });
-    if (rest.length) {
-      const row = document.createElement("div");
-      row.className = "altrow";
-      row.innerHTML = `<div class="altlabel">${t("cook.alsoN", { n: rest.length })}</div>`;
-      rest.forEach((r, i) => {
-        const b = altCard(r, i);
-        b.addEventListener("click", () => {
-          const target = curList.indexOf(r);
-          if (target >= 0) { curIdx = target; paintResults(); window.scrollTo({ top: 0, behavior: "smooth" }); }
-        });
-        row.appendChild(b);
-      });
-      box.appendChild(row);
-    }
-    currentHero = hero.recipe;
-    syncActFav();
-    const cookBtn = $("#actCook");
-    if (cookBtn) cookBtn.disabled = !currentHero;
+    box.querySelector("[data-act-fav]").addEventListener("click", () => {
+      const on = FD.favHas && FD.favHas({ type: "lib", id: hero.recipe.id });
+      if (on) { FD.favRemove("lib:" + hero.recipe.id); toast(t("fav.removed")); }
+      else { FD.favAdd({ type: "lib", id: hero.recipe.id, name: hero.recipe.name, minutes: hero.recipe.minutes }); toast(t("fav.added", { s: hero.recipe.name })); }
+      syncActFav();
+    });
+    box.querySelector("[data-act-back]").addEventListener("click", () => {
+      setState("pick");
+      $("#stage").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
   }
 
   /* ---------- 本地经典菜：词表 + 技法卡，不依赖 AI ---------- */
@@ -1140,41 +1114,6 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
-  /* 结果态：开始做饭 / 换一道 / 收藏 / 重新选 */
-  const actCook = $("#actCook");
-  if (actCook) actCook.addEventListener("click", () => {
-    if (currentHero) cook(currentHero, actCook);
-  });
-  const actSwap = $("#actSwap");
-  if (actSwap) actSwap.addEventListener("click", () => {
-    if (curList.length > 1) {
-      curIdx = (curIdx + 1) % curList.length;
-      paintResults();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else if (uiHasAi()) {
-      askAi();
-    } else {
-      toast(t("cook.onlyOne"));
-    }
-  });
-  const actFav = $("#actFav");
-  if (actFav) actFav.addEventListener("click", () => {
-    if (!currentHero) return;
-    const on = FD.favHas && FD.favHas({ type: "lib", id: currentHero.id });
-    if (on) {
-      FD.favRemove("lib:" + currentHero.id);
-      toast(t("fav.removed"));
-    } else {
-      FD.favAdd({ type: "lib", id: currentHero.id, name: currentHero.name, minutes: currentHero.minutes });
-      toast(t("fav.added", { s: currentHero.name }));
-    }
-    syncActFav();
-  });
-  const actReselect = $("#actReselect");
-  if (actReselect) actReselect.addEventListener("click", () => {
-    setState("select");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
   function uiHasAi() { return !!document.querySelector("#aiBox [data-ai-again]"); }
 
   $("#pot").addEventListener("keydown", e => {
@@ -1268,7 +1207,7 @@
   bindPrefs();
   setupScroll();
   renderFridge();
-  setState("select");
+  setState("pick");
   markCut();
   window.addEventListener("resize", markCut);
   applyLang();

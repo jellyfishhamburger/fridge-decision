@@ -623,3 +623,122 @@ body[data-state="loading"] #pot{transform:none}
 body[data-state="loading"] .pot-art{transform:scale(1.08)}
 body[data-state="loading"] .steam{opacity:.9;animation:steamup 1.8s ease-in-out infinite}
 @keyframes potbob{0%,100%{transform:scale(1.08) translateY(0)}50%{transform:scale(1.08) translateY(-3px)}}
+
+/* ================= 场景化锅：不换页，锅在场上把食材煮熟 ================= */
+.wrap{max-width:620px;margin:0 auto;padding:0 14px}
+
+/* 食材区：整块滚动，高度由 JS 算到「舞台上沿」 */
+.fridge-body{height:360px;max-height:none;overflow-y:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y}
+
+/* 舞台：锅 + 选中 + 按钮 + 成品，同一块区域 */
+.stage{position:relative;margin:10px 0 12px;padding:10px 12px 14px;background:var(--card);
+  border:1px solid var(--line);border-radius:calc(var(--r) + 4px);
+  box-shadow:0 14px 30px -26px rgba(51,48,42,.8)}
+
+/* 锅：够大，食材放在锅口里 */
+.pot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  gap:0;min-height:150px;padding:4px 0 0;transition:min-height .35s var(--ease)}
+.pot-art{width:178px;height:142px;display:block;transition:width .42s var(--ease),height .42s var(--ease)}
+.pot-items{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);
+  list-style:none;display:flex;flex-wrap:nowrap;gap:7px;justify-content:center;margin:0;padding:0;
+  max-width:150px}
+.pot-items li{width:38px;height:38px;border-radius:99px;background:rgba(255,253,247,.94);
+  border:1px solid var(--green-line);display:grid;place-items:center;flex:none;
+  box-shadow:0 3px 8px -4px rgba(47,60,45,.5);animation:potpop .34s var(--spring)}
+.pot-items li svg{width:24px;height:24px}
+.pot-plus{position:absolute;left:calc(50% + 52px);top:47%;transform:translateY(-50%);
+  font-size:11.5px;font-weight:800;color:var(--green);background:var(--card);border:1px solid var(--green-line);
+  border-radius:99px;padding:3px 7px}
+@keyframes potpop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+.pot.bump .pot-art{animation:potbump .5s var(--spring)}
+@keyframes potbump{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-2.4deg) scale(1.02)}60%{transform:rotate(1.8deg) scale(1.01)}}
+
+/* 飞进锅里的那一颗图标 */
+.flyicon{position:fixed;z-index:90;pointer-events:none;width:40px;height:40px;display:grid;place-items:center;
+  border-radius:99px;background:var(--card);border:1px solid var(--green-line);
+  box-shadow:0 8px 18px -10px rgba(47,60,45,.7);transition:transform .52s cubic-bezier(.42,0,.28,1),opacity .52s}
+.flyicon svg{width:26px;height:26px}
+.flyicon.go{opacity:.12}
+
+/* 已选名字标签 */
+.chips{list-style:none;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%;margin:6px 0 0}
+.chips:empty{display:none}
+
+/* 主按钮和筛选并排，跟着舞台，不再固定在屏幕底部 */
+.stage-act{display:flex;gap:8px;align-items:stretch;margin-top:10px}
+.stage-act .primary{flex:1;margin:0}
+.filter-mini{flex:0 0 auto;padding:0 14px;font-size:12.5px;border-radius:14px;background:var(--card-2);
+  border:1px solid var(--line);color:var(--ink-2);font-weight:700}
+.prefs-body{bottom:calc(100% + 10px)}
+
+/* 成品菜：从锅里长出来 */
+.dish{margin:6px 0 0;padding-top:10px;border-top:1px dashed var(--line);animation:dishin .5s cubic-bezier(.22,.68,.28,1) both}
+@keyframes dishin{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+.dish .dphoto{position:relative;border-radius:var(--r-md);overflow:hidden;aspect-ratio:16/10;background:var(--card-2)}
+.dish .dphoto img{width:100%;height:100%;object-fit:cover;display:block}
+.dish .dphoto .cr{position:absolute;right:8px;bottom:6px;font-size:9.5px;color:#fff;
+  background:rgba(31,59,45,.42);border-radius:99px;padding:2px 7px}
+.dish .dphoto .cr a{color:#fff;text-decoration:none}
+.dish .dphoto.art{display:flex;align-items:center;justify-content:center;gap:16px}
+.dish h3{font-family:var(--font-display);font-size:23px;line-height:1.2;margin:10px 0 6px;letter-spacing:-.01em}
+.dish .dmeta{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.dish .dmeta span{font-size:11.5px;padding:2px 8px;border-radius:99px;background:#F4EDDD;color:var(--ink-2)}
+.dish .dmeta span.ok{background:var(--green-soft);color:var(--green)}
+.dish .dmeta span.gap{background:var(--red-soft);color:var(--red)}
+.dish .use{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.dish .use span{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:4px 9px 4px 5px;
+  border-radius:99px;background:var(--card-2);border:1px solid var(--line)}
+.dish .use svg{width:18px;height:18px}
+.dish details{margin:6px 0}
+.dish details summary{font-size:13px;font-weight:650;color:var(--green);cursor:pointer}
+
+/* 结果态：锅缩小让位，菜是主角 */
+#stage[data-mode="result"] .pot{min-height:0;padding:0}
+#stage[data-mode="result"] .pot-art{width:96px;height:76px}
+#stage[data-mode="result"] .pot-items,#stage[data-mode="result"] .pot-plus{display:none}
+#stage[data-mode="result"] .pot-hint{display:none}
+#stage[data-mode="result"] .stage-act{display:none}
+
+/* 生成中：食材区变淡、锅冒气 */
+body[data-mode="loading"] .fridge-sec{opacity:.45;pointer-events:none;transition:opacity .25s}
+body[data-mode="loading"] .pot-art{animation:potbob 2s ease-in-out infinite}
+body[data-mode="loading"] .steam{opacity:.9;animation:steamup 1.8s ease-in-out infinite}
+body[data-mode="loading"] .steam.s2{animation-delay:.3s}
+body[data-mode="loading"] .steam.s3{animation-delay:.6s}
+@keyframes potbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes steamup{0%{opacity:.15;transform:translateY(4px)}45%{opacity:.9}100%{opacity:.15;transform:translateY(-6px)}}
+
+/* 锅里做完后的收尾按钮 */
+.dish .dact{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 2px}
+.dish .dact .primary{flex:1 1 100%;margin:0}
+.dish .dact .alt{flex:1;height:44px;border-radius:var(--r-sm);background:var(--card-2);
+  border:1px solid var(--line);font-size:13.5px;font-weight:650;color:var(--ink-2)}
+.dish .dact .alt.on{background:var(--green-soft);border-color:var(--green-line);color:var(--green)}
+.dish .back{display:inline-flex;align-items:center;gap:4px;margin:12px 0 0;font-size:12.5px;
+  color:var(--muted);background:none;border:0;padding:2px 0}
+.dish .refs{margin:16px 0 0;padding-top:12px;border-top:1px dashed var(--line)}
+.dish .refs h4{font-size:12px;font-weight:700;color:var(--muted);margin:0 0 8px}
+.dish .refs .links{display:flex;flex-wrap:wrap;gap:8px}
+.dish .refs a{font-size:12.5px;font-weight:600;color:var(--green);background:var(--green-soft);
+  border:1px solid var(--green-line);border-radius:99px;padding:6px 12px;text-decoration:none}
+
+/* 再挤一点：一屏尽量多看到一类 */
+.tile{padding:5px 3px 4px}
+.tile .art{width:34px;height:34px}
+.tile .nm{font-size:10px}
+.tile .qt{font-size:9px}
+.shelves{gap:12px}
+.shelf{padding:3px 2px 5px}
+.shelf-label{font-size:9px;margin-bottom:1px}
+.filter-mini{min-width:56px;justify-content:center}
+
+/* 有食材就不再提示「把食材拖进来」 */
+#pot.has + .pot-hint{display:none}
+.pot-items li{width:42px;height:42px}
+.pot-items li svg{width:26px;height:26px}
+.pot-items{max-width:170px;gap:8px}
+
+.stage{scroll-margin-top:64px}
+.dish .useline{font-size:11.5px;color:var(--muted);margin:0 0 6px;letter-spacing:.02em}
+#stage[data-mode="result"] .pot-count{font-size:12px;color:var(--muted);margin-bottom:2px}
