@@ -748,3 +748,4 @@ body[data-mode="loading"] .steam.s3{animation-delay:.6s}
 #stage[data-mode="result"] .pot-plus{display:flex;opacity:0;transition:opacity .3s;pointer-events:none}
 #stage[data-mode="result"] .pot-plus{display:block}
 #stage[data-mode="result"] .pot-art{width:108px;height:86px}
+.pot-hint{text-align:center;width:100%}
