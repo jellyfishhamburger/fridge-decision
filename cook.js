@@ -708,7 +708,7 @@
         <span>${t("cook.kcal", { n: hero.recipe.kcal })}</span>
         <span class="ok">${t("cook.match", { a: hero.recipe.needs.filter(id => sel.has(id)).length, b: hero.recipe.needs.length })}</span>
       </div>
-      ${used ? `<p class="useline">${t("cook.youPut")}</p><div class="use">${used}</div>` : ""}
+      ${used ? `<p class="useline">${t("cook.youPut")} ${[...sel].map(foodName).join(" · ")}</p>` : ""}
       ${buy}
       <details><summary>${t("cook.steps")}</summary><ol>${steps}</ol></details>
       <div class="dact">
