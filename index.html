@@ -195,11 +195,17 @@
   .sheet h3{font-size:17px;margin:0 0 4px}
   .sheet .hint{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 12px}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 14px}
-  .pick{border:1px solid var(--line);border-radius:12px;background:#fbfcfb;padding:10px 8px;font-size:13px;
-    text-align:center;cursor:pointer;font-family:inherit;line-height:1.3;
-    display:flex;flex-direction:column;align-items:center;gap:3px}
+  .pick{border:1px solid var(--line);border-radius:14px;background:#fff;padding:11px 6px 9px;font-size:12.5px;
+    text-align:center;cursor:pointer;font-family:inherit;line-height:1.25;position:relative;
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    transition:transform .12s ease, border-color .12s ease, background .12s ease}
+  .pick:active{transform:scale(.96)}
   .pick small{color:#9aa8a1;font-size:10.5px}
-  .pick.on{border-color:var(--green);background:var(--green-soft);color:#0b5c44;font-weight:600}
+  .pick .fdico{color:var(--green)}
+  .pick.on{border-color:var(--green);background:#EFF5EE;color:var(--ink);font-weight:600}
+  .pick.on::after{content:"✓";position:absolute;right:5px;top:5px;font-size:12px;
+    width:19px;height:19px;line-height:19px;text-align:center;border-radius:50%;
+    background:var(--green);color:#fff;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.25)}
   /* iOS Safari: 按钮里的 SVG 会吞掉 click，图标一律不接收指针事件 */
   button svg, button svg *{pointer-events:none}
   .pick, .pf, .chip button{touch-action:manipulation}
@@ -411,7 +417,10 @@
   .soon{margin:0 0 14px}
   .soon .fhd{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 8px}
   /* 和锅页的橱柜同一套：插画在上、名字、剩余天数 —— 比一排窄胶囊好认 */
-  .soonrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+  .soonrow{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;margin:0 -2px}
+  .soonrow::-webkit-scrollbar{display:none}
+  .soonrow .wc{flex:0 0 31%;scroll-snap-align:start}
   .wc{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;text-align:center;
     border:1px solid var(--line);background:var(--card);border-radius:16px;padding:10px 8px 11px;
     font-family:inherit;cursor:pointer;transition:transform .18s var(--ease),border-color .2s;
@@ -924,6 +933,11 @@
 
   .plan-miss{margin:6px 0 2px;font-size:12px;font-weight:600;color:#8a6d1f;
     background:#FBF5E3;border-radius:8px;padding:4px 9px;display:inline-block}
+
+  .idea-sub{margin:-6px 0 12px;font-size:12.5px;color:var(--muted)}
+
+  #sheetTitle{font-size:17px;font-weight:700;letter-spacing:-.01em}
+  #sheet .sect, #sheet h4{font-size:12.5px;color:var(--muted);font-weight:600}
 </style>
 </head>
 <body>
@@ -1607,7 +1621,7 @@ function renderHome(){
       return `<div class="plan" data-plan="${i}">
         <div class="plan-hd">
           <span class="plan-no">${i + 1}</span>
-          <b>${I18N.recipeName(p.main.recipe)}</b>
+          <b>${I18N.recipeName(p.main.recipe)} + ${I18N.recipeName(p.side.recipe)}</b>
           <span class="st ${p.ready ? "" : "warn"}">${miss}</span>
         </div>
         <div class="plan-dishes">
@@ -1946,7 +1960,7 @@ function renderItems(){
         seen[i.cat] = merged.length;
         merged.push({ id: i.id, cat: i.cat, qty: q });
       });
-      const top = merged.slice(0, 3);
+      const top = merged;      /* 临期的全部放进去，横向滑动看 */
       soonBox.innerHTML = `<h3 class="fhd">${tt("fridge.soonH", "先吃这些")}</h3>` +
         `<div class="soonrow">` + top.map(it => {
           const src = items.find(x => x.id === it.id) || {};
@@ -2027,7 +2041,7 @@ function itemRow(it){
      <button class="del" aria-label="${tt("fridge.del", "删除")}" data-del="${it.id}">×</button>`;
   el.addEventListener("click", ev => {
     if(ev.target.closest("button")) return;   /* × 是删除 */
-    location.href = "add.html?edit=" + encodeURIComponent(it.id);   /* 点行 = 去改这一条 */
+    openSheet(it);   /* 点行 = 就地改，不再跳旧页面 */
   });
   return el;
 }
@@ -2854,6 +2868,7 @@ function openDishIdeas(cat){
   $("#rBody").innerHTML = `
     <button class="rbclose" id="rCloseIdea" aria-label="关闭">✕</button>
     <h3 id="rName">用「${name}」能做什么</h3>
+    <p class="idea-sub">${list.length ? "按现在冰箱里的食材排的序，最多 3 道" : ""}</p>
     ${list.length ? `<p class="tiny" style="margin:0 0 10px">按你冰箱里现有的食材排的序。</p>
       <div class="idearows">${rows}</div>`
       : `<p class="tiny">现在用「${name}」还做不成一道菜，加点别的食材再看看。</p>`}`;
@@ -3322,7 +3337,9 @@ function openSheetLegacy(){
   $("#scrim").classList.add("on"); $("#sheet").classList.add("on");
   picked = null;
   const g = $("#picks"); g.innerHTML = "";
-  FD.CATALOG.forEach(c=>{
+  FD.CATALOG.slice().sort((a, b) => {
+    try { return (a.cn || "").localeCompare(b.cn || "", "zh-Hans-CN"); } catch (e) { return 0; }
+  }).forEach(c=>{
     const b = document.createElement("button");
     b.className = "pick"; b.type = "button";
     b.innerHTML = window.FD_ICON(c.id,22) + `<span>${I18N.foodName(c.id)}</span><small>${I18N.getLang()==="en" ? c.cn : c.name}</small>`;
@@ -3354,6 +3371,11 @@ function openSheetLegacy(){
     const c = FD.CATALOG.find(x => x.id === editTarget.cat);
     if(c){ picked = c; pendingDays = Math.max(1, FD.daysLeftOf(editTarget));
       pendingQty = editTarget.qty == null ? 1 : editTarget.qty;
+      /* 选中的那一格滚到眼前，不然打开面板看不到当前是什么 */
+      setTimeout(() => {
+        const on = document.querySelector("#picks .pick.on");
+        if(on) on.scrollIntoView({block:"center", behavior:"auto"});
+      }, 60);
       const b = [...g.querySelectorAll(".pick")].find(x => x.textContent.includes(I18N.foodName(c.id)));
       if(b) b.classList.add("on");
       paintKeep();
