@@ -138,8 +138,9 @@
 
     const used = [], missing = [];
     for (const need of recipe.needs) {
-      const list = byCat[need];
-      if (list && list.length) used.push(list.slice().sort((a, b) => daysLeftOf(a) - daysLeftOf(b))[0]);
+      /* 过期的食材不能拿来做饭，也不能算「冰箱里有」——按缺料处理。 */
+      const list = (byCat[need] || []).filter(i => daysLeftOf(i) >= 0);
+      if (list.length) used.push(list.slice().sort((a, b) => daysLeftOf(a) - daysLeftOf(b))[0]);
       else missing.push(need);
     }
 
