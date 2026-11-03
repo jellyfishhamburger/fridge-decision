@@ -898,6 +898,13 @@
   .expbar b{font-variant-numeric:tabular-nums}
   .expbar .ar{margin-left:auto;flex:none;opacity:.7}
   .expbar.soft{border-color:#EDDCB6;background:#FBF5E3;color:#7A5E1C}
+
+  /* 一键处理过期货 */
+  .expact{margin:8px 0 0;padding:12px;border-radius:14px;border:1px dashed #E0B9B0;background:#FFF9F7}
+  .expact[hidden]{display:none}
+  .expact p{margin:0 0 10px;font-size:12.5px;color:#8C3A2C;line-height:1.5}
+  .expact-btns{display:flex;gap:8px;flex-wrap:wrap}
+  .expact-btns .btn{flex:1 1 0;min-width:92px;margin:0;padding:10px 8px;font-size:13px}
 </style>
 </head>
 <body>
@@ -1155,6 +1162,14 @@
     <!-- 1 · 紧凑摘要 -->
     <div class="fsum" id="fsum"></div>
     <button class="expbar" id="expBar" hidden></button>
+    <div class="expact" id="expAct" hidden>
+      <p id="expActList"></p>
+      <div class="expact-btns">
+        <button class="btn ghost" id="expCancel">先放着</button>
+        <button class="btn ghost" id="expThrew">扔掉了</button>
+        <button class="btn primary" id="expAte">都吃了</button>
+      </div>
+    </div>
 
     <div class="undo" id="undoBar">
       <span id="undoText"></span>
@@ -1882,7 +1897,16 @@ function renderItems(){
         ? `⚠ 有 <b>${expired}</b> 样已经过期${todayN ? "，" + todayN + " 样今天到期" : ""}`
         : (todayN ? `<b>${todayN}</b> 样今天到期${soonN ? "，" + soonN + " 样 3 天内到期" : ""}`
                   : `<b>${soonN}</b> 样 3 天内到期，先吃掉`);
-      expBar.innerHTML = msg + `<span class="ar">按到期看 →</span>`;
+      expBar.innerHTML = msg + `<span class="ar">${expired ? "一键处理 →" : "按到期看 →"}</span>`;
+      const list = $("#expActList");
+      if(list){
+        if(!expired){ if(expAct) expAct.hidden = true; }
+        else {
+          const names = sorted.filter(i => FD.daysLeftOf(i) < 0)
+            .map(i => cnOf(i.cat) + (i.qty > 1 ? "×" + i.qty : "")).join("、");
+          list.textContent = "这些已经过期了：" + names + "。处理掉会从库存里删掉。";
+        }
+      }
     }
   }
 
@@ -2897,13 +2921,26 @@ function renderDiscover(){
     });
   }
   const expBarBtn = $("#expBar");
-  if(expBarBtn) expBarBtn.addEventListener("click", () => {
-    fridgeSort = "expiry";
-    const sg = $("#fridgeSort");
-    if(sg) [...sg.querySelectorAll("button")].forEach(x => x.classList.toggle("on", x.dataset.sort === "expiry"));
-    renderItems();
-    window.scrollTo({ top: $("#items").getBoundingClientRect().top + window.scrollY - 70, behavior: "smooth" });
+  const expAct = $("#expAct");
+  if(expBarBtn && expAct) expBarBtn.addEventListener("click", () => {
+    expAct.hidden = !expAct.hidden;
+    if(!expAct.hidden) expAct.scrollIntoView({ block: "nearest", behavior: "smooth" });
   });
+  const expCancel = $("#expCancel");
+  if(expCancel) expCancel.addEventListener("click", () => { expAct.hidden = true; });
+
+  function handleExpired(how){
+    const gone = items.filter(i => FD.daysLeftOf(i) < 0);
+    if(!gone.length) return;
+    items = items.filter(i => FD.daysLeftOf(i) >= 0);
+    FD.saveItems(items);
+    if(expAct) expAct.hidden = true;
+    renderItems();
+    toast((how === "ate" ? "已经吃掉 " : "已经扔掉 ") + gone.length + " 样");
+  }
+  const expThrew = $("#expThrew"), expAte = $("#expAte");
+  if(expThrew) expThrew.addEventListener("click", () => handleExpired("threw"));
+  if(expAte) expAte.addEventListener("click", () => handleExpired("ate"));
 
   const seg = $("#fridgeSort");
   if(seg) seg.addEventListener("click", e => {
