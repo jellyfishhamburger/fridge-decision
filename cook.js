@@ -89,7 +89,7 @@
     "cook.aiSavedToast": "已收藏「{s}」",
     "cook.aiSavedAlready": "这道已经收藏过了",
     "cook.favGo": "已收藏 {n} 道 · 去菜谱页看 →",
-    "cook.youPut": "你放入了", "cook.dishNeeds": "这道菜用", "cook.gapShort": "缺", "cook.potDone": "出锅了", "cook.moreRefs": "更多做法参考", "cook.expired": "这样已经过期了，别下锅",
+    "cook.youPut": "你放入了", "cook.dishNeeds": "这道菜用", "cook.gapShort": "缺", "cook.inFridge": "在冰箱", "cook.potDone": "出锅了", "cook.moreRefs": "更多做法参考", "cook.expired": "这样已经过期了，别下锅",
     "cook.xhsGo": "小红书「{s}」", "cook.biliGo": "B 站「{s}」",
     "cook.expandAll": "展开全部", "cook.collapseAll": "收起食材", "cook.pickedSum": "已选", "cook.editPick": "修改",
     "cook.startCook": "开始做饭", "cook.another": "换一道", "cook.reselect": "重新选", "cook.onlyOne": "这组食材只有这一道能直接做",
@@ -192,7 +192,7 @@
     "cook.aiSavedToast": "Saved “{s}”",
     "cook.aiSavedAlready": "Already saved",
     "cook.favGo": "{n} saved — open them in Recipes →",
-    "cook.youPut": "You put in", "cook.dishNeeds": "This dish uses", "cook.gapShort": "need", "cook.potDone": "Done", "cook.moreRefs": "More references", "cook.expired": "That one is past its date — leave it out",
+    "cook.youPut": "You put in", "cook.dishNeeds": "This dish uses", "cook.gapShort": "need", "cook.inFridge": "in fridge", "cook.potDone": "Done", "cook.moreRefs": "More references", "cook.expired": "That one is past its date — leave it out",
     "cook.xhsGo": "RED “{s}”", "cook.biliGo": "Bilibili “{s}”",
     "cook.expandAll": "Show all", "cook.collapseAll": "Show less", "cook.pickedSum": "Picked", "cook.editPick": "Edit",
     "cook.startCook": "Start cooking", "cook.another": "Another", "cook.reselect": "Change picks", "cook.onlyOne": "Only one dish fits these picks",
@@ -708,7 +708,11 @@
     /* 这道菜自己要用哪几样：对上的打勾，缺的直接标出来 */
     const needs = (hero.recipe.needs || []).map(id => {
       const have = sel.has(id);
-      return `<span class="${have ? "ok" : "miss"}">${art(id)}${foodName(id)}${have ? "" : `<i>${t("cook.gapShort")}</i>`}</span>`;
+      /* 没放进锅、但冰箱里有的：别写「缺」，写「在冰箱」 */
+      const inFridge = !have && items.some(i => i.cat === id && FD.daysLeftOf(i) >= 0);
+      const cls = have ? "ok" : inFridge ? "away" : "miss";
+      const tag = have ? "" : `<i>${inFridge ? t("cook.inFridge") : t("cook.gapShort")}</i>`;
+      return `<span class="${cls}">${art(id)}${foodName(id)}${tag}</span>`;
     }).join("");
 
     const buy = hero.missing.length

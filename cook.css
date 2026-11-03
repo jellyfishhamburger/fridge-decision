@@ -810,3 +810,6 @@ body[data-mode="loading"] .steam.s3{animation-delay:.6s}
 .dish .use.needs span.miss{background:var(--red-soft);border-color:#EFCFC7;color:#8E3B32}
 .dish .use span i{font-style:normal;font-size:10px;font-weight:700;color:var(--red);
   background:#fff;border-radius:99px;padding:0 5px;margin-left:2px}
+
+.dish .use.needs span.away{background:#FDF4E2;border-color:#EBD6AE;color:#7A5E1C}
+.dish .use.needs span.away i{color:#7A5E1C}
