@@ -547,6 +547,9 @@
     /* 相机保持常亮：抓拍只在画面上闪一下 + 边框变绿 + 提示音，
        否则用户会以为「卡住了 / 相机没了」。 */
     state.shots.push({ img: url });
+    /* 计数跟「拍了几张」走，不跟「认出几件」走：没认出来也是一张，
+       否则页面显示「已拍 0 件」而缩略图明明有一张，用户会以为没拍上。 */
+    if ($("#cnt")) $("#cnt").textContent = tt("add.shotN", "已拍 {n} 件").replace("{n}", state.shots.length);
     flashCapture(url);
     var r = { cat: "", name: "" };
     try { r = await classifySmart(c); } catch (e) { r = { cat: "", name: "" }; }
@@ -554,6 +557,8 @@
     else addRow("", 1, "detect", url, r.name || "");
     if (!r.cat) state.needManual = true;
     var note = r.cat ? "" : (r.why === "lowconf" ? "（没认准，等下选）" : r.name ? "（认成「" + r.name + "」，等下选）" : "（没认出来，等下选）");
+    /* 配了 AI 却没连上时要说出来：不然「明明开了千问还是认不出」会被当成模型坏了 */
+    if (!r.cat && AI_URL && AI_OK === false) note = "（本地 AI 没连上，只用了端侧的 8 类模型）";
     $("#detHint").textContent = "✓ 拍到第 " + state.shots.length + " 件" + note +
       " · 继续放下一件，全部放完点「结束并确认」。";
     renderRows();
