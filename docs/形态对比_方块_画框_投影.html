@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>三种形态 · 台面占用对比</title>
+<style>
+  :root{--paper:#FBF6EC;--ink:#23201B;--navy:#1E2A44;--red:#C7392B;--rule:#D9CEBA;--soft:#F3EADA;--grey:#6E6558}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif}
+  .sheet{max-width:1120px;padding:34px 36px 28px;background:var(--paper);
+    background-image:radial-gradient(rgba(30,42,68,.055) 1px,transparent 1px);background-size:14px 14px}
+  .kicker{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);
+    font-family:ui-monospace,Consolas,monospace}
+  h1{font-size:30px;line-height:1.2;margin:9px 0 6px;letter-spacing:-.02em;font-weight:800}
+  h1 em{font-style:normal;color:var(--red)}
+  .sub{font-size:13px;color:var(--grey);margin:0 0 22px;line-height:1.6}
+  .row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .card{background:#fff;border:1.6px solid var(--navy);border-radius:5px;padding:12px 12px 10px;
+    box-shadow:4px 4px 0 rgba(30,42,68,.12)}
+  .card h2{font-size:15px;margin:0 0 2px}
+  .card .t{font-size:10.5px;color:var(--grey);letter-spacing:.08em;font-family:ui-monospace,Consolas,monospace;margin-bottom:8px}
+  .card .num{font-size:12.5px;margin-top:7px;display:flex;justify-content:space-between;align-items:baseline;
+    border-top:1px dashed var(--rule);padding-top:7px}
+  .card .num b{font-size:15px;color:var(--red);font-family:ui-monospace,Consolas,monospace}
+  .card .note{font-size:11px;color:var(--grey);line-height:1.5;margin-top:6px}
+  .bad .num b{color:var(--red)}
+  svg{display:block;width:100%;height:auto}
+
+  .wide{display:grid;grid-template-columns:1.05fr 1fr;gap:16px;margin-top:16px}
+  .panel{background:#fff;border:1.6px solid var(--navy);border-radius:5px;padding:13px 14px;
+    box-shadow:4px 4px 0 rgba(30,42,68,.10)}
+  .panel h3{font-size:13.5px;margin:0 0 8px}
+  .panel p{font-size:11.5px;line-height:1.62;color:#3a342c;margin:0 0 7px}
+  .panel p b{color:var(--ink)}
+  .panel .k{color:var(--red);font-weight:700}
+  ol.pts{margin:2px 0 0;padding-left:17px;font-size:11.5px;line-height:1.62;color:#3a342c}
+  ol.pts li{margin-bottom:5px}
+  ol.pts b{color:var(--ink)}
+  .foot{margin-top:14px;border-top:1.6px solid var(--navy);padding-top:11px;display:flex;justify-content:space-between;
+    font-size:11px;color:var(--grey)}
+  .foot b{color:var(--ink)}
+  @media(max-width:900px){.row{grid-template-columns:1fr}.wide{grid-template-columns:1fr}.sheet{padding:22px 16px}h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="kicker">冰箱决策 · 做饭端形态 · 2026-11-03</div>
+  <h1>同一块台面，三种摆法：<em>投影并不省地方</em></h1>
+  <p class="sub">俯视，同一比例（1 cm = 5 px），台面按 <b>60 × 45 cm</b> 画。方块不是必须的——45° 分光镜只要求斜边罩住屏幕，压扁就是画框。</p>
+
+  <div class="row">
+
+    <!-- A cube -->
+    <div class="card">
+      <h2>A · 透明小电视（现成套件）</h2>
+      <div class="t">10 × 10 × 10 cm</div>
+      <svg viewBox="0 0 300 225">
+        <rect x="0" y="0" width="300" height="225" fill="#FBF6EC" stroke="#D9CEBA"/>
+        <text x="8" y="16" font-size="9" fill="#6E6558" font-family="monospace">后墙</text>
+        <rect x="125" y="20" width="50" height="50" fill="#fff" stroke="#1E2A44" stroke-width="2"/>
+        <text x="131" y="50" font-size="8.5" fill="#6E6558" font-family="monospace">10 × 10</text>
+        <path d="M188 45 h13" stroke="#1E2A44" stroke-width="1"/>
+        <path d="M201 45 l-5 -3 v6z" fill="#1E2A44"/>
+        <text x="206" y="48" font-size="8.5" fill="#6E6558" font-family="monospace">看</text>
+        <text x="8" y="216" font-size="9" fill="#6E6558" font-family="monospace">台面 60 × 45</text>
+      </svg>
+      <div class="num"><span>台面占用</span><b>100 cm²</b></div>
+      <div class="note">正方体是套件的默认形状；四边都能看，但正对台面中间，擦台面要挪它。</div>
+    </div>
+
+    <!-- B frame -->
+    <div class="card">
+      <h2>B · 横版画框（同一个光学）</h2>
+      <div class="t">9.5 × 5.5 × 6 cm</div>
+      <svg viewBox="0 0 300 225">
+        <rect x="0" y="0" width="300" height="225" fill="#FBF6EC" stroke="#D9CEBA"/>
+        <text x="8" y="16" font-size="9" fill="#6E6558" font-family="monospace">后墙</text>
+        <rect x="126" y="20" width="47" height="27" fill="#fff" stroke="#1E2A44" stroke-width="2"/>
+        <text x="130" y="62" font-size="8.5" fill="#6E6558" font-family="monospace">9.5 × 5.5</text>
+        <path d="M180 33 h13" stroke="#1E2A44" stroke-width="1"/>
+        <path d="M193 33 l-5 -3 v6z" fill="#1E2A44"/>
+        <text x="198" y="36" font-size="8.5" fill="#6E6558" font-family="monospace">看</text>
+        <text x="8" y="216" font-size="9" fill="#6E6558" font-family="monospace">台面 60 × 45</text>
+      </svg>
+      <div class="num"><span>台面占用</span><b>52 cm²</b></div>
+      <div class="note">贴后墙放，只占一条边；画面同样是 4″ 悬浮，按压结构照做，整框更轻（约 450 g）。</div>
+    </div>
+
+    <!-- C projector -->
+    <div class="card bad">
+      <h2>C · 投影 + 透明膜（你发的那张）</h2>
+      <div class="t">膜 30 × 22 cm + 投距 50–80 cm</div>
+      <svg viewBox="0 0 300 225">
+        <rect x="0" y="0" width="300" height="225" fill="#FBF6EC" stroke="#D9CEBA"/>
+        <text x="8" y="16" font-size="9" fill="#6E6558" font-family="monospace">后墙</text>
+        <rect x="75" y="22" width="150" height="110" fill="none" stroke="#C7392B" stroke-width="1.6" stroke-dasharray="5 4"/>
+        <text x="84" y="72" font-size="9.5" fill="#C7392B" font-family="monospace">透明膜 30 × 22 cm</text>
+        <rect x="40" y="144" width="220" height="64" fill="url(#hatch)"/>
+        <rect x="40" y="144" width="220" height="64" fill="none" stroke="#D9CEBA"/>
+        <text x="52" y="166" font-size="9.5" fill="#6E6558" font-family="monospace">投距 50–80 cm</text>
+        <text x="52" y="182" font-size="9.5" fill="#6E6558" font-family="monospace">这段台面不能用</text>
+        <text x="52" y="200" font-size="9" fill="#C7392B" font-family="monospace">↓ 台面外还要再退</text>
+        <defs>
+          <pattern id="hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0" x2="0" y2="7" stroke="#D9CEBA" stroke-width="2"/>
+          </pattern>
+        </defs>
+        <text x="8" y="216" font-size="9" fill="#6E6558" font-family="monospace">台面 60 × 45</text>
+      </svg>
+      <div class="num"><span>台面占用</span><b>660 cm² + 空出 50–80 cm</b></div>
+      <div class="note">投距比膜还长：台面深 45 cm，放不下，只能吊在吊柜下俯投。</div>
+    </div>
+
+  </div>
+
+  <div class="wide">
+
+    <!-- section -->
+    <div class="panel">
+      <h3>为什么可以不做正方体</h3>
+      <svg viewBox="0 0 520 230">
+        <line x1="16" y1="200" x2="504" y2="200" stroke="#1E2A44" stroke-width="2"/>
+        <path d="M120 200 L120 90 L440 90 L440 200" fill="none" stroke="#1E2A44" stroke-width="1.8"/>
+        <line x1="440" y1="90" x2="440" y2="200" stroke="#9aa7b8" stroke-width="1.6"/>
+        <rect x="130" y="192" width="100" height="8" fill="#F3EADA" stroke="#1E2A44" stroke-width="1.4"/>
+        <line x1="130" y1="192" x2="230" y2="92" stroke="#C7392B" stroke-width="2.4"/>
+        <line x1="180" y1="192" x2="180" y2="142" stroke="#C7392B" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="180" y1="142" x2="486" y2="142" stroke="#C7392B" stroke-width="1" stroke-dasharray="3 3"/>
+        <path d="M486 142 q-9 -6 -18 0 q9 6 18 0z" fill="none" stroke="#1E2A44" stroke-width="1.2"/>
+        <circle cx="477" cy="142" r="1.5" fill="#1E2A44"/>
+        <text x="128" y="222" font-size="10" fill="#6E6558" font-family="monospace">4″ 屏（横放，朝上）</text>
+        <text x="22" y="130" font-size="10" fill="#C7392B" font-family="monospace">45° 分光镜</text>
+        <line x1="90" y1="134" x2="150" y2="172" stroke="#C7392B" stroke-width=".8"/>
+        <text x="328" y="82" font-size="10" fill="#6E6558" font-family="monospace">前窗 3 mm 低反射</text>
+        <text x="450" y="166" font-size="9.5" fill="#6E6558" font-family="monospace">眼睛</text>
+        <text x="250" y="132" font-size="9.5" fill="#6E6558" font-family="monospace">像浮在前窗后 4–5 cm</text>
+        <text x="120" y="84" font-size="9" fill="#6E6558" font-family="monospace">剖面示意 · 不按比例</text>
+      </svg>
+      <p>立方体只是“屏幕的正方形对角线决定盒子”的结果。屏幕换成 <b>4″ 横屏</b>，45° 镜只要求斜边把屏幕罩住，盒子自然变成 <b>9.5 × 5.5 × 6 cm 的横画框</b>——光学一模一样，画面一样浮在玻璃后 4–5 cm。</p>
+      <p>代价只有一个：<b>只有正面能看</b>。餐桌上要四面都能看就该做方块，厨房台面不需要。</p>
+    </div>
+
+    <!-- pitfalls -->
+    <div class="panel">
+      <h3>那张图能复现，但它复现的是“氛围”</h3>
+      <p>它不是全息，是 <b>正投打在透明膜上</b>：投到的光被膜散射回眼睛，没投到的部分透过去——所以背后的墙、椅子都看得见，通透感是这么来的。要复现，四件事绕不过：</p>
+      <ol class="pts">
+        <li><b>投距比对焦还难</b>：100–300 流明的小投影，最小投距通常 0.5–1 m，投出来 30–80 cm 宽。要投一张 10 cm 的画面，得 10–20 cm 投距，普通小投影对不上焦；能对上的是超短焦，大、贵、要散热。</li>
+        <li><b>透明膜会把背景光透过来</b>：厨房白天 300–800 lux，黑不下去；<span class="k">白字在亮背景上直接消失</span>。这类膜天生适合发光的图形（花、logo、动画），不适合“要读的文字”。</li>
+        <li><b>浮不起来</b>：画面就贴在膜上，是平面；所谓悬浮感来自暗背景 + 高对比内容 + 拍摄角度。</li>
+        <li><b>占地反而更大</b>：投影机要退到 50–80 cm 外，还要躲开你自己的影子。台面深 45 cm，只能吊在吊柜下俯投，碰一下就歪，每次重新对位。</li>
+      </ol>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <span><b>结论</b>：拿走“板”，去掉“投影”——用 45° 分光镜把 4″ 屏折成一块横画框。</span>
+    <span>先做 ¥20 的假体：纸盒 + 一块玻璃 + 一面小镜子，在真厨房白天/晚上各测一次</span>
+  </div>
+
+</div>
+</body>
+</html>

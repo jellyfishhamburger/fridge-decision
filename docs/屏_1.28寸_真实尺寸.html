@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>1.28″ 240×240 真实尺寸</title>
+<style>
+  :root{--paper:#FBF6EC;--ink:#23201B;--navy:#1E2A44;--red:#C7392B;--rule:#D9CEBA;--grey:#6E6558}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif}
+  .wrap{padding:26px 26px 22px}
+  .kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);font-family:ui-monospace,Consolas,monospace}
+  h1{font-size:22px;margin:8px 0 4px;letter-spacing:-.01em}
+  .sub{font-size:12.5px;color:var(--grey);margin:0 0 20px}
+  .row{display:flex;gap:30px;align-items:flex-start}
+  .item{width:123px}
+  .screen{width:240px;height:240px;transform:scale(0.5125);transform-origin:top left;border-radius:50%;background:#0b0d0c;color:#fff;
+    position:relative;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.25), inset 0 0 0 6px #14181a}
+  .frame{width:123px;height:123px;position:relative}
+  .cap{font-size:11.5px;margin-top:10px;line-height:1.5}
+  .cap b{display:block;font-size:12.5px;margin-bottom:2px}
+  .cap span{color:var(--grey)}
+
+  /* A: their demo */
+  .a-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  .icon{width:96px;height:96px;border-radius:50%;background:linear-gradient(160deg,#E9C46A,#C7392B)}
+  .word{font-size:30px;font-weight:700;letter-spacing:.02em}
+
+  /* B: one step */
+  .ring{position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(#2FBF8F 0 216deg, rgba(255,255,255,.08) 216deg 360deg);
+    -webkit-mask:radial-gradient(circle, transparent 100px, #000 101px);
+            mask:radial-gradient(circle, transparent 100px, #000 101px)}
+  .b-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .b-num{font-size:44px;font-weight:800;line-height:1;letter-spacing:-.02em}
+  .b-num small{font-size:16px;font-weight:600;color:#9aa7b8;margin-left:2px}
+  .b-line{font-size:16px;margin-top:10px;color:#e8edf2;letter-spacing:.02em}
+  .b-time{font-size:13px;margin-top:8px;color:#2FBF8F;font-family:ui-monospace,Consolas,monospace}
+
+  /* C: crammed */
+  .c-inner{position:absolute;inset:0;padding:34px 30px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+  .c-title{font-size:13px;color:#9aa7b8;text-align:center}
+  .c-num{font-size:20px;font-weight:700;text-align:center;margin:2px 0 4px}
+  .c-body{font-size:12px;line-height:1.45;color:#dfe6ee}
+  .c-foot{font-size:11px;color:#9aa7b8;text-align:center;margin-top:4px}
+
+  .note{margin-top:22px;font-size:12px;color:var(--grey);line-height:1.6;border-top:1px solid var(--rule);padding-top:12px;max-width:1000px}
+  .note b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">GC9A01 · 1.28″ · 实物直径 32.5 mm · 三个圆按 96 dpi 的 1:1 画（电脑屏幕上看≈实物大小；手机上会缩放，但比例和字号关系是准的）</div>
+  <h1>这块屏到底能放多少字</h1>
+  <p class="sub">下面是三种排版，同一个 240×240 像素。<b>不是分辨率不够，是距离不够</b>——图上这个大小，等于你把设备拿在手里 30 cm 看。</p>
+
+  <div class="row">
+
+    <div class="item">
+      <div class="frame"><div class="screen">
+        <div class="a-inner">
+          <div class="icon"></div>
+          <div class="word">香菇</div>
+        </div>
+      </div></div>
+      <div class="cap"><b>A · 他们在 demo 里给的样子</b><span>一个大图标 + 一个词。这是排版选择，不是屏幕上限。</span></div>
+    </div>
+
+    <div class="item">
+      <div class="frame"><div class="screen">
+        <div class="ring"></div>
+        <div class="b-inner">
+          <div class="b-num">03<small>/05</small></div>
+          <div class="b-line">下蛋液 中火翻炒</div>
+          <div class="b-time">0:28</div>
+        </div>
+      </div></div>
+      <div class="cap"><b>B · 我建议的排版（一步一屏）</b><span>步骤号 + 10 字以内一句 + 圆环进度与倒计时。字够大，转头就能读。</span></div>
+    </div>
+
+    <div class="item">
+      <div class="frame"><div class="screen">
+        <div class="c-inner">
+          <div class="c-title">番茄炒蛋</div>
+          <div class="c-num">03 / 05</div>
+          <div class="c-body">
+            1. 鸡蛋打散，加少许盐<br>
+            2. 热锅冷油，倒蛋液<br>
+            3. 蛋液半凝固时盛出<br>
+            4. 下番茄炒出汁<br>
+            5. 倒回鸡蛋，翻炒 30 秒
+          </div>
+          <div class="c-foot">12 px · 还剩 0:28</div>
+        </div>
+      </div></div>
+      <div class="cap"><b>C · 把整道菜的 5 步都塞进去</b><span>塞得下，但 12 px 字在厨房里没人看得清——这就是你要求里那 6 项的矛盾。</span></div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <b>怎么看这张图：</b>这三个圆是 1:1 的，实物就这么大。把手机拿远到手臂伸直（约 60 cm），再回来看 A/B/C——B 还能读，C 就糊了。<b>这就是"屏太小"的真实含义</b>：不是 240×240 装不下，是你站在灶台边、屏放在台面上时，一行 16 px 的字只有 4 mm 高。<br>
+    两条出路：① 设备拿在手里看（30 cm，B 很舒服）；② 屏挂到眼高（离眼睛 50–70 cm，B 也够）。<b>只有"放在台面上、人站着看"这一种是最差的，而它恰好是大家默认的摆法。</b>
+  </div>
+</div>
+</body>
+</html>
