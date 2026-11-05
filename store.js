@@ -144,6 +144,7 @@
     var ev = events();
     var e = ev.filter(function (x) { return x.key === key; })[0];
     if (!e || e.reason === "undo") return { ok: false };
+    if(ev.some(function(x){ return x.reason === "undo" && x.key.indexOf(key + ":undo:") === 0; })) return {ok:true, already:true};
     /* 按 cat 找回条目（条目 id 可能已经变） */
     e.items.forEach(function (u) {
       var it = find(items, u.item_id) || items.filter(function (i) { return i.cat === u.cat; })[0];

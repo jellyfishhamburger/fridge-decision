@@ -14,15 +14,19 @@
   var LS_SNAP = "fd.cloud.snap.v1";
   var LS_OUT = "fd.outbox.v1";
   var suppress = false;
-  var timer = null, running = false;
+  var timer = null, running = false, started = false;
 
   function on() {
     return !!(g.AUTH && AUTH.configured && AUTH.configured() && AUTH.signedIn());
   }
-  function snap() { try { return JSON.parse(localStorage.getItem(LS_SNAP) || "{}") || {}; } catch (e) { return {}; } }
-  function saveSnap(o) { try { localStorage.setItem(LS_SNAP, JSON.stringify(o)); } catch (e) {} }
-  function outbox() { try { return JSON.parse(localStorage.getItem(LS_OUT) || "[]") || []; } catch (e) { return []; } }
-  function saveOut(a) { try { localStorage.setItem(LS_OUT, JSON.stringify(a.slice(-300))); } catch (e) {} }
+  function storageKey(k) {
+    var session = g.AUTH && AUTH.session();
+    return k + ":" + encodeURIComponent(session && session.user_id || "guest");
+  }
+  function snap() { try { return JSON.parse(localStorage.getItem(storageKey(LS_SNAP)) || "{}") || {}; } catch (e) { return {}; } }
+  function saveSnap(o) { try { localStorage.setItem(storageKey(LS_SNAP), JSON.stringify(o)); } catch (e) {} }
+  function outbox() { try { return JSON.parse(localStorage.getItem(storageKey(LS_OUT)) || "[]") || []; } catch (e) { return []; } }
+  function saveOut(a) { try { localStorage.setItem(storageKey(LS_OUT), JSON.stringify(a)); } catch (e) {} }
 
   function toLocal(r) {
     return {
@@ -41,7 +45,12 @@
   /* ---------- 读：拉云端，合并还没推上去的本地新增 ---------- */
   async function pull() {
     if (!on()) return null;
+    var owner = storageKey(LS_OUT);
+    try { await AUTH.rpc("expire_my_meals", {}); }
+    catch(e) { if(e.code !== "PGRST202" && e.status !== 404) throw e; }
+    if(owner !== storageKey(LS_OUT) || !on()) return null;
     var rows = await AUTH.items();
+    if(owner !== storageKey(LS_OUT) || !on()) return null;
     if (!Array.isArray(rows)) return null;
 
     var server = rows.map(toLocal);
@@ -55,9 +64,13 @@
                           .filter(function (i) { return i && !server.some(function (s) { return s.id === i.id; }); });
 
     var merged = server.concat(keep);
+    outbox().forEach(function (op) {
+      if (op.type === "remove") merged = merged.filter(function (i) { return i.id !== op.id; });
+      if (op.type === "set") merged.forEach(function (i) { if (i.id === op.id) i.qty = op.qty; });
+    });
     try { localStorage.setItem("fd.cloud.lastPull", String(Date.now())); } catch (e) {}
     var s = {};
-    server.forEach(function (i) { s[i.id] = [i.cat, Number(i.qty) || 0]; });
+    merged.forEach(function (i) { s[i.id] = [i.cat, Number(i.qty) || 0]; });
     saveSnap(s);
     return merged;
   }
@@ -82,14 +95,9 @@
       if (!now[id]) q.push({ type: "remove", id: id, at: Date.now() });
     });
 
-    /* 一次改动超过 30 条，几乎一定是「整批换了一次数据」（比如刚登录换了数据源），
-       不是用户手点出来的。这种情况重建快照就好，别把几百条塞进 outbox 去推。 */
-    if (q.length > 30) {
-      resetQueue(list);
-      return 0;
-    }
-
+    q.forEach(function(op){ if(!op.operation_id) op.operation_id = crypto.randomUUID(); });
     saveOut(q);
+    saveSnap(now);
     schedule();
     return q.length;
   }
@@ -105,11 +113,15 @@
 
   async function flush() {
     if (!on() || running) return;
+    var owner = storageKey(LS_OUT);
     var q = outbox();
     if (!q.length) return;
+    q.forEach(function(op){ if(!op.operation_id) op.operation_id = crypto.randomUUID(); });
+    saveOut(q);
     running = true;
     try {
       while (q.length) {
+        if(owner !== storageKey(LS_OUT) || !on()) break;
         var op = q[0], ok = false;
         try {
           if (op.type === "add") {
@@ -118,15 +130,18 @@
               p_unit: op.unit, p_life: op.life, p_days_left: op.daysLeft,
               p_date_source: "manual", p_key: "add:" + op.id, p_id: op.id
             });
-            var s = snap(); s[op.id] = [op.cat, Number(op.qty) || 1]; saveSnap(s);
+            if(owner !== storageKey(LS_OUT)) break;
+
             ok = true;
           } else if (op.type === "set") {
             await AUTH.rpc("set_item_qty", { p_item: op.id, p_qty: op.qty });
-            var s2 = snap(); if (s2[op.id]) s2[op.id][1] = Number(op.qty) || 0; saveSnap(s2);
+            if(owner !== storageKey(LS_OUT)) break;
+
             ok = true;
           } else if (op.type === "remove") {
             await AUTH.rpc("remove_item", { p_item: op.id });
-            var s3 = snap(); delete s3[op.id]; saveSnap(s3);
+            if(owner !== storageKey(LS_OUT)) break;
+
             ok = true;
           }
         } catch (e) {
@@ -136,7 +151,11 @@
           else { break; }        /* 其他错误：留着下次再推 */
         }
         if (!ok) break;
-        q.shift(); saveOut(q);
+        if(owner !== storageKey(LS_OUT) || !on()) break;
+        var latest = outbox();
+        latest = latest.filter(function(entry){ return entry.operation_id !== op.operation_id; });
+        saveOut(latest);
+        q = latest;
       }
     } finally {
       running = false;
@@ -149,7 +168,8 @@
   }
 
   function start() {
-    if (!on()) return;
+    if (!on() || started) return;
+    started = true;
     setTimeout(flush, 1200);
     setInterval(function () { if (outbox().length) flush(); }, 15000);
     g.addEventListener("online", function () { flush(); });
