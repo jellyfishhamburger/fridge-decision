@@ -12,9 +12,12 @@ LittleFS保存已校验画面，临时文件写完后rename替换；重启时复
 网页fridge-screen.html中由家庭创建者绑定，下载fridge-device.local.json。tools/prepare-fridge-ca.cjs取得正式项目经校验的公开TLS根证书。tools/prepare-fridge-online.cjs接收设备JSON和CA路径，复用本机CookingPebble/pebble_secrets.h的WiFi设置，生成被Git忽略的fridge_secrets.h和fridge_wifi.local.h；不会输出密码或密钥。换网络时由用户在本机更新WiFi配置。设备不持有网页登录令牌或Supabase anon/service-role key。
 
 ## 构建
-ESP32 core3.1.0/GxEPD2 1.6.9；打开本目录FridgeOnline.ino并保留驱动文件；AirM2M_CORE_ESP32C3，4MB，上传COM4（先确认端口）。默认分区下无配置构建占Flash970240字节、静态RAM65004字节。
+ESP32 core3.1.0/GxEPD2 1.6.9；打开本目录FridgeOnline.ino并保留驱动文件；AirM2M_CORE_ESP32C3，4MB，上传COM4（先确认端口）。2026-11-08 修复版带本机配置构建通过：Flash 1150544 字节（87%）、静态 RAM 66988 字节（20%）。构建产物含私人配置，仅保留在本机。
 
 ## 验证状态（检查点）
-云端函数已部署，家庭owner绑定RPC已安装。独立设备密钥在电脑HTTPS请求实测200、15000字节、SHA256一致，再次请求304；未认证请求401。已生成正式私有配置，带配置版本正在编译。尚未把本版本上传到实体设备，WiFi直连、缓存重启恢复及5分钟自动更新仍待实测。原先手动库存快照固件已由用户目视验收。
+云端函数已部署，家庭owner绑定RPC已安装。独立设备密钥在电脑HTTPS请求实测200、15000字节、SHA256一致，再次请求304；未认证请求401。2026-11-08 已完成根证书与服务端证书链审查，HTTPS 改为内置 esp_http_client 单次正式连接、TLS 1.2 严格验证，移除重复探测，增加分阶段诊断和超时处理；带配置版本编译通过。用户要求暂不开放热点实测，本修复版尚未上传设备；是否消除原 -80 握手重置、缓存重启恢复及5分钟自动更新仍待验收。原先手动库存快照固件已由用户目视验收。
 
 服务端render.mjs使用Noto Sans CJK SC字形（SIL OFL，见FONT-LICENSE.txt）生成400x300、MSB-first、bit1黑位图。未知字形用方框代替；库存最多500条，屏幕显示临期前三项，服务器日期按Asia/Shanghai计算，画面时间以半小时取整避免分钟级重复全刷。
+
+## HTTPS 修复说明
+[证书审查、实现、错误码及一组连续现场步骤](../../docs/FridgeOnline_TLS_修复_20261108.md)。-80 是连接重置，不能仅凭该错误判定根证书错误；原始握手重置的唯一触发因素仍未确认。

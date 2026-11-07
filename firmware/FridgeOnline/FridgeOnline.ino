@@ -1,12 +1,16 @@
 #include <SPI.h>
 #include <WiFi.h>
-#include <WiFiClientSecure.h>
-#include <HTTPClient.h>
+#include <new>
+
 #include <LittleFS.h>
 #include <mbedtls/sha256.h>
 #include <time.h>
+#include "FridgeHttps.h"
 #include <GxEPD2_BW.h>
 #include "GxEPD2_420c_Z96.h"
+#if __has_include("InventoryPage.local.h")
+#include "InventoryPage.local.h"
+#endif
 #if __has_include("fridge_secrets.h")
 #include "fridge_secrets.h"
 #else
@@ -19,7 +23,7 @@ GxEPD2_BW<GxEPD2_420c_Z96,GxEPD2_420c_Z96::HEIGHT> display(GxEPD2_420c_Z96(7,6,1
 struct Frame{uint8_t bytes[FRAME_BYTES];char sha[65];};
 Frame current{};
 QueueHandle_t frames=nullptr;TaskHandle_t workerHandle=nullptr;
-volatile int netState=0,httpCode=0;volatile uint32_t lastSuccess=0;
+volatile int netState=0,httpCode=0,tlsCode=0;volatile uint32_t lastSuccess=0;
 bool hasFrame=false,cacheReady=false,cacheSaved=false,dirty=true;
 uint32_t refreshEnded=0,pressCount[3]={};int page=0,lastNet=-1;
 struct Key{int raw=HIGH,stable=HIGH;uint32_t changed=0;}keys[3];
@@ -27,23 +31,94 @@ void digest(const uint8_t* bytes,char* hex){uint8_t hash[32];mbedtls_sha256(byte
 bool valid(const Frame& frame){char sha[65];digest(frame.bytes,sha);return memcmp(sha,frame.sha,65)==0;}
 bool loadCache(){if(!cacheReady)return false;auto f=LittleFS.open("/frame.bin","r");if(!f||f.size()!=FRAME_BYTES+68)return false;char magic[4];bool ok=f.readBytes(magic,4)==4&&memcmp(magic,"FRD1",4)==0&&f.readBytes(current.sha,64)==64;current.sha[64]=0;ok=ok&&f.read(current.bytes,FRAME_BYTES)==FRAME_BYTES;f.close();return ok&&valid(current);}
 bool saveCache(){if(!cacheReady)return false;auto f=LittleFS.open("/frame.new","w");if(!f)return false;bool ok=f.write((const uint8_t*)"FRD1",4)==4&&f.write((const uint8_t*)current.sha,64)==64&&f.write(current.bytes,FRAME_BYTES)==FRAME_BYTES;f.flush();f.close();return ok&&LittleFS.rename("/frame.new","/frame.bin");}
-bool fetchFrame(char* etag){
- WiFiClientSecure tls;tls.setCACert(FRIDGE_ROOT_CA);tls.setTimeout(15000);
- HTTPClient http;http.setTimeout(15000);http.setConnectTimeout(10000);http.setFollowRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS);
- String url=String(FRIDGE_FRAME_URL)+"?device_id="+FRIDGE_DEVICE_ID;
- if(!http.begin(tls,url)){httpCode=-10;return false;}
- const char* names[]={"x-frame-sha256","x-frame-format"};http.collectHeaders(names,2);
- http.addHeader("x-device-secret",FRIDGE_DEVICE_SECRET);if(strlen(etag))http.addHeader("If-None-Match",String('"')+etag+'"');
- int code=http.GET();httpCode=code;
- if(code==304){lastSuccess=millis();http.end();return true;}
- if(code!=200||http.getSize()!=FRAME_BYTES||http.header("x-frame-format")!="400x300-msb-black1-v1"){http.end();return false;}
- String sha=http.header("x-frame-sha256");if(sha.length()!=64){http.end();return false;}
- Frame* received=new Frame;strlcpy(received->sha,sha.c_str(),65);
- auto stream=http.getStreamPtr();stream->setTimeout(1500);size_t n=0;uint32_t start=millis();
- while(n<FRAME_BYTES&&uint32_t(millis()-start)<20000){size_t got=stream->readBytes(received->bytes+n,min(size_t(1024),FRAME_BYTES-n));if(!got)break;n+=got;}
- http.end();if(n!=FRAME_BYTES||!valid(*received)){delete received;httpCode=-11;return false;}
- if(xQueueSend(frames,&received,0)!=pdTRUE){delete received;httpCode=-12;return false;}
- strlcpy(etag,sha.c_str(),65);lastSuccess=millis();return true;
+bool fetchFrame(char* etag) {
+ tlsCode = 0;
+ const String base(FRIDGE_FRAME_URL);
+ // Keep credentials on the configured HTTPS origin; redirects are disabled below.
+ if (!base.startsWith("https://") || base.indexOf('/', 8) < 0 ||
+     base.indexOf('?') >= 0 || base.indexOf('#') >= 0 || base.indexOf('@') >= 0) {
+   httpCode = -10; Serial.println("HTTPS config: invalid HTTPS endpoint"); return false;
+ }
+ const String url = base + "?device_id=" + FRIDGE_DEVICE_ID;
+ FridgeHttpsDiagnostics diag;
+
+ esp_http_client_config_t config = {};
+ config.url = url.c_str();
+ config.cert_pem = FRIDGE_ROOT_CA;
+ config.tls_version = ESP_HTTP_CLIENT_TLS_VER_TLS_1_2;
+
+ config.transport_type = HTTP_TRANSPORT_OVER_SSL;
+ config.skip_cert_common_name_check = false;
+ config.timeout_ms = 15000;
+ config.disable_auto_redirect = true;
+ config.buffer_size = 1024;
+ config.buffer_size_tx = 1024;
+ config.event_handler = fridgeHttpsEvent;
+ config.user_data = &diag;
+ auto client = esp_http_client_init(&config);
+ if (!client) { httpCode = -15; Serial.println("HTTPS init: allocation failed"); return false; }
+ const uint32_t started = millis();
+ // One open -> headers -> body -> cleanup. No TCP/TLS preflight or hidden retry.
+ auto finish = [&](const char* phase, esp_err_t result) {
+   const int socketError = esp_http_client_get_errno(client);
+   if (socketError) diag.socketError = socketError;
+   esp_http_client_close(client); // Collect transport/TLS error before logging or freeing handle.
+   fridgeHttpsLog(phase, result, client, diag, started);
+   esp_http_client_cleanup(client);
+   tlsCode = diag.tlsError;
+ };
+ esp_err_t error = esp_http_client_set_header(client, "x-device-secret", FRIDGE_DEVICE_SECRET);
+ if (error == ESP_OK) error = esp_http_client_set_header(client, "Connection", "close");
+ if (error == ESP_OK && etag[0]) {
+   const String quoted = String('"') + etag + '"';
+   error = esp_http_client_set_header(client, "If-None-Match", quoted.c_str());
+ }
+ if (error != ESP_OK) { httpCode = -10; finish("request-config", error); return false; }
+ Serial.println("HTTPS START client=esp_http_client tls=1.2 http=1.1 verify=required connect_timeout_ms=15000");
+ error = esp_http_client_open(client, 0);
+ if (error != ESP_OK) { httpCode = -23; finish("connect", error); return false; }
+ const int64_t length = esp_http_client_fetch_headers(client);
+ if (length < 0) { httpCode = -24; finish("headers", ESP_FAIL); return false; }
+ const int status = esp_http_client_get_status_code(client);
+ httpCode = status;
+ Serial.printf("HTTPS HEADERS http=%d content_length=%lld chunked=%d\n", status,
+               (long long)length, esp_http_client_is_chunked_response(client));
+ if (status == 304 && etag[0]) {
+   lastSuccess = millis(); finish("not-modified", ESP_OK); return true;
+ }
+ bool shaOK = strlen(diag.sha) == 64;
+ for (size_t i = 0; shaOK && i < 64; ++i)
+   shaOK = (diag.sha[i] >= '0' && diag.sha[i] <= '9') || (diag.sha[i] >= 'a' && diag.sha[i] <= 'f');
+ if (status != 200 || length != FRAME_BYTES || esp_http_client_is_chunked_response(client) ||
+     diag.invalidHeaders || !shaOK || strcmp(diag.format, "400x300-msb-black1-v1") != 0) {
+   if (status == 200 || status == 304) httpCode = -16;
+   finish("response-rejected", ESP_ERR_INVALID_RESPONSE); return false;
+ }
+ Frame* received = new (std::nothrow) Frame;
+ if (!received) { httpCode = -15; finish("frame-allocation", ESP_ERR_NO_MEM); return false; }
+ strlcpy(received->sha, diag.sha, sizeof(received->sha));
+ const uint32_t bodyStarted = millis();
+ size_t count = 0;
+ while (count < FRAME_BYTES) {
+   const uint32_t elapsed = millis() - bodyStarted;
+   if (elapsed >= 20000) { error = ESP_ERR_TIMEOUT; break; }
+   // Bound each read by both the idle timeout and the remaining body deadline.
+   esp_http_client_set_timeout_ms(client, min(uint32_t(1500), uint32_t(20000 - elapsed)));
+   const int got = esp_http_client_read(client, reinterpret_cast<char*>(received->bytes + count),
+                                        min(size_t(1024), FRAME_BYTES - count));
+   if (got < 0) { error = got == -ESP_ERR_HTTP_EAGAIN ? ESP_ERR_TIMEOUT : ESP_FAIL; break; }
+   if (got == 0) { error = ESP_ERR_INVALID_SIZE; break; }
+   count += got;
+ }
+ const bool complete = count == FRAME_BYTES && esp_http_client_is_complete_data_received(client);
+ if (!complete || !valid(*received)) {
+   Serial.printf("HTTPS BODY rejected bytes=%u expected=%u complete=%d\n", (unsigned)count, (unsigned)FRAME_BYTES, complete);
+   delete received; httpCode = error == ESP_ERR_TIMEOUT ? -17 : -11;
+   finish("body-or-sha", error == ESP_OK ? ESP_ERR_INVALID_CRC : error); return false;
+ }
+ finish("verified-frame", ESP_OK);
+ if (xQueueSend(frames, &received, 0) != pdTRUE) { delete received; httpCode = -12; return false; }
+ strlcpy(etag, diag.sha, 65); lastSuccess = millis(); return true;
 }
 void networkTask(void*){
  char etag[65]={};if(hasFrame)strlcpy(etag,current.sha,65);
@@ -51,9 +126,9 @@ void networkTask(void*){
  WiFi.persistent(false);WiFi.mode(WIFI_STA);WiFi.setAutoReconnect(true);WiFi.begin(FRIDGE_WIFI_SSID,FRIDGE_WIFI_PASSWORD);
  configTime(0,0,"pool.ntp.org","time.cloudflare.com");
  for(;;){
-  netState=1;uint32_t start=millis();while(WiFi.status()!=WL_CONNECTED&&millis()-start<20000)vTaskDelay(pdMS_TO_TICKS(200));
+  tlsCode=0;netState=1;uint32_t start=millis();while(WiFi.status()!=WL_CONNECTED&&millis()-start<20000)vTaskDelay(pdMS_TO_TICKS(200));
   bool ok=false;
-  if(WiFi.status()==WL_CONNECTED){netState=2;start=millis();while(time(nullptr)<1700000000&&millis()-start<15000)vTaskDelay(pdMS_TO_TICKS(200));if(time(nullptr)>=1700000000)ok=fetchFrame(etag);else httpCode=-13;}
+  if(WiFi.status()==WL_CONNECTED){netState=2;start=millis();while(time(nullptr)<1700000000&&millis()-start<15000)vTaskDelay(pdMS_TO_TICKS(200));if(time(nullptr)>=1700000000)ok=fetchFrame(etag);else {httpCode=-13;Serial.println("HTTPS skipped: clock not synchronized within 15000 ms");}}
   else httpCode=-14;
   netState=ok?3:-2;Serial.printf("SYNC result=%s code=%d; previous frame preserved on failure\n",ok?"OK":"FAILED",httpCode);
   uint32_t deadline=millis()+(ok?POLL_MS:RETRY_MS);ulTaskNotifyTake(pdTRUE,pdMS_TO_TICKS(ok?POLL_MS:RETRY_MS));
@@ -76,11 +151,14 @@ void draw(){
  for(int i=0;i<3;i++){keys[i].raw=keys[i].stable=digitalRead(KEYS[i]);keys[i].changed=millis();}
  Serial.printf("DISPLAY RETURNED page=%d has_frame=%d cache_saved=%d; visual confirmation required\n",page,hasFrame,cacheSaved);
 }
-void report(){Serial.printf("STATE page=%d net=%d http=%d has_frame=%d cache=%d uptime=%lu\n",page,netState,httpCode,hasFrame,cacheSaved,(unsigned long)millis());}
+void report(){Serial.printf("STATE page=%d net=%d http=%d tls=%d wifi=%d has_frame=%d cache=%d cache_ready=%d uptime=%lu\n",page,netState,httpCode,tlsCode,(int)WiFi.status(),hasFrame,cacheSaved,cacheReady,(unsigned long)millis());}
 void action(int key){if(key==1){if(workerHandle&&netState!=-1)xTaskNotifyGive(workerHandle);}else{page=page?0:1;dirty=true;}Serial.printf("KEY GPIO%d action=%s\n",KEYS[key],key==1?"sync":"page");}
 void setup(){
  Serial.begin(115200);delay(1500);for(int i=0;i<3;i++)pinMode(KEYS[i],INPUT_PULLUP);
  cacheReady=LittleFS.begin(true);hasFrame=loadCache();cacheSaved=hasFrame;
+#if __has_include("InventoryPage.local.h")
+ if(!hasFrame){memcpy_P(current.bytes,INVENTORY_PAGE,FRAME_BYTES);digest(current.bytes,current.sha);hasFrame=true;cacheSaved=saveCache();Serial.println("BOOT seeded last known local inventory snapshot; not a fresh sync");}
+#endif
  SPI.begin(2,-1,3,7);display.epd2.selectSPI(SPI,SPISettings(1000000,MSBFIRST,SPI_MODE0));display.init(115200,true,2,false);display.setRotation(2);display.mirror(true);
  frames=xQueueCreate(1,sizeof(Frame*));if(!frames){netState=-1;page=1;draw();return;}
  if(xTaskCreate(networkTask,"fridge-sync",10000,nullptr,1,&workerHandle)!=pdPASS){workerHandle=nullptr;netState=-1;}
