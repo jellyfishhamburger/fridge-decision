@@ -37,7 +37,10 @@ public:
         int bytes=0;
         for(;;){String line=readStringUntil('\n');bytes+=line.length();if(bytes>2048||!connected()){stop();return 0;}if(line=="\r")break;}
         proxyDiagnostic=-204;
-        int result=startTLS();if(result)proxyDiagnostic=0;return result;
+        // Preserve the actual mbedTLS error instead of the wrapper's 0/1 result.
+        int result=ssl_starttls_handshake(sslclient.get());
+        if(result<0){proxyDiagnostic=result;stop();return 0;}
+        _stillinPlainStart=false;proxyDiagnostic=0;return 1;
     }
 };
 
