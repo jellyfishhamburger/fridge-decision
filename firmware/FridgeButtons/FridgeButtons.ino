@@ -47,7 +47,7 @@ void setup(){
   }while(display.nextPage());
   display.hibernate();
   Serial.printf("DISPLAY API returned in %lu ms; visual confirmation required\n",(unsigned long)(millis()-started));
-  configureButtons(true); printLevels();
+  configureButtons(false); printLevels();
 }
 void loop(){
   while(Serial.available()){
