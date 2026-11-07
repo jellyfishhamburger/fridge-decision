@@ -1,0 +1,3 @@
+[functions.device-api]
+# Devices authenticate with their own x-device-secret, never a Supabase key.
+verify_jwt = false
