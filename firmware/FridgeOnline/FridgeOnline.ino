@@ -128,12 +128,13 @@ void networkTask(void*){
  for(;;){
   tlsCode=0;netState=1;uint32_t start=millis();while(WiFi.status()!=WL_CONNECTED&&millis()-start<20000)vTaskDelay(pdMS_TO_TICKS(200));
   bool ok=false;
-  if(WiFi.status()==WL_CONNECTED){netState=2;start=millis();while(time(nullptr)<1700000000&&millis()-start<15000)vTaskDelay(pdMS_TO_TICKS(200));if(time(nullptr)>=1700000000)ok=fetchFrame(etag);else {httpCode=-13;Serial.println("HTTPS skipped: clock not synchronized within 15000 ms");}}
+  if(WiFi.status()==WL_CONNECTED){netState=2;start=millis();while(time(nullptr)<1700000000&&millis()-start<15000)vTaskDelay(pdMS_TO_TICKS(200));if(time(nullptr)>=1700000000){start=millis();ok=fetchFrame(etag);}else {httpCode=-13;Serial.println("HTTPS skipped: clock not synchronized within 15000 ms");}}
   else httpCode=-14;
   netState=ok?3:-2;Serial.printf("SYNC result=%s code=%d; previous frame preserved on failure\n",ok?"OK":"FAILED",httpCode);
-  uint32_t deadline=millis()+(ok?POLL_MS:RETRY_MS);ulTaskNotifyTake(pdTRUE,pdMS_TO_TICKS(ok?POLL_MS:RETRY_MS));
+  uint32_t command=0; xTaskNotifyWait(0,UINT32_MAX,&command,pdMS_TO_TICKS(ok?POLL_MS:RETRY_MS));
+  if(command&2U){etag[0]=0;Serial.println("SYNC next request: full fetch; cached frame preserved");}
   // Manual sync is bounded to one attempt per 30 seconds.
-  uint32_t elapsed=millis()-start;if(elapsed<RETRY_MS)vTaskDelay(pdMS_TO_TICKS(RETRY_MS-elapsed));(void)deadline;
+  uint32_t elapsed=millis()-start;if(elapsed<RETRY_MS)vTaskDelay(pdMS_TO_TICKS(RETRY_MS-elapsed));
  }
 }
 void text(int x,int y,const char* value,int size=2){display.setTextSize(size);display.setCursor(x,y);display.print(value);}
@@ -152,7 +153,7 @@ void draw(){
  Serial.printf("DISPLAY RETURNED page=%d has_frame=%d cache_saved=%d; visual confirmation required\n",page,hasFrame,cacheSaved);
 }
 void report(){Serial.printf("STATE page=%d net=%d http=%d tls=%d wifi=%d has_frame=%d cache=%d cache_ready=%d uptime=%lu\n",page,netState,httpCode,tlsCode,(int)WiFi.status(),hasFrame,cacheSaved,cacheReady,(unsigned long)millis());}
-void action(int key){if(key==1){if(workerHandle&&netState!=-1)xTaskNotifyGive(workerHandle);}else{page=page?0:1;dirty=true;}Serial.printf("KEY GPIO%d action=%s\n",KEYS[key],key==1?"sync":"page");}
+void action(int key){if(key==1){if(workerHandle&&netState!=-1)xTaskNotify(workerHandle,1U,eSetBits);}else{page=page?0:1;dirty=true;}Serial.printf("KEY GPIO%d action=%s\n",KEYS[key],key==1?"sync":"page");}
 void setup(){
  Serial.begin(115200);delay(1500);for(int i=0;i<3;i++)pinMode(KEYS[i],INPUT_PULLUP);
  cacheReady=LittleFS.begin(true);hasFrame=loadCache();cacheSaved=hasFrame;
@@ -168,7 +169,7 @@ void setup(){
 void loop(){
  Frame* next=nullptr;if(frames&&xQueueReceive(frames,&next,0)==pdTRUE){bool changed=!hasFrame||memcmp(current.sha,next->sha,65)!=0;memcpy(&current,next,sizeof(Frame));delete next;hasFrame=true;if(changed){cacheSaved=saveCache();page=0;dirty=true;}}
  if(lastNet!=netState){lastNet=netState;if(page==1)dirty=true;}
- while(Serial.available()){char c=Serial.read();if(c=='s')report();if(c=='n')action(1);if(c=='p')action(0);}
+ while(Serial.available()){char c=Serial.read();if(c=='s')report();if(c=='n')action(1);if(c=='f'&&workerHandle&&netState!=-1)xTaskNotify(workerHandle,2U,eSetBits);if(c=='p')action(0);}
  uint32_t now=millis();for(int i=0;i<3;i++){int level=digitalRead(KEYS[i]);if(level!=keys[i].raw){keys[i].raw=level;keys[i].changed=now;}if(level!=keys[i].stable&&uint32_t(now-keys[i].changed)>=40){keys[i].stable=level;if(level==LOW){++pressCount[i];action(i);}}}
  if(dirty&&uint32_t(now-refreshEnded)>=REFRESH_GAP)draw();delay(2);
 }

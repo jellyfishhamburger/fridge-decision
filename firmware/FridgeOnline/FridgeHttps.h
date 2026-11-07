@@ -40,7 +40,8 @@ inline esp_err_t fridgeHttpsEvent(esp_http_client_event_t* event) {
         static_cast<esp_tls_error_handle_t>(event->data), &code, &flags);
     // Cleanup may emit a second disconnect; preserve the original failure.
     if (error != ESP_OK) diag->transportError = error;
-    if (code) diag->tlsError = code;
+    // ESP-TLS stores the absolute mbedTLS code; normalize it for decoding.
+    if (code) diag->tlsError = code > 0 ? -code : code;
     if (flags) diag->verifyFlags = flags;
   }
   return ESP_OK;
