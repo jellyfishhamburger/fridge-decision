@@ -5,6 +5,7 @@
 #include <cJSON.h>
 #include <time.h>
 #include <math.h>
+#include <lwip/sockets.h>
 #if __has_include("pebble_sync_config.h")
 #include "pebble_sync_config.h"
 #else
@@ -30,12 +31,21 @@ public:
         // TCP goes to the PC; SNI and certificate validation use the real target.
         if(!WiFiClientSecure::connect(proxy,PEBBLE_PROXY_PORT,host,PEBBLE_ROOT_CA,nullptr,nullptr))return 0;
         proxyDiagnostic=-202;
-        print(String("CONNECT ")+host+":443 HTTP/1.1\r\nHost: "+host+":443\r\nProxy-Authorization: Bearer "+PEBBLE_PROXY_TOKEN+"\r\n\r\n");
-        String status=readStringUntil('\n');
-        if(!status.startsWith("HTTP/1.1 200")){stop();return 0;}
+        String request=String("CONNECT ")+host+":443 HTTP/1.1\r\nHost: "+host+":443\r\nProxy-Authorization: Bearer "+PEBBLE_PROXY_TOKEN+"\r\n\r\n";
+        if(lwip_send(sslclient->socket,request.c_str(),request.length(),0)!=(int)request.length()){stop();return 0;}
+        String response;uint32_t began=millis();
+        // Do not call the core's plain-start read/connected helpers: its
+        // peek_net_receive uses an uninitialized fd_set in this SDK version.
+        while(!response.endsWith("\r\n\r\n")){
+            if(response.length()>=2048||uint32_t(millis()-began)>15000){stop();return 0;}
+            fd_set readSet;FD_ZERO(&readSet);FD_SET(sslclient->socket,&readSet);
+            timeval wait{0,200000};
+            int ready=lwip_select(sslclient->socket+1,&readSet,nullptr,nullptr,&wait);
+            if(ready<0){stop();return 0;}if(!ready)continue;
+            char byte;if(lwip_recv(sslclient->socket,&byte,1,0)!=1){stop();return 0;}response+=byte;
+        }
+        if(!response.startsWith("HTTP/1.1 200")){stop();return 0;}
         proxyDiagnostic=-203;
-        int bytes=0;
-        for(;;){String line=readStringUntil('\n');bytes+=line.length();if(bytes>2048||!connected()){stop();return 0;}if(line=="\r")break;}
         proxyDiagnostic=-204;
         // Preserve the actual mbedTLS error instead of the wrapper's 0/1 result.
         int result=ssl_starttls_handshake(sslclient.get());

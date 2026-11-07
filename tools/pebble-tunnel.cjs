@@ -11,6 +11,12 @@ server.on('connect',(req,client,head)=>{
  upstream.setTimeout(15000,()=>upstream.destroy());
  upstream.on('connect',(response,socket,initial)=>{
   if(response.statusCode!==200){socket.destroy();client.end('HTTP/1.1 502 Bad Gateway\r\n\r\n');return;}
+  // CONNECT's establishment timeout must not cut off the subsequent TLS tunnel.
+  socket.setTimeout(60000);client.setTimeout(60000);
+  socket.on('timeout',()=>socket.destroy());client.on('timeout',()=>client.destroy());
+  let sent=0,received=0;const started=Date.now();
+  client.on('data',b=>{sent+=b.length;});socket.on('data',b=>{received+=b.length;});
+  client.once('close',()=>console.log(JSON.stringify({event:'tunnel_closed',elapsed_ms:Date.now()-started,sent_bytes:sent,received_bytes:received})));
   client.write('HTTP/1.1 200 Connection Established\r\n\r\n');
   if(initial.length)client.write(initial);if(head.length)socket.write(head);
   client.pipe(socket);socket.pipe(client);
