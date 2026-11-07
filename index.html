@@ -256,6 +256,8 @@
     font-size:13.5px;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:86%;
     box-shadow:0 8px 24px rgba(12,22,18,.24)}
   .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* 弹层开着时，toast 会压在「保存修改」按钮上 → 挪到顶部 */
+  body:has(#sheet.on) .toast{top:calc(72px + env(safe-area-inset-top));bottom:auto}
   .foot{font-size:11.5px;color:#93a29a;text-align:center;line-height:1.8;padding:18px 8px 0}
   .foot a{color:#0f7a5a}
 
@@ -473,12 +475,30 @@
   .fbhd h2{font-size:15px;margin:0}
 
   .items{display:flex;flex-direction:column}
-  .row-i{display:grid;grid-template-columns:36px minmax(0,1fr) auto 26px;gap:10px;align-items:center;
+  .row-i{display:grid;grid-template-columns:36px minmax(0,1fr) auto auto 26px;gap:10px;align-items:center;
     padding:10px 2px;border-bottom:1px solid var(--line);background:none;cursor:pointer}
   .row-i:last-child{border-bottom:0}
   .row-i .ic{width:36px;height:36px;border-radius:11px;background:#F1F4EF;display:grid;place-items:center;color:var(--green)}
   .row-i .mid{min-width:0;display:flex;flex-direction:column;gap:2px}
   .row-i .nm{font-size:14.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:6px}
+  /* 冰箱页的快速加减：一次一件，不弹层。手机上比进弹层再改快得多。 */
+  .row-i .stepq{display:flex;gap:4px}
+  .row-i .stepq button{width:28px;height:28px;border:1px solid var(--line);background:#fff;
+    border-radius:9px;font-size:16px;line-height:1;color:var(--ink);cursor:pointer;font-family:inherit}
+  .row-i .stepq button:disabled{opacity:.32;cursor:default}
+  .row-i .meta{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* 品牌 / 口味 / 规格 / 位置 / 开封 */
+  .moreinfo{margin:12px 0 2px;border-top:1px solid var(--line);padding-top:10px}
+  .moreinfo summary{font-size:13px;color:var(--ink-2);cursor:pointer;font-weight:600;list-style:none}
+  .moreinfo summary::-webkit-details-marker{display:none}
+  .moreinfo summary::after{content:"⌄";float:right;color:var(--muted)}
+  .moreinfo[open] summary::after{content:"⌃"}
+  .mi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .mi-grid label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+  .mi-grid input[type=text],.mi-grid select{height:38px;border:1px solid var(--line);border-radius:10px;
+    padding:0 10px;font:inherit;font-size:14px;background:#fff;color:var(--ink)}
+  .mi-grid .mi-check{flex-direction:row;align-items:center;gap:8px;font-size:13px;color:var(--ink)}
   .row-i .q{font-size:11.5px;font-weight:600;color:var(--muted);background:#eef2ef;border-radius:6px;padding:1px 6px}
   .row-i .meta{font-size:11.5px;color:#9AA69C}
   .row-i .d{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -1651,6 +1671,25 @@
       <button type="button" id="qPlus">＋</button>
     </span>
   </div>
+  <!-- 雪糕 / 饮料这类只写「雪糕」说不清：同名的香草和巧克力是两回事 -->
+  <details class="moreinfo" id="moreInfo">
+    <summary data-i18n="sheet.more">品牌 / 口味 / 规格 / 存放位置</summary>
+    <div class="mi-grid">
+      <label><span data-i18n="sheet.brand">品牌</span><input id="miBrand" type="text" autocomplete="off" placeholder="伊利 / 钟薛高"></label>
+      <label><span data-i18n="sheet.flavor">口味</span><input id="miFlavor" type="text" autocomplete="off" placeholder="香草 / 巧克力"></label>
+      <label><span data-i18n="sheet.size">规格</span><input id="miSize" type="text" autocomplete="off" placeholder="500ml / 6 支装"></label>
+      <label><span data-i18n="sheet.place">存放位置</span>
+        <select id="miPlace">
+          <option value="" data-i18n="sheet.placeNone">未指定</option>
+          <option value="冷冻" data-i18n="sheet.placeFreezer">冷冻</option>
+          <option value="冷藏" data-i18n="sheet.placeChill">冷藏</option>
+          <option value="门架" data-i18n="sheet.placeDoor">门架</option>
+          <option value="常温" data-i18n="sheet.placeRoom">常温</option>
+        </select>
+      </label>
+      <label class="mi-check"><input id="miOpened" type="checkbox"> <span data-i18n="sheet.opened">已开封</span></label>
+    </div>
+  </details>
   <div class="sheet-foot" id="sheetFoot">
     <button class="btn primary" id="saveBtn" data-i18n="sheet.save">加进冰箱</button>
     <button class="btn quiet" id="cancelBtn" style="margin-top:8px" data-i18n="sheet.cancel">取消</button>
@@ -1682,7 +1721,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="motion.js?v=20261030-4"></script>
-<script src="data.js?v=20261030-18"></script>
+<script src="data.js?v=20261105-1"></script>
 <script src="tags.js?v=20261101-7"></script>
 <script src="sets.js?v=20261101-6"></script>
 <script src="cook-art.js?v=20261030-6"></script>
@@ -1690,15 +1729,15 @@
 <script src="cook-steps.js?v=20261030-6"></script>
 <script src="cook-step-ing.js?v=20261030-9"></script>
 <script src="icons.js?v=20261029-17"></script>
-<script src="cook-icons-extra.js?v=20261103-3"></script>
+<script src="cook-icons-extra.js?v=20261105-1"></script>
 <script src="dish-photos.js?v=20261029-19"></script>
 <script src="sync.js?v=20261029-17"></script>
-<script src="logic.js?v=20261103-7"></script>
+<script src="logic.js?v=20261105-1"></script>
 <script src="store.js?v=20261101-2"></script>
 <script src="auth.js?v=20261107-email-return-1"></script>
 <script src="cloud.js?v=20261101-4"></script>
 <script src="realtime.js?v=20261101-5"></script>
-<script src="i18n.js?v=20261103-3"></script>
+<script src="i18n.js?v=20261105-1"></script>
 <script src="techniques.js?v=20261103-1"></script>
 <script>
 "use strict";
@@ -2110,7 +2149,9 @@ function addFromCat(catId, qty, days, msg){
 const SHELVES = [
   {id:0, key:"fridge.shelf0", fallback:"上层", tags:["protein"]},
   {id:1, key:"fridge.shelf1", fallback:"中层", tags:["veg", "greens"]},
-  {id:2, key:"fridge.shelf2", fallback:"下层", tags:["carb", "dairy", "other", ""]}
+  {id:2, key:"fridge.shelf2", fallback:"下层", tags:["carb", "dairy", "other", ""]},
+  {id:3, key:"fridge.shelfFreezer", fallback:"冷冻", tags:["ice"]},
+  {id:4, key:"fridge.shelfDoor", fallback:"门架", tags:["drink"]}
 ];
 /* 层位只用来标一行「上层/中层/下层」，不参与任何交互；没有整理模式了 */
 function shelfOf(it){
@@ -2162,6 +2203,8 @@ const GROUPS = [
   {id:"protein", key:"fridge.grpProtein", tags:["protein"]},
   {id:"dairy",   key:"fridge.grpDairy",   tags:["dairy"]},
   {id:"carb",    key:"fridge.grpCarb",    tags:["carb"]},
+  {id:"ice",     key:"fridge.grpIce",     tags:["ice"]},
+  {id:"drink",   key:"fridge.grpDrink",   tags:["drink"]},
   {id:"other",   key:"fridge.grpOther",   tags:["other", ""]}
 ];
 let fridgeQuery = "", fridgeSort = "group";          /* group | expiry */
@@ -2304,6 +2347,9 @@ function renderItems(){
 function itemRow(it){
   const d = FD.daysLeftOf(it);
   const q = it.qty == null ? 1 : it.qty;
+  /* 雪糕/饮料这一类，光有名字不够：同是「雪糕」，香草和巧克力是两回事 */
+  const bits = [it.brand, it.flavor, it.size, it.opened ? tt("fridge.opened", "已开封") : "", it.place]
+    .filter(Boolean).map(x => String(x).replace(/[<>&]/g, ""));
   const el = document.createElement("div");
   el.className = "row-i";
   el.dataset.id = it.id;
@@ -2311,7 +2357,12 @@ function itemRow(it){
     `<span class="ic">${window.FD_ICON(it.cat, 20)}</span>
      <span class="mid">
        <span class="nm">${cnOf(it.cat)}${q > 1 ? `<span class="q">×${q}</span>` : ""}</span>
+       ${bits.length ? `<span class="meta">${bits.join(" · ")}</span>` : ""}
        ${it.by ? `<span class="meta">${it.by}</span>` : ""}
+     </span>
+     <span class="stepq">
+       <button type="button" data-q="-1" aria-label="${tt("fridge.minus", "减一")}"${q <= 1 ? " disabled" : ""}>−</button>
+       <button type="button" data-q="1" aria-label="${tt("fridge.plus", "加一")}">＋</button>
      </span>
      <span class="d ${daysClass(d)}">${expiryText(d)}</span>
      <button class="del" aria-label="${tt("fridge.del", "删除")}" data-del="${it.id}">×</button>`;
@@ -3804,8 +3855,9 @@ $("#ck-done").addEventListener("click", ()=>{
 $("#undoBtn").addEventListener("click", ()=>{
   if(!lastUndo) return;
   if(lastUndo.cloud){
-    const id = (lastUndo.events || [])[0];
-    CLOUD.undoEvent(id).then(async ok => {
+    const ids = (lastUndo.events || []);
+    if(!ids.length){ toast("没有可撤销的库存记录"); return; }
+    AUTH.rpc("undo_meal_events", {p_events: ids}).then(async () => {
       try{
         const merged = await CLOUD.pull();
         if(Array.isArray(merged)) CLOUD.withSuppress(() => { items = merged; FD.saveItems(items); });
@@ -3814,7 +3866,7 @@ $("#undoBtn").addEventListener("click", ()=>{
       $("#undoBar").classList.remove("on");
       toast(t("undo.ok"));
       lastUndo = null;
-    });
+    }).catch(err => { toast((err && err.message) || "撤销失败，请重试"); });
     return;
   }
   if(lastUndo.key && window.FDSTORE){
@@ -3842,6 +3894,7 @@ function openSheet(item, pendItem){
   editTarget = (item && item.id) ? item : null;   /* 只认真正的条目；别把 click 事件当成条目 */
   sheetFor = pendItem || null;
   openSheetLegacy();                       /* 建网格 + 回填状态 */
+  fillMore(item || pendItem || null);
   /* 编辑既有条目时不需要相机（东西已经在冰箱里了） */
   const editing = !!item;
   ["#airow", "#zoomRow", "#camMsg", "#pickHint"].forEach(sel => {
@@ -3854,6 +3907,37 @@ function openSheet(item, pendItem){
 }
 
 /* current = 只显示当前食材（编辑态）；grid = 展开全部食材 + 搜索（新增 / 改成别的） */
+/* ---------- 品牌 / 口味 / 规格 / 位置 / 开封 ----------
+   五个自由字段，全部可选：老数据没有这些键，读出来就是空，不迁移也不破坏。 */
+function fillMore(it){
+  const set = (id, v) => { const el = $(id); if(el) el.value = v == null ? "" : v; };
+  set("#miBrand", it && it.brand);
+  set("#miFlavor", it && it.flavor);
+  set("#miSize", it && it.size);
+  const place = $("#miPlace");
+  if(place){
+    let v = (it && it.place) || "";
+    if(!v && it && it.tag === "ice") v = "冷冻";
+    if(!v && it && it.tag === "drink") v = "门架";
+    place.value = v;
+  }
+  const op = $("#miOpened"); if(op) op.checked = !!(it && it.opened);
+  const box = $("#moreInfo");
+  const relevant = !!(it && (it.tag === "ice" || it.tag === "drink"));
+  if(box) box.open = relevant && !!it.id;    /* 编辑雪糕/饮料时默认展开 */
+}
+function moreFields(){
+  const val = id => { const el = $(id); return el ? String(el.value || "").trim() : ""; };
+  const out = {};
+  ["brand","flavor","size"].forEach(k => {
+    const v = val("#mi" + k[0].toUpperCase() + k.slice(1));
+    if(v) out[k] = v;
+  });
+  const place = val("#miPlace"); if(place) out.place = place;
+  const op = $("#miOpened"); if(op && op.checked) out.opened = true;
+  return out;
+}
+
 function setPickMode(mode){
   const cur = $("#pickCur"), tools = $("#pickTools"), grid = $("#picks"), none = $("#pickNone");
   const isCur = mode === "current";
@@ -4145,10 +4229,10 @@ $("#saveBtn").addEventListener("click", ()=>{
   if (dup) {
     dup.qty = (dup.qty == null ? 1 : dup.qty) + pendingQty;   // 同一天到期的合成一份
   } else {
-    items.push({id:uid(), cat:picked.id, name:picked.name, tag:picked.tag,
+    items.push(Object.assign({id:uid(), cat:picked.id, name:picked.name, tag:picked.tag,
                 qty:pendingQty, unit:FD.unitOf(picked.id),
                 daysLeft:pendingDays, life:pendingDays, addedAt:today(),
-                by: hh.members.length ? hh.members[0] : null});
+                by: hh.members.length ? hh.members[0] : null}, moreFields()));
   }
   if(editTarget){
     const i = items.findIndex(x => x.id === editTarget.id);
@@ -4158,7 +4242,7 @@ $("#saveBtn").addEventListener("click", ()=>{
         qty: pendingQty, unit: FD.unitOf(picked.id),
         daysLeft: pendingDays, life: pendingDays,
         addedAt: today()                       // 从今天重新算保质期
-      });
+      }, moreFields());
     }
     items = FD.mergeItems(items);
     FD.saveItems(items); renderItems(); closeSheet();
@@ -4181,6 +4265,19 @@ const __unusedDemo = (()=>{
 });
 
 $("#items").addEventListener("click", e=>{
+  const qb = e.target.closest("[data-q]");
+  if(qb){
+    e.stopPropagation();
+    const row = qb.closest(".row-i"); if(!row) return;
+    const it = items.find(x=>x.id===row.dataset.id); if(!it) return;
+    const next = (Number(it.qty)||1) + Number(qb.dataset.q);
+    if(next <= 0){ items = items.filter(x=>x.id!==it.id); }
+    else { it.qty = next; }
+    FD.saveItems(items); renderItems();
+    if(qb.dataset.q === "1") toast(t("toast.added", {name: cnOf(it.cat), n: 1, days: FD.daysLeftOf(it)}));
+    else toast(t("fridge.minusOne", {name: cnOf(it.cat)}));
+    return;
+  }
   const b = e.target.closest("[data-del]"); if(!b) return;
   items = items.filter(i=>i.id!==b.dataset.del);
   FD.saveItems(items); renderItems();

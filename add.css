@@ -196,3 +196,24 @@ body.has-pick{padding-bottom:96px}
 .mtl b{min-width:20px;text-align:center;font-variant-numeric:tabular-nums;
   font-size:13.5px;font-weight:700;color:var(--ink)}
 .mtl .u{font-size:11.5px;color:var(--muted);margin:0 1px}
+
+/* 识别状态：识别中 / 没认出来 + 重试。不能只留一个空白下拉，
+   用户会以为「拍完什么都没发生」。 */
+.row .rstate{display:inline-flex;align-items:center;gap:6px;margin-top:4px;
+  font-size:11.5px;color:var(--muted);line-height:1.3}
+.row .rstate.pend{color:#8a6d1f}
+.row .rstate.fail{color:var(--red,#b23)}
+.row .rstate .retry{border:0;background:transparent;color:var(--sage-dk,#3d6b52);
+  font:inherit;font-weight:700;text-decoration:underline;padding:0 0 0 2px;cursor:pointer}
+
+/* 品牌/口味/规格：整行下面独占一条，别挤进名字那一栏 */
+.row{flex-wrap:wrap}
+.row .rmore{flex:1 0 100%;order:9;margin-top:2px}
+.row .rmore summary{font-size:12px;color:var(--sage-dk,#3d6b52);cursor:pointer;font-weight:600;list-style:none}
+.row .rmore summary::-webkit-details-marker{display:none}
+.row .rmore summary::before{content:"＋ ";font-weight:700}
+.row .rmore[open] summary::before{content:"− "}
+.row .rmore-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px;width:100%}
+.row .rmore-g input[type=text]{height:32px;border:1px solid var(--line);border-radius:9px;
+  padding:0 8px;font:inherit;font-size:12.5px;background:#fff;color:var(--ink);min-width:0}
+.row .rmore-ck{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}

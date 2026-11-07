@@ -6,7 +6,7 @@
    ============================================================ */
 window.FD_DATA = {
  "version": "0.3",
- "updated": "2026-11-02",
+ "updated": "2026-11-05",
  "recipeSource": {
   "name": "HowToCook (Anduin2017)",
   "license": "CC-BY-4.0",
@@ -18,6 +18,87 @@ window.FD_DATA = {
   "est": "internal estimate — verify before citing"
  },
  "foods": [
+ {
+  "id": "ice_cream",
+  "name": "Ice cream bar",
+  "cn": "雪糕",
+  "tag": "ice",
+  "days": 180,
+  "src": "est",
+  "shop": "1 盒"
+ },
+ {
+  "id": "ice_lolly",
+  "name": "Popsicle",
+  "cn": "冰棍",
+  "tag": "ice",
+  "days": 240,
+  "src": "est",
+  "shop": "1 袋"
+ },
+ {
+  "id": "ice_cup",
+  "name": "Ice cream cup",
+  "cn": "冰淇淋杯",
+  "tag": "ice",
+  "days": 180,
+  "src": "est",
+  "shop": "1 杯"
+ },
+ {
+  "id": "ice_tub",
+  "name": "Ice cream tub",
+  "cn": "冰淇淋桶",
+  "tag": "ice",
+  "days": 180,
+  "src": "est",
+  "shop": "1 桶"
+ },
+ {
+  "id": "soda",
+  "name": "Soda",
+  "cn": "汽水",
+  "tag": "drink",
+  "days": 270,
+  "src": "est",
+  "shop": "1 罐"
+ },
+ {
+  "id": "tea_drink",
+  "name": "Bottled tea",
+  "cn": "茶饮",
+  "tag": "drink",
+  "days": 270,
+  "src": "est",
+  "shop": "1 瓶"
+ },
+ {
+  "id": "juice",
+  "name": "Juice",
+  "cn": "果汁",
+  "tag": "drink",
+  "days": 21,
+  "src": "est",
+  "shop": "1 瓶"
+ },
+ {
+  "id": "coffee_drink",
+  "name": "Bottled coffee",
+  "cn": "咖啡",
+  "tag": "drink",
+  "days": 14,
+  "src": "est",
+  "shop": "1 罐"
+ },
+ {
+  "id": "sparkling",
+  "name": "Sparkling water",
+  "cn": "气泡水",
+  "tag": "drink",
+  "days": 270,
+  "src": "est",
+  "shop": "1 瓶"
+ },
  {
   "id": "shrimp",
   "name": "Shrimp",

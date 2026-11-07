@@ -235,7 +235,7 @@
   /* ---------- quantities ----------
      A fridge does not hold "one tofu", it holds "a box of eggs, 10 left".
      Each item carries qty + unit; cooking decrements it and removes it at zero. */
-  const UNIT_RE = /(盒|个|把|颗|根|包|袋|罐|条|杯|碗|块|片|斤|克)/;
+  const UNIT_RE = /(盒|个|把|颗|根|包|袋|罐|条|杯|碗|块|片|斤|克|瓶|桶|支|瓶装)/;
   function unitOf(cat) {
     const f = byId[cat];
     const shop = (f && f.shop) || "1 份";
@@ -295,7 +295,11 @@
   function mergeItems(list) {
     const out = [], index = {};
     (list || []).forEach(it => {
-      const key = [it.cat, daysLeftOf(it), it.unit || "", it.by || ""].join("|");
+      /* 合并键带上品牌/口味/规格/位置/开封：同是「雪糕」，香草和巧克力不能并成一条。
+         老数据没有这些键 → key 里都是空串，行为跟以前完全一致。 */
+      const key = [it.cat, daysLeftOf(it), it.unit || "", it.by || "",
+                   it.brand || "", it.flavor || "", it.size || "", it.place || "",
+                   it.opened ? 1 : 0].join("|");
       if (index[key] != null) {
         const target = out[index[key]];
         target.qty = (target.qty == null ? 1 : target.qty) + (it.qty == null ? 1 : it.qty);
@@ -1001,6 +1005,24 @@
     return l;
   }
 
+  /* ---------- 给未来的墨水屏用 ----------
+     只回数量，不回名字：一块 400×300 的黑白屏放不下 100 个菜名，
+     但「冷冻 4 / 饮料 9 / 临期 2」这种一行摘要放得下。
+     形状固定，固件那边按字段读就行，以后加分类只加键不改结构。 */
+  function categoryStats(list) {
+    const out = { total: 0, veg: 0, protein: 0, dairy: 0, carb: 0, fruit: 0, ice: 0, drink: 0, other: 0, soon: 0, expired: 0 };
+    (list || []).forEach(it => {
+      const tag = it && it.tag;
+      const key = tag === "greens" ? "veg" : (out.hasOwnProperty(tag) ? tag : "other");
+      out[key] += 1;
+      out.total += 1;
+      const d = daysLeftOf(it);
+      if (d < 0) out.expired += 1;
+      else if (d <= 3) out.soon += 1;
+    });
+    return out;
+  }
+
   global.FD = {
     CATALOG, RECIPES, PANTRY, byId, pantryById, DB, SETS,
     evaluateSet, decideSets, buildSets, INTENTS, tagOf, altDishes, composeSet, compareSet,
@@ -1009,7 +1031,7 @@
     cookLog, noteCooked, cookMeals, cookSummary,
     LS_ITEMS, LS_SETTINGS, LS_LOG, LS_PANTRY, LS_HOUSEHOLD,
     read, write,
-    items, saveItems, unitOf, consumptionOf, consume, migrate, mergeItems,
+    items, saveItems, unitOf, consumptionOf, consume, migrate, mergeItems, categoryStats,
     settings, saveSettings, DEFAULT_SETTINGS,
     pantry, savePantry,
     household, saveHousehold, newCode, sync, cloudOn,
