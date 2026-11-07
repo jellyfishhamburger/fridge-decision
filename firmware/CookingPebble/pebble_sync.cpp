@@ -15,6 +15,7 @@
 #define PEBBLE_PROXY_PORT 18080
 #define PEBBLE_PROXY_TOKEN ""
 #endif
+static volatile int proxyDiagnostic=0;
 class ProxyTLS : public WiFiClientSecure {
 public:
     using WiFiClientSecure::connect;
@@ -25,15 +26,18 @@ public:
         if(!strlen(PEBBLE_PROXY_HOST))return WiFiClientSecure::connect(host,port);
         if(strcmp(host,"blobcadhyoudubcnbdml.supabase.co")!=0||port!=443)return 0;
         IPAddress proxy;if(!proxy.fromString(PEBBLE_PROXY_HOST))return 0;
-        setPlainStart();
+        setPlainStart();proxyDiagnostic=-201;
         // TCP goes to the PC; SNI and certificate validation use the real target.
         if(!WiFiClientSecure::connect(proxy,PEBBLE_PROXY_PORT,host,PEBBLE_ROOT_CA,nullptr,nullptr))return 0;
+        proxyDiagnostic=-202;
         print(String("CONNECT ")+host+":443 HTTP/1.1\r\nHost: "+host+":443\r\nProxy-Authorization: Bearer "+PEBBLE_PROXY_TOKEN+"\r\n\r\n");
         String status=readStringUntil('\n');
         if(!status.startsWith("HTTP/1.1 200")){stop();return 0;}
+        proxyDiagnostic=-203;
         int bytes=0;
         for(;;){String line=readStringUntil('\n');bytes+=line.length();if(bytes>2048||!connected()){stop();return 0;}if(line=="\r")break;}
-        return startTLS();
+        proxyDiagnostic=-204;
+        int result=startTLS();if(result)proxyDiagnostic=0;return result;
     }
 };
 
@@ -99,7 +103,7 @@ static bool exchange(const char *path,const String *payload){
     http.addHeader("x-device-secret",PEBBLE_DEVICE_SECRET);
     int code;
     if(payload){http.addHeader("Content-Type","application/json");code=http.POST(*payload);}else code=http.GET();
-    diagnostic=code;
+    diagnostic=code<0&&proxyDiagnostic?proxyDiagnostic:code;
     bool ok=false;
     if(code==200 && http.getSize()<=static_cast<int>(MAX_RESPONSE_BYTES)){
         BoundedBody body;
