@@ -2,7 +2,20 @@
 const http=require('node:http'),crypto=require('node:crypto'),fs=require('node:fs'),path=require('node:path');
 const config=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../../pebble-content-preview/.local-pebble-tunnel.json'),'utf8'));
 const target='blobcadhyoudubcnbdml.supabase.co:443';
-const server=http.createServer((req,res)=>{res.writeHead(405);res.end();});
+const root=path.resolve(__dirname,'..');
+const publicFiles={
+ '/':'pebble-test.html','/pebble-test.html':'pebble-test.html','/pebble-test.js':'pebble-test.js',
+ '/data.js':'data.js','/pebble-steps.js':'pebble-steps.js','/pebble-phone.js':'pebble-phone.js'
+};
+const server=http.createServer((req,res)=>{
+ if(req.method!=='GET'){res.writeHead(405);res.end();return;}
+ const file=publicFiles[req.url?.split('?')[0]];
+ if(!file){res.writeHead(404);res.end();return;}
+ fs.readFile(path.join(root,file),(error,bytes)=>{
+  if(error){res.writeHead(404);res.end();return;}
+  res.writeHead(200,{'Content-Type':file.endsWith('.html')?'text/html; charset=utf-8':'text/javascript; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src https://blobcadhyoudubcnbdml.supabase.co; frame-ancestors 'none'; base-uri 'none'"});res.end(bytes);
+ });
+});
 server.on('connect',(req,client,head)=>{
  const provided=Buffer.from(req.headers['proxy-authorization']||''),expected=Buffer.from('Bearer '+config.token);
  if(provided.length!==expected.length||!crypto.timingSafeEqual(provided,expected)){client.end('HTTP/1.1 407 Proxy Authentication Required\r\nConnection: close\r\n\r\n');return;}

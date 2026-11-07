@@ -11,6 +11,7 @@ else{
  fs.writeFileSync(privateFile,JSON.stringify(device,null,2),{flag:'wx'});
 }
 if(device.endpoint!==endpoint)throw Error('Test endpoint mismatch');
+fs.writeFileSync(path.join(out,'pebble-phone-config.json'),JSON.stringify({project_url:new URL(endpoint).origin,device_id:device.id,household_id:device.household},null,2));
 const recipe=JSON.parse(fs.readFileSync(path.join(out,'recipes.json'),'utf8')).recipes[0];
 const state=require('../pebble-state.js').create(device.session,{id:recipe.id,steps:recipe.steps});
 const hash=crypto.createHash('sha256').update(device.secret).digest('hex');
