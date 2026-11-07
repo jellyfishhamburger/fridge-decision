@@ -1,9 +1,9 @@
 (function(g){
  'use strict';
  function snapshot(rows,household,now){
-  if(!household || typeof household.id!=='string')throw Error('请先创建或加入家庭。');
+  if(!household || typeof household.household_id!=='string')throw Error('请先创建或加入家庭。');
   if(!Array.isArray(rows))throw Error('读取库存失败，请稍后重试。');
-  const items=rows.filter(r=>r.household_id===household.id && !r.deleted_at && Number.isFinite(Number(r.qty)) && Number(r.qty)>0).map(r=>({
+  const items=rows.filter(r=>r.household_id===household.household_id && !r.deleted_at && Number.isFinite(Number(r.qty)) && Number(r.qty)>0).map(r=>({
    name:r.name,qty:Number(r.qty),unit:r.unit,life:r.life,added_at:r.added_at,days_left:r.days_left
   }));
   return {schema_version:1,generated_at:now.toISOString(),items};
