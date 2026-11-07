@@ -8,6 +8,7 @@ struct PebbleRemoteState {
 };
 enum class PebbleCommand { SetStep, ToggleTimer, Exit };
 bool pebbleSyncConfigured();
+int pebbleSyncStatus(); // -101 Wi-Fi, -102 clock, -103 response, -104 idle; HTTP codes otherwise
 void pebbleSyncBegin();
 bool pebbleSyncTake(PebbleRemoteState &state);
 bool pebbleSyncSend(PebbleCommand command,const PebbleRemoteState &state,int step=0);

@@ -45,7 +45,13 @@ static uint32_t timeLeft() {
 }
 static void render() {
     if(pebbleSyncConfigured()&&!remote.present){
-        lv_label_set_text(heading,"WAIT PHONE");lv_label_set_text(action,"");
+        int code=pebbleSyncStatus();
+        if(code==-101)lv_label_set_text(heading,"WAIT WIFI");
+        else if(code==-102)lv_label_set_text(heading,"WAIT CLOCK");
+        else if(code==-103)lv_label_set_text(heading,"BAD RESPONSE");
+        else if(code==-104||code==200)lv_label_set_text(heading,"WAIT PHONE");
+        else lv_label_set_text_fmt(heading,"NET %d",code);
+        lv_label_set_text(action,"");
         lv_label_set_text(clockLabel,"--:--");lv_label_set_text(statusLabel,"");return;
     }
     uint32_t ms = timeLeft();
@@ -138,6 +144,8 @@ void loop() {
         lv_obj_set_style_text_color(networkLabel,lv_color_hex(connected?0x9DE8A9:0xE8CE94),0);
         lastNetwork=network;
     }
+    static int lastDiagnostic=-999;
+    if(pebbleSyncConfigured()&&!remote.present&&lastDiagnostic!=pebbleSyncStatus()){lastDiagnostic=pebbleSyncStatus();render();}
     if ((timeLeft()+999)/1000 != lastShown) render();
     lvgl_port_unlock();
     delay(30);

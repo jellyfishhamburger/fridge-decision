@@ -13,6 +13,8 @@
 
 struct Request { PebbleCommand command; char session[37]; uint32_t revision; int step; };
 static QueueHandle_t incoming=nullptr, outgoing=nullptr;
+static volatile int diagnostic=-104;
+int pebbleSyncStatus(){return diagnostic;}
 static constexpr size_t MAX_RESPONSE_BYTES=64000;
 // HTTPClient decodes chunked responses into this sink. Reject oversized bodies
 // while receiving them, rather than allocating an unbounded String first.
@@ -63,26 +65,29 @@ static bool parse(const String &body,PebbleRemoteState &result){
     cJSON_Delete(root);return valid;
 }
 static bool exchange(const char *path,const String *payload){
-    WiFiClientSecure tls;tls.setCACert(PEBBLE_ROOT_CA);tls.setHandshakeTimeout(5);
-    HTTPClient http;http.setConnectTimeout(4000);http.setTimeout(4000);
+    WiFiClientSecure tls;tls.setCACert(PEBBLE_ROOT_CA);tls.setHandshakeTimeout(15);
+    HTTPClient http;http.setConnectTimeout(10000);http.setTimeout(10000);
     String url=String(PEBBLE_API_URL)+"/"+path+"?device_id="+PEBBLE_DEVICE_ID;
     if(!http.begin(tls,url))return false;
     http.setFollowRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS);
     http.addHeader("x-device-secret",PEBBLE_DEVICE_SECRET);
     int code;
     if(payload){http.addHeader("Content-Type","application/json");code=http.POST(*payload);}else code=http.GET();
+    diagnostic=code;
     bool ok=false;
     if(code==200 && http.getSize()<=static_cast<int>(MAX_RESPONSE_BYTES)){
         BoundedBody body;
         const int received=http.writeToStream(&body);
-        if(received>=0&&!body.failed){PebbleRemoteState s;if(parse(body.data,s)){xQueueOverwrite(incoming,&s);ok=true;}}
+        if(received>=0&&!body.failed){PebbleRemoteState s;if(parse(body.data,s)){xQueueOverwrite(incoming,&s);ok=true;}else diagnostic=-103;}
+        else diagnostic=-103;
     }
     http.end();return ok;
 }
 static void worker(void*){
     uint32_t lastPoll=millis()-2000;
     for(;;){
-        if(WiFi.status()!=WL_CONNECTED || time(nullptr)<1700000000){vTaskDelay(pdMS_TO_TICKS(200));continue;}
+        if(WiFi.status()!=WL_CONNECTED){diagnostic=-101;vTaskDelay(pdMS_TO_TICKS(200));continue;}
+        if(time(nullptr)<1700000000){diagnostic=-102;vTaskDelay(pdMS_TO_TICKS(200));continue;}
         Request r;
         if(xQueueReceive(outgoing,&r,0)==pdTRUE){
             cJSON *body=cJSON_CreateObject();
