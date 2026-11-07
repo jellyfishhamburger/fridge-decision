@@ -1,3 +1,4 @@
+> **2026-11-07 最新硬件进度**：4.2英寸墨水屏已实测点亮，用户确认测试画面出现。可工作驱动是包内自定义 `GxEPD2_420c_Z96`，不是本文早期示例中的 M01/420。请先阅读 [墨水屏诊断及验收记录](墨水屏诊断_20261107.md) 与 [可工作的测试说明](../firmware/FridgeZ96Diagnostic/README.md)。三按键输入诊断见 `firmware/FridgeButtons`，按键映射及极性仍待实测。本文其余内容保留为早期历史，不能据此退回已失败的驱动配置。
 # 交接文件：Fridge Display Pebble + Cooking Pebble 硬件落地
 
 > 给"接手继续指导"的 AI 助手（家里电脑的 Hermes / GPT / 其他）。
