@@ -171,7 +171,7 @@
 <script src="data.js?v=20261101-1"></script>
 <script src="logic.js?v=20261101-1"></script>
 <script src="sync.js?v=20261107-cloud-config-1"></script>
-<script src="auth.js?v=20261101-3"></script>
+<script src="auth.js?v=20261107-email-return-1"></script>
 <script src="nav.js?v=20261101-1" defer></script>
 <script>
 (function(){
@@ -230,7 +230,7 @@
     var m = String(err && err.message || err || "");
     if (/rate limit|429/i.test(m)) return "邮件额度用完了（Supabase 自带邮件每小时只发 2 封）。先用密码登录，或者等一小时。";
     if (/Invalid login credentials/i.test(m)) return "邮箱或密码不对。";
-    if (/already registered|already exists/i.test(m)) return "这个邮箱注册过了 —— 密码可能记错了。";
+    if (/already registered|already exists/i.test(m)) return "这个邮箱已注册，但可能还没设置密码。请先用邮件链接登录；创建或加入家庭后，可以设置以后登录用的密码。";
     if (/Email not confirmed/i.test(m)) return "项目还开着「确认邮箱」，得先去邮箱点确认（或者让我把它关掉）。";
     if (/Password should be/i.test(m)) return "密码至少 6 位。";
     return m;

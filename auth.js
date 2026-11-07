@@ -11,6 +11,12 @@
 (function (g) {
   "use strict";
 
+  // Some existing email links fall back to Settings/Site URL instead of account.html.
+  // Preserve the credential fragment in the same browser; never put it in a query.
+  if (g.location && /(?:^#|&)(?:access_token|error_description|error)=/.test(g.location.hash || "") &&
+      !/\/account\.html$/.test(g.location.pathname || "")) {
+    g.location.replace("account.html" + g.location.hash);
+  }
   var LS = "fd.auth.v1";
 
   function cfg() {
