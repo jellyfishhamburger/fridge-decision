@@ -1,6 +1,7 @@
 (function(){
  'use strict';
  const base='https://blobcadhyoudubcnbdml.supabase.co', $=id=>document.getElementById(id);
+ document.title='Cooking Pebble 测试 · 计时修复版2';
  let token=null,uid=null,key='',config=null,state=null,poll=null,busy=false,generation=0;
  const uuid=s=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s||'');
  const recipes=window.FD_DATA.recipes.slice(0,20);
