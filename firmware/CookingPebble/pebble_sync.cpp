@@ -10,6 +10,32 @@
 #else
 #include "pebble_sync.example.h"
 #endif
+#ifndef PEBBLE_PROXY_HOST
+#define PEBBLE_PROXY_HOST ""
+#define PEBBLE_PROXY_PORT 18080
+#define PEBBLE_PROXY_TOKEN ""
+#endif
+class ProxyTLS : public WiFiClientSecure {
+public:
+    using WiFiClientSecure::connect;
+    int connect(const char *host,uint16_t port,int32_t timeout) override {
+        setTimeout(timeout);return connect(host,port);
+    }
+    int connect(const char *host,uint16_t port) override {
+        if(!strlen(PEBBLE_PROXY_HOST))return WiFiClientSecure::connect(host,port);
+        if(strcmp(host,"blobcadhyoudubcnbdml.supabase.co")!=0||port!=443)return 0;
+        IPAddress proxy;if(!proxy.fromString(PEBBLE_PROXY_HOST))return 0;
+        setPlainStart();
+        // TCP goes to the PC; SNI and certificate validation use the real target.
+        if(!WiFiClientSecure::connect(proxy,PEBBLE_PROXY_PORT,host,PEBBLE_ROOT_CA,nullptr,nullptr))return 0;
+        print(String("CONNECT ")+host+":443 HTTP/1.1\r\nHost: "+host+":443\r\nProxy-Authorization: Bearer "+PEBBLE_PROXY_TOKEN+"\r\n\r\n");
+        String status=readStringUntil('\n');
+        if(!status.startsWith("HTTP/1.1 200")){stop();return 0;}
+        int bytes=0;
+        for(;;){String line=readStringUntil('\n');bytes+=line.length();if(bytes>2048||!connected()){stop();return 0;}if(line=="\r")break;}
+        return startTLS();
+    }
+};
 
 struct Request { PebbleCommand command; char session[37]; uint32_t revision; int step; };
 static QueueHandle_t incoming=nullptr, outgoing=nullptr;
@@ -65,7 +91,7 @@ static bool parse(const String &body,PebbleRemoteState &result){
     cJSON_Delete(root);return valid;
 }
 static bool exchange(const char *path,const String *payload){
-    WiFiClientSecure tls;tls.setCACert(PEBBLE_ROOT_CA);tls.setHandshakeTimeout(15);
+    ProxyTLS tls;tls.setCACert(PEBBLE_ROOT_CA);tls.setHandshakeTimeout(15);
     HTTPClient http;http.setConnectTimeout(10000);http.setTimeout(10000);
     String url=String(PEBBLE_API_URL)+"/"+path+"?device_id="+PEBBLE_DEVICE_ID;
     if(!http.begin(tls,url))return false;
