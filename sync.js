@@ -20,7 +20,18 @@
   const TABLE_PEND   = "pending";
   const LS_CFG       = "fd.sb.v1";
 
-  function cfg() { try { return JSON.parse(localStorage.getItem(LS_CFG) || "{}") || {}; } catch (e) { return {}; } }
+  // One effective configuration for SYNC, AUTH, Realtime and Settings.
+  // A different project's URL must never inherit this project's public key.
+  function cfg() {
+    let saved = {};
+    try {
+      const value = JSON.parse(localStorage.getItem(LS_CFG) || "{}");
+      if (value && typeof value === "object" && !Array.isArray(value)) saved = value;
+    } catch (e) {}
+    const url = normalizeUrl(typeof saved.url === "string" ? saved.url : "") || SUPABASE_URL;
+    const customKey = typeof saved.key === "string" ? saved.key.trim() : "";
+    return Object.assign({}, saved, {url, key: customKey || (url === SUPABASE_URL ? SUPABASE_KEY : "")});
+  }
 
   /* 只认 https://xxxx.supabase.co 这一段。
      贴成 https://xxxx.supabase.co/rest/v1/ 是最常见的错 —— 拼起来会变成
@@ -42,8 +53,8 @@
     localStorage.setItem(LS_CFG, JSON.stringify(c));
     return c;
   }
-  const base = () => cfg().url || SUPABASE_URL;
-  const anon = () => cfg().key || SUPABASE_KEY;
+  const base = () => cfg().url;
+  const anon = () => cfg().key;
   const enabled = () => !!(base() && anon());
 
   function headers(extra) {
