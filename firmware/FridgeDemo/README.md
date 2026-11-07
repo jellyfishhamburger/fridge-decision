@@ -18,3 +18,11 @@ ESP32 core3.1.0，GxEPD2 1.6.9及Adafruit GFX依赖；AirM2M_CORE_ESP32C3，4MB 
 此版本监听按键，ESP32不深睡；屏幕刷新后hibernate。未做电池续航验证，不作为省电正式版。
 
 2026-11-07验证：已编译上传COM4；串口n/a/p/n走完0→1→3→2→0，5次累计刷新，重复刷屏调用约4.46秒，等待约4.08秒。尚待用户目视及实体按键翻页验收。
+
+## 使用真实家庭库存快照
+网页入口 fridge-screen.html：在已登录浏览器读取当前家庭库存，下载inventory.local.json，仅含显示所需食材字段。电脑运行：
+
+    python tools/fridge_demo/render_inventory.py /path/to/inventory.local.json --out /private/output
+
+将生成的InventoryPage.local.h复制到本固件目录并重新编译上传。该文件被.gitignore排除，不得强制提交；原始JSON、PNG/bin、带私人库存的编译产物也不得入库。无本地头文件时继续使用演示食材页；有头文件时第0页改为库存快照，串口启动输出INVENTORY_SNAPSHOT=1。其他菜谱/状态/步骤仍是明确标注的演示页面。
+快照不含登录凭证，不会写库存。日期和内容固定于生成时刻，不是自动联网或自动每日更新；显示快照时间供识别陈旧数据。每次更新仍需重新生成并上传。后续再接入设备认证的TLS下载及缓存。

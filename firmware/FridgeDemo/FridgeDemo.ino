@@ -2,6 +2,12 @@
 #include <GxEPD2_BW.h>
 #include "GxEPD2_420c_Z96.h"
 #include "DemoPages.h"
+#if __has_include("InventoryPage.local.h")
+#include "InventoryPage.local.h"
+#define HAS_INVENTORY_SNAPSHOT 1
+#else
+#define HAS_INVENTORY_SNAPSHOT 0
+#endif
 constexpr uint8_t BUTTON_PINS[]={4,5,13};
 constexpr uint32_t REFRESH_GAP_MS=15000;
 GxEPD2_BW<GxEPD2_420c_Z96,GxEPD2_420c_Z96::HEIGHT> display(GxEPD2_420c_Z96(7,6,10,0));
@@ -18,12 +24,19 @@ void action(char key){
   if(key=='a') requestedPage=requestedPage==1?3:requestedPage==3?1:requestedPage==0?1:0;
   Serial.printf("ACTION %c requested=%d; queued until refresh gap elapsed\n",key,requestedPage);
 }
+const uint8_t* inventoryPage(){
+#if HAS_INVENTORY_SNAPSHOT
+  return INVENTORY_PAGE;
+#else
+  return PAGE_0;
+#endif
+}
 void refreshPage(){
   const int page=requestedPage;
   uint32_t started=millis();
   Serial.printf("REFRESH START page=%d; input polling pauses during display update\n",page);
   display.setFullWindow();display.firstPage();
-  do{display.fillScreen(GxEPD_WHITE);display.drawBitmap(0,0,PAGES[page],400,300,GxEPD_BLACK);}while(display.nextPage());
+  do{display.fillScreen(GxEPD_WHITE);display.drawBitmap(0,0,(HAS_INVENTORY_SNAPSHOT && page==0 ? inventoryPage() : PAGES[page]),400,300,GxEPD_BLACK);}while(display.nextPage());
   display.hibernate();shownPage=page;refreshEnded=millis();++refreshCount;
   // Synchronize after blocking refresh: do not replay a key held across refresh.
   for(int i=0;i<3;i++){buttons[i].raw=buttons[i].stable=digitalRead(BUTTON_PINS[i]);buttons[i].changed=millis();}
@@ -36,6 +49,7 @@ void setup(){
   for(int i=0;i<3;i++)pinMode(BUTTON_PINS[i],INPUT_PULLUP);
   SPI.begin(2,-1,3,7);display.epd2.selectSPI(SPI,SPISettings(1000000,MSBFIRST,SPI_MODE0));
   display.init(115200,true,2,false);display.setRotation(2);display.mirror(true);
+  Serial.printf("INVENTORY_SNAPSHOT=%d; other pages remain DEMO\n",HAS_INVENTORY_SNAPSHOT);
   refreshPage();
 }
 void loop(){
