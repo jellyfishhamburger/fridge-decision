@@ -14,6 +14,9 @@ async function rest(path: string, method = 'GET', body?: unknown) {
   return await result.json();
 }
 const store = {
+  async inventory(household: string) {
+    return await rest(`items?household_id=eq.${encodeURIComponent(household)}&deleted_at=is.null&qty=gt.0&select=id,name,qty,unit,life,added_at,days_left&order=added_at.asc,id.asc&limit=500`);
+  },
   async device(id: string) {
     return (await rest(`devices?id=eq.${id}&select=id,household_id,secret_hash&limit=1`))[0];
   },

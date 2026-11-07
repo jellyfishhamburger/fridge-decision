@@ -25,3 +25,8 @@ models/food*_savedmodel/
 models/food*_report.json
 # whole training workspace (venv + 1.9GB)
 training/
+
+# Private inventory snapshots and local credentials
+**/InventoryPage.local.h
+**/inventory.local.json
+**/fridge_secrets.h

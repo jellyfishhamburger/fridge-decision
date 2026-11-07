@@ -5,8 +5,8 @@ export function makeHandler({store, rules, cryptoApi = globalThis.crypto}) {
   return async request => {
     try {
       const url = new URL(request.url), path = url.pathname.split('/').pop();
-      if (!['state','action'].includes(path)) return reply(404,{error:'not_found'});
-      if ((path === 'state' && request.method !== 'GET') || (path === 'action' && request.method !== 'POST')) return reply(405,{error:'method_not_allowed'});
+      if (!['state','action','inventory'].includes(path)) return reply(404,{error:'not_found'});
+      if ((['state','inventory'].includes(path) && request.method !== 'GET') || (path === 'action' && request.method !== 'POST')) return reply(405,{error:'method_not_allowed'});
       const id = url.searchParams.get('device_id'), secret = request.headers.get('x-device-secret');
       if (!uuid.test(id || '') || !/^[0-9a-f]{64}$/i.test(secret || '')) return reply(401,{error:'unauthorized'});
       const device = await store.device(id);
@@ -16,6 +16,14 @@ export function makeHandler({store, rules, cryptoApi = globalThis.crypto}) {
       const expected = device?.secret_hash || '0'.repeat(64);
       for (let i=0;i<64;i++) mismatch |= hash.charCodeAt(i) ^ expected.charCodeAt(i);
       if (!device?.household_id || expected.length !== 64 || mismatch) return reply(401,{error:'unauthorized'});
+      if (path === 'inventory') {
+        const items = await store.inventory(device.household_id);
+        // Explicit allow-list; never expose owner IDs, notes or arbitrary DB columns.
+        return reply(200,{schema_version:1,generated_at:new Date().toISOString(),items:items.map(item=>({
+          id:item.id,name:item.name,qty:item.qty,unit:item.unit,
+          life:item.life,added_at:item.added_at,days_left:item.days_left
+        }))});
+      }
       const row = await store.session(id,device.household_id);
       if (!row) return reply(200,{state:null});
       if (path === 'state') return reply(200,{state:row.state,revision:row.revision,server_time:Date.now()});
