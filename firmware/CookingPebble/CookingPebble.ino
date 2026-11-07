@@ -56,7 +56,7 @@ static void render() {
     }
     uint32_t ms = timeLeft();
     if (running && ms == 0) { running = false; remaining = 0; }
-    if(active)lv_label_set_text_fmt(heading,"%02d / %02d   %d/%d",current+1,pebbleSyncConfigured()?remote.count:stepCount,page+1,pages(current));
+    if(active)lv_label_set_text_fmt(heading,"%02d / %02d   %d/%d%s",current+1,pebbleSyncConfigured()?remote.count:stepCount,page+1,pages(current),remote.syncing?" *":"");
     else lv_label_set_text(heading,"COOKING PEBBLE");
     lv_label_set_text(action, active ? pageText(currentText(),page).c_str() : "已退出");
     uint32_t seconds = (ms + 999)/1000;
@@ -72,7 +72,9 @@ static void moveStep(int direction) {
         if(direction<0 && page>0){page--;render();lvgl_port_unlock();return;}
         int next = current + direction;
         if(pebbleSyncConfigured()){
-            if(remote.present && next>=0 && next<remote.count)pebbleSyncSend(PebbleCommand::SetStep,remote,next);
+            if(remote.present && next>=0 && next<remote.count && pebbleSyncPreview(remote,next)){
+                current=remote.index;page=0;remaining=remote.remainingMs;startedAt=remote.receivedAt;running=remote.running;render();
+            }
             lvgl_port_unlock();return;
         }
         if (next >= 0 && next < stepCount) {

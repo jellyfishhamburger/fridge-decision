@@ -56,6 +56,17 @@ public:
 
 struct Request { PebbleCommand command; char session[37]; uint32_t revision; int step; };
 static QueueHandle_t incoming=nullptr, outgoing=nullptr;
+static SemaphoreHandle_t cacheLock=nullptr;
+static String cachedText[100];static uint32_t cachedSeconds[100];
+static char cachedSession[37]={},wantedSession[37]={};
+static int cachedCount=0,wantedStep=-1;static uint32_t intent=0;
+static PebbleRemoteState authoritative{}; // worker-owned
+static void overlay(PebbleRemoteState &s){
+    if(wantedStep>=0&&strcmp(s.session,wantedSession)==0&&strcmp(s.session,cachedSession)==0&&wantedStep<cachedCount){
+        s.syncing=true;
+        if(s.index!=wantedStep){s.index=wantedStep;strlcpy(s.text,cachedText[wantedStep].c_str(),sizeof(s.text));s.durationSeconds=cachedSeconds[wantedStep];s.remainingMs=s.durationSeconds*1000;s.running=false;s.receivedAt=millis();}
+    }
+}
 static volatile int diagnostic=-104;
 int pebbleSyncStatus(){return diagnostic;}
 static constexpr size_t MAX_RESPONSE_BYTES=64000;
@@ -101,6 +112,16 @@ static bool parse(const String &body,PebbleRemoteState &result){
                 if(!cJSON_IsNull(end)&&(!cJSON_IsNumber(end)||!isfinite(end->valuedouble))){cJSON_Delete(root);return false;}
                 result.running=cJSON_IsNumber(end)&&result.active;
                 result.remainingMs=result.running?(uint32_t)fmin(86400000.0,fmax(0.0,end->valuedouble-server)):(uint32_t)remaining;
+                if(cacheLock&&xSemaphoreTake(cacheLock,portMAX_DELAY)==pdTRUE){
+                    cachedCount=result.count;strcpy(cachedSession,result.session);
+                    for(int i=0;i<cachedCount;i++){
+                        const auto *item=cJSON_GetArrayItem(steps,i),*t=field(item,"text");double seconds;
+                        if(!cJSON_IsString(t)||strlen(t->valuestring)>1500||!number(item,"seconds",seconds)||seconds<0||seconds>86400){cachedCount=0;break;}
+                        cachedText[i]=t->valuestring;cachedSeconds[i]=seconds;
+                    }
+                    for(int i=cachedCount;i<100;i++)cachedText[i]=String();
+                    xSemaphoreGive(cacheLock);
+                }
                 valid=true;
             }
         }
@@ -121,7 +142,13 @@ static bool exchange(const char *path,const String *payload){
     if(code==200 && http.getSize()<=static_cast<int>(MAX_RESPONSE_BYTES)){
         BoundedBody body;
         const int received=http.writeToStream(&body);
-        if(received>=0&&!body.failed){PebbleRemoteState s;if(parse(body.data,s)){xQueueOverwrite(incoming,&s);ok=true;}else diagnostic=-103;}
+        if(received>=0&&!body.failed){PebbleRemoteState s;if(parse(body.data,s)){
+            authoritative=s;
+            xSemaphoreTake(cacheLock,portMAX_DELAY);
+            if(wantedStep>=0&&(strcmp(wantedSession,s.session)!=0||!s.active))wantedStep=-1;
+            overlay(s);xSemaphoreGive(cacheLock);
+            xQueueOverwrite(incoming,&s);ok=true;
+        }else diagnostic=-103;}
         else diagnostic=-103;
     }
     http.end();return ok;
@@ -132,21 +159,37 @@ static void worker(void*){
         if(WiFi.status()!=WL_CONNECTED){diagnostic=-101;vTaskDelay(pdMS_TO_TICKS(200));continue;}
         if(time(nullptr)<1700000000){diagnostic=-102;vTaskDelay(pdMS_TO_TICKS(200));continue;}
         Request r;
-        if(xQueueReceive(outgoing,&r,0)==pdTRUE){
+        uint32_t version=0;bool stepRequest=false;
+        xSemaphoreTake(cacheLock,portMAX_DELAY);
+        if(wantedStep>=0&&authoritative.present&&strcmp(authoritative.session,wantedSession)==0){
+            r={};r.command=PebbleCommand::SetStep;strcpy(r.session,wantedSession);r.revision=authoritative.revision;r.step=wantedStep;version=intent;stepRequest=true;
+        }
+        xSemaphoreGive(cacheLock);
+        bool command=stepRequest||xQueueReceive(outgoing,&r,0)==pdTRUE;
+        if(command){
+            if(strcmp(r.session,authoritative.session)!=0)continue;
+            r.revision=authoritative.revision;
             cJSON *body=cJSON_CreateObject();
             cJSON_AddStringToObject(body,"session_id",r.session);cJSON_AddNumberToObject(body,"revision",r.revision);
             cJSON_AddStringToObject(body,"action",r.command==PebbleCommand::SetStep?"set_step":r.command==PebbleCommand::ToggleTimer?"toggle_timer":"exit");
             if(r.command==PebbleCommand::SetStep)cJSON_AddNumberToObject(body,"step_index",r.step);
             char *raw=cJSON_PrintUnformatted(body);String payload(raw?raw:"");if(raw)cJSON_free(raw);cJSON_Delete(body);
-            exchange("action",&payload);
+            bool saved=exchange("action",&payload);
             // Never retry a toggle after an ambiguous timeout. Refresh authoritative state.
-            exchange("state",nullptr);lastPoll=millis();
+            if(!saved)exchange("state",nullptr);
+            if(stepRequest){
+                xSemaphoreTake(cacheLock,portMAX_DELAY);
+                if(intent==version&&authoritative.present&&strcmp(authoritative.session,r.session)==0&&authoritative.index==r.step){wantedStep=-1;PebbleRemoteState s=authoritative;xQueueOverwrite(incoming,&s);}
+                xSemaphoreGive(cacheLock);
+            }
+            lastPoll=millis();
         }else if(uint32_t(millis()-lastPoll)>=2000){exchange("state",nullptr);lastPoll=millis();}
         vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
 void pebbleSyncBegin(){
     if(!pebbleSyncConfigured())return;
+    cacheLock=xSemaphoreCreateMutex();if(!cacheLock)return;
     incoming=xQueueCreate(1,sizeof(PebbleRemoteState));outgoing=xQueueCreate(1,sizeof(Request));
     if(!incoming||!outgoing){
         if(incoming)vQueueDelete(incoming);if(outgoing)vQueueDelete(outgoing);
@@ -158,9 +201,20 @@ void pebbleSyncBegin(){
         Serial.println("Sync task allocation failed");
     }
 }
-bool pebbleSyncTake(PebbleRemoteState &s){return incoming&&xQueueReceive(incoming,&s,0)==pdTRUE;}
+bool pebbleSyncTake(PebbleRemoteState &s){
+    if(!incoming||xQueueReceive(incoming,&s,0)!=pdTRUE)return false;
+    xSemaphoreTake(cacheLock,portMAX_DELAY);overlay(s);xSemaphoreGive(cacheLock);return true;
+}
+bool pebbleSyncPreview(PebbleRemoteState &s,int step){
+    if(!cacheLock)return false;
+    xSemaphoreTake(cacheLock,portMAX_DELAY);
+    bool ok=strcmp(s.session,cachedSession)==0&&step>=0&&step<cachedCount;
+    if(ok){wantedStep=step;strcpy(wantedSession,s.session);intent++;overlay(s);}
+    xSemaphoreGive(cacheLock);return ok;
+}
 bool pebbleSyncSend(PebbleCommand command,const PebbleRemoteState &s,int step){
     if(!outgoing||!s.present||!s.active)return false;
+    if(command==PebbleCommand::SetStep){PebbleRemoteState copy=s;return pebbleSyncPreview(copy,step);}
     Request r{};r.command=command;strcpy(r.session,s.session);r.revision=s.revision;r.step=step;
     return xQueueSend(outgoing,&r,0)==pdTRUE;
 }
