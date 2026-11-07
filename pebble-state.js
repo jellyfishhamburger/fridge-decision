@@ -18,7 +18,12 @@
     if (!command || command.session_id !== state.id) throw Error("Wrong session");
     if (command.revision !== state.revision) throw Error("Stale revision");
     if (state.status !== "cooking") throw Error("Session ended");
-    const next = { ...state, remaining_ms: remaining(state, now), updated_at: now, revision: state.revision + 1 };
+    let effectiveNow=now;
+    if(command.action==='toggle_timer' && command.occurred_at !== undefined){
+      if(!Number.isSafeInteger(command.occurred_at)||command.occurred_at<now-30000||command.occurred_at>now+2000)throw Error('Invalid event time');
+      effectiveNow=Math.min(now,Math.max(state.updated_at,command.occurred_at));
+    }
+    const next = { ...state, remaining_ms: remaining(state, effectiveNow), updated_at: now, revision: state.revision + 1 };
     if (command.action === "set_step") {
       const index = command.step_index;
       if (!Number.isInteger(index) || index < 0 || index >= state.steps.length) throw Error("Invalid step index");
@@ -26,7 +31,7 @@
         next.step_index = index; next.remaining_ms = state.steps[index].seconds * 1000; next.timer_ends_at = null;
       }
     } else if (command.action === "toggle_timer") {
-      next.timer_ends_at = state.timer_ends_at === null && next.remaining_ms > 0 ? now + next.remaining_ms : null;
+      next.timer_ends_at = state.timer_ends_at === null && next.remaining_ms > 0 ? effectiveNow + next.remaining_ms : null;
     } else if (command.action === "exit") {
       next.status = "exited"; next.remaining_ms = 0; next.timer_ends_at = null;
     } else throw Error("Unknown action");

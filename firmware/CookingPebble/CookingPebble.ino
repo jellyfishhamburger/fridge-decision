@@ -83,8 +83,9 @@ static void moveStep(int direction) {
     }
     lvgl_port_unlock();
 }
-static void left(int,void*) { moveStep(-1); }
-static void right(int,void*) { moveStep(1); }
+// Physical direction verified by user: reverse the manufacturer's event labels.
+static void left(int,void*) { moveStep(1); }
+static void right(int,void*) { moveStep(-1); }
 static void click(void*,void*) {
     lvgl_port_lock(-1);
     if(pebbleSyncConfigured()){pebbleSyncSend(PebbleCommand::ToggleTimer,remote);lvgl_port_unlock();return;}

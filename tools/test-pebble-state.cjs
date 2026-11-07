@@ -23,4 +23,12 @@ assert.equal(remaining(expired,999999),0);
 expired=apply(expired,command(expired,'toggle_timer'),999999);
 assert.equal(expired.timer_ends_at,null);
 assert.throws(()=>create('x',{steps:[{text:'bad',seconds:-1}]}),/Invalid/);
+const ten=create('latency',{id:'fish',steps:[{text:'腌制10分钟以上',seconds:600}]},1000);
+const delayed=apply(ten,{...command(ten,'toggle_timer'),occurred_at:1000},6000);
+assert.equal(delayed.timer_ends_at,601000);
+assert.equal(remaining(delayed,6000),595000); // acknowledgement must not reset to 10:00
+const paused=apply(delayed,{...command(delayed,'toggle_timer'),occurred_at:11000},16000);
+assert.equal(paused.timer_ends_at,null);assert.equal(paused.remaining_ms,590000);
+assert.throws(()=>apply(ten,{...command(ten,'toggle_timer'),occurred_at:-100000},6000),/Invalid event time/);
+assert.throws(()=>apply(ten,{...command(ten,'toggle_timer'),occurred_at:100000},6000),/Invalid event time/);
 console.log('PASS: timer pause/resume, step bounds/reset, exit, stale retries, session isolation, expiry and immutable input');

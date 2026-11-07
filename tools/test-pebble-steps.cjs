@@ -12,12 +12,12 @@ const a=prepare([long])[0];assert.equal(a.pages.flat().join(''),long);assert.equ
 assert.ok(a.pages.flat().every(line=>Array.from(line).length<=7));
 assert.equal(duration('炒2～3分钟'),0);assert.equal(duration('煮1.5分钟'),0);
 assert.equal(duration('翻炒15秒再焖2分钟'),0);
-assert.equal(duration('腌制10分钟以上'),0);
+assert.equal(duration('腌制10分钟以上'),600);
 assert.equal(duration('约蒸10分钟'),0);
 assert.deepEqual(prepare(['油热后，放入菠菜，大火翻炒15秒']).map(s=>s.text),['油热后，放入菠菜','大火翻炒15秒']);
 assert.deepEqual(prepare(['加入盐，糖，生抽，搅拌均匀']).map(s=>s.text),['加入盐，糖，生抽','搅拌均匀']);
 assert.equal(prepare(['轻轻搅匀，尽量不要起泡'])[0].text,'轻轻搅匀，尽量不要起泡');
 assert.equal(prepare(['覆盖保鲜膜并扎孔，或使用专用盖'])[0].text,'覆盖保鲜膜并扎孔，或使用专用盖');
-assert.ok(prepare(['腌制10分钟以上'])[0].review_flags.includes('ambiguous_timer'));
+assert.equal(prepare(['腌制10分钟以上'])[0].timer_kind,'minimum');
 assert.deepEqual(prepare(['步骤一','步骤二']).map(s=>s.source_index),[0,1]);
 console.log('PASS: action splitting, source mapping, timer binding, safety notes, lossless pagination, ambiguous durations');

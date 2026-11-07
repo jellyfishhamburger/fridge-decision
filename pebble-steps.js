@@ -28,7 +28,7 @@
   }
   function duration(text){
     const matches=[...text.matchAll(/(?<![\d.])(\d+)\s*(秒|分钟|seconds?|minutes?)(?![a-z])/gi)];
-    if(matches.length!==1 || /\d\s*[-~～至到–—.]\s*\d/.test(text) || /约|大概|大约|至少|最多|以上|以下|左右|不少于|不超过|approximately|about|at least|up to/i.test(text))return 0;
+    if(matches.length!==1 || /\d\s*[-~～至到–—.]\s*\d/.test(text) || /约|大概|大约|最多|以下|左右|不超过|approximately|about|up to/i.test(text))return 0;
     const n=Number(matches[0][1])*(/分钟|minute/i.test(matches[0][2])?60:1);
     return n<=86400?n:0;
   }
@@ -42,7 +42,8 @@
       if(chars.length>14)flags.push('long_action');
       if(/\d+\s*(秒|分钟|seconds?|minutes?)/i.test(text)&&seconds===0)flags.push('ambiguous_timer');
       if(/可选|或者|或使用|补充|并行|建议/.test(text))flags.push('editorial_review');
-      return {text,seconds,source_index,pages,needs_review:flags.length>0,review_flags:flags};
+      const timer_kind=seconds>0&&/至少|以上|不少于|at least/i.test(text)?'minimum':'exact';
+      return {text,seconds,timer_kind,source_index,pages,needs_review:flags.length>0,review_flags:flags};
     }));
   }
   const api={prepare,duration};

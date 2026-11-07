@@ -54,7 +54,7 @@ public:
     }
 };
 
-struct Request { PebbleCommand command; char session[37]; uint32_t revision; int step; };
+struct Request { PebbleCommand command; char session[37]; uint32_t revision; int step; double occurredAt; };
 static QueueHandle_t incoming=nullptr, outgoing=nullptr;
 static SemaphoreHandle_t cacheLock=nullptr;
 static String cachedText[100];static uint32_t cachedSeconds[100];
@@ -178,6 +178,7 @@ static void worker(void*){
             cJSON *body=cJSON_CreateObject();
             cJSON_AddStringToObject(body,"session_id",r.session);cJSON_AddNumberToObject(body,"revision",r.revision);
             cJSON_AddStringToObject(body,"action",r.command==PebbleCommand::SetStep?"set_step":r.command==PebbleCommand::ToggleTimer?"toggle_timer":"exit");
+            if(r.command==PebbleCommand::ToggleTimer)cJSON_AddNumberToObject(body,"occurred_at",r.occurredAt);
             if(r.command==PebbleCommand::SetStep)cJSON_AddNumberToObject(body,"step_index",r.step);
             char *raw=cJSON_PrintUnformatted(body);String payload(raw?raw:"");if(raw)cJSON_free(raw);cJSON_Delete(body);
             bool saved=exchange("action",&payload);
@@ -226,6 +227,7 @@ bool pebbleSyncSend(PebbleCommand command,const PebbleRemoteState &s,int step){
     if(!outgoing||!s.present||!s.active)return false;
     if(command==PebbleCommand::SetStep){PebbleRemoteState copy=s;return pebbleSyncPreview(copy,step);}
     Request r{};r.command=command;strcpy(r.session,s.session);r.revision=s.revision;r.step=step;
+    timeval pressedAt;gettimeofday(&pressedAt,nullptr);r.occurredAt=double(pressedAt.tv_sec)*1000+pressedAt.tv_usec/1000;
     xSemaphoreTake(cacheLock,portMAX_DELAY);
     if(commandPending||wantedStep>=0){xSemaphoreGive(cacheLock);return false;}
     bool accepted=xQueueSend(outgoing,&r,0)==pdTRUE;
