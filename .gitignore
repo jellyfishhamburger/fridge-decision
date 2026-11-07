@@ -30,3 +30,6 @@ training/
 **/InventoryPage.local.h
 **/inventory.local.json
 **/fridge_secrets.h
+
+**/fridge_wifi.local.h
+**/fridge-device.local.json
