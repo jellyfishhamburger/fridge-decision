@@ -61,7 +61,10 @@ static String cachedText[100];static uint32_t cachedSeconds[100];
 static char cachedSession[37]={},wantedSession[37]={};
 static int cachedCount=0,wantedStep=-1;static uint32_t intent=0;
 static PebbleRemoteState authoritative{}; // worker-owned
+static bool commandPending=false;
+static PebbleRemoteState commandPreview{};
 static void overlay(PebbleRemoteState &s){
+    if(commandPending&&wantedStep<0&&strcmp(s.session,commandPreview.session)==0){s=commandPreview;s.syncing=true;}
     if(wantedStep>=0&&strcmp(s.session,wantedSession)==0&&strcmp(s.session,cachedSession)==0&&wantedStep<cachedCount){
         s.syncing=true;
         if(s.index!=wantedStep){s.index=wantedStep;strlcpy(s.text,cachedText[wantedStep].c_str(),sizeof(s.text));s.durationSeconds=cachedSeconds[wantedStep];s.remainingMs=s.durationSeconds*1000;s.running=false;s.receivedAt=millis();}
@@ -167,7 +170,10 @@ static void worker(void*){
         xSemaphoreGive(cacheLock);
         bool command=stepRequest||xQueueReceive(outgoing,&r,0)==pdTRUE;
         if(command){
-            if(strcmp(r.session,authoritative.session)!=0)continue;
+            if(strcmp(r.session,authoritative.session)!=0){
+                if(!stepRequest){xSemaphoreTake(cacheLock,portMAX_DELAY);commandPending=false;xSemaphoreGive(cacheLock);}
+                continue;
+            }
             r.revision=authoritative.revision;
             cJSON *body=cJSON_CreateObject();
             cJSON_AddStringToObject(body,"session_id",r.session);cJSON_AddNumberToObject(body,"revision",r.revision);
@@ -180,6 +186,10 @@ static void worker(void*){
             if(stepRequest){
                 xSemaphoreTake(cacheLock,portMAX_DELAY);
                 if(intent==version&&authoritative.present&&strcmp(authoritative.session,r.session)==0&&authoritative.index==r.step){wantedStep=-1;PebbleRemoteState s=authoritative;xQueueOverwrite(incoming,&s);}
+                xSemaphoreGive(cacheLock);
+            }else{
+                xSemaphoreTake(cacheLock,portMAX_DELAY);commandPending=false;
+                PebbleRemoteState s=authoritative;overlay(s);xQueueOverwrite(incoming,&s);
                 xSemaphoreGive(cacheLock);
             }
             lastPoll=millis();
@@ -216,5 +226,18 @@ bool pebbleSyncSend(PebbleCommand command,const PebbleRemoteState &s,int step){
     if(!outgoing||!s.present||!s.active)return false;
     if(command==PebbleCommand::SetStep){PebbleRemoteState copy=s;return pebbleSyncPreview(copy,step);}
     Request r{};r.command=command;strcpy(r.session,s.session);r.revision=s.revision;r.step=step;
-    return xQueueSend(outgoing,&r,0)==pdTRUE;
+    xSemaphoreTake(cacheLock,portMAX_DELAY);
+    if(commandPending||wantedStep>=0){xSemaphoreGive(cacheLock);return false;}
+    bool accepted=xQueueSend(outgoing,&r,0)==pdTRUE;
+    if(accepted){
+        commandPreview=s;commandPreview.syncing=true;
+        uint32_t elapsed=uint32_t(millis()-s.receivedAt);
+        if(s.running)commandPreview.remainingMs=elapsed>=s.remainingMs?0:s.remainingMs-elapsed;
+        commandPreview.receivedAt=millis();
+        if(command==PebbleCommand::ToggleTimer)commandPreview.running=!s.running&&commandPreview.remainingMs>0;
+        else if(command==PebbleCommand::Exit){commandPreview.active=false;commandPreview.running=false;commandPreview.remainingMs=0;}
+        commandPending=true;
+        xQueueOverwrite(incoming,&commandPreview);
+    }
+    xSemaphoreGive(cacheLock);return accepted;
 }
