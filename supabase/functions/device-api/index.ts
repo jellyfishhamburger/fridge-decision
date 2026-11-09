@@ -1,4 +1,5 @@
-import '../../../pebble-state.js';
+// 与仓库根目录 pebble-state.js 内容一致；复制一份是为了让本函数可被 supabase CLI 独立部署。
+import './pebble-state.js';
 import { makeHandler } from './handler.mjs';
 
 const base = Deno.env.get('SUPABASE_URL');

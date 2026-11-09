@@ -35,3 +35,5 @@ training/
 **/fridge-device.local.json
 fridge-private/
 supabase/.temp/
+**/pebble_secrets.h
+**/pebble_sync_config.h
