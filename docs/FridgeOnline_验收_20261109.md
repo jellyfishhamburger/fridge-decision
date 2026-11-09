@@ -49,14 +49,27 @@ SYNC result=OK code=304
 
 | 项 | 状态 |
 |---|---|
-| 5 分钟自动轮询跑满一轮 | 未观察 |
+| 5 分钟自动轮询跑满一轮 | ✅ 400 秒串口连续记录：21.2 s 与 324.4 s 各一次请求，间隔 303 s；均 304，未触发重刷 |
 | 断电重插从 LittleFS 缓存恢复 | 已在启动日志见到 `has_cached_frame=1 cache_ready=1`，未做冷启动对比 |
 | 服务端换帧后设备自动更新（非手动 `n`） | 未验证 |
 | 断网保留旧画面 | 历史已验证，本次未复验 |
 
-## 渲染侧发现的两个视觉问题（待修）
+## 自动轮询实测（2026-11-09 深夜）
 
-1. **行内文字重叠**：食材名（如 `Leafy greens`）的下缘和「已过期 6 天」那行挤在一起，字母 descender 被压住。
-2. **语言不一致**：库存里是英文名（`Leafy greens`、`Tofu`）与中文名（`鸡翅`）混排。
+```
+ 18.6s  HTTPS START ... 
+ 21.2s  HTTPS HEADERS http=304   SYNC result=OK code=304
+321.2s  HTTPS START ...
+324.4s  HTTPS HEADERS http=304   SYNC result=OK code=304
+```
 
-两处都在 `supabase/functions/fridge-frame/render.mjs`，属于渲染排版问题，不影响同步链路。
+间隔 303 s，符合 5 分钟轮询；两次都是 304，均未触发全刷（无 `DISPLAY REFRESH`）。
+
+## 渲染排版已改版（commit 5b8d7bc，未部署）
+
+1. 食材名与倒计时改为同一行左右对齐，消除行内重叠；
+2. 英文食材名映射中文（109 条 `data.js` + 60 条常见写法）；
+3. 新增 44×44 分类图标（叶菜 / 鱼 / 蛋 / 骨头 / 豆腐块 / 牛奶 / 饭碗 / 苹果 / 包裹）；
+4. 到期项使用反白块。
+
+`node tools/test-fridge-frame.mjs` 通过。**线上仍是旧版**，需 `supabase functions deploy fridge-frame` 后才生效。
