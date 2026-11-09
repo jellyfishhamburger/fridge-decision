@@ -33,3 +33,4 @@ training/
 
 **/fridge_wifi.local.h
 **/fridge-device.local.json
+fridge-private/

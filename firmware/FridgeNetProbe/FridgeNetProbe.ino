@@ -17,6 +17,19 @@
 #define FRIDGE_WIFI_PASSWORD ""
 #endif
 
+// ESP32-C3 只能看 2.4 GHz。允许最多两组候选 SSID，按顺序试。
+struct WifiCandidate { const char* ssid; const char* pass; };
+static const WifiCandidate WIFI_CANDIDATES[] = {
+  {FRIDGE_WIFI_SSID, FRIDGE_WIFI_PASSWORD},
+#ifdef FRIDGE_WIFI_SSID_2
+  {FRIDGE_WIFI_SSID_2, FRIDGE_WIFI_PASSWORD_2},
+#endif
+#ifdef FRIDGE_WIFI_SSID_3
+  {FRIDGE_WIFI_SSID_3, FRIDGE_WIFI_PASSWORD_3},
+#endif
+};
+static const int NWIFI = sizeof(WIFI_CANDIDATES) / sizeof(WIFI_CANDIDATES[0]);
+
 struct Target {
   const char* label;
   const char* url;
@@ -108,16 +121,39 @@ void setup() {
   }
   WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(FRIDGE_WIFI_SSID, FRIDGE_WIFI_PASSWORD);
-  uint32_t t0 = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - t0 < 25000) delay(250);
-  if (WiFi.status() != WL_CONNECTED) {
-    Serial.printf("PROBE ERROR: WiFi 未连上 status=%d\n", (int)WiFi.status());
+  WiFi.disconnect(true, true);
+  delay(300);
+
+  // 先扫一遍：ESP32-C3 看得到的只有 2.4 GHz 网络
+  int found = WiFi.scanNetworks();
+  Serial.printf("PROBE SCAN count=%d (只能看到 2.4G)\n", found);
+  for (int i = 0; i < found; i++) {
+    Serial.printf("PROBE SCAN ssid=%s rssi=%d ch=%d enc=%d\n",
+                  WiFi.SSID(i).c_str(), WiFi.RSSI(i), WiFi.channel(i), (int)WiFi.encryptionType(i));
+  }
+  WiFi.scanDelete();
+
+  bool connected = false;
+  for (int i = 0; i < NWIFI && !connected; i++) {
+    if (!strlen(WIFI_CANDIDATES[i].ssid)) continue;
+    Serial.printf("PROBE WIFI try ssid=%s\n", WIFI_CANDIDATES[i].ssid);
+    WiFi.begin(WIFI_CANDIDATES[i].ssid, WIFI_CANDIDATES[i].pass);
+    uint32_t t0 = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - t0 < 15000) delay(250);
+    connected = WiFi.status() == WL_CONNECTED;
+    if (!connected) {
+      Serial.printf("PROBE WIFI fail ssid=%s status=%d\n", WIFI_CANDIDATES[i].ssid, (int)WiFi.status());
+      WiFi.disconnect(true, true);
+      delay(500);
+    }
+  }
+  if (!connected) {
+    Serial.println("PROBE ERROR: 两组候选 SSID 都没连上（Wi-Fi 名/密码/2.4G 频段三选一有问题）");
     return;
   }
-  Serial.printf("PROBE WIFI connected ssid=%s\n", WiFi.SSID().c_str());
+  Serial.printf("PROBE WIFI connected ssid=%s rssi=%d\n", WiFi.SSID().c_str(), WiFi.RSSI());
   configTime(0, 0, "pool.ntp.org", "time.cloudflare.com");
-  t0 = millis();
+  uint32_t t0 = millis();
   while (time(nullptr) < 1700000000 && millis() - t0 < 15000) delay(250);
   runAll();
 }
