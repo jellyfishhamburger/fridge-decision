@@ -73,3 +73,13 @@ SYNC result=OK code=304
 4. 到期项使用反白块。
 
 `node tools/test-fridge-frame.mjs` 通过。**线上仍是旧版**，需 `supabase functions deploy fridge-frame` 后才生效。
+
+## 版面 v3：只显示未过期 + 今晚推荐（commit 0391737，已部署）
+
+- **过期食材不再上屏**：只保留 `days >= 0` 的条目，按剩余天数升序取前 2 条。
+- **新增「今晚做这个」**：服务器侧沿用 `logic.js` 的 `evaluate()` 规则评分（最先坏的主轴、青菜 +4、超过 20 分钟按时长扣分、缺一样料扣 10），只在一道菜都不成立时才显示「库存还不够做一道菜」。
+- 库存查询增加 `cat` 字段（`index.ts` 的 select），推荐用食材 id 匹配 `data.js` 的 `needs`，不靠名字。
+- 线上实测：HTTP 200 / 15000 字节 / ETag `1ae6a7b7…`；设备 `SYNC result=OK code=200` 后整刷 4.08 s。
+- `tools/test-fridge-frame.mjs`、`test-fridge-inventory.mjs`、`test-fridge-snapshot.cjs` 全部 PASS。
+
+取舍待确认：临期只放 2 行（把下半屏让给推荐），推荐只出 1 道。
