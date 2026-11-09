@@ -203,10 +203,10 @@ export function renderFrame(items,now=Date.now(),page=0){
   const count={};
   rows.forEach(r=>{count[r.tag]=(count[r.tag]||0)+1;});
   const parts=Object.keys(groups).filter(k=>count[k]).map(k=>groups[k]+' '+count[k]);
-  text('分类',16,178,16,200);
-  rect(64,186,40,1);
-  for(let i=0;i<Math.min(3,parts.length);i+=2){
-   text(parts.slice(i,i+2).join('，'),16,202+(i/2)*28,16,368);
+  text('分类',16,172,16,200);
+  rect(64,180,40,1);
+  for(let i=0;i<Math.min(6,parts.length);i+=2){
+   text(fit(parts.slice(i,i+2).join('，'),16,368),16,196+(i/2)*26,16,368);
   }
   text('更新 '+stamp,16,274,16,368);
   return frame;
