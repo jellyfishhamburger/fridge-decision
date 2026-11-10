@@ -100,6 +100,8 @@ static int fetchFrame(const char* etag) {
 
   esp_err_t error = esp_http_client_set_header(client, "x-device-secret", FRIDGE_DEVICE_SECRET);
   if (error == ESP_OK) error = esp_http_client_set_header(client, "Connection", "close");
+  // Cloudflare 会把「没有 User-Agent」的请求按 error 1010 拦掉
+  if (error == ESP_OK) esp_http_client_set_header(client, "User-Agent", "FridgeDisplay/1.0");
   if (error == ESP_OK && etag[0]) {
     const String quoted = String('"') + etag + '"';
     error = esp_http_client_set_header(client, "If-None-Match", quoted.c_str());
