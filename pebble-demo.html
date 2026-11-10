@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>旋钮联调 · 本地</title>
+<style>
+  :root{--fg:#152923;--muted:#6b7f78;--line:#dfe6e2;--bg:#f7f5ef;--accent:#244d3e;--warn:#a6402d}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,"Segoe UI",system-ui,sans-serif}
+  main{max-width:640px;margin:0 auto;padding:28px 20px 60px}
+  h1{font-size:20px;margin:0 0 4px}
+  p.sub{color:var(--muted);margin:0 0 20px;font-size:13px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+  input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}
+  button{padding:9px 14px;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:#fff;font:inherit;cursor:pointer}
+  button.ghost{background:#fff;color:var(--accent)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .step{font-size:26px;font-weight:600;margin:6px 0}
+  .clock{font-variant-numeric:tabular-nums;font-size:34px;font-weight:700}
+  .count{color:var(--muted);font-size:13px}
+  #msg{color:var(--warn);font-size:13px;min-height:20px;margin-top:8px}
+  code{background:#eef2ef;padding:1px 5px;border-radius:5px;font-size:12px}
+</style>
+</head>
+<body>
+<main>
+  <h1>旋钮联调</h1>
+  <p class="sub">本地页面 · 只用于验证「手机 → 云端 → 旋钮」。登录后按钮会真实写入会话。</p>
+
+  <section class="card">
+    <label for="email">邮箱</label>
+    <input id="email" type="email" autocomplete="username" placeholder="你或妈妈的账号">
+    <label for="password">密码</label>
+    <input id="password" type="password" autocomplete="current-password">
+    <label for="device">旋钮设备 UUID</label>
+    <input id="device" value="557f1f01-b838-4675-8c5a-b798e7152c21">
+    <div class="row">
+      <button id="login">登录</button>
+      <button id="logout" class="ghost" hidden>退出</button>
+    </div>
+    <label for="code">邀请码（把当前账号加进旋钮所在的家）</label>
+    <input id="code" value="D34MVM">
+    <div class="row"><button id="join" class="ghost">加入这个家</button></div>
+    <div id="msg"></div>
+  </section>
+
+  <section class="card">
+    <div class="count" id="count">尚未开始</div>
+    <div class="step" id="step">—</div>
+    <div class="clock" id="clock">--:--</div>
+    <div class="row">
+      <button id="start">开始做饭（发送 3 步）</button>
+      <button id="prev" class="ghost">上一步</button>
+      <button id="next" class="ghost">下一步</button>
+      <button id="timer" class="ghost">开始/暂停计时</button>
+      <button id="exit" class="ghost">退出</button>
+    </div>
+  </section>
+
+  <p class="sub">步骤只用旋钮字库里有的字：<code>倒入油 15s · 放菠菜翻炒 20s · 倒入鸡蛋块 10s</code></p>
+</main>
+<script>
+const SUPA = 'https://zbrvcwxwecorjdzqltxg.supabase.co';
+const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpicnZjd3h3ZWNvcmpkenFsdHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyNDMyNjgsImV4cCI6MjEwODgxOTI2OH0.ezAgz21CCFqLVex-nAOZwpp-06CVc9v9ViYYkw0Plvo';
+const STEPS = [
+  { text: '倒入油', seconds: 15 },
+  { text: '放菠菜翻炒', seconds: 20 },
+  { text: '倒入鸡蛋块', seconds: 10 },
+];
+const $ = id => document.getElementById(id);
+let token = null, state = null, poll = null;
+
+const say = t => { $('msg').textContent = t || ''; };
+
+async function api(path, body, auth = token) {
+  const r = await fetch(SUPA + path, {
+    method: 'POST',
+    headers: {
+      apikey: ANON,
+      Authorization: 'Bearer ' + (auth || ANON),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  const text = await r.text();
+  let data = null; try { data = JSON.parse(text); } catch {}
+  if (!r.ok) throw new Error((data && (data.message || data.error_description || data.msg)) || ('HTTP ' + r.status));
+  return data;
+}
+const rpc = (name, args) => api('/rest/v1/rpc/' + name, args);
+
+function render() {
+  const on = !!state && state.status === 'cooking';
+  $('step').textContent = on ? state.steps[state.step_index].text : (state ? '会话已结束' : '—');
+  $('count').textContent = state ? `第 ${state.step_index + 1} / ${state.steps.length} 步 · revision ${state.revision}` : '尚未开始';
+  const ms = !on ? 0 : (state.timer_ends_at === null ? state.remaining_ms : Math.max(0, state.timer_ends_at - Date.now()));
+  const s = Math.ceil(ms / 1000);
+  $('clock').textContent = state && state.steps[state.step_index].seconds ? String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') : '--:--';
+  for (const id of ['start', 'prev', 'next', 'timer', 'exit']) $(id).disabled = !token;
+  $('prev').disabled = !on; $('next').disabled = !on; $('timer').disabled = !on; $('exit').disabled = !on;
+}
+
+async function refresh() {
+  if (!token) return;
+  try {
+    const v = await rpc('pebble_read', { p_device: $('device').value.trim() });
+    state = v; render();
+  } catch (e) { say(e.message); }
+  clearTimeout(poll);
+  poll = setTimeout(refresh, 2000);
+}
+
+$('login').onclick = async () => {
+  try {
+    say('');
+    const d = await api('/auth/v1/token?grant_type=password', { email: $('email').value.trim(), password: $('password').value }, ANON);
+    token = d.access_token; $('password').value = '';
+    $('logout').hidden = false; $('login').disabled = true;
+    say('已登录：' + (d.user && d.user.email || ''));
+    refresh();
+  } catch (e) { say(e.message); }
+};
+
+$('logout').onclick = () => { token = null; state = null; clearTimeout(poll); $('logout').hidden = true; $('login').disabled = false; render(); say('已退出'); };
+
+$('start').onclick = async () => {
+  try {
+    say('正在发送…');
+    const v = await rpc('pebble_start', { p_device: $('device').value.trim(), p_recipe: 'demo_spinach', p_steps: STEPS });
+    state = v; render(); say('已发送，旋钮 2 秒内应切换');
+  } catch (e) { say(e.message); }
+};
+const act = async (action, step) => {
+  try {
+    const args = { p_device: $('device').value.trim(), p_session: state.id, p_revision: state.revision, p_action: action };
+    if (step !== undefined) args.p_step = step;
+    state = await rpc('pebble_action', args); render(); say('已执行 ' + action);
+  } catch (e) { say(e.message); }
+};
+$('join').onclick = async () => {
+  try {
+    say('正在加入…');
+    const d = await rpc('join_household', { p_code: $('code').value.trim() });
+    say('已加入：' + (d && d.name || '成功'));
+    refresh();
+  } catch (e) { say(e.message); }
+};
+$('prev').onclick = () => act('set_step', Math.max(0, state.step_index - 1));
+$('next').onclick = () => act('set_step', Math.min(state.steps.length - 1, state.step_index + 1));
+$('timer').onclick = () => act('toggle_timer');
+$('exit').onclick = () => act('exit');
+
+render();
+</script>
+</body>
+</html>

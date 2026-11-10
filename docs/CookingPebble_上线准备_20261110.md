@@ -58,3 +58,22 @@ arduino-cli compile --fqbn esp32:esp32:esp32c3 \
 1. 烧录后确认旋钮屏出现步骤文字与倒计时（WAIT PHONE / 步骤页）。
 2. 手机端 `pebble-test.html` 目前只在硬件分支，未发布到 main；端到端需要它或等价 UI。
 3. 旋钮/按键的物理动作与 RPC 的联调（旋转切步、短按计时、长按退出）。
+
+## 端到端验证（2026-11-11 00:23 UTC+8）
+
+手机侧（本地联调页 `pebble-demo.html`，登录后调 RPC）→ 云端 → 旋钮屏，整条链路打通：
+
+| 动作 | 证据 |
+|---|---|
+| 手机发出「开始做饭」 | `pebble_sessions` 出现 `recipe_id=demo_spinach`，`revision=0` |
+| 旋钮屏显示步骤 | 屏上出现页（用户目视确认） |
+| 旋钮转动 / 短按 | `revision 0 → 9`，`step_index 0 → 2`，`timer_ends_at` 被写入 |
+| 手机侧改步 | `revision` 继续递增，`step_index` 跟随 |
+
+接口：`GET /device-api/state`（设备，device_secret 鉴权）与 `POST /rpc/pebble_start|pebble_action|pebble_read`（手机，用户 JWT + 家庭成员校验）。
+
+已知限制：
+- `account.html` 在账号已有家庭时隐藏「用邀请码加入」入口，但后端 `join_household` 允许加入多个家；
+  `pebble-demo.html` 补了这个入口（预填 `D34MVM`）。
+- 旋钮屏字库只有 `font-text.txt` 里的 67 个字形，真实菜谱接入前必须扩大字库，否则出现方框。
+- `pebble-test.html` / `pebble-test.js` 指向旧测试项目 `blobcadhyoudubcnbdml.supabase.co`，已不适用。
