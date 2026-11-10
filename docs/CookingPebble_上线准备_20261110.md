@@ -80,3 +80,23 @@ arduino-cli compile --fqbn esp32:esp32:esp32c3 \
   `pebble-demo.html` 补了这个入口（预填 `D34MVM`）。
 - 旋钮屏字库只有 `font-text.txt` 里的 67 个字形，真实菜谱接入前必须扩大字库，否则出现方框。
 - `pebble-test.html` / `pebble-test.js` 指向旧测试项目 `blobcadhyoudubcnbdml.supabase.co`，已不适用。
+
+## 冰箱屏电池版：按键唤醒验收（2026-11-11）
+
+硬件真相：板子上有一个**拨动开关**，之前处于"关"的位置，所以电池不供电；拨到另一边后电池正常（离线也能按）。
+白色 JST 旁边丝印是 **5V**，电池应接 **bat+/bat-** 焊盘——实际接法待卖家确认。
+
+按键修复：原先在唤醒后直接 `digitalRead()`，手松得快会读到"已松开"，导致整屏重刷但页面不变。
+改用 `esp_sleep_get_gpio_wakeup_status()` 锁存唤醒引脚后实测：
+
+```
+BOOT cause=7            ← 7 = ESP_SLEEP_WAKEUP_GPIO
+WAKE mask=0x10 prev=1   ← 左键
+DRAW page=3/3
+...
+BOOT cause=7
+WAKE mask=0x20 next=1   ← 中键
+DRAW page=1/3
+```
+
+已知限制：GPIO13（右键）不能作为 C3 深睡唤醒源，电池版只有左/中两个键；刷屏那 4 秒内的按键会被忽略。

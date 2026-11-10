@@ -194,9 +194,16 @@ void setup() {
 
   // ---- 按键唤醒：只翻页，不联网 ----
   if (cause == ESP_SLEEP_WAKEUP_GPIO && haveCache) {
-    const bool prev = digitalRead(KEY_PREV) == LOW;
-    const bool next = digitalRead(KEY_NEXT) == LOW;
-    Serial.printf("WAKE key prev=%d next=%d\n", prev, next);
+    // 用唤醒状态锁存判断哪个键：按得快时直接 digitalRead 会读到"已松开"
+    uint64_t mask = 0;
+    mask = esp_sleep_get_gpio_wakeup_status();
+    bool prev = ((mask >> KEY_PREV) & 1ULL) != 0;
+    bool next = ((mask >> KEY_NEXT) & 1ULL) != 0;
+    if (!prev && !next) {   // 兜底：读当前电平
+      prev = digitalRead(KEY_PREV) == LOW;
+      next = digitalRead(KEY_NEXT) == LOW;
+    }
+    Serial.printf("WAKE mask=0x%llx prev=%d next=%d\n", (unsigned long long)mask, prev, next);
     if (prev && !next) rtcPage = (rtcPage + PAGE_COUNT - 1) % PAGE_COUNT;
     else if (next && !prev) rtcPage = (rtcPage + 1) % PAGE_COUNT;
     drawPage(rtcPage);
