@@ -380,7 +380,7 @@ void loop() {}
 ## 8. 与 Fridge Decision App 的连接（基于真实代码）
 
 ### 8.1 现在的真实结构（已核对仓库）
-- 前端：GitHub Pages 静态 PWA，无构建步骤；`data.js`（21 种食材 + 18 道菜 + 步骤）、`logic.js`（决策与日期）、`cook.html`/`cook.js`（做饭模式，已有"上一步/下一步/做完了 · 扣减库存"）。
+- 前端：GitHub Pages 静态 PWA，无构建步骤；`data.js`（118 种食材 + 373 道菜谱 + 步骤，另有 151 道本地菜词表）、`logic.js`（决策与日期）、`cook.html`/`cook.js`（做饭模式，已有"上一步/下一步/做完了 · 扣减库存"）。
 - 后端：Supabase Auth（邮箱密码）+ Postgres + RLS + RPC（`confirm_purchase`、`reserve_meal`、`complete_meal`）。
 - 已有 `devices` 表：`id / household_id / name / secret_hash / last_seen / firmware`。
 - `capture_sessions.device_id` 已存在，说明"设备写入"这条设计早就预留了。
