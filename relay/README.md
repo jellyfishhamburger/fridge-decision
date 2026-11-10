@@ -30,6 +30,9 @@ curl -sS -D - -o frame.bin \
 成功应当看到 `HTTP/1.1 200`、`content-length: 45000`、`x-frame-pages: 3`；
 再请求一次（带上 `-H 'if-none-match: "<上一步的 etag>"'`）应当返回 **304**。
 
+已实测（2026-11-10，`fridge-relay.leiwanpan.workers.dev`）：
+`200 / 45000 B / x-frame-pages: 3`，带 ETag 再请求 `304`。
+
 ## 接到设备上
 
 只需要把固件里的入口换成 Worker 地址（其余逻辑完全不变）：
@@ -39,8 +42,11 @@ curl -sS -D - -o frame.bin \
   （固件会自己拼 `?device_id=`，所以基址不要带查询串）
 - 根证书 `FRIDGE_ROOT_CA` 保持不变（上游仍是 supabase 的证书，Worker 透传）
 
-> 注意 Worker 前面的 `?device_id=` 由设备拼接，Worker 原样转发，所以基址形如
-> `https://fridge-relay.xxx.workers.dev` 即可。
+> 两个必须注意的点（都踩过）：
+> 1. 基址**必须以 `/` 结尾**：固件里校验 `base.indexOf('/', 8) >= 0`，写成
+>    `https://fridge-relay.xxx.workers.dev/` 才不会在启动时被判为无效配置。
+> 2. 请求**必须带 User-Agent**：Cloudflare 对无 UA 的请求直接 `403 error code: 1010`。
+>    固件已加 `User-Agent: FridgeDisplay/1.0`（commit `97f20cb`）。
 
 ## 安全边界
 
