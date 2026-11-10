@@ -83,3 +83,11 @@ SYNC result=OK code=304
 - `tools/test-fridge-frame.mjs`、`test-fridge-inventory.mjs`、`test-fridge-snapshot.cjs` 全部 PASS。
 
 取舍待确认：临期只放 2 行（把下半屏让给推荐），推荐只出 1 道。
+
+## 修复：3 页包导致的堆碎片（2026-11-10）
+
+现场串口出现 `HTTPS phase=pack-allocation result=ESP_ERR_NO_MEM`（`code=-15`），堆剩余 124 KB 仍分配不出连续 45 KB。
+原因：每次同步用 `new Pack`（45000 B）申请/释放，与 mbedTLS 缓冲一起造成碎片。
+
+改为**静态下载缓冲** `static Pack incoming`（另一块 45 KB 常驻 BSS），此后 200/304 两条路径都不再动态申请 45 KB。
+代价：静态 RAM 从 20% 升到 **43%**（142 052 B），堆仍余 ~84 KB。重编译烧录后 `SYNC result=OK code=304`、`STATE net=3 http=304`。

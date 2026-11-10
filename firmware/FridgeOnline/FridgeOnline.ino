@@ -32,6 +32,7 @@ GxEPD2_BW<GxEPD2_420c_Z96, GxEPD2_420c_Z96::HEIGHT> display(GxEPD2_420c_Z96(7, 6
 
 struct Pack { uint8_t bytes[PACK_BYTES]; char sha[65]; };
 static Pack current{};
+static Pack incoming{};   // 静态下载缓冲：3 页 45KB，避免每次 new 造成堆碎片（曾出现 ESP_ERR_NO_MEM）
 static QueueHandle_t frames = nullptr;
 static TaskHandle_t workerHandle = nullptr;
 static volatile int netState = 0, httpCode = 0, tlsCode = 0;
@@ -142,8 +143,7 @@ static bool fetchFrame(char* etag) {
     finish("response-rejected", ESP_ERR_INVALID_RESPONSE); return false;
   }
 
-  Pack* received = new (std::nothrow) Pack;
-  if (!received) { httpCode = -15; finish("pack-allocation", ESP_ERR_NO_MEM); return false; }
+  Pack* received = &incoming;
   strlcpy(received->sha, diag.sha, sizeof(received->sha));
   const uint32_t bodyStarted = millis();
   size_t count = 0;
@@ -161,11 +161,11 @@ static bool fetchFrame(char* etag) {
   if (!complete || !valid(*received)) {
     Serial.printf("HTTPS BODY rejected bytes=%u expected=%u complete=%d\n",
                   (unsigned)count, (unsigned)PACK_BYTES, complete);
-    delete received; httpCode = error == ESP_ERR_TIMEOUT ? -17 : -11;
+    httpCode = error == ESP_ERR_TIMEOUT ? -17 : -11;
     finish("body-or-sha", error == ESP_OK ? ESP_ERR_INVALID_CRC : error); return false;
   }
   finish("verified-frame", ESP_OK);
-  if (xQueueSend(frames, &received, 0) != pdTRUE) { delete received; httpCode = -12; return false; }
+  if (xQueueSend(frames, &received, 0) != pdTRUE) { httpCode = -12; return false; }
   strlcpy(etag, diag.sha, 65);
   lastSuccess = millis();
   return true;
@@ -293,7 +293,6 @@ void loop() {
   if (frames && xQueueReceive(frames, &next, 0) == pdTRUE) {
     const bool changed = !hasPack || memcmp(current.sha, next->sha, 65) != 0;
     memcpy(&current, next, sizeof(Pack));
-    delete next;
     hasPack = true;
     if (changed) { cacheSaved = saveCache(); dirty = true; lastInput = millis(); }
   }
