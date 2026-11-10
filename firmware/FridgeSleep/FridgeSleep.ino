@@ -26,7 +26,7 @@
 constexpr size_t PAGE_BYTES = 15000;
 constexpr int PAGE_COUNT = 3;
 constexpr size_t PACK_BYTES = PAGE_BYTES * PAGE_COUNT;
-constexpr uint8_t KEY_PREV = 4, KEY_NEXT = 5;   // 电池版只用这两个键
+constexpr uint8_t KEY_PREV = 4, KEY_NEXT = 5, KEY_SYNC = 13;  // 4/5 可深睡唤醒；13 只能醒着时用
 
 GxEPD2_BW<GxEPD2_420c_Z96, GxEPD2_420c_Z96::HEIGHT> display(GxEPD2_420c_Z96(7, 6, 10, 0));
 
@@ -189,6 +189,7 @@ void setup() {
 
   pinMode(KEY_PREV, INPUT_PULLUP);
   pinMode(KEY_NEXT, INPUT_PULLUP);
+  pinMode(KEY_SYNC, INPUT_PULLUP);
   LittleFS.begin(true);
   const bool haveCache = loadCache();
 
@@ -204,11 +205,27 @@ void setup() {
       next = digitalRead(KEY_NEXT) == LOW;
     }
     Serial.printf("WAKE mask=0x%llx prev=%d next=%d\n", (unsigned long long)mask, prev, next);
-    if (prev && !next) rtcPage = (rtcPage + PAGE_COUNT - 1) % PAGE_COUNT;
-    else if (next && !prev) rtcPage = (rtcPage + 1) % PAGE_COUNT;
-    drawPage(rtcPage);
-    sleepNow();
-    return;
+    // 700ms 观察窗：右键(GPIO13)按下 = 立即刷新；唤醒键一直按住 = 长按刷新
+    bool wantSync = false;
+    uint32_t t0 = millis();
+    while (millis() - t0 < 700) {
+      if (digitalRead(KEY_SYNC) == LOW) { wantSync = true; break; }
+      const bool stillDown = (prev && digitalRead(KEY_PREV) == LOW) || (next && digitalRead(KEY_NEXT) == LOW);
+      if (!stillDown) break;
+      delay(20);
+    }
+    if (!wantSync) {
+      const bool stillDown = (prev && digitalRead(KEY_PREV) == LOW) || (next && digitalRead(KEY_NEXT) == LOW);
+      wantSync = stillDown;                        // 长按 = 刷新
+    }
+    if (!wantSync) {
+      if (prev && !next) rtcPage = (rtcPage + PAGE_COUNT - 1) % PAGE_COUNT;
+      else if (next && !prev) rtcPage = (rtcPage + 1) % PAGE_COUNT;
+      drawPage(rtcPage);
+      sleepNow();
+      return;
+    }
+    Serial.println("WAKE refresh requested");
   }
 
   // ---- 定时唤醒 / 上电：联网同步 ----
@@ -241,13 +258,19 @@ void setup() {
 
   char etag[65] = {};
   if (haveCache) strlcpy(etag, current.sha, 65);
+  const bool manualRefresh = (cause == ESP_SLEEP_WAKEUP_GPIO);
   const int result = fetchFrame(etag);
   if (result == 1) {
     saveCache();
     rtcPage = 0;
     drawPage(0);
   } else if (result == 0) {
-    Serial.println("SYNC unchanged; panel keeps current image");
+    if (manualRefresh) {                 // 手动刷新给个可见反馈：重刷当前页
+      Serial.println("SYNC unchanged; redraw current page as feedback");
+      drawPage(rtcPage);
+    } else {
+      Serial.println("SYNC unchanged; panel keeps current image");
+    }
   } else {
     Serial.println("SYNC failed; panel keeps current image");
   }
