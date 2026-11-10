@@ -244,7 +244,7 @@
   }
 
   /* which ingredients a recipe uses, and how many units of each.
-     Without reliable gram data (only 4 of 20 recipes parse grams), we deduct
+     Without reliable gram data (only 4 of 373 recipes parse grams), we deduct
      one unit per ingredient — and say so in the UI instead of pretending. */
   function consumptionOf(recipe) {
     return recipe.needs.map(cat => ({cat, qty: 1}));
