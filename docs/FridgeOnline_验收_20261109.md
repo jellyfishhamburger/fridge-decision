@@ -91,3 +91,18 @@ SYNC result=OK code=304
 
 改为**静态下载缓冲** `static Pack incoming`（另一块 45 KB 常驻 BSS），此后 200/304 两条路径都不再动态申请 45 KB。
 代价：静态 RAM 从 20% 升到 **43%**（142 052 B），堆仍余 ~84 KB。重编译烧录后 `SYNC result=OK code=304`、`STATE net=3 http=304`。
+
+## 经 Cloudflare Worker 中转（2026-11-10）
+
+`https://fridge-relay.leiwanpan.workers.dev/` 已部署并实测：`200 / 45000 B / x-frame-pages: 3`，带 ETag 再请求 `304`。
+
+设备侧两处必须改动，否则失败：
+
+1. **基址必须以 `/` 结尾**（固件校验 `base.indexOf('/', 8) >= 0`）；
+2. **TLS 根证书换成内置 CA 包**：`*.workers.dev` 的链是 `YE1 → Root YE → ISRG Root X2 → ISRG Root X1`，
+   与 Supabase 的 `GTS Root R4` 不同，pinning 会报 `verify=0x8 / not correctly signed by the trusted CA`。
+   固件现在支持 `FRIDGE_USE_CA_BUNDLE`（`config.crt_bundle_attach`），仍做完整链校验与主机名校验，只是不再 pin 单一根。
+
+实测：`HTTPS http=304 tls=0 verify=0x0 elapsed_ms=5852` → `SLEEP wakes=1 next_wake=900s`。
+
+代价：CA 包让程序占用从 86% 升到 **92%**（1 209 160 / 1 310 720 B）。再加功能需要重分区。

@@ -8,6 +8,7 @@
 #include <mbedtls/sha256.h>
 #include <time.h>
 #include <esp_sleep.h>
+#include <esp_crt_bundle.h>
 #include <driver/gpio.h>
 #include "FridgeHttps.h"
 #include <GxEPD2_BW.h>
@@ -78,7 +79,12 @@ static int fetchFrame(const char* etag) {
 
   esp_http_client_config_t config = {};
   config.url = url.c_str();
+#ifdef FRIDGE_USE_CA_BUNDLE
+  // 中继域名（Cloudflare/Let's Encrypt）与 Supabase 的根证书不同，用内置 CA 包更稳
+  config.crt_bundle_attach = esp_crt_bundle_attach;
+#else
   config.cert_pem = FRIDGE_ROOT_CA;
+#endif
   config.tls_version = ESP_HTTP_CLIENT_TLS_VER_TLS_1_2;
   config.transport_type = HTTP_TRANSPORT_OVER_SSL;
   config.skip_cert_common_name_check = false;
