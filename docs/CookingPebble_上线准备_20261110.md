@@ -68,7 +68,10 @@ arduino-cli compile --fqbn esp32:esp32:esp32c3 \
 | 手机发出「开始做饭」 | `pebble_sessions` 出现 `recipe_id=demo_spinach`，`revision=0` |
 | 旋钮屏显示步骤 | 屏上出现页（用户目视确认） |
 | 旋钮转动 / 短按 | `revision 0 → 9`，`step_index 0 → 2`，`timer_ends_at` 被写入 |
-| 手机侧改步 | `revision` 继续递增，`step_index` 跟随 |
+| 手机侧改步 | 点「上一步」→ `step_index` 2 → **1**，旋钮屏跟随 |
+| 旋钮短按计时 | `timer_ends_at=1794327953814` 写入，`remaining_ms=20000` |
+
+最终实测：`revision=9`、`step_index=1`、`status=cooking`、`timer_ends_at` 有值——两个方向（手机→屏、屏→云端）都验证通过。
 
 接口：`GET /device-api/state`（设备，device_secret 鉴权）与 `POST /rpc/pebble_start|pebble_action|pebble_read`（手机，用户 JWT + 家庭成员校验）。
 
